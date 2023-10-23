@@ -1,0 +1,13 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.VibeCast" parent="Theme.Material3.DayNight.NoActionBar">
+      <item name="colorPrimary">@color/main_text_color</item>
+        <item name="colorSecondary">@color/secondary_text_color</item>
+        <item name="buttonStyle">@color/button_color</item>
+        <item name="navigationRailStyle">@color/navigation_drawer_background</item>
+
+
+    </style>
+
+    <style name="Theme.VibeCast" parent="Base.Theme.VibeCast" />
+</resources>

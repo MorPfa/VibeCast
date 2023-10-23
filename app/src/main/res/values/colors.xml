@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="main_text_color">#C3FFFFFF</color>
+    <color name="secondary_text_color">#8DFFFFFF</color>
+    <color name="button_color">#C3FFFFFF</color>
+    <color name="navigation_drawer_background">#CC000000</color>
+</resources>
