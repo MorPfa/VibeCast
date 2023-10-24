@@ -6,34 +6,37 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity"
     android:background="@drawable/best_winter_aesthetic_phone_wallpaper_in_hd"
+    android:fitsSystemWindows="true"
     >
 
-    <com.google.android.material.appbar.AppBarLayout
 
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        >
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:background="@android:color/transparent">
 
-        <androidx.appcompat.widget.Toolbar
-
+        <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-         >
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"
+            android:background="@android:color/transparent"
+            app:titleTextColor="@android:color/black">
 
+            <!-- Search bar -->
             <androidx.appcompat.widget.SearchView
-                android:background="#80EFECEC"
                 android:id="@+id/searchView"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:iconifiedByDefault="false" />
-
-
-        </androidx.appcompat.widget.Toolbar>
-
-
+                app:iconifiedByDefault="false"
+                app:queryHint="Search"
+                android:textAppearance="@color/white"
+                android:background="@drawable/semi_transparent_rounded_searchview_background"
+                app:queryBackground="@android:color/transparent" />
+        </com.google.android.material.appbar.MaterialToolbar>
     </com.google.android.material.appbar.AppBarLayout>
+
 
     <include layout="@layout/content_main" />
 
