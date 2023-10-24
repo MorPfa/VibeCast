@@ -1,18 +1,18 @@
 <resources>
     <string name="app_name">VibeCast</string>
 
-<!--    Search bar-->
+    <!--    Search bar-->
     <string name="search_bar_text">Search for city</string>
-<!--    Weather info underneath music widget-->
+    <!--    Weather info underneath music widget-->
     <string name="left_weather_metrics">Rainy-8 AM -8C</string>
     <string name="center_weather_metrics">Rainy-9 AM -9C</string>
     <string name="right_weather_metrics">Rainy-10 AM -11C</string>
 
-<!--    Main temperature display-->
+    <!--    Main temperature display-->
     <string name="center_temperature_text">12</string>
     <string name="left_location_text">Seattle - United States</string>
 
-<!--    Air Quality widget-->
+    <!--    Air Quality widget-->
     <string name="air_quality">Air Quality</string>
     <string name="feels_like">Feels like</string>
     <string name="feels_like_value">13</string>
@@ -27,10 +27,10 @@
     <string name="o3">o3</string>
     <string name="o3_value">54</string>
 
-<!--    Bottom row weather metrics-->
+    <!--    Bottom row weather metrics-->
     <string name="humidity">Humidty</string>
 
-<!--    Navigation Drawer Items-->
+    <!--    Navigation Drawer Items-->
     <string name="my_account">My Account</string>
     <string name="pictures">Pictures</string>
     <string name="settings">Settings</string>
@@ -38,12 +38,28 @@
     <string name="username">Username</string>
     <string name="email">user@useremail.com</string>
 
-<!--    Picture gallery-->
+    <!--    Picture gallery-->
     <string name="header">Header</string>
     <string name="sub_head">Subhead</string>
     <string name="title">Title</string>
     <string name="sub_title">Subtitle</string>
     <string name="description">Description</string>
     <string name="remove_btn_text">Remove</string>
+    <!-- TODO: Remove or change this placeholder text -->
+
+    <string name="users_profile_picture">Users Profile picture</string>
+    <string name="account">Account</string>
+    <string name="title_activity_main2">MainActivity2</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="menu_home">Home</string>
+    <string name="menu_gallery">Gallery</string>
+    <string name="menu_slideshow">Slideshow</string>
+    <string name="title_activity_home">HomeActivity</string>
 
 </resources>
