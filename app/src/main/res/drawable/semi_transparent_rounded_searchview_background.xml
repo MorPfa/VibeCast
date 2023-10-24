@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Background shape -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#33000000" /> <!-- Semi-transparent color (adjust alpha) -->
+            <corners android:radius="150dp" /> <!-- Radius for rounded corners -->
+        </shape>
+    </item>
+    <!-- Your original drawable (rounded rectangle) -->
+    <item android:drawable="@drawable/rounded_searchview_background" />
+</layer-list>
