@@ -319,7 +319,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Row 1, Text 1"
+                    android:text="@string/feels_like"
                     android:textColor="#000000"
                     android:textSize="14sp" />
 
@@ -327,7 +327,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Row 1, Text 2"
+                    android:text="@string/wind_speed"
                     android:textColor="#000000"
                     android:textSize="14sp" />
 
@@ -335,7 +335,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Row 1, Text 3"
+                    android:text="@string/So2"
                     android:textColor="#000000"
                     android:textSize="14sp" />
             </LinearLayout>
@@ -350,7 +350,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Row 2, Text 1"
+                    android:text="@string/chance_of_rain"
                     android:textColor="#000000"
                     android:textSize="14sp" />
 
@@ -358,7 +358,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Row 2, Text 2"
+                    android:text="@string/uv_index"
                     android:textColor="#000000"
                     android:textSize="14sp" />
 
@@ -366,7 +366,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Row 2, Text 3"
+                    android:text="@string/o3"
                     android:textColor="#000000"
                     android:textSize="14sp" />
             </LinearLayout>
@@ -374,6 +374,45 @@
     </androidx.cardview.widget.CardView>
 
 
+
+
+    <LinearLayout
+        android:id="@+id/bottom_row_titles"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@id/linearLayout2">
+
+        <TextView
+            android:id="@+id/bottom_humidity_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Humidity"
+            android:textAlignment="center"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/bottom_chance_of_rain_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Chance of rain"
+            android:textAlignment="center"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/bottom_uv_index_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="UV Index"
+            android:textAlignment="center"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold" />
+    </LinearLayout>
     <LinearLayout
         android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
