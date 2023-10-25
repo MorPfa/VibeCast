@@ -5,16 +5,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
-    android:background="@drawable/best_winter_aesthetic_phone_wallpaper_in_hd"
     android:fitsSystemWindows="true"
+
     >
 
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        android:background="@android:color/transparent">
+        android:background="@android:color/transparent"
+        android:theme="@style/Theme.VibeCast.NoActionBar"
+      >
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"

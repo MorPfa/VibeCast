@@ -51,11 +51,20 @@ android {
 }
 
 dependencies {
+
+
+//    Spotify
+    implementation ("com.spotify.android:auth:1.2.3")
+
+//    Navigation
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.4")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.4")
     val room_version = "2.6.0"
     val lifecycle_version = "2.6.2"
     val work_version = "2.8.1"
+
+
+
 
 //    Work manager
     implementation("androidx.work:work-runtime-ktx:$work_version")
