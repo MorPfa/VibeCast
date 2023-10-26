@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/main_widget"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        app:cardBackgroundColor="#4A4747"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="2dp"
+        app:contentPadding="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_row"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/location_display">
+
+<!--    <TextView-->
+<!--        android:id="@+id/air_quality"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="@string/air_quality"-->
+<!--        android:textColor="#000000"-->
+<!--        android:textSize="16sp"-->
+<!--        android:textStyle="bold" />-->
+
+    <GridLayout
+        android:elevation="2dp"
+        android:background="#4A4747"
+        android:padding="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:columnCount="3"
+        android:rowCount="4">
+
+        <!-- Row 1 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/feels_like"
+            android:textAlignment="textStart"
+            android:textColor="#000000"
+            android:textSize="14sp"
+            android:layout_columnWeight="1" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/wind_speed"
+            android:textAlignment="textStart"
+            android:textColor="#000000"
+            android:textSize="14sp"
+            android:layout_columnWeight="1" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/So2"
+            android:textColor="#000000"
+            android:textSize="14sp"
+            android:textAlignment="textStart"
+            android:layout_columnWeight="1" />
+
+        <!-- Row 2 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="13"
+            android:textColor="#000000"
+            android:textSize="14sp"
+            android:textAlignment="textStart"
+            android:layout_columnWeight="1" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="12kmh"
+            android:textColor="#000000"
+            android:textSize="14sp"
+            android:textAlignment="textStart"
+            android:layout_columnWeight="1" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0.9"
+            android:textColor="#000000"
+            android:textSize="14sp"
+            android:textAlignment="textStart"
+            android:layout_columnWeight="1" />
+
+        <!-- Row 3 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/chance_of_rain"
+            android:paddingTop="20dp"
+            android:textColor="#000000"
+            android:textSize="14sp"
+            android:textAlignment="textStart"
+            android:layout_columnWeight="1" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/uv_index"
+            android:paddingTop="20dp"
+            android:textColor="#000000"
+            android:textSize="14sp"
+            android:textAlignment="textStart"
+            android:layout_columnWeight="1" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/o3"
+            android:paddingTop="20dp"
+            android:textColor="#000000"
+            android:textSize="14sp"
+            android:textAlignment="textStart"
+            android:layout_columnWeight="1" />
+
+        <!-- Row 4 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="88%"
+            android:textColor="#000000"
+            android:textSize="14sp"
+            android:textAlignment="textStart"
+            android:layout_columnWeight="1" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="3"
+            android:textColor="#000000"
+            android:textSize="14sp"
+            android:textAlignment="textStart"
+            android:layout_columnWeight="1" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="54"
+            android:textColor="#000000"
+            android:textSize="14sp"
+            android:textAlignment="textStart"
+            android:layout_columnWeight="1" />
+    </GridLayout>
+
+
+</androidx.cardview.widget.CardView>
+
