@@ -61,5 +61,6 @@
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
     <string name="title_activity_home">HomeActivity</string>
+    <string name="next_screen_forward_message">Button to go to the screen to the right which holds another locations weather data if saved</string>
 
 </resources>

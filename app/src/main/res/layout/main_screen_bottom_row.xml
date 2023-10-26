@@ -1,18 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    >
+
 
     <LinearLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/bottom_row"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:paddingTop="20dp"
         android:layout_marginStart="60dp"
-        android:layout_marginBottom="14dp"
+        android:layout_marginBottom="36dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <LinearLayout
@@ -26,7 +23,8 @@
                 android:id="@+id/bottom_humidity_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Humidity"
+                android:text="@string/humidity"
+                android:textSize="15sp"
                 android:textAlignment="textStart"
                 android:textColor="#FFFFFF"
                 android:textStyle="bold" />
@@ -36,6 +34,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="54%"
+                android:textSize="20sp"
                 android:textAlignment="textStart"
                 android:textColor="#FFFFFF"
                 android:textStyle="bold" />
@@ -53,8 +52,9 @@
                 android:id="@+id/bottom_chance_of_rain_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Chance of rain"
+                android:text="@string/chance_of_rain"
                 android:textAlignment="textStart"
+                android:textSize="15sp"
                 android:textColor="#FFFFFF"
                 android:textStyle="bold" />
 
@@ -63,6 +63,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="88%"
+                android:textSize="20sp"
                 android:textAlignment="textStart"
                 android:textColor="#FFFFFF"
                 android:textStyle="bold" />
@@ -81,7 +82,8 @@
                 android:id="@+id/bottom_uv_index_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="UV Index"
+                android:text="@string/uv_index"
+                android:textSize="15sp"
                 android:textAlignment="textStart"
                 android:textColor="#FFFFFF"
                 android:textStyle="bold" />
@@ -91,6 +93,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="3"
+                android:textSize="20sp"
                 android:textAlignment="textStart"
                 android:textColor="#FFFFFF"
                 android:textStyle="bold" />
@@ -99,4 +102,3 @@
         </LinearLayout>
     </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
