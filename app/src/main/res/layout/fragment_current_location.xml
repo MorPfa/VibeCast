@@ -14,6 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
+        android:paddingTop="5dp"
         app:cardBackgroundColor="#4A4747"
         app:cardCornerRadius="16dp"
         app:cardElevation="0dp"
@@ -91,21 +92,50 @@
         </RelativeLayout>
     </androidx.cardview.widget.CardView>
 
-
-
-    <TextView
-        android:id="@+id/main_temp_display"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
-        android:text="12"
-        android:textSize="50sp"
-        android:textColor="#FFFFFF"
-        android:textStyle="bold"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_marginTop="50dp"
+        app:layout_constraintBottom_toTopOf="@id/location_display"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/center_temp_row" />
+        app:layout_constraintTop_toBottomOf="@+id/center_temp_row" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/main_temp_display"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="12"
+                android:layout_marginStart="130dp"
+                android:textColor="#FFFFFF"
+                android:textSize="108sp"
+
+                />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/next_screen_button_right"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="60dp"
+                android:layout_marginTop="10dp"
+                android:background="@android:color/transparent"
+                app:icon="@drawable/next_screen_forward"
+                app:iconSize="60dp"
+                android:contentDescription="@string/next_screen_forward_message"/>
+
+
+        </LinearLayout>
+
+
+
 
     <TextView
         android:id="@+id/location_display"
@@ -113,11 +143,9 @@
         android:layout_height="wrap_content"
         android:text="seattle - United States"
         android:textColor="#FFFFFF"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/main_temp_display" />
+       />
+
+    </LinearLayout>
 
     <include
         android:id="@+id/center_temp_row"
