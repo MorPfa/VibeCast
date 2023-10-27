@@ -1,10 +1,10 @@
 package app.vibecast.presentation.navigation
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import app.vibecast.R
 import app.vibecast.databinding.FragmentAccountBinding
 
@@ -15,7 +15,7 @@ private const val ARG_PARAM2 = "param2"
 
 /**
  * A simple [Fragment] subclass.
- * Use the [CurrentLocationFragment.newInstance] factory method to
+ * Use the [AccountFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
 class AccountFragment : Fragment() {
@@ -35,11 +35,10 @@ class AccountFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
         binding = FragmentAccountBinding.inflate(inflater,container,false)
 
-        // Inflate the layout for this fragment
         return binding.root
+
     }
 
     companion object {

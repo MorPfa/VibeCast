@@ -13,6 +13,9 @@
         <!-- This is where you should define the status bar attributes -->
 
         <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowTranslucentStatus" >true</item>
+        <item name="colorPrimary">@android:color/transparent</item>
+
     </style>
 
     <style name="Theme.VibeCast.NoActionBar">
@@ -20,6 +23,11 @@
         <item name="windowNoTitle">true</item>
 
     </style>
+
+<!--    <style name="Theme.VibeCast.SecondaryNav">-->
+<!--        <item name="android:statusBarColor">@drawable/generic_background</item>-->
+
+<!--    </style>-->
 
     <style name="Theme.VibeCast.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 

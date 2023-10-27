@@ -4,7 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment.Companion.findNavController
+import app.vibecast.MainActivity
+import app.vibecast.R
 import app.vibecast.databinding.FragmentCurrentLocationBinding
 
 // TODO: Rename parameter arguments, choose names that match
@@ -37,10 +42,10 @@ class CurrentLocationFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentCurrentLocationBinding.inflate(inflater,container,false)
+//        (requireActivity() as AppCompatActivity).setSupportActionBar(binding.toolbar2)
 
         return binding.root
     }
-
 
 
 
