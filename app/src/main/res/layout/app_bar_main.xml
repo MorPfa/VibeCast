@@ -10,11 +10,11 @@
     >
 
 
+
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
-        android:theme="@style/Theme.VibeCast.NoActionBar"
       >
 
         <com.google.android.material.appbar.MaterialToolbar

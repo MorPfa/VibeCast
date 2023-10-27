@@ -9,12 +9,18 @@
     <fragment
         android:id="@+id/nav_home"
         android:name="app.vibecast.presentation.CurrentLocationFragment"
-        tools:layout="@layout/fragment_current_location" />
+        tools:layout="@layout/fragment_current_location" >
 
-    <fragment
+</fragment>
+
+
+<fragment
         android:id="@+id/nav_account"
         android:name="app.vibecast.presentation.navigation.AccountFragment"
-        tools:layout="@layout/fragment_account" />
+        tools:layout="@layout/fragment_account">
+
+</fragment>
+
 
     <fragment
         android:id="@+id/nav_pictures"
