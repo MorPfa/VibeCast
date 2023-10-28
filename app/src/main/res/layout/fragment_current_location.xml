@@ -10,14 +10,24 @@
     tools:context=".presentation.CurrentLocationFragment">
 
 
-<include layout="@layout/music_widget"
+<include
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+     layout="@layout/music_widget"
     app:layout_constraintBottom_toTopOf="@id/center_temp_row"/>
+
+    <include
+        android:id="@+id/center_temp_row"
+        layout="@layout/center_temp_row"
+        app:layout_constraintBottom_toTopOf="@id/temp_location_display"/>
+
 
     <LinearLayout
         android:id="@+id/temp_location_display"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
+        android:layout_marginVertical="56dp"
         android:gravity="center"
         android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@id/main_weather_widget"
@@ -62,13 +72,11 @@
         app:layout_constraintTop_toTopOf="@+id/temp_location_display" />
 
 
-    <include
-        android:id="@+id/center_temp_row"
-        layout="@layout/center_temp_row" />
 
     <include
         android:id="@+id/main_weather_widget"
-        layout="@layout/main_screen_weather_widget" />
+        layout="@layout/main_screen_weather_widget"
+        app:layout_constraintTop_toBottomOf="@id/temp_location_display"/>
 
 
     <include layout="@layout/main_screen_bottom_row" />
