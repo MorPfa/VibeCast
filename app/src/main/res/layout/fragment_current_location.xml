@@ -1,97 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:id="@+id/constraintLayout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/osman_rana_gxezuwo5m4i_unsplash2"
     tools:context=".presentation.CurrentLocationFragment">
 
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/musicControlWidget"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:paddingTop="50dp"
-        app:cardBackgroundColor="#4A4747"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="0dp"
-        app:layout_constraintBottom_toTopOf="@id/center_temp_row">
-
-
-        <RelativeLayout
-            android:id="@+id/relativeLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageView
-                android:id="@+id/albumArtImageView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:adjustViewBounds="true"
-                android:scaleType="centerCrop" />
-
-            <TextView
-                android:id="@+id/songTitleTextView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/albumArtImageView"
-                android:layout_marginTop="16dp"
-                android:text="Song Title"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/artistNameTextView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/songTitleTextView"
-                android:layout_marginTop="8dp"
-                android:text="Artist Name"
-                android:textSize="14sp" />
-
-            <ProgressBar
-                android:id="@+id/progressBar"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/artistNameTextView"
-                android:layout_marginTop="16dp"
-                android:max="100"
-                android:progress="50" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/progressBar"
-                android:layout_marginTop="16dp"
-                android:gravity="center_horizontal">
-
-                <ImageButton
-                    android:id="@+id/rewindButton"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp" />
-
-                <ImageButton
-                    android:id="@+id/playPauseButton"
-                    android:layout_width="72dp"
-                    android:layout_height="72dp" />
-
-                <ImageButton
-                    android:id="@+id/forwardButton"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp" />
-            </LinearLayout>
-        </RelativeLayout>
-    </androidx.cardview.widget.CardView>
+<include layout="@layout/music_widget"
+    app:layout_constraintBottom_toTopOf="@id/center_temp_row"/>
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:id="@+id/temp_location_display"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="50dp"
         android:gravity="center"
@@ -101,36 +25,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/center_temp_row">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal">
+
 
             <TextView
                 android:id="@+id/main_temp_display"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="130dp"
-                android:text="12"
+                android:text="12°"
                 android:textColor="#FFFFFF"
                 android:textSize="108sp"
 
                 />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/next_screen_button_right"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="60dp"
-                android:layout_marginTop="10dp"
-                android:background="@android:color/transparent"
-                android:contentDescription="@string/next_screen_forward_message"
-                app:icon="@drawable/next_screen_forward"
-                app:iconSize="60dp" />
-
-
-        </LinearLayout>
 
 
         <TextView
@@ -141,6 +47,19 @@
             android:textColor="#FFFFFF" />
 
     </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/next_screen_button_right"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/next_screen_forward_message"
+        app:icon="@drawable/next_screen_forward"
+        app:iconSize="60dp"
+        app:layout_constraintBottom_toTopOf="@+id/main_weather_widget"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/temp_location_display"
+        app:layout_constraintTop_toTopOf="@+id/temp_location_display" />
 
 
     <include

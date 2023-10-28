@@ -10,8 +10,12 @@
 
     <item
         android:id="@+id/action_search"
-        android:title="Search"
+        android:title="@string/search_bar_text"
         android:icon="@drawable/ic_search"
+        android:actionLayout="@layout/custom_searchview"
         app:showAsAction="ifRoom"
         app:actionViewClass="androidx.appcompat.widget.SearchView" />
+
+
+
 </menu>
