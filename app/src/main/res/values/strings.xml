@@ -62,5 +62,7 @@
     <string name="menu_slideshow">Slideshow</string>
     <string name="title_activity_home">HomeActivity</string>
     <string name="next_screen_forward_message">Button to go to the screen to the right which holds another locations weather data if saved</string>
+    <string name="lorem_ipusm">Lorem ipsum dolor sit amet, consectetur adipiscing elit. </string>
+    <string name="remove_btn">Remove</string>
 
 </resources>
