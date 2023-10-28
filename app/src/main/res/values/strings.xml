@@ -9,7 +9,7 @@
     <string name="right_weather_metrics">Rainy-10 AM -11C</string>
 
     <!--    Main temperature display-->
-    <string name="center_temperature_text">12</string>
+    <string name="center_temperature_text">%1$s°</string>
     <string name="left_location_text">Seattle - United States</string>
 
     <!--    Air Quality widget-->
