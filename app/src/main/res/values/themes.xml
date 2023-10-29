@@ -11,7 +11,12 @@
 
     </style>
 
+    <style name="SwitchTheme" >
+        <!-- Customize the colorAccent attribute to change the switch color -->
+        <item name="colorAccent">#181819</item> <!-- Turquoise color for the switch -->
 
+        <!-- Other theme attributes as needed -->
+    </style>
 
 <!--    <style name="Theme.VibeCast.NoActionBar">-->
 <!--        <item name="windowActionBar">false</item>-->
