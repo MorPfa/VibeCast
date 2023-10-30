@@ -120,6 +120,13 @@ dependencies {
     testImplementation ("org.mockito:mockito-core:5.5.0")
     testImplementation ("org.mockito.kotlin:mockito-kotlin:4.1.0")
 
+    //Dagger Hilt Test
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.48")
+
+    //Coroutine Test
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.1")
+
+
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 }
