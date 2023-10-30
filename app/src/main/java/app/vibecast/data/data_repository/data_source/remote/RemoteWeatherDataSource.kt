@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface RemoteWeatherDataSource {
 
-    fun getCity() : Flow<CoordinateApiModel>
+    fun getCity(name : String) : Flow<CoordinateApiModel>
 
     fun getWeather() : Flow<Weather>
 }

@@ -20,8 +20,8 @@ import javax.inject.Inject
 class RemoteWeatherDataSourceImpl @Inject constructor(private val weatherService: WeatherService) : RemoteWeatherDataSource {
 
 
-    override fun getCity(): Flow<CoordinateApiModel> = flow{
-        emit(weatherService.getCiyCoordinates("stub",1,"stub"))
+    override fun getCity(name : String): Flow<CoordinateApiModel> = flow{
+        emit(weatherService.getCiyCoordinates(name,1,"stub"))
         //So far only using placeholder values
         //TODO add real values / figure out where or how to pass them
     }
