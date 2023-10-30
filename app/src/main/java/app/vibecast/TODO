@@ -1,3 +1,5 @@
-Give hosting activity the background and set fragments background to transparent
-Experiment with themes to apply to fragments to fix status bar and search bar
-set background color for secondary screen when navigated to
+Develop database schema for cached weather data
+add usescases for weather
+figure out parameters for for functions related to caching weather data
+add api key to proguard
+write unit tests
