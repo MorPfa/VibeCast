@@ -13,6 +13,7 @@ class CreateFakeWeather {
         val random = Random
 
         // Generate random latitude and longitude values
+        val cityName = " London"
         val latitude = random.nextDouble(-90.0, 90.0)
         val longitude = random.nextDouble(-180.0, 180.0)
 
@@ -58,7 +59,7 @@ class CreateFakeWeather {
             )
         }
 
-        return Weather(latitude, longitude, currentWeather, hourlyWeather)
+        return Weather(cityName, latitude, longitude, currentWeather, hourlyWeather)
     }
 
 }

@@ -1,20 +1,42 @@
 package app.vibecast.data.local.source
 
 import app.vibecast.data.data_repository.data_source.local.LocalWeatherDataSource
-import app.vibecast.data.data_repository.data_source.remote.RemoteWeatherDataSource
-import app.vibecast.data.remote.network.weather.WeatherService
+import app.vibecast.data.local.db.weather.WeatherDao
+import app.vibecast.data.local.db.weather.WeatherEntity
 import app.vibecast.domain.entity.Weather
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 //TODO add userDao to constructor
-class LocalWeatherDataSourceImpl @Inject constructor( ) :
+class LocalWeatherDataSourceImpl @Inject constructor(private val weatherDao: WeatherDao ) :
     LocalWeatherDataSource {
-    override fun getWeather(id: Int): Flow<Weather> {
-        TODO("Not yet implemented")
+    override fun getWeather(cityName: String): Flow<Weather> = weatherDao.getWeather(cityName).map {
+            weatherEntity -> weatherEntity.toWeather()
     }
 
-    override suspend fun addWeather(cityName: String) {
-        TODO("Not yet implemented")
+    override suspend fun addWeather(cityName : String, weather : Weather) {
+       weatherDao.addWeather(weather.toWeatherEntity(cityName))
     }
+
+
+    private fun WeatherEntity.toWeather(): Weather {
+        return Weather(
+            cityName = cityName,
+            latitude = weatherData.latitude,
+            longitude = weatherData.longitude,
+            currentWeather = weatherData.currentWeather,
+            hourlyWeather = weatherData.hourlyWeather
+        )
+    }
+    private fun Weather.toWeatherEntity(cityName: String): WeatherEntity {
+        return WeatherEntity(
+            cityName = cityName,
+            weatherData = this
+        )
+    }
+
+
+
+
 }

@@ -43,6 +43,7 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
     //Converting Api response data to domain layer entity
     fun WeatherApiModel.toWeather(): Weather {
         return Weather(
+            cityName =cityName,
             latitude = latitude,
             longitude = longitude,
             currentWeather = currentWeatherRemote.toCurrentWeather(),

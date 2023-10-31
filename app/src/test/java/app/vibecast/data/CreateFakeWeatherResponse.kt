@@ -18,6 +18,7 @@ class CreateFakeWeatherResponse {
         val random = Random
 
         // Generate random latitude and longitude values
+        val cityName = "London"
         val latitude = random.nextDouble(-90.0, 90.0)
         val longitude = random.nextDouble(-180.0, 180.0)
 
@@ -63,6 +64,6 @@ class CreateFakeWeatherResponse {
             )
         }
 
-        return WeatherApiModel(latitude, longitude, currentWeatherRemote, hourlyWeatherRemotes)
+        return WeatherApiModel(cityName, latitude, longitude, currentWeatherRemote, hourlyWeatherRemotes)
     }
 }
