@@ -1,4 +1,4 @@
-
+import org.jetbrains.kotlin.konan.properties.Properties
 
 plugins {
     id("com.android.application")
@@ -19,6 +19,15 @@ android {
         targetSdk = 33
         versionCode = 1
         versionName = "1.0"
+        val keystoreFile = project.rootProject.file("apikeys.properties")
+        val properties = Properties()
+        properties.load(keystoreFile.inputStream())
+        val apiKey = properties.getProperty("OWM_KEY") ?: ""
+        buildConfigField(
+            type = "String",
+            name = "OWM_KEY",
+            value = apiKey
+        )
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -26,6 +35,7 @@ android {
     buildFeatures{
         viewBinding = true
         dataBinding = true
+        buildConfig = true
     }
 
     buildTypes {

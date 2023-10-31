@@ -2,3 +2,4 @@ Develop database schema for cached weather data
 figure out parameters for for functions related to caching weather data
 add api key to proguard
 write unit tests
+add apikeys.properties to .gitignore

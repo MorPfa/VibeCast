@@ -24,10 +24,11 @@ class WeatherRepositoryImplTest {
     @ExperimentalCoroutinesApi
     @Test
     fun testGetWeather() = runTest {
+        val cityName = "London"
         val weather = CreateFakeWeather().createFakeWeather()
-        whenever(remoteWeatherDataSource.getWeather()).thenReturn(flowOf(weather))
-        val result = repositoryImpl.getWeather(0).first()
+        whenever(remoteWeatherDataSource.getWeather(cityName)).thenReturn(flowOf(weather))
+        val result = repositoryImpl.getWeather(cityName).first()
         assertEquals(weather, result)
-        verify(localWeatherDataSource).addWeather(0)
+        verify(localWeatherDataSource).addWeather(cityName)
     }
 }

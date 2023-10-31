@@ -12,9 +12,9 @@ class WeatherRepositoryImpl @Inject constructor(
     private val remoteWeatherDataSource: RemoteWeatherDataSource,
     private val localWeatherDataSource: LocalWeatherDataSource
 ) : WeatherRepository{
-    override fun getWeather(id : Int ): Flow<Weather> = remoteWeatherDataSource.getWeather()
+    override fun getWeather(cityName : String): Flow<Weather> = remoteWeatherDataSource.getWeather(cityName)
         .onEach {
-            localWeatherDataSource.addWeather(id)
+            localWeatherDataSource.addWeather(cityName)
         }
 //TODO Once workmanager is implemented add refresh weather function to do what getWeather does right now and change getweather to only use the locally persisted data
 

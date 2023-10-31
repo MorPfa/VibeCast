@@ -13,11 +13,11 @@ class GetWeatherUseCase @Inject constructor(
 ) : UseCase<GetWeatherUseCase.Request , GetWeatherUseCase.Response>(configuration){
 
     override fun process(request: Request): Flow<Response> =
-        weatherRepository.getWeather(request.weatherDataId)
+        weatherRepository.getWeather(request.weatherDataCityName)
             .map {
                 Response(it)
             }
 
-    data class Request(val weatherDataId: Int) : UseCase.Request
+    data class Request(val weatherDataCityName: String) : UseCase.Request
     data class Response(val weather: Weather) : UseCase.Response
 }

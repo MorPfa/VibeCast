@@ -20,9 +20,9 @@ class GetWeatherUseCaseTest {
     @ExperimentalCoroutinesApi
     @Test
     fun testProcess()= runTest {
-        val request = GetWeatherUseCase.Request(0)
+        val request = GetWeatherUseCase.Request("London")
         val fakeWeather = CreateFakeWeather().createFakeWeather()
-        whenever(weatherRepository.getWeather(request.weatherDataId)).thenReturn(flowOf(fakeWeather))
+        whenever(weatherRepository.getWeather(request.weatherDataCityName)).thenReturn(flowOf(fakeWeather))
         val response = useCase.process(request).first()
         assertEquals(GetWeatherUseCase.Response(fakeWeather),response)
     }

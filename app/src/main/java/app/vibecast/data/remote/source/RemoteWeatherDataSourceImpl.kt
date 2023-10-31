@@ -1,5 +1,6 @@
 package app.vibecast.data.remote.source
 
+import app.vibecast.BuildConfig
 import app.vibecast.data.data_repository.data_source.remote.RemoteWeatherDataSource
 import app.vibecast.data.remote.network.weather.CoordinateApiModel
 import app.vibecast.data.remote.network.weather.CurrentWeatherRemote
@@ -9,32 +10,33 @@ import app.vibecast.data.remote.network.weather.WeatherConditionRemote
 import app.vibecast.data.remote.network.weather.WeatherService
 import app.vibecast.domain.entity.CurrentWeather
 import app.vibecast.domain.entity.HourlyWeather
+import app.vibecast.domain.entity.UseCaseException
 import app.vibecast.domain.entity.Weather
 import app.vibecast.domain.entity.WeatherCondition
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class RemoteWeatherDataSourceImpl @Inject constructor(private val weatherService: WeatherService) : RemoteWeatherDataSource {
+class RemoteWeatherDataSourceImpl @Inject constructor(
+    private val weatherService: WeatherService) : RemoteWeatherDataSource {
 
 
     override fun getCity(name : String): Flow<CoordinateApiModel> = flow{
-        emit(weatherService.getCiyCoordinates(name,1,"stub"))
-        //So far only using placeholder values
-        //TODO add real values / figure out where or how to pass them
-    }
+        emit(weatherService.getCiyCoordinates(name,1,BuildConfig.OWM_KEY))
 
-    override fun getWeather(): Flow<Weather> = flow {
-        //So far only using placeholder values
-        //TODO add real values / figure out where or how to pass them
-        emit(weatherService.getWeather(1.0,1.0,"stub"))
+    }
+    override fun getWeather(name: String): Flow<Weather> = flow {
+        val coordinates = weatherService.getCiyCoordinates(name,1, BuildConfig.OWM_KEY)
+        val weatherData = weatherService.getWeather(coordinates.latitude, coordinates.longitude, BuildConfig.OWM_KEY)
+        emit(weatherData)
     }.map {weatherApiModel ->
         weatherApiModel.toWeather()
-        //TODO throw exception in case of error
+    }.catch {
+        throw UseCaseException.WeatherException(it)
     }
-
 
 
     companion object {
