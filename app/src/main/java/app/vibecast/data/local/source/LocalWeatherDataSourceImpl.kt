@@ -10,14 +10,11 @@ import javax.inject.Inject
 //TODO add userDao to constructor
 class LocalWeatherDataSourceImpl @Inject constructor( ) :
     LocalWeatherDataSource {
-
-    override fun getWeather(id : Int): Flow<Weather> {
+    override fun getWeather(id: Int): Flow<Weather> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun addWeather(id: Int) {
+    override suspend fun addWeather(cityName: String) {
         TODO("Not yet implemented")
     }
-
-
 }
