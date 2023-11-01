@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-
 <LinearLayout
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -34,7 +33,7 @@
                 android:id="@+id/bottom_humidity_display"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="54%"
+                android:text="@string/humidity"
                 android:textSize="20sp"
                 android:textAlignment="textStart"
                 android:textColor="#FFFFFF"
@@ -63,7 +62,7 @@
                 android:id="@+id/bottom_chance_of_rain_display"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="88%"
+                android:text="@string/chance_of_rain_value"
                 android:textSize="20sp"
                 android:textAlignment="textStart"
                 android:textColor="#FFFFFF"
@@ -93,7 +92,7 @@
                 android:id="@+id/bottom_uv_index_display"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="3"
+                android:text="@string/uv_index_value"
                 android:textSize="20sp"
                 android:textAlignment="textStart"
                 android:textColor="#FFFFFF"

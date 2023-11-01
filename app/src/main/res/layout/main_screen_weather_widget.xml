@@ -58,7 +58,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/So2"
+            android:text="@string/visibility"
             android:textColor="#000000"
             android:textSize="14sp"
             android:textAlignment="textStart"
@@ -66,27 +66,30 @@
 
         <!-- Row 2 -->
         <TextView
+            android:id="@+id/feels_like_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="13"
+            android:text="@string/feels_like_value"
             android:textColor="#000000"
             android:textSize="14sp"
             android:textAlignment="textStart"
             android:layout_columnWeight="1" />
 
         <TextView
+            android:id="@+id/wind_speed_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="12kmh"
+            android:text="@string/wind_speed_value"
             android:textColor="#000000"
             android:textSize="14sp"
             android:textAlignment="textStart"
             android:layout_columnWeight="1" />
 
         <TextView
+            android:id="@+id/visibility_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="0.9"
+            android:text="@string/visibility_value"
             android:textColor="#000000"
             android:textSize="14sp"
             android:textAlignment="textStart"
@@ -125,27 +128,30 @@
 
         <!-- Row 4 -->
         <TextView
+            android:id="@+id/chance_of_rain_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="88%"
+            android:text="@string/chance_of_rain_value"
             android:textColor="#000000"
             android:textSize="14sp"
             android:textAlignment="textStart"
             android:layout_columnWeight="1" />
 
         <TextView
+            android:id="@+id/uv_index_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="3"
+            android:text="@string/uv_index_value"
             android:textColor="#000000"
             android:textSize="14sp"
             android:textAlignment="textStart"
             android:layout_columnWeight="1" />
 
         <TextView
+            android:id="@+id/humidty_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="54"
+            android:text="@string/humidity"
             android:textColor="#000000"
             android:textSize="14sp"
             android:textAlignment="textStart"

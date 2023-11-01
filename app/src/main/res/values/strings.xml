@@ -7,9 +7,9 @@
 
 
     <!--    Weather info underneath music widget-->
-    <string name="left_weather_condition"></string>
-    <string name="left_time"></string>
-    <string name="left_temp">%1$s°</string>
+    <string name="left_weather_condition">%1$s</string>
+    <string name="left_time">%1$d</string>
+    <string name="left_temp">%1$d°</string>
 
 
 
@@ -28,25 +28,23 @@
 
     <!--    Main temperature display-->
     <string name="center_temperature_text">%1$s°</string>
-    <string name="left_location_text">Seattle - United States</string>
+    <string name="center_location_text">%1$s°</string>
 
     <!--    Air Quality widget-->
     <string name="air_quality">Air Quality</string>
     <string name="feels_like">Feels like</string>
     <string name="feels_like_value">13</string>
     <string name="wind_speed">Wind Speed</string>
-    <string name="wind_speed_value">12km/h</string>
-    <string name="So2">SO2</string>
-    <string name="So2_value">0.9</string>
+    <string name="wind_speed_value"></string>
+    <string name="visibility">Visibility</string>
+    <string name="visibility_value"></string>
     <string name="chance_of_rain">Chance of rain</string>
-    <string name="chance_of_rain_value">88%</string>
+    <string name="chance_of_rain_value">%d%%</string>
     <string name="uv_index">UV index</string>
-    <string name="uv_index_value">3</string>
+    <string name="uv_index_value"></string>
     <string name="o3">o3</string>
     <string name="o3_value">54</string>
-
-    <!--    Bottom row weather metrics-->
-    <string name="humidity">Humidty</string>
+    <string name="humidity"></string>
 
     <!--    Navigation Drawer Items-->
     <string name="my_account">My Account</string>

@@ -1,6 +1,4 @@
 
-implement viewmodel
-configure strings resources to hold values
+fix viewmodel
 pass string resources into converter
 write unit tests for presentation
-add apikeys.properties to .gitignore

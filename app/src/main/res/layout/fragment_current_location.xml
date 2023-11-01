@@ -41,7 +41,7 @@
                 android:id="@+id/main_temp_display"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="12°"
+                android:text="@string/center_temperature_text"
                 android:textColor="#FFFFFF"
                 android:textSize="108sp"
 
@@ -53,7 +53,7 @@
             android:id="@+id/location_display"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="seattle - United States"
+            android:text="@string/center_location_text"
             android:textColor="#FFFFFF" />
 
     </LinearLayout>
