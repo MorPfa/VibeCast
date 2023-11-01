@@ -3,10 +3,28 @@
 
     <!--    Search bar-->
     <string name="search_bar_text">Search for city</string>
+
+
+
     <!--    Weather info underneath music widget-->
-    <string name="left_weather_metrics">Rainy-8 AM -8C</string>
-    <string name="center_weather_metrics">Rainy-9 AM -9C</string>
-    <string name="right_weather_metrics">Rainy-10 AM -11C</string>
+    <string name="left_weather_condition"></string>
+    <string name="left_time"></string>
+    <string name="left_temp">%1$s°</string>
+
+
+
+    <string name="center_weather_condition"></string>
+    <string name="center_time"></string>
+    <string name="center_temp">%1$s°</string>
+
+    <string name="right_weather_condition"></string>
+    <string name="right_time"></string>
+    <string name="right_temp">%1$s°</string>
+
+
+
+    <string name="center_row_seperator">-</string>
+
 
     <!--    Main temperature display-->
     <string name="center_temperature_text">%1$s°</string>

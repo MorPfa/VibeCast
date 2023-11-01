@@ -22,7 +22,7 @@
             android:id="@+id/leftWeather"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Snowy"
+            android:text="@string/left_weather_condition"
             android:textColor="#FFFFFF"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -30,7 +30,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="-"
+            android:text="@string/center_row_seperator"
             android:textColor="#FFFFFF"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -39,7 +39,7 @@
             android:id="@+id/leftTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="8 AM"
+            android:text="@string/left_time"
             android:textColor="#FFFFFF"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -47,7 +47,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="-"
+            android:text="@string/center_row_seperator"
             android:textColor="#FFFFFF"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -82,7 +82,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="-"
+            android:text="@string/center_row_seperator"
             android:textColor="#FFFFFF"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -99,7 +99,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="-"
+            android:text="@string/center_row_seperator"
             android:textColor="#FFFFFF"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -108,7 +108,7 @@
             android:id="@+id/centerTemp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="9C"
+            android:text="@string/center_temp"
             android:textColor="#FFFFFF"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -134,7 +134,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="-"
+            android:text="@string/center_row_seperator"
             android:textColor="#FFFFFF"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -151,7 +151,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="-"
+            android:text="@string/center_row_seperator"
             android:textColor="#FFFFFF"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -160,7 +160,7 @@
             android:id="@+id/rightTemp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="10C"
+            android:text="@string/right_temp"
             android:textColor="#FFFFFF"
             android:textSize="14sp"
             android:textStyle="bold" />
