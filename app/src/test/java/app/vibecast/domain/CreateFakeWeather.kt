@@ -1,5 +1,6 @@
 package app.vibecast.domain
 
+import app.vibecast.data.local.db.weather.WeatherEntity
 import app.vibecast.domain.entity.CurrentWeather
 import app.vibecast.domain.entity.HourlyWeather
 import app.vibecast.domain.entity.Weather
@@ -8,6 +9,10 @@ import kotlin.random.Random
 
 
 class CreateFakeWeather {
+
+    fun Weather.toWeatherEntity(cityName: String): WeatherEntity {
+        return WeatherEntity(cityName, this)
+    }
 
     fun createFakeWeather(): Weather {
         val random = Random
