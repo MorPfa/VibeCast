@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.vibecast.domain.usecase.GetWeatherUseCase
 import app.vibecast.presentation.state.UiState
-import app.vibecast.presentation.weather.WeatherConverter
+
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,15 +20,13 @@ class WeatherViewModel @Inject constructor(
 ) : ViewModel() {
 
 
-    //TODO fix this
+    private val _weatherFlow = MutableStateFlow<UiState<WeatherModel>>(UiState.Loading)
 
-    private val _weatherFlow =
-        MutableStateFlow<UiState<WeatherModel>>(UiState.Loading)
     val weatherFlow: StateFlow<UiState<WeatherModel>> = _weatherFlow
 
-    fun loadUser(userId: Long) {
+    fun loadWeather(cityName : String) {
         viewModelScope.launch {
-            weatherUseCase.execute(GetWeatherUseCase.Request())
+            weatherUseCase.execute(GetWeatherUseCase.Request(cityName))
                 .map {
                     weatherConverter.convert(it)
                 }

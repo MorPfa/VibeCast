@@ -11,7 +11,6 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import app.vibecast.BuildConfig
 import app.vibecast.R
 import app.vibecast.databinding.ActivityMainBinding
 

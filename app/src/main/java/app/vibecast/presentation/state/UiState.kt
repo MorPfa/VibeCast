@@ -1,10 +1,10 @@
 package app.vibecast.presentation.state
 
-sealed class UiState<T : Any> {
+sealed class UiState<out T : Any> {
 
     data object Loading : UiState<Nothing>()
 
-    data class Error<T : Any>(val errorMessage: String) : UiState<T>()
+    data class Error(val errorMessage: String) : UiState<Nothing>()
 
     data class Success<T : Any>(val data: T) : UiState<T>()
 

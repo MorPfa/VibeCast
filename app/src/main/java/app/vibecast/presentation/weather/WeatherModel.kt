@@ -1,41 +1,33 @@
 package app.vibecast.presentation.weather
 
-class WeatherModel (
-    val cityName : String,
-    val latitude: Double?,
-    val longitude: Double?,
-    val currentWeather: CurrentWeather?,
-    val hourlyWeather: List<HourlyWeather>?
-)
 
 
-data class CurrentWeather(
-    val timestamp: Long,
-    val temperature: Double,
-    val feelsLike: Double,
-    val humidity: Int,
-    val uvi: Double,
-    val cloudCover: Int,
-    val visibility: Int,
-    val windSpeed: Double,
-    val weatherConditions: List<WeatherCondition>
-)
+data class WeatherModel(
+    val cityName: String,
+    val currentWeather: CurrentWeatherModel,
+    val hourlyWeather: List<HourlyWeatherModel>
+) {
+    data class CurrentWeatherModel(
+        val timestamp: String,
+        val temperature: String,
+        val feelsLike: String,
+        val humidity: String,
+        val uvi: String,
+        val visibility: String,
+        val windSpeed: String,
+        val weatherConditions: List<WeatherConditionModel>
+    )
 
-data class HourlyWeather(
-    val timestamp: Long,
-    val temperature: Double,
-    val feelsLike: Double,
-    val humidity: Int,
-    val uvi: Double,
-    val cloudCover: Int,
-    val windSpeed: Double,
-    val weatherConditions: List<WeatherCondition>,
-    val chanceOfRain: Double
-)
+    data class HourlyWeatherModel(
+        val firstHourTimeStamp : String,
+        val firstHourTemp : String,
+        val firstHourWeatherCondition : String,
+        val secondHourTimestamp: String,
+        val secondHourTemperature: String,
+        val secondHourWeatherCondition: String
+    )
 
-data class WeatherCondition(
-    val conditionId: Int,
-    val mainDescription: String,
-    val detailedDescription: String,
-    val icon: String
-)
+    data class WeatherConditionModel(
+        val mainDescription: String
+    )
+}

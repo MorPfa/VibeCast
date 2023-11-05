@@ -22,7 +22,7 @@ android {
         val keystoreFile = project.rootProject.file("apikeys.properties")
         val properties = Properties()
         properties.load(keystoreFile.inputStream())
-        val apiKey = properties.getProperty("OWM_KEY") ?: ""
+        val apiKey = properties.getProperty("OWM_KEY")
         buildConfigField(
             type = "String",
             name = "OWM_KEY",

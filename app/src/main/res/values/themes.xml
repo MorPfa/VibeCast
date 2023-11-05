@@ -2,34 +2,31 @@
     <!-- Base application theme. -->
     <style name="Theme.VibeCast" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
 
-
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowTranslucentStatus" >true</item>
-        <item name="colorPrimary">@android:color/transparent</item>
+        <item name="actionBarStyle">@style/ActionBar</item>
+
 
 
 
     </style>
 
+
+    <style name="ActionBar" >
+        <item name="background">@drawable/rounded_black_background</item>
+
+
+    </style>
     <style name="SwitchTheme" >
         <!-- Customize the colorAccent attribute to change the switch color -->
         <item name="colorAccent">#181819</item> <!-- Turquoise color for the switch -->
 
-        <!-- Other theme attributes as needed -->
     </style>
 
-<!--    <style name="Theme.VibeCast.NoActionBar">-->
-<!--        <item name="windowActionBar">false</item>-->
-<!--        <item name="windowNoTitle">true</item>-->
 
-<!--    </style>-->
+    <style name="Theme.VibeCast.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" >
 
-<!--    <style name="Theme.VibeCast.SecondaryNav">-->
-<!--        <item name="android:statusBarColor">@drawable/generic_background</item>-->
-
-<!--    </style>-->
-
-    <style name="Theme.VibeCast.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    </style>
 
     <style name="Theme.VibeCast.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>

@@ -1,4 +1,9 @@
 
-fix viewmodel
-pass string resources into converter
-write unit tests for presentation
+
+fix weather converter
+migrate tests to unconfinedtestdispatcher
+fix search bar appearance
+give search bar functionality
+start working out fragment redraw mechanism
+implement deleting strategy and workmanager
+commit changes to github

@@ -56,7 +56,7 @@
             android:id="@+id/leftTemp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="8C"
+            android:text="@string/center_temperature_text"
             android:textColor="#FFFFFF"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -74,7 +74,7 @@
             android:id="@+id/centerWeather"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Rainy"
+            android:text="@string/center_weather_condition"
             android:textColor="#FFFFFF"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -91,7 +91,7 @@
             android:id="@+id/centerTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="9 AM"
+            android:text="@string/center_time"
             android:textColor="#FFFFFF"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -126,7 +126,7 @@
             android:id="@+id/rightWeather"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Sunny"
+            android:text="@string/right_weather_condition"
             android:textColor="#FFFFFF"
             android:textSize="14sp"
             android:textStyle="bold" />
@@ -143,7 +143,7 @@
             android:id="@+id/rightTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="10 AM"
+            android:text="@string/right_time"
             android:textColor="#FFFFFF"
             android:textSize="14sp"
             android:textStyle="bold" />
