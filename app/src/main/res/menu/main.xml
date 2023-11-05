@@ -12,6 +12,7 @@
         android:id="@+id/action_search"
         android:title="@string/search_bar_text"
         android:icon="@drawable/ic_search"
+        android:iconTint="@color/white"
         android:actionLayout="@layout/custom_searchview"
         app:showAsAction="ifRoom"
         app:actionViewClass="androidx.appcompat.widget.SearchView" />

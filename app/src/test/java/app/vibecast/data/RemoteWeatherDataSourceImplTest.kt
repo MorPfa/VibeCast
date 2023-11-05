@@ -1,7 +1,7 @@
 package app.vibecast.data
 
+
 import app.vibecast.BuildConfig
-import app.vibecast.data.local.db.weather.WeatherEntity
 import app.vibecast.data.remote.network.weather.CoordinateApiModel
 import app.vibecast.data.remote.network.weather.CurrentWeatherRemote
 import app.vibecast.data.remote.network.weather.HourlyWeatherRemote
@@ -146,7 +146,7 @@ class RemoteWeatherDataSourceImplTest {
         val cityName = "London"
         val remoteCoordinates = CoordinateApiModel(51.5073219, -0.1276474)
 
-        whenever(weatherService.getCiyCoordinates(cityName, 1, BuildConfig.OWM_KEY)).thenReturn(remoteCoordinates)
+        whenever(weatherService.getCiyCoordinates(cityName, 1, BuildConfig.OWM_KEY )).thenReturn(remoteCoordinates)
 
         whenever(weatherService.getWeather(remoteCoordinates.latitude, remoteCoordinates.longitude, BuildConfig.OWM_KEY)).thenReturn(remoteWeather)
 

@@ -13,11 +13,6 @@ import app.vibecast.databinding.FragmentCurrentLocationBinding
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [CurrentLocationFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class CurrentLocationFragment : Fragment() {
 
     private lateinit var binding : FragmentCurrentLocationBinding
