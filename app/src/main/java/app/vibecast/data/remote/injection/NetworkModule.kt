@@ -1,6 +1,8 @@
 package app.vibecast.data.remote.injection
 
+import app.vibecast.data.data_repository.data_source.remote.RemoteWeatherDataSource
 import app.vibecast.data.remote.network.weather.WeatherService
+import app.vibecast.data.remote.source.RemoteWeatherDataSourceImpl
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.squareup.moshi.Moshi
@@ -10,9 +12,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
-import retrofit2.create
 
 
 @Module
@@ -33,4 +33,8 @@ class NetworkModule {
     @Provides
     fun provideWeatherService(retrofit: Retrofit) : WeatherService =
         retrofit.create(WeatherService::class.java)
+
+
+    @Provides
+    fun remoteWeatherDataSource(weatherService: WeatherService) : RemoteWeatherDataSource = RemoteWeatherDataSourceImpl(weatherService)
 }
