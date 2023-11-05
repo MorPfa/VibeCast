@@ -29,6 +29,7 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
 
     }
     override fun getWeather(name: String): Flow<Weather> = flow {
+        //TODO reformat to use getCity() and to use suspend function
         val coordinates = weatherService.getCiyCoordinates(name,1, BuildConfig.OWM_KEY)
         val weatherData = weatherService.getWeather(coordinates.latitude, coordinates.longitude, BuildConfig.OWM_KEY)
         emit(weatherData)
