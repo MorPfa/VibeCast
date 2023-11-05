@@ -3,6 +3,7 @@ package app.vibecast.data.local.injection
 import android.content.Context
 import androidx.room.Room
 import app.vibecast.data.local.db.AppDatabase
+import app.vibecast.data.local.db.location.LocationDao
 import app.vibecast.data.local.db.user.UserDao
 import app.vibecast.data.local.db.weather.WeatherDao
 import dagger.Module
@@ -32,4 +33,7 @@ class PersistenceModule {
 
     @Provides
     fun provideUserDao(appDatabase: AppDatabase) : UserDao = appDatabase.userDao()
+
+    @Provides
+    fun provideLocationDao(appDatabase: AppDatabase) : LocationDao = appDatabase.locationDao()
 }
