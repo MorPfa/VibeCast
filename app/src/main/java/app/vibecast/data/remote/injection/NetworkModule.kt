@@ -34,7 +34,4 @@ class NetworkModule {
     fun provideWeatherService(retrofit: Retrofit) : WeatherService =
         retrofit.create(WeatherService::class.java)
 
-
-    @Provides
-    fun remoteWeatherDataSource(weatherService: WeatherService) : RemoteWeatherDataSource = RemoteWeatherDataSourceImpl(weatherService)
 }
