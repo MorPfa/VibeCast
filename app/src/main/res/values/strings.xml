@@ -40,6 +40,7 @@
     <string name="uv_index_value">%1$d</string>
     <string name="o3">o3</string>
     <string name="o3_value">%1$d</string>
+    <string name="humidity_title">Humidity</string>
     <string name="humidity">%1$d</string>
 
 
@@ -81,5 +82,6 @@
     <string name="saved_locations">Saved Locations</string>
     <string name="profile_picture_content_desc">Users profile picture</string>
     <string name="name">%1$s</string>
+    <string name="save_location">Save location</string>
 
 </resources>

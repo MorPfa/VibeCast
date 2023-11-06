@@ -1,8 +1,17 @@
+fix weather converter -stuck
 
+give search bar functionality -started NEED CONVERTER FIXED FOR PROGRESS
 
-fix weather converter
+start working out fragment redraw mechanism -Not started yet
+
+implement deleting strategy and workmanager -Not started yet
+
+complete worker class -Started need to figure out caching first
+
+change top app bar settings to save location button -Need to implement functionality
+
+integrate location into user/ account stuff -Not started yet
+
+figure out data base schema for saved locations  -Not started yet
+
 fix search bar appearance
-give search bar functionality
-start working out fragment redraw mechanism
-implement deleting strategy and workmanager
-figure out data base schema for saved locations

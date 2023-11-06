@@ -15,19 +15,28 @@ import app.vibecast.R
 import app.vibecast.databinding.ActivityMainBinding
 
 import com.google.android.material.navigation.NavigationView
-
+import androidx.appcompat.widget.SearchView
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import app.vibecast.presentation.weather.WeatherViewModel
 
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
+    private lateinit var searchView: SearchView
+    private lateinit var fragmentViewModel : ViewModel
+    private lateinit var currentLocationFragment: Fragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        currentLocationFragment = supportFragmentManager.findFragmentByTag("nav_home")!!
+        fragmentViewModel = ViewModelProvider(currentLocationFragment)[WeatherViewModel::class.java]
 
 
 
@@ -48,17 +57,39 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.main, menu)
-        val searchItem = menu?.findItem(R.id.action_search)
-        val actionView = searchItem?.actionView
-        if (actionView != null) {
-            val inflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-            val customView = inflater.inflate(R.layout.custom_searchview, null)
-            searchItem.actionView = customView
-        }
+
+        val searchItem = menu.findItem(R.id.action_search)
+        searchView = searchItem.actionView as SearchView
+        val inflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val customView = inflater.inflate(R.layout.custom_searchview, null)
+        searchItem.actionView = customView
+
+        // Set up the OnQueryTextListener
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                // This method is called when the user submits their search query.
+                // You can capture the query here and perform your search operation.
+                performSearch(query)
+                return true // Return true to indicate that you have handled the search submission.
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+                // This method is called when the text in the search view changes.
+                // You can use it for real-time search suggestions or filtering.
+                // newText parameter contains the current query.
+                return true // Return true to indicate that you have handled the query change.
+            }
+        })
+
         return true
+    }
+
+    private fun performSearch(query: String) {
+        (fragmentViewModel as WeatherViewModel).loadWeather(query)
     }
 
     override fun onSupportNavigateUp(): Boolean {
