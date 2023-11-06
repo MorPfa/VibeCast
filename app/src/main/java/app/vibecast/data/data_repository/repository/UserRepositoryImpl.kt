@@ -6,7 +6,7 @@ import app.vibecast.domain.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class UserRepositoryImpl@Inject constructor(
+class UserRepositoryImpl @Inject constructor(
     private val localUserDataSource: LocalUserDataSource
 ): UserRepository {
     override fun getUser(userId: Long): Flow<User> = localUserDataSource.getUSer(userId)
