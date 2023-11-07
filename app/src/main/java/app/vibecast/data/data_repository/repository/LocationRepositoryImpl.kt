@@ -9,6 +9,11 @@ import javax.inject.Inject
 class LocationRepositoryImpl @Inject constructor(
     private val localLocationDataSource: LocalLocationDataSource
 ) : LocationRepository {
+
+
+    override fun getLocations(): Flow<List<Location>> = localLocationDataSource.getAllLocations()
+
+
     override fun getLocation(cityName: String): Flow<Location> = localLocationDataSource.getLocation(cityName)
 
     override fun addLocation(location: Location) = localLocationDataSource.addLocation(location)

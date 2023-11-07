@@ -4,14 +4,36 @@ give search bar functionality -started NEED CONVERTER FIXED FOR PROGRESS
 
 start working out fragment redraw mechanism -Not started yet
 
-implement deleting strategy and workmanager -Not started yet
+implement deleting strategy and workmanager - Started workmanager, need to implement deleting
 
-complete worker class -Started need to figure out caching first
+complete worker class -Started need to figure out deleting
 
-change top app bar settings to save location button -Need to implement functionality
+change top app bar settings to save location button -started to implement functionality, need rest of the app to make progress
 
 integrate location into user/ account stuff -Not started yet
 
-figure out data base schema for saved locations  -Not started yet
+figure out data base schema for saved locations  -Implemented db schema for weather / location, yet to be tested
 
-fix search bar appearance
+
+
+
+SEARCH BAR / CACHING FUNCTIONALITY:
+
+when performSearch() gets called it returns an object holding weather and location data
+when the location gets saved that data class' weather object gets updated by workmanager every 10 minutes
+
+STEPS TO TAKE:
+
+
+FIGURE OUT HOW TO CONTINUOUSLY GET USERS LOCATION
+
+create db entity to merge weather and location table - DONE
+rename current worker class to currentlocation sync worker or something like that -DONE
+create new worker to update weather for all saved locations -DONE NEED TO TEST
+implement worker for current location - Need to figure out location getting
+
+create mechanism to save and update new db entity:
+- create use case for entity
+- create dtos for entity
+- create or reuse repository - used weather repo for caching data need to figure out deleting
+- modify viewmodel to update views according to which screen is shown

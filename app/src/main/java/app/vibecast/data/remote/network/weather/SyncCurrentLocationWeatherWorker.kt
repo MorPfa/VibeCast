@@ -4,14 +4,9 @@ import android.content.Context
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import app.vibecast.data.data_repository.data_source.remote.RemoteWeatherDataSource
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.launch
-import java.lang.Exception
 import javax.inject.Inject
 
-class FetchWeatherDataWorker @Inject constructor(
+class SyncCurrentLocationWeatherWorker @Inject constructor(
     appContext: Context,
     workerParameters: WorkerParameters,
     private val remoteWeatherDataSource: RemoteWeatherDataSource) : Worker(appContext, workerParameters) {

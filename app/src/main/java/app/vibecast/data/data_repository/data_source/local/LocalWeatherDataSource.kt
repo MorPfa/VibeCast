@@ -8,5 +8,5 @@ interface LocalWeatherDataSource {
 
     fun getWeather(cityName : String) : Flow<Weather>
 
-    suspend fun addWeather(cityName : String, weather: Weather)
+    suspend fun addWeather( weather: Weather)
 }

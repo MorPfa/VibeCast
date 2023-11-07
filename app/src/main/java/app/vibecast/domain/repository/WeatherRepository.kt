@@ -7,5 +7,5 @@ interface WeatherRepository {
 
     fun getWeather(cityName : String) : Flow<Weather>
 
-    fun refreshWeather(cityName : String, weather: Weather) : Flow<Weather>
+    fun refreshWeather(cityName : String) : Flow<Weather>
 }

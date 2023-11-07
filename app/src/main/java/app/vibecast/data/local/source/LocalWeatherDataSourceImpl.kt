@@ -8,15 +8,15 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-//TODO add userDao to constructor
+
 class LocalWeatherDataSourceImpl @Inject constructor(private val weatherDao: WeatherDao ) :
     LocalWeatherDataSource {
     override fun getWeather(cityName: String): Flow<Weather> = weatherDao.getWeather(cityName).map {
             weatherEntity -> weatherEntity.toWeather()
     }
 
-    override suspend fun addWeather(cityName : String, weather : Weather) {
-       weatherDao.addWeather(weather.toWeatherEntity(cityName))
+    override suspend fun addWeather( weather : Weather) {
+       weatherDao.addWeather(weather.toWeatherEntity(weather.cityName))
     }
 
 

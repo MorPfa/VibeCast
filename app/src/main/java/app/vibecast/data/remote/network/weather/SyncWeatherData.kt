@@ -15,7 +15,7 @@ class SyncWeatherData {
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-        val periodicWorkRequest = PeriodicWorkRequestBuilder<FetchWeatherDataWorker>(
+        val periodicWorkRequest = PeriodicWorkRequestBuilder<SyncCurrentLocationWeatherWorker>(
             repeatInterval = 10, // Set the desired interval
             repeatIntervalTimeUnit = TimeUnit.MINUTES
         )

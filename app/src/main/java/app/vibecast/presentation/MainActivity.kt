@@ -62,6 +62,13 @@ class MainActivity : AppCompatActivity() {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.main, menu)
 
+        val saveLocationBtn = menu.findItem(R.id.action_save_location)
+
+        //TODO implement onclick listener for save location btn
+//        saveLocationBtn.setOnMenuItemClickListener {
+//
+//        }
+
         val searchItem = menu.findItem(R.id.action_search)
         searchView = searchItem.actionView as SearchView
         val inflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
@@ -87,6 +94,8 @@ class MainActivity : AppCompatActivity() {
 
         return true
     }
+
+    //TODO make performSearch return a location with weather object
 
     private fun performSearch(query: String) {
         (fragmentViewModel as WeatherViewModel).loadWeather(query)
