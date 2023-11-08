@@ -24,7 +24,7 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
     private val weatherService: WeatherService) : RemoteWeatherDataSource {
 
 
-    override fun getCity(name : String): Flow<CoordinateApiModel> = flow{
+    override fun getCoordinates(name : String): Flow<CoordinateApiModel> = flow{
         emit(weatherService.getCiyCoordinates(name,1,BuildConfig.OWM_KEY))
 
     }

@@ -72,6 +72,7 @@ dependencies {
 //    Navigation
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.4")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.4")
+    implementation("com.google.android.gms:play-services-location:21.0.1")
     val room_version = "2.6.0"
     val lifecycle_version = "2.6.2"
     val work_version = "2.8.1"

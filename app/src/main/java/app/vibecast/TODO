@@ -8,14 +8,7 @@ implement deleting strategy and workmanager - Started workmanager, need to imple
 
 complete worker class -Started need to figure out deleting
 
-change top app bar settings to save location button -started to implement functionality, need rest of the app to make progress
-
 integrate location into user/ account stuff -Not started yet
-
-figure out data base schema for saved locations  -Implemented db schema for weather / location, yet to be tested
-
-
-
 
 SEARCH BAR / CACHING FUNCTIONALITY:
 
@@ -27,13 +20,21 @@ STEPS TO TAKE:
 
 FIGURE OUT HOW TO CONTINUOUSLY GET USERS LOCATION
 
-create db entity to merge weather and location table - DONE
-rename current worker class to currentlocation sync worker or something like that -DONE
-create new worker to update weather for all saved locations -DONE NEED TO TEST
-implement worker for current location - Need to figure out location getting
-
 create mechanism to save and update new db entity:
+-FIGURE OUT IF BELOW STEPS ARE EVEN NECESSARY
 - create use case for entity
 - create dtos for entity
-- create or reuse repository - used weather repo for caching data need to figure out deleting
 - modify viewmodel to update views according to which screen is shown
+
+
+GOAL FOR TODAY:
+
+FINISH WORKERS FOR CACHING - refactor refresh weather method to use coordinates instead of city name or
+                             just eliminate need for extra api call
+                           - integrate deleting in refresh weather
+START TO WRITE TESTS FOR NEW CLASSES
+
+
+GOALS FOR TOMORROW:
+FINISH WRITING TESTS
+IMPLEMENT MECHANISM THAT DECIDES WHEN TO USE WHICH DATA SOURCE IN CASE OF NO INTERNET
