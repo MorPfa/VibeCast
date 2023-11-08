@@ -1,6 +1,8 @@
 package app.vibecast.presentation
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -13,7 +15,6 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import app.vibecast.R
 import app.vibecast.databinding.ActivityMainBinding
-
 import com.google.android.material.navigation.NavigationView
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
@@ -30,8 +31,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var fragmentViewModel : ViewModel
     private lateinit var currentLocationFragment: Fragment
 
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -105,6 +110,4 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_content_home)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
-
-
 }

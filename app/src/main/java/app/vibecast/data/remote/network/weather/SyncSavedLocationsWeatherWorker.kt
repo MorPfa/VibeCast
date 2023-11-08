@@ -1,13 +1,18 @@
 package app.vibecast.data.remote.network.weather
 
 import android.content.Context
-import androidx.work.Worker
+import androidx.work.Constraints
+import androidx.work.CoroutineWorker
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import app.vibecast.domain.entity.Location
 import app.vibecast.domain.repository.LocationRepository
 import app.vibecast.domain.repository.WeatherRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.runBlocking
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class SyncSavedLocationsWeatherWorker @Inject constructor(
@@ -15,28 +20,38 @@ class SyncSavedLocationsWeatherWorker @Inject constructor(
     workerParameters: WorkerParameters,
     private val weatherRepository: WeatherRepository,
     private val locationRepository: LocationRepository
-) : Worker(appContext, workerParameters) {
+) : CoroutineWorker(appContext, workerParameters) {
 
 
-    override fun doWork(): Result {
+    override suspend fun doWork(): Result {
         return try {
             val savedLocations: Flow<List<Location>> = locationRepository.getLocations()
-
-            runBlocking {
-                savedLocations.collect { locations ->
+            savedLocations.collect { locations ->
                     for (location in locations) {
                         val cityName = location.cityName
                         weatherRepository.refreshWeather(cityName)
-
-
                     }
                 }
-            }
-
             Result.success()
         } catch (e: Exception) {
             Result.failure()
         }
     }
+    fun enqueueWeatherSyncWork(context: Context) {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val periodicWorkRequest = PeriodicWorkRequestBuilder<SyncCurrentLocationWeatherWorker>(
+            repeatInterval = 10, // Set the desired interval
+            repeatIntervalTimeUnit = TimeUnit.MINUTES
+        )
+            .setConstraints(constraints)
+            .build()
+
+        WorkManager.getInstance(context)
+            .enqueueUniquePeriodicWork("weatherSyncWork", ExistingPeriodicWorkPolicy.KEEP, periodicWorkRequest)
+    }
+
 }
 

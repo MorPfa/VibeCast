@@ -136,7 +136,7 @@ class RemoteWeatherDataSourceImplTest {
         val cityName = "London"
         val remoteCoordinates = CoordinateApiModel(51.5073219,-0.1276474 )
         whenever(weatherService.getCiyCoordinates(cityName,1,BuildConfig.OWM_KEY)).thenReturn(remoteCoordinates)
-        val result = weatherDataSource.getCity(cityName).first()
+        val result = weatherDataSource.getCoordinates(cityName).first()
         assertEquals(remoteCoordinates, result)
     }
 
