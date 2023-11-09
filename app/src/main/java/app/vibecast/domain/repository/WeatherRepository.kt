@@ -11,4 +11,6 @@ interface WeatherRepository {
     fun getWeather(cityName : String) : Flow<Weather>
 
     fun refreshWeather(cityName : String) : Flow<Weather>
+
+    fun refreshWeather(lat : Double, lon : Double) : Flow<Weather>
 }

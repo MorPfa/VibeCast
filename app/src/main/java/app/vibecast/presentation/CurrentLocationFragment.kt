@@ -35,6 +35,8 @@ class CurrentLocationFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
+        //TODO laod weather data from viewmodel here
         binding = FragmentCurrentLocationBinding.inflate(inflater,container,false)
         val nextScreenButton = binding.nextScreenButtonRight
         nextScreenButton.setOnClickListener {

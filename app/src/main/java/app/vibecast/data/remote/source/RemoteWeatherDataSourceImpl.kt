@@ -15,13 +15,14 @@ import app.vibecast.domain.entity.Weather
 import app.vibecast.domain.entity.WeatherCondition
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
-
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class RemoteWeatherDataSourceImpl @Inject constructor(
-    private val weatherService: WeatherService) : RemoteWeatherDataSource {
+    private val weatherService: WeatherService,
+) : RemoteWeatherDataSource {
 
 
     override fun getCoordinates(name : String): Flow<CoordinateApiModel> = flow{
@@ -29,9 +30,17 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
 
     }
     override fun getWeather(name: String): Flow<Weather> = flow {
-        //TODO reformat to use getCity() and to use suspend function
-        val coordinates = weatherService.getCiyCoordinates(name,1, BuildConfig.OWM_KEY)
-        val weatherData = weatherService.getWeather(coordinates.latitude, coordinates.longitude, BuildConfig.OWM_KEY)
+        val coordinates = getCoordinates(name).first()
+        val weatherData = weatherService.getWeather(coordinates.latitude, coordinates.longitude , BuildConfig.OWM_KEY)
+        emit(weatherData)
+    }.map {weatherApiModel ->
+        weatherApiModel.toWeather()
+    }.catch {
+        throw UseCaseException.WeatherException(it)
+    }
+
+    override fun getWeather(lat : Double, lon : Double): Flow<Weather> = flow {
+        val weatherData = weatherService.getWeather(lat, lon, BuildConfig.OWM_KEY)
         emit(weatherData)
     }.map {weatherApiModel ->
         weatherApiModel.toWeather()
