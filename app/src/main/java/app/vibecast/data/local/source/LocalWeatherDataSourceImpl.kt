@@ -9,8 +9,9 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 
-class LocalWeatherDataSourceImpl @Inject constructor(private val weatherDao: WeatherDao ) :
-    LocalWeatherDataSource {
+class LocalWeatherDataSourceImpl @Inject constructor(
+    private val weatherDao: WeatherDao
+) : LocalWeatherDataSource {
     override fun getWeather(cityName: String): Flow<Weather> = weatherDao.getWeather(cityName).map {
             weatherEntity -> weatherEntity.toWeather()
     }

@@ -14,7 +14,11 @@ interface LocationDao {
 
     @Transaction
     @Query("SELECT * FROM locations")
-    fun getLocationWithWeather() : List<LocationWithWeatherData>
+    fun getLocationWithWeather() : Flow<List<LocationWithWeatherData>>
+
+    @Transaction
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun addLocationWithWeather(locationWithWeatherData: LocationWithWeatherData)
 
     @Query("SELECT * FROM locations WHERE cityName = :cityName")
     fun getLocation(cityName : String) : Flow<LocationEntity>

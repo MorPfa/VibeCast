@@ -30,6 +30,7 @@ class SyncSavedLocationsWeatherWorker @Inject constructor(
                     for (location in locations) {
                         val cityName = location.cityName
                         weatherRepository.refreshWeather(cityName)
+                        //TODO fix this to reference combined weather location table by using location repositoyr instead
                     }
                 }
             Result.success()

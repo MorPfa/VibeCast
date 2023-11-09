@@ -4,37 +4,33 @@ give search bar functionality -started NEED CONVERTER FIXED FOR PROGRESS
 
 start working out fragment redraw mechanism -Not started yet
 
-implement deleting strategy and workmanager - Started workmanager, need to implement deleting
-
-complete worker class -Started need to figure out deleting
-
 integrate location into user/ account stuff -Not started yet
+
+-figure out how to add saved locations as merged table of location / weather and
 
 SEARCH BAR / CACHING FUNCTIONALITY:
 
-when performSearch() gets called it returns an object holding weather and location data
-when the location gets saved that data class' weather object gets updated by workmanager every 10 minutes
-
-STEPS TO TAKE:
-
-
-FIGURE OUT HOW TO CONTINUOUSLY GET USERS LOCATION
 
 create mechanism to save and update new db entity:
 -FIGURE OUT IF BELOW STEPS ARE EVEN NECESSARY
 - create use case for entity
 - create dtos for entity
-- modify viewmodel to update views according to which screen is shown
+- modify viewmodel to update views according to which screen is shown:
+    - Implement mechanism (simple list to track index) to check which screen is being shown (current location being index 0)
+    - with each click on next screen button, index changes
 
 
 GOAL FOR TODAY:
 
-FINISH WORKERS FOR CACHING - refactor refresh weather method to use coordinates instead of city name or
-                             just eliminate need for extra api call
-                           - integrate deleting in refresh weather
-START TO WRITE TESTS FOR NEW CLASSES
+FINISH WORKERS FOR CACHING
+                           - integrate deleting in refresh weather - more compliacted than expected:
+                           - CHANGE LOCAL DATA SOURCE TO SAVE COMBINED ENTITY
+                           - CHANGE SAVED LOCATIONS WORKER TO SAVE COMBINED ENTITY
+                           - ADD USE CASE FOR SAVED LOCATIONS AND REFACTOR CURRENT ONE TO
+                             BE SPECIFICALLY BE FOR CURRENT LOCATION
+
+START TO WRITE TESTS FOR NEW CLASSES AND REWRITE OLD TESTS FOR REFACTORED CODE
 
 
-GOALS FOR TOMORROW:
-FINISH WRITING TESTS
-IMPLEMENT MECHANISM THAT DECIDES WHEN TO USE WHICH DATA SOURCE IN CASE OF NO INTERNET
+
+

@@ -10,4 +10,6 @@ interface RemoteWeatherDataSource {
     fun getCoordinates(name : String) : Flow<CoordinateApiModel>
 
     fun getWeather(name : String) : Flow<Weather>
+
+    fun getWeather(lat : Double, lon : Double) : Flow<Weather>
 }

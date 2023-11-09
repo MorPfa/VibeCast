@@ -11,7 +11,6 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import app.vibecast.BuildConfig
 import app.vibecast.domain.repository.WeatherRepository
 import com.google.android.gms.location.LocationServices
 import java.util.concurrent.TimeUnit
@@ -21,7 +20,6 @@ class SyncCurrentLocationWeatherWorker @Inject constructor(
     private val appContext: Context,
     workerParameters: WorkerParameters,
     private val weatherRepository: WeatherRepository,
-    private val weatherService: WeatherService
 ) : CoroutineWorker(appContext, workerParameters) {
 
     private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(appContext)
@@ -37,8 +35,7 @@ class SyncCurrentLocationWeatherWorker @Inject constructor(
                 if (locationResult != null) {
                     val latitude = locationResult.latitude
                     val longitude = locationResult.longitude
-                    val weatherData = weatherService.getWeather(latitude, longitude, BuildConfig.OWM_KEY)
-                    weatherRepository.refreshWeather(weatherData.cityName)
+                    weatherRepository.refreshWeather(latitude, longitude)
                 }
                 Result.success()
             }
