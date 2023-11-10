@@ -7,10 +7,10 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 
-class GetWeatherUseCase @Inject constructor(
+class GetCurrentWeatherUseCase @Inject constructor(
     configuration: Configuration,
     private val weatherRepository: WeatherRepository
-) : UseCase<GetWeatherUseCase.Request , GetWeatherUseCase.Response>(configuration){
+) : UseCase<GetCurrentWeatherUseCase.Request , GetCurrentWeatherUseCase.Response>(configuration){
 
     override fun process(request: Request): Flow<Response> =
         weatherRepository.getWeather(request.weatherDataCityName)

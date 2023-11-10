@@ -21,13 +21,7 @@ create mechanism to save and update new db entity:
 
 
 GOAL FOR TODAY:
-
-FINISH WORKERS FOR CACHING
-                           - integrate deleting in refresh weather - more compliacted than expected:
-                           - CHANGE LOCAL DATA SOURCE TO SAVE COMBINED ENTITY
-                           - CHANGE SAVED LOCATIONS WORKER TO SAVE COMBINED ENTITY
-                           - ADD USE CASE FOR SAVED LOCATIONS AND REFACTOR CURRENT ONE TO
-                             BE SPECIFICALLY BE FOR CURRENT LOCATION
+Ensure that replacing of entities / values works as expected - it does for saved locations
 
 START TO WRITE TESTS FOR NEW CLASSES AND REWRITE OLD TESTS FOR REFACTORED CODE
 

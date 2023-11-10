@@ -8,31 +8,20 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import app.vibecast.domain.entity.Location
 import app.vibecast.domain.repository.LocationRepository
-import app.vibecast.domain.repository.WeatherRepository
-import kotlinx.coroutines.flow.Flow
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class SyncSavedLocationsWeatherWorker @Inject constructor(
     appContext: Context,
     workerParameters: WorkerParameters,
-    private val weatherRepository: WeatherRepository,
     private val locationRepository: LocationRepository
 ) : CoroutineWorker(appContext, workerParameters) {
 
 
     override suspend fun doWork(): Result {
         return try {
-            val savedLocations: Flow<List<Location>> = locationRepository.getLocations()
-            savedLocations.collect { locations ->
-                    for (location in locations) {
-                        val cityName = location.cityName
-                        weatherRepository.refreshWeather(cityName)
-                        //TODO fix this to reference combined weather location table by using location repositoyr instead
-                    }
-                }
+            locationRepository.refreshLocationWeather()
             Result.success()
         } catch (e: Exception) {
             Result.failure()

@@ -18,7 +18,7 @@ interface LocationDao {
 
     @Transaction
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun addLocationWithWeather(locationWithWeatherData: LocationWithWeatherData)
+    suspend fun addLocationWithWeather(locationWithWeatherData: LocationWithWeatherData)
 
     @Query("SELECT * FROM locations WHERE cityName = :cityName")
     fun getLocation(cityName : String) : Flow<LocationEntity>
@@ -27,8 +27,8 @@ interface LocationDao {
     fun getLocations() : Flow<List<LocationEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun addLocation(locationEntity: LocationEntity)
+    suspend fun addLocation(locationEntity: LocationEntity)
 
     @Delete
-    fun deleteLocation(locationEntity: LocationEntity)
+    suspend fun deleteLocation(locationEntity: LocationEntity)
 }

@@ -1,7 +1,7 @@
 package app.vibecast.presentation
 
 import app.vibecast.domain.entity.Result
-import app.vibecast.domain.usecase.GetWeatherUseCase
+import app.vibecast.domain.usecase.GetCurrentWeatherUseCase
 import app.vibecast.presentation.state.UiState
 import app.vibecast.presentation.weather.WeatherConverter
 import app.vibecast.presentation.weather.WeatherModel
@@ -10,8 +10,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.TestCoroutineDispatcher
-import kotlinx.coroutines.test.TestCoroutineScheduler
-import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -29,7 +27,7 @@ class WeatherViewModelTest {
 
     @ExperimentalCoroutinesApi
     private val testDispatcher: TestCoroutineDispatcher = TestCoroutineDispatcher()
-    private val useCase = mock<GetWeatherUseCase>()
+    private val useCase = mock<GetCurrentWeatherUseCase>()
     private val converter = mock<WeatherConverter>()
     @ExperimentalCoroutinesApi
     private val viewModel = WeatherViewModel(useCase, converter)
@@ -53,8 +51,8 @@ class WeatherViewModelTest {
         assertEquals(UiState.Loading, viewModel.weatherFlow.value)
         val cityName = "London"
         val uiState = mock<UiState<WeatherModel>>()
-        val result = mock<Result<GetWeatherUseCase.Response>>()
-        whenever(useCase.execute(GetWeatherUseCase.Request(cityName))).thenReturn(flowOf(result))
+        val result = mock<Result<GetCurrentWeatherUseCase.Response>>()
+        whenever(useCase.execute(GetCurrentWeatherUseCase.Request(cityName))).thenReturn(flowOf(result))
         whenever(converter.convert(result)).thenReturn(uiState)
         viewModel.loadWeather(cityName)
         assertEquals(uiState, viewModel.weatherFlow.value)
