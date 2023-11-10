@@ -1,7 +1,7 @@
 package app.vibecast.presentation
 
 import android.content.Context
-import app.vibecast.domain.usecase.GetWeatherUseCase
+import app.vibecast.domain.usecase.GetCurrentWeatherUseCase
 import app.vibecast.presentation.weather.WeatherConverter
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -118,7 +118,7 @@ class WeatherConverterTest {
 
     @Test
     fun testConvertSuccess() {
-        val response = GetWeatherUseCase.Response(expectedWeather)
+        val response = GetCurrentWeatherUseCase.Response(expectedWeather)
         whenever(testContext.getString(R.string.left_time, "left_time")).thenReturn(timestamp)
         whenever(testContext.getString(R.string.center_temperature_text, "center_temperature_text")).thenReturn(temperature)
         whenever(testContext.getString(R.string.left_temp, "left_temp")).thenReturn(temperature)

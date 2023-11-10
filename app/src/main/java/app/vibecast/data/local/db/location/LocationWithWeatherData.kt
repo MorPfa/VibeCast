@@ -10,5 +10,5 @@ data class LocationWithWeatherData(
         parentColumn = "cityName",
         entityColumn = "cityName"
     )
-    val weather : WeatherEntity
+    var weather : WeatherEntity
 )

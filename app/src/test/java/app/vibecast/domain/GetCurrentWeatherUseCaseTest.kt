@@ -1,7 +1,7 @@
 package app.vibecast.domain
 
 import app.vibecast.domain.repository.WeatherRepository
-import app.vibecast.domain.usecase.GetWeatherUseCase
+import app.vibecast.domain.usecase.GetCurrentWeatherUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -11,19 +11,19 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
-class GetWeatherUseCaseTest {
+class GetCurrentWeatherUseCaseTest {
 
     private val weatherRepository = mock<WeatherRepository>()
-    private val useCase = GetWeatherUseCase(mock(),weatherRepository)
+    private val useCase = GetCurrentWeatherUseCase(mock(),weatherRepository)
 
 
     @ExperimentalCoroutinesApi
     @Test
     fun testProcess()= runTest {
-        val request = GetWeatherUseCase.Request("London")
+        val request = GetCurrentWeatherUseCase.Request("London")
         val fakeWeather = CreateFakeWeather().createFakeWeather()
         whenever(weatherRepository.getWeather(request.weatherDataCityName)).thenReturn(flowOf(fakeWeather))
         val response = useCase.process(request).first()
-        assertEquals(GetWeatherUseCase.Response(fakeWeather),response)
+        assertEquals(GetCurrentWeatherUseCase.Response(fakeWeather),response)
     }
 }

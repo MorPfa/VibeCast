@@ -2,17 +2,16 @@ package app.vibecast.presentation.weather
 
 import android.content.Context
 import app.vibecast.R
-import app.vibecast.domain.usecase.GetWeatherUseCase
+import app.vibecast.domain.usecase.GetCurrentWeatherUseCase
 import app.vibecast.presentation.state.CommonResultConverter
 import dagger.hilt.android.qualifiers.ApplicationContext
-import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.TimeZone
 import javax.inject.Inject
 
 class WeatherConverter @Inject constructor(@ApplicationContext private val context: Context) :
-    CommonResultConverter<GetWeatherUseCase.Response, WeatherModel>() {
+    CommonResultConverter<GetCurrentWeatherUseCase.Response, WeatherModel>() {
 
     private fun formatTimeStamp(timeStamp : Long) : String {
         val sdf = SimpleDateFormat("hh:mm a")
@@ -22,7 +21,7 @@ class WeatherConverter @Inject constructor(@ApplicationContext private val conte
 
 
     }
-    override fun convertSuccess(data: GetWeatherUseCase.Response): WeatherModel {
+    override fun convertSuccess(data: GetCurrentWeatherUseCase.Response): WeatherModel {
         val cityName = context.getString(R.string.center_location_text, data.weather.cityName)
         val currentTimestamp = context.getString(R.string.left_time, data.weather.currentWeather?.let {
             formatTimeStamp(it.timestamp)

@@ -2,7 +2,7 @@ package app.vibecast.presentation.weather
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import app.vibecast.domain.usecase.GetWeatherUseCase
+import app.vibecast.domain.usecase.GetCurrentWeatherUseCase
 import app.vibecast.presentation.state.UiState
 
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class WeatherViewModel @Inject constructor(
-    private val weatherUseCase: GetWeatherUseCase,
+    private val weatherUseCase: GetCurrentWeatherUseCase,
     private val weatherConverter: WeatherConverter
 ) : ViewModel() {
 
@@ -26,7 +26,7 @@ class WeatherViewModel @Inject constructor(
 
     fun loadWeather(cityName : String) {
         viewModelScope.launch {
-            weatherUseCase.execute(GetWeatherUseCase.Request(cityName))
+            weatherUseCase.execute(GetCurrentWeatherUseCase.Request(cityName))
                 .map {
                     weatherConverter.convert(it)
                 }
