@@ -1,50 +1,50 @@
-package app.vibecast.data
+package app.vibecast.domain
 
-
-
-import app.vibecast.data.local.db.weather.WeatherDao
+import app.vibecast.data.local.db.location.LocationEntity
+import app.vibecast.data.local.db.location.LocationWithWeatherData
 import app.vibecast.data.local.db.weather.WeatherEntity
-import app.vibecast.data.local.source.LocalWeatherDataSourceImpl
 import app.vibecast.domain.entity.CurrentWeather
 import app.vibecast.domain.entity.HourlyWeather
+import app.vibecast.domain.entity.Location
 import app.vibecast.domain.entity.Weather
 import app.vibecast.domain.entity.WeatherCondition
+import app.vibecast.domain.repository.LocationRepository
+import app.vibecast.domain.usecase.AddLocationUseCase
+import app.vibecast.domain.usecase.GetLocationUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
-class LocalWeatherDataSourceImplTest {
+class AddLocationUseCaseTest {
 
-    private val weatherDao = mock<WeatherDao>()
-    private val weatherDataSource = LocalWeatherDataSourceImpl(weatherDao)
-    private lateinit var localWeather: WeatherEntity
-    private lateinit var  expectedWeather : Weather
-    private val cityName = "London"
+    private val locationRepository = mock<LocationRepository>()
+    private val useCase = AddLocationUseCase(mock(),locationRepository)
+    private lateinit var location : Location
+    private lateinit var locationWithWeatherData: LocationWithWeatherData
+    private lateinit var locationEntity : LocationEntity
+    private lateinit var weatherEntity : WeatherEntity
+    private lateinit var weather : Weather
 
-
-    private fun WeatherEntity.toWeather(): Weather {
-        return Weather(
-            cityName = cityName,
-            latitude = weatherData.latitude,
-            longitude = weatherData.longitude,
-            currentWeather = weatherData.currentWeather,
-            hourlyWeather = weatherData.hourlyWeather
-        )
-    }
-
+    @ExperimentalCoroutinesApi
     @Before
     fun setUp() {
-         localWeather = WeatherEntity(
-            cityName = cityName,
+        location = Location(
+            cityName = "London",
+            locationIndex = 1
+        )
+
+        locationEntity = LocationEntity(
+            cityname = "London",
+            locationIndex = 1)
+
+
+        weatherEntity =  WeatherEntity(
+            cityName = "London",
             weatherData = Weather(
-                cityName = cityName,
+                cityName = "London",
                 latitude = 51.5074,
                 longitude = -0.1278,
                 currentWeather = CurrentWeather(
@@ -87,8 +87,8 @@ class LocalWeatherDataSourceImplTest {
                 }
             )
         )
-        expectedWeather =  Weather(
-            cityName = cityName,
+        weather = Weather(
+            cityName = "London",
             latitude = 51.5074,
             longitude = -0.1278,
             currentWeather = CurrentWeather(
@@ -111,7 +111,7 @@ class LocalWeatherDataSourceImplTest {
             ),
             hourlyWeather = List(24) {
                 HourlyWeather(
-                    timestamp = 1637094000,
+                    timestamp = (1637094000 + it * 3600).toLong(), // Incrementing timestamp for hourly forecast
                     temperature = 14.0,
                     feelsLike = 13.0,
                     humidity = 65,
@@ -131,35 +131,16 @@ class LocalWeatherDataSourceImplTest {
             }
         )
 
+
+        locationWithWeatherData = LocationWithWeatherData(locationEntity, weatherEntity)
+
     }
-
-
 
     @ExperimentalCoroutinesApi
     @Test
-    fun testGetWeather() = runTest {
-        whenever(weatherDao.getWeather(cityName)).thenReturn(flowOf(localWeather))
-        val result = weatherDataSource.getWeather(cityName).first()
-        assertEquals(expectedWeather.latitude,result.latitude)
-        assertEquals(expectedWeather.longitude,result.longitude)
-        assertEquals(expectedWeather.cityName,result.cityName)
+    fun testProcess()= runTest {
+        val request = AddLocationUseCase.Request(locationWithWeatherData)
+        useCase.process(request)
+        verify(locationRepository).addLocationWeather(request.location)
     }
-
-
-
-
-
-    @ExperimentalCoroutinesApi
-    @Test
-    fun testAddWeather() = runTest {
-        val cityName = "London"
-        val weather = localWeather.toWeather()
-        val weatherEntity = WeatherEntity(cityName, weather) // Convert weather to WeatherEntity
-
-        weatherDataSource.addWeather(weather)
-        verify(weatherDao).addWeather(weatherEntity) // Verify with the correct argument
-    }
-
-
-
 }

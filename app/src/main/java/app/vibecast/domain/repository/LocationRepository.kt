@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 interface  LocationRepository {
 
 
-    fun refreshLocationWeather()
+    fun refreshLocationWeather() : Flow<List<LocationWithWeatherData>>
     fun getLocationWeather(index : Int) : Flow<Weather>
 
 
