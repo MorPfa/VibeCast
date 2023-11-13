@@ -21,7 +21,8 @@ class LocationRepositoryImpl @Inject constructor(
     private val remoteWeatherDataSource: RemoteWeatherDataSource
 ) : LocationRepository {
     private val backgroundScope = CoroutineScope(Dispatchers.IO)
-    override fun refreshLocationWeather() {
+    override fun refreshLocationWeather() : Flow<List<LocationWithWeatherData>> {
+
         backgroundScope.launch {
             localLocationDataSource.getLocationWithWeather().map { locationWithWeatherDataList ->
                     locationWithWeatherDataList.map { locationWithWeatherData ->
@@ -42,6 +43,8 @@ class LocationRepositoryImpl @Inject constructor(
 
                 }.single()
         }
+        //TODO figure out how to test this method / if return value is needed
+        return localLocationDataSource.getLocationWithWeather()
     }
 
     override fun addLocationWeather(location: LocationWithWeatherData) {
@@ -55,10 +58,8 @@ class LocationRepositoryImpl @Inject constructor(
                 val selectedLocationWithWeather = locationWithWeatherDataList[index]
                 selectedLocationWithWeather.weather.weatherData
             } else {
-                // Handle index out of bounds or other error cases here
-                // You can return a default value, throw an exception, or handle it as needed.
-                // For now, returning an empty Weather object as a placeholder:
-                Weather(cityName = "", latitude = null, longitude = null, currentWeather = null, hourlyWeather = null)
+                //TODO Handle index out of bounds or other error cases here
+                Weather(cityName = "", latitude = 0.0, longitude = 0.0, currentWeather = null, hourlyWeather = null)
             }
         }
     }

@@ -12,6 +12,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import javax.inject.Named
 
 
 @Module
@@ -23,17 +24,20 @@ class NetworkModule {
     @Provides
     fun provideGson(): Gson = GsonBuilder().create()
 
+    @Named("weather")
     @Provides
     fun provideWeatherRetrofit(moshi: Moshi): Retrofit = Retrofit.Builder()
         .baseUrl("https://api.openweathermap.org/")
         .addConverterFactory(MoshiConverterFactory.create(moshi))
         .build()
 
+
     @Provides
-    fun provideWeatherService(retrofit: Retrofit) : WeatherService =
+    fun provideWeatherService(@Named("weather") retrofit: Retrofit) : WeatherService =
         retrofit.create(WeatherService::class.java)
 
     //TODO add glide for image transformation
+    @Named("unsplash")
     @Provides
     fun provideUnsplashRetrofit(moshi: Moshi) : Retrofit = Retrofit.Builder()
         .baseUrl("https://api.unsplash.com/")
@@ -42,6 +46,6 @@ class NetworkModule {
 
 
     @Provides
-    fun providePictureService(retrofit: Retrofit) : PictureService =
+    fun providePictureService(@Named("unsplash") retrofit: Retrofit) : PictureService =
         retrofit.create(PictureService::class.java)
 }

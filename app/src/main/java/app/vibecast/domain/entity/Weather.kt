@@ -4,8 +4,8 @@ package app.vibecast.domain.entity
 
 data class Weather (
     val cityName : String,
-    val latitude: Double?,
-    val longitude: Double?,
+    val latitude: Double,
+    val longitude: Double,
     val currentWeather: CurrentWeather?,
     val hourlyWeather: List<HourlyWeather>?
 )

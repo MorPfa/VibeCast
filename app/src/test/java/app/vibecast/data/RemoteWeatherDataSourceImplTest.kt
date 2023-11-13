@@ -36,6 +36,8 @@ class RemoteWeatherDataSourceImplTest {
     private val cityName = "London"
 
 
+
+
     @Before
     fun setUp() {
          remoteWeather = WeatherApiModel(
@@ -152,10 +154,19 @@ class RemoteWeatherDataSourceImplTest {
 
         val result = weatherDataSource.getWeather(cityName).first()
 
+        assertEquals(expectedWeather.longitude, result.longitude,1.0)
+        assertEquals(expectedWeather.latitude, result.latitude,1.0)
+        assertEquals(expectedWeather.currentWeather?.timestamp, result.currentWeather?.timestamp)
+    }
 
 
-        assertEquals(expectedWeather.longitude, result.longitude)
-        assertEquals(expectedWeather.latitude, result.latitude)
+    @ExperimentalCoroutinesApi
+    @Test
+    fun testGetWeatherWithCoordinates() = runTest {
+        whenever(weatherService.getWeather(expectedWeather.latitude, expectedWeather.longitude, BuildConfig.OWM_KEY)).thenReturn(remoteWeather)
+        val result = weatherDataSource.getWeather(expectedWeather.latitude , expectedWeather.longitude).first()
+        assertEquals(expectedWeather.longitude, result.longitude,1.0)
+        assertEquals(expectedWeather.latitude, result.latitude,1.0)
         assertEquals(expectedWeather.currentWeather?.timestamp, result.currentWeather?.timestamp)
     }
 

@@ -14,7 +14,7 @@ class LocalLocationDataSourceImpl @Inject constructor(
 ) : LocalLocationDataSource {
 
     override suspend fun addLocationWithWeather(location: LocationWithWeatherData)  {
-        locationDao.addLocationWithWeather(location)
+        locationDao.addLocationWithWeather(location.location, location.weather)
     }
 
 
