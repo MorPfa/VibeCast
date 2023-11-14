@@ -1,6 +1,6 @@
 package app.vibecast.domain.usecase
 
-import app.vibecast.domain.entity.Location
+import app.vibecast.domain.entity.LocationDto
 import app.vibecast.domain.repository.LocationRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -17,5 +17,5 @@ class GetLocationUseCase @Inject constructor(
         }
 
     data class Request(val cityName: String) : UseCase.Request
-    data class Response(val location: Location) : UseCase.Response
+    data class Response(val location: LocationDto) : UseCase.Response
 }

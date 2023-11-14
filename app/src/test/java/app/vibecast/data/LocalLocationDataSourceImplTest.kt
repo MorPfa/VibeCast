@@ -7,8 +7,8 @@ import app.vibecast.data.local.db.weather.WeatherEntity
 import app.vibecast.data.local.source.LocalLocationDataSourceImpl
 import app.vibecast.domain.entity.CurrentWeather
 import app.vibecast.domain.entity.HourlyWeather
-import app.vibecast.domain.entity.Location
-import app.vibecast.domain.entity.Weather
+import app.vibecast.domain.entity.LocationDto
+import app.vibecast.domain.entity.WeatherDto
 import app.vibecast.domain.entity.WeatherCondition
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -25,7 +25,7 @@ class LocalLocationDataSourceImplTest {
 
     private val locationDao = mock<LocationDao>()
     private val locationDataSource = LocalLocationDataSourceImpl(locationDao)
-    private lateinit var location : Location
+    private lateinit var location : LocationDto
     private lateinit var locationWithWeatherData: LocationWithWeatherData
     private lateinit var locationEntity : LocationEntity
     private lateinit var weatherEntity : WeatherEntity
@@ -33,7 +33,7 @@ class LocalLocationDataSourceImplTest {
 
     @Before
     fun setUp() {
-        location = Location(
+        location = LocationDto(
             cityName = "London",
             locationIndex = 1
         )
@@ -45,7 +45,7 @@ class LocalLocationDataSourceImplTest {
 
         weatherEntity =  WeatherEntity(
                 cityName = "London",
-                weatherData = Weather(
+                weatherData = WeatherDto(
                 cityName = "London",
                 latitude = 51.5074,
                 longitude = -0.1278,

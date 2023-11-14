@@ -4,11 +4,11 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import app.vibecast.databinding.ItemCardviewBinding
-import app.vibecast.domain.entity.Picture
+import app.vibecast.domain.entity.ImageDto
 
 // Replace with the correct package name
 
-class PictureAdapter(private val items: List<Picture>) : RecyclerView.Adapter<PictureAdapter.PictureViewHolder>() {
+class PictureAdapter(private val items: List<ImageDto>) : RecyclerView.Adapter<PictureAdapter.PictureViewHolder>() {
 
     class PictureViewHolder(private val binding: ItemCardviewBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -34,10 +34,7 @@ class PictureAdapter(private val items: List<Picture>) : RecyclerView.Adapter<Pi
         val item = items[position]
 
         // Bind data to views using ViewBinding
-        holder.savedImage.setImageResource(item.imageResId)
-        holder.header.text = item.headerText
-        holder.title.text = item.titleText
-        holder.description.text = item.descriptionText
+
 
 
 //        holder.removeButton.setOnClickListener {

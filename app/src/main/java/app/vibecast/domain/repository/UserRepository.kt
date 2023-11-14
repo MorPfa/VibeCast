@@ -1,7 +1,6 @@
 package app.vibecast.domain.repository
 
 import app.vibecast.domain.entity.User
-import app.vibecast.domain.entity.Weather
 import kotlinx.coroutines.flow.Flow
 
 

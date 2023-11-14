@@ -1,6 +1,6 @@
 package app.vibecast.domain
 
-import app.vibecast.domain.entity.Location
+import app.vibecast.domain.entity.LocationDto
 import app.vibecast.domain.repository.LocationRepository
 import app.vibecast.domain.usecase.GetLocationUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -22,7 +22,7 @@ class GetLocationUseCaseTest {
     @Test
     fun testProcess()= runTest {
         val request = GetLocationUseCase.Request("London")
-        val location = Location("London", 1)
+        val location = LocationDto("London", 1)
         whenever(locationRepository.getLocation(request.cityName)).thenReturn(flowOf(location))
         val response = useCase.process(request).first()
         Assert.assertEquals(GetLocationUseCase.Response(location),response)

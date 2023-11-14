@@ -8,7 +8,7 @@ import app.vibecast.data.data_repository.data_source.remote.RemoteWeatherDataSou
 import app.vibecast.data.data_repository.repository.WeatherRepositoryImpl
 import app.vibecast.domain.entity.CurrentWeather
 import app.vibecast.domain.entity.HourlyWeather
-import app.vibecast.domain.entity.Weather
+import app.vibecast.domain.entity.WeatherDto
 import app.vibecast.domain.entity.WeatherCondition
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -30,13 +30,13 @@ class WeatherRepositoryImplTest {
     private val connectivityManager = mock<ConnectivityManager>()
     private val networkCapabilities = mock<NetworkCapabilities>()
     private val repositoryImpl = WeatherRepositoryImpl(remoteWeatherDataSource,localWeatherDataSource, context)
-    private lateinit var  expectedWeather : Weather
+    private lateinit var  expectedWeather : WeatherDto
     private val cityName = "London"
 
     @Before
     fun setUp() {
 
-        expectedWeather =  Weather(
+        expectedWeather =  WeatherDto(
             cityName = cityName,
             latitude = 51.5074,
             longitude = -0.1278,

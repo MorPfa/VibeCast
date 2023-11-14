@@ -5,12 +5,11 @@ import app.vibecast.data.local.db.location.LocationWithWeatherData
 import app.vibecast.data.local.db.weather.WeatherEntity
 import app.vibecast.domain.entity.CurrentWeather
 import app.vibecast.domain.entity.HourlyWeather
-import app.vibecast.domain.entity.Location
-import app.vibecast.domain.entity.Weather
+import app.vibecast.domain.entity.LocationDto
+import app.vibecast.domain.entity.WeatherDto
 import app.vibecast.domain.entity.WeatherCondition
 import app.vibecast.domain.repository.LocationRepository
 import app.vibecast.domain.usecase.AddLocationUseCase
-import app.vibecast.domain.usecase.GetLocationUseCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -22,16 +21,16 @@ class AddLocationUseCaseTest {
 
     private val locationRepository = mock<LocationRepository>()
     private val useCase = AddLocationUseCase(mock(),locationRepository)
-    private lateinit var location : Location
+    private lateinit var location : LocationDto
     private lateinit var locationWithWeatherData: LocationWithWeatherData
     private lateinit var locationEntity : LocationEntity
     private lateinit var weatherEntity : WeatherEntity
-    private lateinit var weather : Weather
+    private lateinit var weather : WeatherDto
 
     @ExperimentalCoroutinesApi
     @Before
     fun setUp() {
-        location = Location(
+        location = LocationDto(
             cityName = "London",
             locationIndex = 1
         )
@@ -43,7 +42,7 @@ class AddLocationUseCaseTest {
 
         weatherEntity =  WeatherEntity(
             cityName = "London",
-            weatherData = Weather(
+            weatherData = WeatherDto(
                 cityName = "London",
                 latitude = 51.5074,
                 longitude = -0.1278,
@@ -87,7 +86,7 @@ class AddLocationUseCaseTest {
                 }
             )
         )
-        weather = Weather(
+        weather = WeatherDto(
             cityName = "London",
             latitude = 51.5074,
             longitude = -0.1278,
