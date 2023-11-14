@@ -1,6 +1,6 @@
 package app.vibecast.domain.usecase
 
-import app.vibecast.domain.entity.Weather
+import app.vibecast.domain.entity.WeatherDto
 import app.vibecast.domain.repository.LocationRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -18,5 +18,5 @@ class GetSavedWeatherUseCase @Inject constructor(
             }
 
     data class Request(val index : Int) : UseCase.Request
-    data class Response(val weather: Weather) : UseCase.Response
+    data class Response(val weather: WeatherDto) : UseCase.Response
 }

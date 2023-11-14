@@ -4,7 +4,7 @@ import app.vibecast.data.data_repository.data_source.local.LocalLocationDataSour
 import app.vibecast.data.local.db.location.LocationDao
 import app.vibecast.data.local.db.location.LocationEntity
 import app.vibecast.data.local.db.location.LocationWithWeatherData
-import app.vibecast.domain.entity.Location
+import app.vibecast.domain.entity.LocationDto
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -21,22 +21,22 @@ class LocalLocationDataSourceImpl @Inject constructor(
     override fun getLocationWithWeather(): Flow<List<LocationWithWeatherData>> = locationDao.getLocationWithWeather()
 
 
-    override fun getAllLocations(): Flow<List<Location>> = locationDao.getLocations().map { locations ->
+    override fun getAllLocations(): Flow<List<LocationDto>> = locationDao.getLocations().map { locations ->
         locations.map {
-            Location(it.cityname, it.locationIndex)
+            LocationDto(it.cityname, it.locationIndex)
         }
     }
 
 
-    override fun getLocation(cityName: String): Flow<Location> = locationDao.getLocation(cityName).map {
-        Location(it.cityname, it.locationIndex)
+    override fun getLocation(cityName: String): Flow<LocationDto> = locationDao.getLocation(cityName).map {
+        LocationDto(it.cityname, it.locationIndex)
     }
 
-    override suspend fun addLocation(location: Location) = locationDao.addLocation(
+    override suspend fun addLocation(location: LocationDto) = locationDao.addLocation(
         LocationEntity(location.cityName, location.locationIndex)
     )
 
-    override suspend fun deleteLocation(location: Location) = locationDao.deleteLocation(
+    override suspend fun deleteLocation(location: LocationDto) = locationDao.deleteLocation(
         LocationEntity(location.cityName, location.locationIndex)
     )
 

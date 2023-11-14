@@ -3,7 +3,7 @@ package app.vibecast.data.data_repository.repository
 import app.vibecast.data.data_repository.data_source.local.LocalWeatherDataSource
 import app.vibecast.data.data_repository.data_source.remote.RemoteWeatherDataSource
 import app.vibecast.data.remote.network.weather.CoordinateApiModel
-import app.vibecast.domain.entity.Weather
+import app.vibecast.domain.entity.WeatherDto
 import app.vibecast.domain.repository.WeatherRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.onEach
@@ -22,7 +22,7 @@ class WeatherRepositoryImpl @Inject constructor(
 
     override fun getCoordinates(cityName: String): Flow<CoordinateApiModel> = remoteWeatherDataSource.getCoordinates(cityName)
 
-    override fun getWeather(cityName : String): Flow<Weather> {
+    override fun getWeather(cityName : String): Flow<WeatherDto> {
         return if(isInternetAvailable(context)) {
             remoteWeatherDataSource.getWeather(cityName)} else {
                 localWeatherDataSource.getWeather(cityName)
@@ -30,13 +30,13 @@ class WeatherRepositoryImpl @Inject constructor(
     }
 
 
-    override fun refreshWeather(cityName: String): Flow<Weather> = remoteWeatherDataSource.getWeather(cityName)
+    override fun refreshWeather(cityName: String): Flow<WeatherDto> = remoteWeatherDataSource.getWeather(cityName)
         .onEach {
             localWeatherDataSource.addWeather(it)
         }
 
 
-    override fun refreshWeather(lat: Double, lon: Double): Flow<Weather> = remoteWeatherDataSource.getWeather(lat, lon)
+    override fun refreshWeather(lat: Double, lon: Double): Flow<WeatherDto> = remoteWeatherDataSource.getWeather(lat, lon)
     .onEach {
         localWeatherDataSource.addWeather(it)
     }

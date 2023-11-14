@@ -22,11 +22,17 @@ android {
         val keystoreFile = project.rootProject.file("apikeys.properties")
         val properties = Properties()
         properties.load(keystoreFile.inputStream())
-        val apiKey = properties.getProperty("OWM_KEY")
+        val owmKey = properties.getProperty("OWM_KEY")
         buildConfigField(
             type = "String",
             name = "OWM_KEY",
-            value = apiKey
+            value = owmKey
+        )
+        val unsplashKey = properties.getProperty("UNSPLASH_KEY")
+        buildConfigField(
+            type = "String",
+            name = "UNSPLASH_KEY",
+            value = unsplashKey
         )
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

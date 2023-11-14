@@ -3,18 +3,18 @@ package app.vibecast.domain
 import app.vibecast.data.local.db.weather.WeatherEntity
 import app.vibecast.domain.entity.CurrentWeather
 import app.vibecast.domain.entity.HourlyWeather
-import app.vibecast.domain.entity.Weather
+import app.vibecast.domain.entity.WeatherDto
 import app.vibecast.domain.entity.WeatherCondition
 import kotlin.random.Random
 
 
 class CreateFakeWeather {
 
-    fun Weather.toWeatherEntity(cityName: String): WeatherEntity {
+    fun WeatherDto.toWeatherEntity(cityName: String): WeatherEntity {
         return WeatherEntity(cityName, this)
     }
 
-    fun createFakeWeather(): Weather {
+    fun createFakeWeather(): WeatherDto {
         val random = Random
 
         // Generate random latitude and longitude values
@@ -64,7 +64,7 @@ class CreateFakeWeather {
             )
         }
 
-        return Weather(cityName, latitude, longitude, currentWeather, hourlyWeather)
+        return WeatherDto(cityName, latitude, longitude, currentWeather, hourlyWeather)
     }
 
 }

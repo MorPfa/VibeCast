@@ -8,8 +8,8 @@ import app.vibecast.data.local.db.location.LocationWithWeatherData
 import app.vibecast.data.local.db.weather.WeatherEntity
 import app.vibecast.domain.entity.CurrentWeather
 import app.vibecast.domain.entity.HourlyWeather
-import app.vibecast.domain.entity.Location
-import app.vibecast.domain.entity.Weather
+import app.vibecast.domain.entity.LocationDto
+import app.vibecast.domain.entity.WeatherDto
 import app.vibecast.domain.entity.WeatherCondition
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -32,18 +32,18 @@ class LocationRepositoryImplTest {
     private val localLocationDataSource = mock<LocalLocationDataSource>()
     private val remoteWeatherDataSource = mock<RemoteWeatherDataSource>()
     private val locationRepository = LocationRepositoryImpl(localLocationDataSource, remoteWeatherDataSource)
-    private lateinit var location : Location
+    private lateinit var location : LocationDto
     private lateinit var locationWithWeatherData: LocationWithWeatherData
     private lateinit var locationEntity : LocationEntity
     private lateinit var weatherEntity : WeatherEntity
-    private lateinit var weather : Weather
+    private lateinit var weather : WeatherDto
     @ExperimentalCoroutinesApi
     private val testDispatcher: TestCoroutineDispatcher = TestCoroutineDispatcher()
     @ExperimentalCoroutinesApi
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        location = Location(
+        location = LocationDto(
             cityName = "London",
             locationIndex = 1
         )
@@ -55,7 +55,7 @@ class LocationRepositoryImplTest {
 
         weatherEntity =  WeatherEntity(
             cityName = "London",
-            weatherData = Weather(
+            weatherData = WeatherDto(
                 cityName = "London",
                 latitude = 51.5074,
                 longitude = -0.1278,
@@ -99,7 +99,7 @@ class LocationRepositoryImplTest {
                 }
             )
         )
-        weather = Weather(
+        weather = WeatherDto(
                 cityName = "London",
                 latitude = 51.5074,
                 longitude = -0.1278,

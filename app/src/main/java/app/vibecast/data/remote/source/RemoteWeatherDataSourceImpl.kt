@@ -11,7 +11,7 @@ import app.vibecast.data.remote.network.weather.WeatherService
 import app.vibecast.domain.entity.CurrentWeather
 import app.vibecast.domain.entity.HourlyWeather
 import app.vibecast.domain.entity.UseCaseException
-import app.vibecast.domain.entity.Weather
+import app.vibecast.domain.entity.WeatherDto
 import app.vibecast.domain.entity.WeatherCondition
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -29,7 +29,7 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
         emit(weatherService.getCiyCoordinates(name,1,BuildConfig.OWM_KEY))
 
     }
-    override fun getWeather(name: String): Flow<Weather> = flow {
+    override fun getWeather(name: String): Flow<WeatherDto> = flow {
         val coordinates = getCoordinates(name).first()
         val weatherData = weatherService.getWeather(coordinates.latitude, coordinates.longitude , BuildConfig.OWM_KEY)
         emit(weatherData)
@@ -39,7 +39,7 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
         throw UseCaseException.WeatherException(it)
     }
 
-    override fun getWeather(lat : Double, lon : Double): Flow<Weather> = flow {
+    override fun getWeather(lat : Double, lon : Double): Flow<WeatherDto> = flow {
         val weatherData = weatherService.getWeather(lat, lon, BuildConfig.OWM_KEY)
         emit(weatherData)
     }.map {weatherApiModel ->
@@ -51,8 +51,8 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
 
     companion object {
     //Converting Api response data to domain layer entity
-    fun WeatherApiModel.toWeather(): Weather {
-        return Weather(
+    fun WeatherApiModel.toWeather(): WeatherDto {
+        return WeatherDto(
             cityName =cityName,
             latitude = latitude,
             longitude = longitude,

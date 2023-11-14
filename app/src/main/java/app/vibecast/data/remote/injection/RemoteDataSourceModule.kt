@@ -1,8 +1,8 @@
 package app.vibecast.data.remote.injection
 
-import app.vibecast.data.data_repository.data_source.remote.RemotePictureDataSource
+import app.vibecast.data.data_repository.data_source.remote.RemoteImageDataSource
 import app.vibecast.data.data_repository.data_source.remote.RemoteWeatherDataSource
-import app.vibecast.data.remote.source.RemotePictureDataSourceImpl
+import app.vibecast.data.remote.source.RemoteImageDataSourceImpl
 import app.vibecast.data.remote.source.RemoteWeatherDataSourceImpl
 import dagger.Binds
 import dagger.Module
@@ -18,5 +18,5 @@ abstract class RemoteDataSourceModule {
     abstract fun bindWeatherDataSource(weatherDataSourceImpl: RemoteWeatherDataSourceImpl) : RemoteWeatherDataSource
 
     @Binds
-    abstract fun bindPictureDataSource(pictureDataSourceImpl: RemotePictureDataSourceImpl) : RemotePictureDataSource
+    abstract fun bindImageDataSource(imageDataSourceImpl: RemoteImageDataSourceImpl) : RemoteImageDataSource
 }

@@ -7,7 +7,7 @@ import org.junit.Test
 import org.mockito.kotlin.mock
 import app.vibecast.domain.entity.CurrentWeather
 import app.vibecast.domain.entity.HourlyWeather
-import app.vibecast.domain.entity.Weather
+import app.vibecast.domain.entity.WeatherDto
 import app.vibecast.domain.entity.WeatherCondition
 import app.vibecast.presentation.weather.WeatherModel
 import app.vibecast.R
@@ -22,7 +22,7 @@ class WeatherConverterTest {
     private val converter = WeatherConverter(testContext)
 
     private lateinit var weatherModel: WeatherModel
-    private lateinit var  expectedWeather : Weather
+    private lateinit var  expectedWeather : WeatherDto
     private val cityName = "London"
     private val timestamp = "1637094000"
     private val temperature = "15.0"
@@ -69,7 +69,7 @@ class WeatherConverterTest {
             }
         )
 
-        expectedWeather =  Weather(
+        expectedWeather =  WeatherDto(
             cityName = cityName,
             latitude = 51.5074,
             longitude = -0.1278,

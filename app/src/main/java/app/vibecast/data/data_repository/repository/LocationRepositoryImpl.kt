@@ -4,8 +4,8 @@ import app.vibecast.data.data_repository.data_source.local.LocalLocationDataSour
 import app.vibecast.data.data_repository.data_source.remote.RemoteWeatherDataSource
 import app.vibecast.data.local.db.location.LocationWithWeatherData
 import app.vibecast.data.local.db.weather.WeatherEntity
-import app.vibecast.domain.entity.Location
-import app.vibecast.domain.entity.Weather
+import app.vibecast.domain.entity.LocationDto
+import app.vibecast.domain.entity.WeatherDto
 import app.vibecast.domain.repository.LocationRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -52,35 +52,35 @@ class LocationRepositoryImpl @Inject constructor(
         localLocationDataSource.addLocationWithWeather(location)
         }
     }
-    override fun getLocationWeather(index: Int): Flow<Weather> {
+    override fun getLocationWeather(index: Int): Flow<WeatherDto> {
         return localLocationDataSource.getLocationWithWeather().map { locationWithWeatherDataList ->
             if (index in locationWithWeatherDataList.indices) {
                 val selectedLocationWithWeather = locationWithWeatherDataList[index]
                 selectedLocationWithWeather.weather.weatherData
             } else {
                 //TODO Handle index out of bounds or other error cases here
-                Weather(cityName = "", latitude = 0.0, longitude = 0.0, currentWeather = null, hourlyWeather = null)
+                WeatherDto(cityName = "", latitude = 0.0, longitude = 0.0, currentWeather = null, hourlyWeather = null)
             }
         }
     }
 
 
-    override fun getLocations(): Flow<List<Location>> = localLocationDataSource.getAllLocations()
+    override fun getLocations(): Flow<List<LocationDto>> = localLocationDataSource.getAllLocations()
 
 
-    override fun getLocation(cityName: String): Flow<Location> = localLocationDataSource.getLocation(cityName)
+    override fun getLocation(cityName: String): Flow<LocationDto> = localLocationDataSource.getLocation(cityName)
 
-    override fun addLocation(location: Location) =  CoroutineScope(Dispatchers.Main).launch {
+    override fun addLocation(location: LocationDto) =  CoroutineScope(Dispatchers.Main).launch {
         localLocationDataSource.addLocation(location)
     }
 
-    override fun deleteLocation(location: Location) =
+    override fun deleteLocation(location: LocationDto) =
         CoroutineScope(Dispatchers.Main).launch {
             localLocationDataSource.deleteLocation(location)
         }
 
 
-    private fun Weather.toWeatherEntity(cityName: String): WeatherEntity {
+    private fun WeatherDto.toWeatherEntity(cityName: String): WeatherEntity {
         return WeatherEntity(
             cityName = cityName,
             weatherData = this

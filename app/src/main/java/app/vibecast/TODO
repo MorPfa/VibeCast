@@ -6,7 +6,6 @@ start working out fragment redraw mechanism -Not started yet
 
 integrate location into user/ account stuff -Not started yet
 
--figure out how to add saved locations as merged table of location / weather and
 
 SEARCH BAR / CACHING FUNCTIONALITY:
 
@@ -19,11 +18,7 @@ create mechanism to save and update new db entity:
     - Implement mechanism (simple list to track index) to check which screen is being shown (current location being index 0)
     - with each click on next screen button, index changes
 
-
-GOAL FOR TODAY:
-Ensure that replacing of entities / values works as expected - it does for saved locations
-
-START TO WRITE TESTS FOR NEW CLASSES AND REWRITE OLD TESTS FOR REFACTORED CODE
+FIND APPROPRIATE DEFAULT IMAGE FOR EACH WEATHER CONDITION IN CASE OF NO INTERNET
 
 
 

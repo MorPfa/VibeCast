@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import app.vibecast.R
 import app.vibecast.databinding.FragmentPicturesBinding
-import app.vibecast.domain.entity.Picture
+import app.vibecast.domain.entity.ImageDto
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -42,28 +42,28 @@ class PicturesFragment : Fragment() {
     ): View? {
         binding = FragmentPicturesBinding.inflate(inflater,container,false)
 
-        val pictureItems = listOf(
-            Picture(R.drawable.osman_rana_gxezuwo5m4i_unsplash, "Header 1", "Title 1", "Description 1"),
-            Picture(R.drawable.osman_rana_gxezuwo5m4i_unsplash, "Header 2", "Title 2", "Description 2"),
-            Picture(R.drawable.osman_rana_gxezuwo5m4i_unsplash, "Header 1", "Title 1", "Description 1"),
-            Picture(R.drawable.osman_rana_gxezuwo5m4i_unsplash, "Header 2", "Title 2", "Description 2"),
-            Picture(R.drawable.osman_rana_gxezuwo5m4i_unsplash, "Header 1", "Title 1", "Description 1"),
-            Picture(R.drawable.osman_rana_gxezuwo5m4i_unsplash, "Header 2", "Title 2", "Description 2"),
-            Picture(R.drawable.osman_rana_gxezuwo5m4i_unsplash, "Header 1", "Title 1", "Description 1"),
-            Picture(R.drawable.osman_rana_gxezuwo5m4i_unsplash, "Header 2", "Title 2", "Description 2"),
-            Picture(R.drawable.osman_rana_gxezuwo5m4i_unsplash, "Header 1", "Title 1", "Description 1"),
-            Picture(R.drawable.osman_rana_gxezuwo5m4i_unsplash, "Header 2", "Title 2", "Description 2"),
-            Picture(R.drawable.osman_rana_gxezuwo5m4i_unsplash, "Header 1", "Title 1", "Description 1"),
-            Picture(R.drawable.osman_rana_gxezuwo5m4i_unsplash, "Header 2", "Title 2", "Description 2"),
-            // Add more PictureItem objects as needed
-        )
+//        val pictureItems = listOf(
+//            ImageDto(R.drawable.osman_rana_gxezuwo5m4i_unsplash, "Header 1", "Title 1", "Description 1"),
+//            ImageDto(R.drawable.osman_rana_gxezuwo5m4i_unsplash, "Header 2", "Title 2", "Description 2"),
+//            ImageDto(R.drawable.osman_rana_gxezuwo5m4i_unsplash, "Header 1", "Title 1", "Description 1"),
+//            ImageDto(R.drawable.osman_rana_gxezuwo5m4i_unsplash, "Header 2", "Title 2", "Description 2"),
+//            ImageDto(R.drawable.osman_rana_gxezuwo5m4i_unsplash, "Header 1", "Title 1", "Description 1"),
+//            ImageDto(R.drawable.osman_rana_gxezuwo5m4i_unsplash, "Header 2", "Title 2", "Description 2"),
+//            ImageDto(R.drawable.osman_rana_gxezuwo5m4i_unsplash, "Header 1", "Title 1", "Description 1"),
+//            ImageDto(R.drawable.osman_rana_gxezuwo5m4i_unsplash, "Header 2", "Title 2", "Description 2"),
+//            ImageDto(R.drawable.osman_rana_gxezuwo5m4i_unsplash, "Header 1", "Title 1", "Description 1"),
+//            ImageDto(R.drawable.osman_rana_gxezuwo5m4i_unsplash, "Header 2", "Title 2", "Description 2"),
+//            ImageDto(R.drawable.osman_rana_gxezuwo5m4i_unsplash, "Header 1", "Title 1", "Description 1"),
+//            ImageDto(R.drawable.osman_rana_gxezuwo5m4i_unsplash, "Header 2", "Title 2", "Description 2"),
+//            // Add more PictureItem objects as needed
+//        )
 
-        val recyclerView: RecyclerView = binding.recyclerView
-        val adapter = PictureAdapter(pictureItems)
-        recyclerView.adapter = adapter
+//        val recyclerView: RecyclerView = binding.recyclerView
+//        val adapter = PictureAdapter(pictureItems)
+//        recyclerView.adapter = adapter
 
-        val layoutManager = GridLayoutManager(requireContext(), 3)
-        recyclerView.layoutManager = layoutManager
+//        val layoutManager = GridLayoutManager(requireContext(), 3)
+//        recyclerView.layoutManager = layoutManager
 
 
         return binding.root

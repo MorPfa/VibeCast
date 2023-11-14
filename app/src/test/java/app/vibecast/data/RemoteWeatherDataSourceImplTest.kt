@@ -12,7 +12,7 @@ import app.vibecast.data.remote.source.RemoteWeatherDataSourceImpl
 import app.vibecast.domain.entity.CurrentWeather
 import app.vibecast.domain.entity.HourlyWeather
 import app.vibecast.domain.entity.UseCaseException
-import app.vibecast.domain.entity.Weather
+import app.vibecast.domain.entity.WeatherDto
 import app.vibecast.domain.entity.WeatherCondition
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.catch
@@ -32,7 +32,7 @@ class RemoteWeatherDataSourceImplTest {
     private val weatherService = mock<WeatherService>()
     private val weatherDataSource = RemoteWeatherDataSourceImpl(weatherService)
     private lateinit var remoteWeather: WeatherApiModel
-    private lateinit var  expectedWeather : Weather
+    private lateinit var  expectedWeather : WeatherDto
     private val cityName = "London"
 
 
@@ -84,7 +84,7 @@ class RemoteWeatherDataSourceImplTest {
             }
         )
 
-        expectedWeather =  Weather(
+        expectedWeather =  WeatherDto(
             cityName = cityName,
             latitude = 51.5074,
             longitude = -0.1278,
