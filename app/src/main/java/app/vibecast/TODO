@@ -15,10 +15,12 @@ SEARCH BAR / CACHING FUNCTIONALITY:
 
 FIND APPROPRIATE DEFAULT IMAGE FOR EACH WEATHER CONDITION IN CASE OF NO INTERNET
 INCLUDE DOWNLOAD URL IN API RESPONSE MODEL
+DOUBLE CHECK APPROPRIATE NULL CHECKS / ERROR HANDLING IN EACH DATA FLOW
 
 
 FINISH GALLERY FRAGMENT:
-- add  functionality to save image button -started
+- add  functionality to save image button -almost done, just need to figure out how to pass
+  values to save functions in fragment
 - write unit tests for new stuff
 
 consider using paging3 to get images from db

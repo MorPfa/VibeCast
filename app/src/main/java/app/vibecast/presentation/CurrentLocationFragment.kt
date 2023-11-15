@@ -7,7 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import app.vibecast.R
+import app.vibecast.data.local.db.location.LocationWithWeatherData
 import app.vibecast.databinding.FragmentCurrentLocationBinding
+import app.vibecast.domain.entity.ImageDto
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -18,9 +20,13 @@ class CurrentLocationFragment : Fragment() {
 
     private lateinit var binding : FragmentCurrentLocationBinding
     private lateinit var permissionHelper: PermissionHelper
+
+    private var actionBarItemClickListener: OnActionBarItemClickListener? = null
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,8 +64,22 @@ class CurrentLocationFragment : Fragment() {
         if (!permissionHelper.isPermissionGranted(permission)) {
             permissionHelper.requestPermission(permission, rationale, requestCode)
         }
+    }
 
 
+    // Call this method when you need to trigger an action from the activity
+    private fun performSaveImage(image : ImageDto) {
+        actionBarItemClickListener?.onSaveImageClicked(image)
+    }
+
+    // Call this method when you need to trigger another action from the activity
+    private fun performSaveLocation(location : LocationWithWeatherData) {
+        actionBarItemClickListener?.onSaveLocationClicked(location)
+    }
+
+    interface OnActionBarItemClickListener {
+        fun onSaveImageClicked(image : ImageDto)
+        fun onSaveLocationClicked(location : LocationWithWeatherData)
     }
 
     companion object {
