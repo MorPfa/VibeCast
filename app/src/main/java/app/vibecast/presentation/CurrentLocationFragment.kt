@@ -36,7 +36,7 @@ class CurrentLocationFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        //TODO laod weather data from viewmodel here
+        //TODO decide on whether to use one combined viewmodel to load all data or or separate viewmodels
         binding = FragmentCurrentLocationBinding.inflate(inflater,container,false)
         val nextScreenButton = binding.nextScreenButtonRight
         nextScreenButton.setOnClickListener {

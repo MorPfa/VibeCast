@@ -1,6 +1,7 @@
 package app.vibecast.data
 
 import app.vibecast.data.data_repository.repository.ImageRepositoryImpl
+import app.vibecast.data.local.source.LocalImageDataSourceImpl
 import app.vibecast.data.remote.network.image.Image
 import app.vibecast.data.remote.network.image.ImageApiModel
 import app.vibecast.data.remote.source.RemoteImageDataSourceImpl
@@ -21,7 +22,8 @@ class ImageRepositoryImplTest {
     //TODO add local data source tests
 
     private val remoteImageDataSource = mock<RemoteImageDataSourceImpl>()
-    private val imageRepository = ImageRepositoryImpl(remoteImageDataSource)
+    private val localImageDataSource = mock<LocalImageDataSourceImpl>()
+    private val imageRepository = ImageRepositoryImpl(remoteImageDataSource, localImageDataSource)
     private lateinit var imageApiModel: ImageApiModel
     private lateinit var imageDto: ImageDto
     private lateinit var image : Image
@@ -75,7 +77,7 @@ class ImageRepositoryImplTest {
             val query = "Seattle rainy"
             val expectedImages = listOf(imageDto)
             whenever(remoteImageDataSource.getImages(query)).thenReturn(flowOf(expectedImages))
-            val result = imageRepository.getImages(query).first()
+            val result = imageRepository.getRemoteImages(query).first()
             assertEquals(expectedImages,result)
         }
     }
@@ -87,7 +89,7 @@ class ImageRepositoryImplTest {
             val query = "Seattle rainy"
             val expectedImage = imageDto
             val listOfImageDtos = listOf(imageDto)
-            whenever(imageRepository.getImages(query)).thenReturn(flowOf(listOfImageDtos))
+            whenever(imageRepository.getRemoteImages(query)).thenReturn(flowOf(listOfImageDtos))
             val result = imageRepository.pickRandomImage(query).first()
             assertEquals(expectedImage, result)
         }

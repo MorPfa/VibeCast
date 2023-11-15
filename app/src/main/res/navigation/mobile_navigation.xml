@@ -24,7 +24,7 @@
 
     <fragment
         android:id="@+id/nav_pictures"
-        android:name="app.vibecast.presentation.navigation.PicturesFragment"
+        android:name="app.vibecast.presentation.navigation.GalleryFragment"
         tools:layout="@layout/fragment_pictures" />
 
     <fragment

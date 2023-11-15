@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import app.vibecast.data.local.db.AppDatabase
 import app.vibecast.data.local.db.location.LocationDao
-import app.vibecast.data.local.db.picture.PictureDao
+import app.vibecast.data.local.db.image.ImageDao
 import app.vibecast.data.local.db.user.UserDao
 import app.vibecast.data.local.db.weather.WeatherDao
 import dagger.Module
@@ -39,5 +39,5 @@ class PersistenceModule {
     fun provideLocationDao(appDatabase: AppDatabase) : LocationDao = appDatabase.locationDao()
 
     @Provides
-    fun providePictureDao(appDatabase: AppDatabase) : PictureDao = appDatabase.pictureDao()
+    fun provideImageDao(appDatabase: AppDatabase) : ImageDao = appDatabase.imageDao()
 }

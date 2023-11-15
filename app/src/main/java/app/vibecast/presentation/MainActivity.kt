@@ -1,13 +1,16 @@
 package app.vibecast.presentation
 
-import android.Manifest
 import android.content.Context
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -15,13 +18,12 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import app.vibecast.R
 import app.vibecast.databinding.ActivityMainBinding
-import com.google.android.material.navigation.NavigationView
-import androidx.appcompat.widget.SearchView
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import app.vibecast.domain.repository.ImageRepository
+import app.vibecast.domain.repository.LocationRepository
 import app.vibecast.presentation.weather.WeatherViewModel
+import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -31,6 +33,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var searchView: SearchView
     private lateinit var fragmentViewModel : ViewModel
     private lateinit var currentLocationFragment: Fragment
+
+    @Inject
+    lateinit var locationRepository: LocationRepository
+
+    @Inject
+    lateinit var  imageRepository: ImageRepository
 
 
 
@@ -68,13 +76,6 @@ class MainActivity : AppCompatActivity() {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.main, menu)
 
-        val saveLocationBtn = menu.findItem(R.id.action_save_location)
-
-        //TODO implement onclick listener for save location btn
-//        saveLocationBtn.setOnMenuItemClickListener {
-//
-//        }
-
         val searchItem = menu.findItem(R.id.action_search)
         searchView = searchItem.actionView as SearchView
         val inflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
@@ -99,6 +100,20 @@ class MainActivity : AppCompatActivity() {
         })
 
         return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_save_image -> {
+                // Handle menu item 1 click
+                true
+            }
+            R.id.action_save_location -> {
+                // Handle menu item 2 click
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     //TODO make performSearch return a location with weather object
