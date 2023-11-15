@@ -83,5 +83,6 @@
     <string name="profile_picture_content_desc">Users profile picture</string>
     <string name="name">%1$s</string>
     <string name="save_location">Save location</string>
+    <string name="save_image_btn">Save Image</string>
 
 </resources>

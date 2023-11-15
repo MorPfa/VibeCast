@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/generic_background"
     android:fitsSystemWindows="true"
-    tools:context=".presentation.navigation.PicturesFragment"
+    tools:context=".presentation.navigation.GalleryFragment"
    >
 
     <LinearLayout

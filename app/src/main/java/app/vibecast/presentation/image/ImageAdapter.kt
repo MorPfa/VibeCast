@@ -1,4 +1,4 @@
-package app.vibecast.presentation.navigation
+package app.vibecast.presentation.image
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -6,13 +6,13 @@ import androidx.recyclerview.widget.RecyclerView
 import app.vibecast.databinding.ItemCardviewBinding
 import app.vibecast.domain.entity.ImageDto
 
-// Replace with the correct package name
 
-class PictureAdapter(private val items: List<ImageDto>) : RecyclerView.Adapter<PictureAdapter.PictureViewHolder>() {
+class ImageAdapter(
+    private val imageLoader: ImageLoader,
+    private val items: List<ImageDto>,
+) : RecyclerView.Adapter<ImageAdapter.PictureViewHolder>() {
 
-    class PictureViewHolder(private val binding: ItemCardviewBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-        // Use binding to access views in the layout
+    class PictureViewHolder(binding: ItemCardviewBinding) : RecyclerView.ViewHolder(binding.root) {
         val savedImage = binding.savedImage
         val header = binding.header
         val title = binding.title
@@ -31,17 +31,16 @@ class PictureAdapter(private val items: List<ImageDto>) : RecyclerView.Adapter<P
     }
 
     override fun onBindViewHolder(holder: PictureViewHolder, position: Int) {
-        val item = items[position]
-
-        // Bind data to views using ViewBinding
-
-
+        val imageUrl = items[position]
+        imageLoader.loadUrlIntoImageView(imageUrl.urls.regular,holder.savedImage)
 
 //        holder.removeButton.setOnClickListener {
-//            //TODO
+//
+        //TODO figure out deleting images
+//
 //        }
 
-        // Set click listeners or other actions as needed
+
 
 
     }

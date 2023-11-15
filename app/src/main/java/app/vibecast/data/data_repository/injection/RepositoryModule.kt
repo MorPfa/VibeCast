@@ -28,5 +28,5 @@ abstract class RepositoryModule {
     abstract fun bindLocationRepository(locationRepositoryImpl: LocationRepositoryImpl) : LocationRepository
 
     @Binds
-    abstract  fun bindPictureRepository(pictureRepositoryImpl: ImageRepositoryImpl) : ImageRepository
+    abstract  fun bindImageRepository(imageRepositoryImpl: ImageRepositoryImpl) : ImageRepository
 }
