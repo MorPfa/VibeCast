@@ -17,7 +17,9 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import app.vibecast.R
+import app.vibecast.data.local.db.location.LocationWithWeatherData
 import app.vibecast.databinding.ActivityMainBinding
+import app.vibecast.domain.entity.ImageDto
 import app.vibecast.domain.repository.ImageRepository
 import app.vibecast.domain.repository.LocationRepository
 import app.vibecast.presentation.weather.WeatherViewModel
@@ -26,7 +28,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), CurrentLocationFragment.OnActionBarItemClickListener {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
@@ -79,27 +81,34 @@ class MainActivity : AppCompatActivity() {
         val searchItem = menu.findItem(R.id.action_search)
         searchView = searchItem.actionView as SearchView
         val inflater = getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val customView = inflater.inflate(R.layout.custom_searchview, null)
+        val customView = inflater.inflate(R.layout.custom_searchview, searchView)
         searchItem.actionView = customView
 
         // Set up the OnQueryTextListener
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
-                // This method is called when the user submits their search query.
-                // You can capture the query here and perform your search operation.
+                // This method is called when the user submits their search query
                 performSearch(query)
-                return true // Return true to indicate that you have handled the search submission.
+                return true // Return true to indicate that query change has been handled
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
-                // This method is called when the text in the search view changes.
-                // You can use it for real-time search suggestions or filtering.
-                // newText parameter contains the current query.
-                return true // Return true to indicate that you have handled the query change.
+                // This method is called when the text in the search view changes
+                // used for real-time search suggestions or filtering
+                // newText parameter represents the current query
+                return true // Return true to indicate that query change has been handled
             }
         })
 
         return true
+    }
+
+    override fun onSaveImageClicked(image: ImageDto) {
+        imageRepository.addImage(image)
+    }
+
+    override fun onSaveLocationClicked(location: LocationWithWeatherData) {
+        locationRepository.addLocationWeather(location)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
