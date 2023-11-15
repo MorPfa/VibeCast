@@ -9,14 +9,11 @@ integrate location into user/ account stuff -Not started yet
 
 SEARCH BAR / CACHING FUNCTIONALITY:
 
-
 - modify viewmodel to update views according to which screen is shown:
     - Implement mechanism (simple list to track index) to check which screen is being shown (current location being index 0)
     - with each click on next screen button, index changes
 
 FIND APPROPRIATE DEFAULT IMAGE FOR EACH WEATHER CONDITION IN CASE OF NO INTERNET
-LOOK INTO USING UPDATE INSTEAD OF INSERT FOR WEATHER / LOCATION DATA
-MAKE ALL DB FUNCTIONS THAT COULD BE USED WHILE USING THE APP SUSPEND
 INCLUDE DOWNLOAD URL IN API RESPONSE MODEL
 
 

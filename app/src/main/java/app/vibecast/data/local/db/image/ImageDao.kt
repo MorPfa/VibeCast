@@ -2,9 +2,8 @@ package app.vibecast.data.local.db.image
 
 import androidx.room.Dao
 import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -14,7 +13,7 @@ interface ImageDao {
     fun getAllImages() : Flow<List<ImageEntity>>
 
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Upsert
     suspend fun addImage(imageEntity: ImageEntity)
 
     @Delete
