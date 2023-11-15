@@ -16,7 +16,7 @@ class LocalWeatherDataSourceImpl @Inject constructor(
             weatherEntity -> weatherEntity.toWeather()
     }
 
-    override suspend fun addWeather( weather : WeatherDto) {
+    override suspend fun addWeather(weather : WeatherDto) {
        weatherDao.addWeather(weather.toWeatherEntity(weather.cityName))
     }
 

@@ -34,7 +34,7 @@ class CurrentLocationFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         //TODO decide on whether to use one combined viewmodel to load all data or or separate viewmodels
         binding = FragmentCurrentLocationBinding.inflate(inflater,container,false)

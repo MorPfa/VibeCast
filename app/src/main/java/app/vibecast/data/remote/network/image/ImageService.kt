@@ -6,7 +6,7 @@ import retrofit2.http.Headers
 import retrofit2.http.Query
 
 
-interface ImageService {
+fun interface ImageService {
 
     companion object {
         const val CLIENT_ID = BuildConfig.UNSPLASH_KEY

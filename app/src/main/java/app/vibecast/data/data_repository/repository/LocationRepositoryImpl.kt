@@ -22,7 +22,6 @@ class LocationRepositoryImpl @Inject constructor(
 ) : LocationRepository {
     private val backgroundScope = CoroutineScope(Dispatchers.IO)
     override fun refreshLocationWeather() : Flow<List<LocationWithWeatherData>> {
-
         backgroundScope.launch {
             localLocationDataSource.getLocationWithWeather().map { locationWithWeatherDataList ->
                     locationWithWeatherDataList.map { locationWithWeatherData ->
