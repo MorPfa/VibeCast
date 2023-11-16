@@ -8,6 +8,7 @@ import app.vibecast.data.local.source.LocalLocationDataSourceImpl
 import app.vibecast.domain.entity.CurrentWeather
 import app.vibecast.domain.entity.HourlyWeather
 import app.vibecast.domain.entity.LocationDto
+import app.vibecast.domain.entity.LocationWithWeatherDataDto
 import app.vibecast.domain.entity.WeatherDto
 import app.vibecast.domain.entity.WeatherCondition
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -25,15 +26,62 @@ class LocalLocationDataSourceImplTest {
 
     private val locationDao = mock<LocationDao>()
     private val locationDataSource = LocalLocationDataSourceImpl(locationDao)
-    private lateinit var location : LocationDto
+    private lateinit var locationDto : LocationDto
+    private lateinit var weatherDto : WeatherDto
     private lateinit var locationWithWeatherData: LocationWithWeatherData
+    private lateinit var locationWithWeatherDataDto: LocationWithWeatherDataDto
     private lateinit var locationEntity : LocationEntity
     private lateinit var weatherEntity : WeatherEntity
 
 
     @Before
     fun setUp() {
-        location = LocationDto(
+
+        weatherDto = WeatherDto(
+            cityName = "London",
+            latitude = 51.5074,
+            longitude = -0.1278,
+            currentWeather = CurrentWeather(
+                timestamp = 1637094000,
+                temperature = 15.0,
+                feelsLike = 14.0,
+                humidity = 70,
+                uvi = 5.2,
+                cloudCover = 40,
+                visibility = 10,
+                windSpeed = 12.0,
+                weatherConditions = listOf(
+                    WeatherCondition(
+                        conditionId = 800,
+                        mainDescription = "Clear",
+                        detailedDescription = "Clear sky",
+                        icon = "01d"
+                    )
+                )
+            ),
+            hourlyWeather = List(24) {
+                HourlyWeather(
+                    timestamp = (1637094000 + it * 3600).toLong(),
+                    temperature = 14.0,
+                    feelsLike = 13.0,
+                    humidity = 65,
+                    uvi = 5.5,
+                    cloudCover = 45,
+                    windSpeed = 11.0,
+                    weatherConditions = listOf(
+                        WeatherCondition(
+                            conditionId = 800,
+                            mainDescription = "Clear",
+                            detailedDescription = "Clear sky",
+                            icon = "01d"
+                        )
+                    ),
+                    chanceOfRain = 10.0
+                )
+            }
+        )
+
+        locationDto = LocationDto(
             cityName = "London",
             locationIndex = 1
         )
@@ -92,6 +140,8 @@ class LocalLocationDataSourceImplTest {
 
         locationWithWeatherData = LocationWithWeatherData(locationEntity, weatherEntity)
 
+        locationWithWeatherDataDto = LocationWithWeatherDataDto(locationDto, weatherDto)
+
     }
 
 
@@ -99,7 +149,7 @@ class LocalLocationDataSourceImplTest {
     @Test
     fun testAddLocationWithWeather() {
         runTest {
-            locationDataSource.addLocationWithWeather(locationWithWeatherData)
+            locationDataSource.addLocationWithWeather(locationWithWeatherDataDto)
             verify(locationDao).addLocationWithWeather(locationEntity,weatherEntity)
 
         }
@@ -110,7 +160,7 @@ class LocalLocationDataSourceImplTest {
     @Test
     fun testAddLocation() {
         runTest {
-            locationDataSource.addLocation(location)
+            locationDataSource.addLocation(locationDto)
             verify(locationDao).addLocation(locationEntity)
 
         }
@@ -120,8 +170,9 @@ class LocalLocationDataSourceImplTest {
     @Test
     fun testGetLocationWithWeather() {
         runTest {
-            val expectedList = listOf(locationWithWeatherData)
-            whenever(locationDao.getLocationWithWeather()).thenReturn(flowOf(expectedList))
+            val localList = listOf(locationWithWeatherData)
+            val expectedList = listOf(locationWithWeatherDataDto)
+            whenever(locationDao.getLocationWithWeather()).thenReturn(flowOf(localList))
             val result = locationDataSource.getLocationWithWeather().first()
             assertEquals(expectedList, result)
 
@@ -132,7 +183,7 @@ class LocalLocationDataSourceImplTest {
     @Test
     fun testGetLocation() {
         runTest {
-            val expectedLocation = location
+            val expectedLocation = locationDto
             val cityName = "London"
             whenever(locationDao.getLocation(cityName)).thenReturn(flowOf(locationEntity))
             val result = locationDataSource.getLocation(cityName).first()
@@ -145,7 +196,7 @@ class LocalLocationDataSourceImplTest {
     @Test
     fun testGetAllLocations() {
         runTest {
-            val expectedList = listOf(location)
+            val expectedList = listOf(locationDto)
             val localList = listOf(locationEntity)
             whenever(locationDao.getLocations()).thenReturn(flowOf(localList))
             val result = locationDataSource.getAllLocations().first()
@@ -158,7 +209,7 @@ class LocalLocationDataSourceImplTest {
     @Test
     fun testDeleteLocation() {
         runTest {
-            locationDataSource.deleteLocation(location)
+            locationDataSource.deleteLocation(locationDto)
             verify(locationDao).deleteLocation(locationEntity)
 
         }

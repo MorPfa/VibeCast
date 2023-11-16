@@ -17,9 +17,9 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import app.vibecast.R
-import app.vibecast.data.local.db.location.LocationWithWeatherData
 import app.vibecast.databinding.ActivityMainBinding
 import app.vibecast.domain.entity.ImageDto
+import app.vibecast.domain.entity.LocationWithWeatherDataDto
 import app.vibecast.domain.repository.ImageRepository
 import app.vibecast.domain.repository.LocationRepository
 import app.vibecast.presentation.weather.WeatherViewModel
@@ -107,7 +107,7 @@ class MainActivity : AppCompatActivity(), CurrentLocationFragment.OnActionBarIte
         imageRepository.addImage(image)
     }
 
-    override fun onSaveLocationClicked(location: LocationWithWeatherData) {
+    override fun onSaveLocationClicked(location: LocationWithWeatherDataDto) {
         locationRepository.addLocationWeather(location)
     }
 
