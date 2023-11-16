@@ -7,19 +7,22 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import app.vibecast.R
-import app.vibecast.data.local.db.location.LocationWithWeatherData
 import app.vibecast.databinding.FragmentCurrentLocationBinding
 import app.vibecast.domain.entity.ImageDto
+import app.vibecast.domain.entity.LocationWithWeatherDataDto
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
+
 class CurrentLocationFragment : Fragment() {
 
     private lateinit var binding : FragmentCurrentLocationBinding
     private lateinit var permissionHelper: PermissionHelper
+
+
 
     private var actionBarItemClickListener: OnActionBarItemClickListener? = null
     // TODO: Rename and change types of parameters
@@ -47,6 +50,7 @@ class CurrentLocationFragment : Fragment() {
         val nextScreenButton = binding.nextScreenButtonRight
         nextScreenButton.setOnClickListener {
             // Call a function to update the fragment with new values
+
             binding.constraintLayout.setBackgroundResource(R.drawable.pexels_karl_solano_2884590)
         }
 
@@ -73,13 +77,14 @@ class CurrentLocationFragment : Fragment() {
     }
 
     // Call this method when you need to trigger another action from the activity
-    private fun performSaveLocation(location : LocationWithWeatherData) {
+    private fun performSaveLocation(location : LocationWithWeatherDataDto) {
         actionBarItemClickListener?.onSaveLocationClicked(location)
     }
 
     interface OnActionBarItemClickListener {
         fun onSaveImageClicked(image : ImageDto)
-        fun onSaveLocationClicked(location : LocationWithWeatherData)
+        fun onSaveLocationClicked(location : LocationWithWeatherDataDto)
+
     }
 
     companion object {

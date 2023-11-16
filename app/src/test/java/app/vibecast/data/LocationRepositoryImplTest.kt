@@ -4,13 +4,13 @@ import app.vibecast.data.data_repository.data_source.local.LocalLocationDataSour
 import app.vibecast.data.data_repository.data_source.remote.RemoteWeatherDataSource
 import app.vibecast.data.data_repository.repository.LocationRepositoryImpl
 import app.vibecast.data.local.db.location.LocationEntity
-import app.vibecast.data.local.db.location.LocationWithWeatherData
 import app.vibecast.data.local.db.weather.WeatherEntity
 import app.vibecast.domain.entity.CurrentWeather
 import app.vibecast.domain.entity.HourlyWeather
 import app.vibecast.domain.entity.LocationDto
-import app.vibecast.domain.entity.WeatherDto
+import app.vibecast.domain.entity.LocationWithWeatherDataDto
 import app.vibecast.domain.entity.WeatherCondition
+import app.vibecast.domain.entity.WeatherDto
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -32,18 +32,18 @@ class LocationRepositoryImplTest {
     private val localLocationDataSource = mock<LocalLocationDataSource>()
     private val remoteWeatherDataSource = mock<RemoteWeatherDataSource>()
     private val locationRepository = LocationRepositoryImpl(localLocationDataSource, remoteWeatherDataSource)
-    private lateinit var location : LocationDto
-    private lateinit var locationWithWeatherData: LocationWithWeatherData
+    private lateinit var locationDto : LocationDto
+    private lateinit var locationWithWeatherDataDto : LocationWithWeatherDataDto
     private lateinit var locationEntity : LocationEntity
     private lateinit var weatherEntity : WeatherEntity
-    private lateinit var weather : WeatherDto
+    private lateinit var weatherDto : WeatherDto
     @ExperimentalCoroutinesApi
     private val testDispatcher: TestCoroutineDispatcher = TestCoroutineDispatcher()
     @ExperimentalCoroutinesApi
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        location = LocationDto(
+        locationDto = LocationDto(
             cityName = "London",
             locationIndex = 1
         )
@@ -99,7 +99,7 @@ class LocationRepositoryImplTest {
                 }
             )
         )
-        weather = WeatherDto(
+        weatherDto = WeatherDto(
                 cityName = "London",
                 latitude = 51.5074,
                 longitude = -0.1278,
@@ -144,7 +144,8 @@ class LocationRepositoryImplTest {
             )
 
 
-        locationWithWeatherData = LocationWithWeatherData(locationEntity, weatherEntity)
+        locationWithWeatherDataDto = LocationWithWeatherDataDto(locationDto, weatherDto)
+
 
     }
 
@@ -160,12 +161,12 @@ class LocationRepositoryImplTest {
     fun testRefreshLocationWithWeather() {
         runTest {
             val cityName = "London"
-            val expectedList = listOf(locationWithWeatherData)
+            val expectedList = listOf(locationWithWeatherDataDto)
             whenever(localLocationDataSource.getLocationWithWeather()).thenReturn(flowOf(expectedList))
-            whenever(remoteWeatherDataSource.getWeather(cityName)).thenReturn(flowOf(weather))
+            whenever(remoteWeatherDataSource.getWeather(cityName)).thenReturn(flowOf(weatherDto))
             locationRepository.refreshLocationWeather()
             verify(remoteWeatherDataSource).getWeather(cityName)
-            verify(localLocationDataSource).addLocationWithWeather(locationWithWeatherData)
+            verify(localLocationDataSource).addLocationWithWeather(locationWithWeatherDataDto)
         }
     }
 
@@ -173,8 +174,8 @@ class LocationRepositoryImplTest {
     @Test
     fun testAddLocationWithWeather() {
         runTest {
-            locationRepository.addLocationWeather(locationWithWeatherData)
-            verify(localLocationDataSource).addLocationWithWeather(locationWithWeatherData)
+            locationRepository.addLocationWeather(locationWithWeatherDataDto)
+            verify(localLocationDataSource).addLocationWithWeather(locationWithWeatherDataDto)
         }
     }
 
@@ -184,8 +185,8 @@ class LocationRepositoryImplTest {
     fun testGetLocationWeather() {
         runTest {
             val index = 0
-            val expectedWeather = weather
-            val expectedList = listOf(locationWithWeatherData)
+            val expectedWeather = weatherDto
+            val expectedList = listOf(locationWithWeatherDataDto)
             whenever(localLocationDataSource.getLocationWithWeather()).thenReturn(flowOf(expectedList))
             val result = locationRepository.getLocationWeather(index).first()
             assertEquals(expectedWeather, result)
@@ -196,7 +197,7 @@ class LocationRepositoryImplTest {
     @Test
     fun testGetAllLocations() {
         runTest {
-            val expectedList = listOf(location)
+            val expectedList = listOf(locationDto)
             whenever(localLocationDataSource.getAllLocations()).thenReturn(flowOf(expectedList))
             val result = locationRepository.getLocations().first()
             assertEquals(expectedList, result)
@@ -208,8 +209,8 @@ class LocationRepositoryImplTest {
     fun testGetLocation() {
         runTest {
             val cityName = "London"
-            val expectedLocation = location
-            whenever(localLocationDataSource.getLocation(cityName)).thenReturn(flowOf(location))
+            val expectedLocation = locationDto
+            whenever(localLocationDataSource.getLocation(cityName)).thenReturn(flowOf(locationDto))
             val result = locationRepository.getLocation(cityName).first()
             assertEquals(expectedLocation, result)
         }
@@ -220,16 +221,16 @@ class LocationRepositoryImplTest {
     @Test
     fun testAddLocation() {
         runTest {
-            locationRepository.addLocation(location)
-            verify(localLocationDataSource).addLocation(location)
+            locationRepository.addLocation(locationDto)
+            verify(localLocationDataSource).addLocation(locationDto)
         }
     }
     @ExperimentalCoroutinesApi
     @Test
     fun testDeleteLocation() {
        runTest {
-           locationRepository.deleteLocation(location)
-           verify(localLocationDataSource).deleteLocation(location)
+           locationRepository.deleteLocation(locationDto)
+           verify(localLocationDataSource).deleteLocation(locationDto)
        }
    }
 }

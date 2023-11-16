@@ -2,9 +2,8 @@ package app.vibecast.data.data_repository.repository
 
 import app.vibecast.data.data_repository.data_source.local.LocalLocationDataSource
 import app.vibecast.data.data_repository.data_source.remote.RemoteWeatherDataSource
-import app.vibecast.data.local.db.location.LocationWithWeatherData
-import app.vibecast.data.local.db.weather.WeatherEntity
 import app.vibecast.domain.entity.LocationDto
+import app.vibecast.domain.entity.LocationWithWeatherDataDto
 import app.vibecast.domain.entity.WeatherDto
 import app.vibecast.domain.repository.LocationRepository
 import kotlinx.coroutines.CoroutineScope
@@ -21,18 +20,18 @@ class LocationRepositoryImpl @Inject constructor(
     private val remoteWeatherDataSource: RemoteWeatherDataSource
 ) : LocationRepository {
     private val backgroundScope = CoroutineScope(Dispatchers.IO)
-    override fun refreshLocationWeather() : Flow<List<LocationWithWeatherData>> {
+    override fun refreshLocationWeather() : Flow<List<LocationWithWeatherDataDto>> {
         backgroundScope.launch {
             localLocationDataSource.getLocationWithWeather().map { locationWithWeatherDataList ->
                     locationWithWeatherDataList.map { locationWithWeatherData ->
-                        val cityName = locationWithWeatherData.location.cityname
+                        val cityName = locationWithWeatherData.location.cityName
 
                         // Asynchronously fetch the latest weather data for the city from the remote data source
                         val newWeatherData = remoteWeatherDataSource.getWeather(cityName).firstOrNull()
 
                         // Update the weather data in the combined entity
                         if (newWeatherData != null) {
-                            locationWithWeatherData.weather = newWeatherData.toWeatherEntity(cityName)
+                            locationWithWeatherData.weather = newWeatherData
                         }
 
                         // Save the updated location with weather entity to the database
@@ -46,7 +45,7 @@ class LocationRepositoryImpl @Inject constructor(
         return localLocationDataSource.getLocationWithWeather()
     }
 
-    override fun addLocationWeather(location: LocationWithWeatherData) {
+    override fun addLocationWeather(location: LocationWithWeatherDataDto) {
         CoroutineScope(Dispatchers.Main).launch {
         localLocationDataSource.addLocationWithWeather(location)
         }
@@ -55,7 +54,7 @@ class LocationRepositoryImpl @Inject constructor(
         return localLocationDataSource.getLocationWithWeather().map { locationWithWeatherDataList ->
             if (index in locationWithWeatherDataList.indices) {
                 val selectedLocationWithWeather = locationWithWeatherDataList[index]
-                selectedLocationWithWeather.weather.weatherData
+                selectedLocationWithWeather.weather
             } else {
                 //TODO Handle index out of bounds or other error cases here
                 WeatherDto(cityName = "", latitude = 0.0, longitude = 0.0, currentWeather = null, hourlyWeather = null)
@@ -78,11 +77,4 @@ class LocationRepositoryImpl @Inject constructor(
             localLocationDataSource.deleteLocation(location)
         }
 
-
-    private fun WeatherDto.toWeatherEntity(cityName: String): WeatherEntity {
-        return WeatherEntity(
-            cityName = cityName,
-            weatherData = this
-        )
-    }
 }

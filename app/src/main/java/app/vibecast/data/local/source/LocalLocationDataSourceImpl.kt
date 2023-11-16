@@ -3,8 +3,10 @@ package app.vibecast.data.local.source
 import app.vibecast.data.data_repository.data_source.local.LocalLocationDataSource
 import app.vibecast.data.local.db.location.LocationDao
 import app.vibecast.data.local.db.location.LocationEntity
-import app.vibecast.data.local.db.location.LocationWithWeatherData
+import app.vibecast.data.local.db.weather.WeatherEntity
 import app.vibecast.domain.entity.LocationDto
+import app.vibecast.domain.entity.LocationWithWeatherDataDto
+import app.vibecast.domain.entity.WeatherDto
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -13,12 +15,23 @@ class LocalLocationDataSourceImpl @Inject constructor(
     private val locationDao: LocationDao
 ) : LocalLocationDataSource {
 
-    override suspend fun addLocationWithWeather(location: LocationWithWeatherData)  {
-        locationDao.addLocationWithWeather(location.location, location.weather)
+    override suspend fun addLocationWithWeather(location: LocationWithWeatherDataDto)  {
+        locationDao.addLocationWithWeather(
+            LocationEntity(location.location.cityName, location.location.locationIndex),
+            WeatherEntity(location.location.cityName, location.weather)
+            )
     }
 
 
-    override fun getLocationWithWeather(): Flow<List<LocationWithWeatherData>> = locationDao.getLocationWithWeather()
+    override fun getLocationWithWeather(): Flow<List<LocationWithWeatherDataDto>> =
+        locationDao.getLocationWithWeather().map { locationWithWeatherList ->
+            locationWithWeatherList.map { locationWithWeatherData ->
+                LocationWithWeatherDataDto(
+                    location = LocationDto(locationWithWeatherData.location.cityname, locationWithWeatherData.location.locationIndex),
+                    weather = locationWithWeatherData.weather.toWeatherDto() // Assuming a conversion function
+                )
+            }
+        }
 
 
     override fun getAllLocations(): Flow<List<LocationDto>> = locationDao.getLocations().map { locations ->
@@ -39,6 +52,17 @@ class LocalLocationDataSourceImpl @Inject constructor(
     override suspend fun deleteLocation(location: LocationDto) = locationDao.deleteLocation(
         LocationEntity(location.cityName, location.locationIndex)
     )
+
+
+    private fun WeatherEntity.toWeatherDto(): WeatherDto {
+        return WeatherDto(
+            cityName = cityName,
+            latitude = weatherData.latitude,
+            longitude = weatherData.longitude,
+            currentWeather = weatherData.currentWeather,
+            hourlyWeather = weatherData.hourlyWeather
+        )
+    }
 
 
 }
