@@ -13,6 +13,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
@@ -28,12 +30,30 @@ class NetworkModule {
     @Provides
     fun provideGson(): Gson = GsonBuilder().create()
 
+//    @Named("weather")
+//    @Provides
+//    fun provideWeatherRetrofit(moshi: Moshi): Retrofit = Retrofit.Builder()
+//        .baseUrl("https://api.openweathermap.org/")
+//        .addConverterFactory(MoshiConverterFactory.create(moshi))
+//        .build()
+
     @Named("weather")
     @Provides
-    fun provideWeatherRetrofit(moshi: Moshi): Retrofit = Retrofit.Builder()
-        .baseUrl("https://api.openweathermap.org/")
-        .addConverterFactory(MoshiConverterFactory.create(moshi))
-        .build()
+    fun provideWeatherRetrofit(moshi: Moshi): Retrofit {
+        val loggingInterceptor = HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
+
+        val client = OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
+            .build()
+
+        return Retrofit.Builder()
+            .baseUrl("https://api.openweathermap.org/")
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .client(client)
+            .build()
+    }
 
 
     @Provides

@@ -3,11 +3,12 @@ package app.vibecast.data.remote.network.weather
 import com.squareup.moshi.Json
 
 data class WeatherApiModel(
-    val cityName : String,
+    val cityName : String = "",
     @Json(name = "lat") val latitude: Double,
     @Json(name = "lon") val longitude: Double,
     @Json(name = "current") val currentWeatherRemote: CurrentWeatherRemote,
-    @Json(name = "hourly") val hourlyWeather: List<HourlyWeatherRemote>
+    @Json(name = "hourly") val hourlyWeather: List<HourlyWeatherRemote>,
+
 )
 
 data class CurrentWeatherRemote(
@@ -19,7 +20,9 @@ data class CurrentWeatherRemote(
     @Json(name = "clouds") val cloudCover: Int,
     @Json(name = "visibility") val visibility: Int,
     @Json(name = "wind_speed") val windSpeed: Double,
-    @Json(name = "weather") val weatherConditionRemotes: List<WeatherConditionRemote>
+    @Json(name = "weather") val weatherConditionRemotes: List<WeatherConditionRemote>,
+
+
 )
 
 data class HourlyWeatherRemote(

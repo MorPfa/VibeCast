@@ -136,21 +136,21 @@ class RemoteWeatherDataSourceImplTest {
     @Test
     fun testGetCityCoordinates() = runTest {
         val cityName = "London"
-        val remoteCoordinates = CoordinateApiModel(51.5073219,-0.1276474 )
+        val remoteCoordinates = listOf(CoordinateApiModel(51.5073219,-0.1276474 ))
         whenever(weatherService.getCiyCoordinates(cityName,1,BuildConfig.OWM_KEY)).thenReturn(remoteCoordinates)
         val result = weatherDataSource.getCoordinates(cityName).first()
-        assertEquals(remoteCoordinates, result)
+        assertEquals(remoteCoordinates[0], result)
     }
 
     @ExperimentalCoroutinesApi
     @Test
     fun testGetWeather() = runTest {
         val cityName = "London"
-        val remoteCoordinates = CoordinateApiModel(51.5073219, -0.1276474)
+        val remoteCoordinates = listOf(CoordinateApiModel(51.5073219,-0.1276474 ))
 
         whenever(weatherService.getCiyCoordinates(cityName, 1, BuildConfig.OWM_KEY )).thenReturn(remoteCoordinates)
 
-        whenever(weatherService.getWeather(remoteCoordinates.latitude, remoteCoordinates.longitude, BuildConfig.OWM_KEY)).thenReturn(remoteWeather)
+        whenever(weatherService.getWeather(remoteCoordinates[0].latitude, remoteCoordinates[0].longitude,"minutely,daily", BuildConfig.OWM_KEY)).thenReturn(remoteWeather)
 
         val result = weatherDataSource.getWeather(cityName).first()
 
@@ -163,7 +163,7 @@ class RemoteWeatherDataSourceImplTest {
     @ExperimentalCoroutinesApi
     @Test
     fun testGetWeatherWithCoordinates() = runTest {
-        whenever(weatherService.getWeather(expectedWeather.latitude, expectedWeather.longitude, BuildConfig.OWM_KEY)).thenReturn(remoteWeather)
+        whenever(weatherService.getWeather(expectedWeather.latitude, expectedWeather.longitude,"minutely,daily",  BuildConfig.OWM_KEY)).thenReturn(remoteWeather)
         val result = weatherDataSource.getWeather(expectedWeather.latitude , expectedWeather.longitude).first()
         assertEquals(expectedWeather.longitude, result.longitude,1.0)
         assertEquals(expectedWeather.latitude, result.latitude,1.0)
@@ -176,7 +176,7 @@ class RemoteWeatherDataSourceImplTest {
     fun testGetWeatherThrowsError() = runTest {
         val cityName = "London"
         val remoteCoordinates = CoordinateApiModel(51.5073219,-0.1276474 )
-        whenever(weatherService.getWeather(remoteCoordinates.latitude, remoteCoordinates.longitude, BuildConfig.OWM_KEY)).thenThrow(RuntimeException())
+        whenever(weatherService.getWeather(remoteCoordinates.latitude, remoteCoordinates.longitude,"minutely,daily", BuildConfig.OWM_KEY)).thenThrow(RuntimeException())
         weatherDataSource.getWeather(cityName).catch {
             assertTrue(it is UseCaseException.WeatherException)
         }.collect()
