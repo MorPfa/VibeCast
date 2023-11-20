@@ -3,14 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_save_location"
-        android:orderInCategory="100"
         android:icon="@drawable/save_location_icon"
         android:title="@string/save_location"
         app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/action_save_image"
-        android:orderInCategory="50"
         android:icon="@drawable/favorite_unselected"
         android:title="@string/save_image_btn"
         app:showAsAction="ifRoom" />
@@ -18,11 +16,7 @@
 
     <item
         android:id="@+id/action_search"
-        android:orderInCategory="25"
         android:title="@string/search_bar_text"
-        android:icon="@drawable/ic_search"
-        android:iconTint="@color/white"
-        android:actionLayout="@layout/custom_searchview"
         app:showAsAction="ifRoom"
         app:actionViewClass="androidx.appcompat.widget.SearchView" />
 

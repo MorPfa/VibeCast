@@ -56,7 +56,7 @@
             android:id="@+id/leftTemp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/center_temperature_text"
+            android:text="@string/center_temp"
             android:textColor="#FFFFFF"
             android:textSize="14sp"
             android:textStyle="bold" />

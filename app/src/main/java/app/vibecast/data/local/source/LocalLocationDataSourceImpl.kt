@@ -8,6 +8,7 @@ import app.vibecast.domain.entity.LocationDto
 import app.vibecast.domain.entity.LocationWithWeatherDataDto
 import app.vibecast.domain.entity.WeatherDto
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -16,6 +17,10 @@ class LocalLocationDataSourceImpl @Inject constructor(
 ) : LocalLocationDataSource {
 
     override suspend fun addLocationWithWeather(location: LocationWithWeatherDataDto)  {
+        val currentLocations = locationDao.getLocations().first()
+        val newIndex = currentLocations.size + 1
+
+        location.location.locationIndex = newIndex
         locationDao.addLocationWithWeather(
             LocationEntity(location.location.cityName, location.location.locationIndex),
             WeatherEntity(location.location.cityName, location.weather)

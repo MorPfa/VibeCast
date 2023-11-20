@@ -9,7 +9,7 @@
     android:background="@drawable/generic_background">
 
     <LinearLayout
-        android:layout_marginTop="56dp"
+        android:layout_marginTop="68dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -18,7 +18,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Settings"
+            android:text="@string/settings_header"
             android:textSize="20sp"
             android:padding="16dp" />
 
@@ -30,6 +30,15 @@
             android:text="@string/display_temperature_in_fahrenheit"
             android:padding="16dp"
           android:theme="@style/SwitchTheme"/>
+
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/allowLocationSwitch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/allow_vibecast_to_use_your_location"
+            android:padding="16dp"
+            android:theme="@style/SwitchTheme"/>
 
 
 

@@ -1,17 +1,20 @@
 package app.vibecast.data.data_repository.repository
 
+import android.content.Context
+import android.icu.text.SimpleDateFormat
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import app.vibecast.data.data_repository.data_source.local.LocalWeatherDataSource
 import app.vibecast.data.data_repository.data_source.remote.RemoteWeatherDataSource
 import app.vibecast.data.remote.network.weather.CoordinateApiModel
 import app.vibecast.domain.entity.WeatherDto
 import app.vibecast.domain.repository.WeatherRepository
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.onEach
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
-import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
-import dagger.hilt.android.qualifiers.ApplicationContext
 
 class WeatherRepositoryImpl @Inject constructor(
     private val remoteWeatherDataSource: RemoteWeatherDataSource,
@@ -24,7 +27,7 @@ class WeatherRepositoryImpl @Inject constructor(
 
     override fun getWeather(cityName : String): Flow<WeatherDto> {
         return if(isInternetAvailable(context)) {
-            remoteWeatherDataSource.getWeather(cityName)} else {
+                remoteWeatherDataSource.getWeather(cityName)} else {
                 localWeatherDataSource.getWeather(cityName)
         }
     }
@@ -50,4 +53,16 @@ class WeatherRepositoryImpl @Inject constructor(
 
         return networkCapabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
     }
+
+    private fun kelvinToFahrenheit(kelvin: Double): Double {
+        return (kelvin - 273.15) * 9 / 5 + 32
+    }
+
+
+    private fun convertUnixTimestampToAmPm(unixTimestamp: Long): String {
+        val date = Date(unixTimestamp * 1000L) // Convert to milliseconds
+        val sdf = SimpleDateFormat("hh:mm a", Locale.getDefault())
+        return sdf.format(date)
+    }
+
 }

@@ -10,7 +10,7 @@
    >
 
     <LinearLayout
-        android:layout_marginTop="76dp"
+        android:layout_marginTop="86dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:textSize="16sp"
         android:layout_marginStart="10dp"
-        android:text="Your saved images"
+        android:text="@string/your_saved_images"
         android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"

@@ -1,5 +1,6 @@
 package app.vibecast.data.remote.source
 
+import android.util.Log
 import app.vibecast.BuildConfig
 import app.vibecast.data.data_repository.data_source.remote.RemoteWeatherDataSource
 import app.vibecast.data.remote.network.weather.CoordinateApiModel
@@ -18,20 +19,38 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.single
 import javax.inject.Inject
+
+const val TAG = "DebugTag"
 
 class RemoteWeatherDataSourceImpl @Inject constructor(
     private val weatherService: WeatherService,
 ) : RemoteWeatherDataSource {
 
 
-    override fun getCoordinates(name : String): Flow<CoordinateApiModel> = flow{
-        emit(weatherService.getCiyCoordinates(name,1,BuildConfig.OWM_KEY))
+    override fun getCoordinates(name: String): Flow<CoordinateApiModel> = flow {
+        try {
+            val coordinatesList = weatherService.getCiyCoordinates(name, 1, BuildConfig.OWM_KEY)
 
+            if (coordinatesList.isNotEmpty()) {
+                val firstCoordinate = coordinatesList[0]
+                Log.d(TAG, "First Coordinate: $firstCoordinate")
+                emit(firstCoordinate)
+            } else {
+                throw UseCaseException.WeatherException(Throwable("Coordinates list is empty."))
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error getting coordinates", e)
+            throw UseCaseException.WeatherException(e)
+        }
     }
+
+
     override fun getWeather(name: String): Flow<WeatherDto> = flow {
-        val coordinates = getCoordinates(name).first()
-        val weatherData = weatherService.getWeather(coordinates.latitude, coordinates.longitude , BuildConfig.OWM_KEY)
+        val coordinates = getCoordinates(name).single()
+        val weatherData = weatherService.getWeather(coordinates.latitude, coordinates.longitude ,"minutely,daily" ,BuildConfig.OWM_KEY)
+
         emit(weatherData)
     }.map {weatherApiModel ->
         weatherApiModel.toWeather()
@@ -40,7 +59,7 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
     }
 
     override fun getWeather(lat : Double, lon : Double): Flow<WeatherDto> = flow {
-        val weatherData = weatherService.getWeather(lat, lon, BuildConfig.OWM_KEY)
+        val weatherData = weatherService.getWeather(lat, lon, "minutely,daily", BuildConfig.OWM_KEY)
         emit(weatherData)
     }.map {weatherApiModel ->
         weatherApiModel.toWeather()
