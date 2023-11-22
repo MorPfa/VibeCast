@@ -1,21 +1,5 @@
 package app.vibecast.presentation
 
-import app.vibecast.domain.entity.Result
-import app.vibecast.presentation.weather.WeatherViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.TestCoroutineDispatcher
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
-import org.junit.After
-import org.junit.Assert.assertEquals
-import org.junit.Before
-import org.junit.Test
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
-
 class WeatherViewModelTest {
 
 

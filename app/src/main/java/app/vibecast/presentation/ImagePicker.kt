@@ -8,8 +8,8 @@ import javax.inject.Inject
 class ImagePicker @Inject constructor(
     private val imageRepository: ImageRepository, ) {
 
-    fun pickImage(cityName : String, weatherCondition : String) : Flow<List<ImageDto>> {
-        val searchTerm = when (weatherCondition) {
+    fun pickImage(cityName : String, weatherCondition : String) : Flow<ImageDto> {
+        val weather = when (weatherCondition) {
             "Clear" -> "clear"
             "Clouds" -> "cloudy"
             "Drizzle", "Rain" -> "rainy"
@@ -24,7 +24,7 @@ class ImagePicker @Inject constructor(
             else -> weatherCondition
         }
 
-        val searchQuery = "$cityName $searchTerm"
+        val searchQuery = "$cityName $weather"
 
          return imageRepository.getRemoteImages(searchQuery)
     }

@@ -1,6 +1,5 @@
 package app.vibecast.data
 
-import app.vibecast.data.remote.network.image.Image
 import app.vibecast.data.remote.network.image.ImageApiModel
 import app.vibecast.data.remote.network.image.ImageService
 import app.vibecast.data.remote.source.RemoteImageDataSourceImpl

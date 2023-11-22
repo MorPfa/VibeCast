@@ -23,8 +23,11 @@ class PersistenceModule {
     fun provideAppDatabase(@ApplicationContext context: Context) : AppDatabase =
         Room.databaseBuilder(
             context,
-            AppDatabase::class.java, "vibecast-db"
-        ).build()
+            AppDatabase::class.java,
+            "vibecast-db"
+        )
+            .fallbackToDestructiveMigration()
+            .build()
 
 
     @Provides

@@ -4,8 +4,10 @@ import android.content.Context
 import android.widget.ImageView
 import app.vibecast.R
 import com.bumptech.glide.Glide
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 
-class ImageLoader(private val context: Context) {
+class ImageLoader @Inject constructor(@ApplicationContext private val context: Context) {
 
     fun loadUrlIntoImageView(url: String, imageView: ImageView) {
         Glide.with(context)

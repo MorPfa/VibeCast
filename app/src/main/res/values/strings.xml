@@ -11,7 +11,7 @@
 
     <string name="center_weather_condition">%1$s</string>
     <string name="center_time">%1$s</string>
-    <string name="center_temp">%1$.1f°</string>
+    <string name="center_temp">%1$d°</string>
 
     <string name="right_weather_condition">%1$s</string>
     <string name="right_time">%1$s</string>
@@ -29,19 +29,19 @@
     <!--    Air Quality widget-->
     <string name="air_quality">Air Quality</string>
     <string name="feels_like">Feels like</string>
-    <string name="feels_like_value">%1$.1f°</string>
+    <string name="feels_like_value">%1$d°</string>
     <string name="wind_speed">Wind Speed</string>
-    <string name="wind_speed_value">%1$.1f°</string>
+    <string name="wind_speed_value">%1$.1f mph</string>
     <string name="visibility">Visibility</string>
     <string name="visibility_value">%1$d</string>
     <string name="chance_of_rain">Chance of rain</string>
-    <string name="chance_of_rain_value">%1$.1f</string>
+    <string name="chance_of_rain_value">%1$.1f%%</string>
     <string name="uv_index">UV index</string>
     <string name="uv_index_value">%1$.1f</string>
     <string name="o3">o3</string>
     <string name="o3_value">%1$d</string>
     <string name="humidity_title">Humidity</string>
-    <string name="humidity">%1$d</string>
+    <string name="humidity" >%1$d%%</string>
 
 
     <string name="my_account">My Account</string>

@@ -12,9 +12,11 @@ import app.vibecast.R
 import app.vibecast.databinding.FragmentCurrentLocationBinding
 import app.vibecast.domain.entity.ImageDto
 import app.vibecast.domain.entity.LocationWithWeatherDataDto
-import app.vibecast.presentation.weather.WeatherViewModel
+import app.vibecast.presentation.weather.CurrentLocationViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 
 private const val ARG_PARAM1 = "param1"
@@ -26,7 +28,7 @@ class CurrentLocationFragment : Fragment() {
     private lateinit var binding : FragmentCurrentLocationBinding
     private lateinit var permissionHelper: PermissionHelper
 
-    private val weatherViewModel: WeatherViewModel by viewModels()
+    private val currentLocationViewModel: CurrentLocationViewModel by viewModels()
     private var actionBarItemClickListener: OnActionBarItemClickListener? = null
 
     private var param1: String? = null
@@ -54,6 +56,17 @@ class CurrentLocationFragment : Fragment() {
     }
 
 
+    private fun observeImageData(city : String, weather : String) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            currentLocationViewModel.loadImage(city, weather).flowOn(Dispatchers.IO).collect { imageDto ->
+                imageDto?.urls?.regular?.let { imageUrl ->
+                    currentLocationViewModel.loadImageIntoImageView(imageUrl, binding.backgroundImageView)
+                }
+            }
+        }
+    }
+
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -65,34 +78,45 @@ class CurrentLocationFragment : Fragment() {
             permissionHelper.requestPermission(permission, rationale, requestCode)
         }
         viewLifecycleOwner.lifecycleScope.launch {
-            val weatherDto = weatherViewModel.loadWeather("Seattle").first()
-            binding.mainTempDisplay.text = weatherDto.currentWeather?.temperature.toString()
+            val weatherData = currentLocationViewModel.loadWeather("Seattle").first()
+            val city = weatherData.cityName
+            val weather = weatherData.currentWeather?.weatherConditions?.get(0)?.mainDescription
+            observeImageData(city, weather!!)
+            binding.mainTempDisplay.text =
+                getString(R.string.center_temp, weatherData.currentWeather.temperature)
             //            Current hour values
             binding.centerTempRow.leftWeather.text =
-                weatherDto.currentWeather?.weatherConditions?.get(0)?.mainDescription
-            binding.centerTempRow.leftTemp.text = weatherDto.currentWeather?.temperature.toString()
-            binding.centerTempRow.leftTime.text = weatherDto.currentWeather?.timestamp.toString()
+                weatherData.currentWeather.weatherConditions.get(0).mainDescription
+            binding.centerTempRow.leftTemp.text = weatherData.currentWeather.temperature.toString()
+            binding.centerTempRow.leftTime.text = weatherData.hourlyWeather?.get(0)?.timestamp
             //            Next hour values
             binding.centerTempRow.centerWeather.text =
-                weatherDto.hourlyWeather?.get(0)?.weatherConditions?.get(0)?.mainDescription
-            binding.centerTempRow.centerTemp.text = weatherDto.hourlyWeather?.get(0)?.temperature.toString()
-            binding.centerTempRow.centerTime.text = weatherDto.hourlyWeather?.get(0)?.timestamp.toString()
+                weatherData.hourlyWeather?.get(1)?.weatherConditions?.get(0)?.mainDescription
+            binding.centerTempRow.centerTemp.text = weatherData.hourlyWeather?.get(1)?.temperature.toString()
+            binding.centerTempRow.centerTime.text = weatherData.hourlyWeather?.get(1)?.timestamp.toString()
             //            2 hours from now values
             binding.centerTempRow.rightWeather.text =
-                weatherDto.hourlyWeather?.get(1)?.weatherConditions?.get(0)?.mainDescription
-            binding.centerTempRow.rightTemp.text = weatherDto.hourlyWeather?.get(0)?.temperature.toString()
-            binding.centerTempRow.rightTime.text = weatherDto.hourlyWeather?.get(0)?.timestamp.toString()
-            binding.locationDisplay.text = weatherDto.cityName
-            //TODO add country to city
-            binding.mainWeatherWidget.feelsLikeTv.text = weatherDto.currentWeather?.feelsLike.toString()
-            binding.mainWeatherWidget.windSpeedTv.text = weatherDto.currentWeather?.windSpeed.toString()
-            binding.mainWeatherWidget.visibilityValue.text = weatherDto.currentWeather?.visibility.toString()
-            binding.mainWeatherWidget.chanceOfRainTv.text = weatherDto.hourlyWeather?.get(0)?.chanceOfRain.toString()
-            binding.mainWeatherWidget.uvIndexTv.text = weatherDto.currentWeather?.uvi.toString()
-            binding.mainWeatherWidget.humidtyTv.text = weatherDto.currentWeather?.humidity.toString()
-            binding.bottomHumidityDisplay.text = weatherDto.currentWeather?.humidity.toString()
-            binding.bottomChanceOfRainDisplay.text =  weatherDto.hourlyWeather?.get(0)?.chanceOfRain.toString()
-            binding.bottomUvIndexDisplay.text = weatherDto.currentWeather?.uvi.toString()
+                weatherData.hourlyWeather?.get(2)?.weatherConditions?.get(0)?.mainDescription
+            binding.centerTempRow.rightTemp.text = weatherData.hourlyWeather?.get(2)?.temperature.toString()
+            binding.centerTempRow.rightTime.text = weatherData.hourlyWeather?.get(2)?.timestamp.toString()
+            binding.locationDisplay.text = weatherData.cityName
+            binding.mainWeatherWidget.feelsLikeTv.text =
+                getString(R.string.feels_like_value, weatherData.currentWeather.feelsLike)
+            binding.mainWeatherWidget.windSpeedTv.text =
+                getString(R.string.wind_speed_value, weatherData.currentWeather.windSpeed)
+            binding.mainWeatherWidget.visibilityValue.text = weatherData.currentWeather.visibility
+            binding.mainWeatherWidget.chanceOfRainTv.text =
+                getString(R.string.chance_of_rain_value,weatherData.hourlyWeather?.get(0)?.chanceOfRain)
+            binding.mainWeatherWidget.uvIndexTv.text = weatherData.currentWeather.uvi.toString()
+            binding.mainWeatherWidget.humidtyTv.text = getString(R.string.humidity,
+                weatherData.currentWeather.humidity
+            )
+            binding.bottomHumidityDisplay.text = getString(R.string.humidity,
+                weatherData.currentWeather.humidity
+            )
+            binding.bottomChanceOfRainDisplay.text =
+                getString(R.string.chance_of_rain_value,weatherData.hourlyWeather?.get(0)?.chanceOfRain)
+            binding.bottomUvIndexDisplay.text = weatherData.currentWeather.uvi.toString()
         }
     }
 

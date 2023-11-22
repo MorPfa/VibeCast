@@ -30,30 +30,30 @@ class NetworkModule {
     @Provides
     fun provideGson(): Gson = GsonBuilder().create()
 
-//    @Named("weather")
-//    @Provides
-//    fun provideWeatherRetrofit(moshi: Moshi): Retrofit = Retrofit.Builder()
-//        .baseUrl("https://api.openweathermap.org/")
-//        .addConverterFactory(MoshiConverterFactory.create(moshi))
-//        .build()
-
     @Named("weather")
     @Provides
-    fun provideWeatherRetrofit(moshi: Moshi): Retrofit {
-        val loggingInterceptor = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
-        }
+    fun provideWeatherRetrofit(moshi: Moshi): Retrofit = Retrofit.Builder()
+        .baseUrl("https://api.openweathermap.org/")
+        .addConverterFactory(MoshiConverterFactory.create(moshi))
+        .build()
 
-        val client = OkHttpClient.Builder()
-            .addInterceptor(loggingInterceptor)
-            .build()
-
-        return Retrofit.Builder()
-            .baseUrl("https://api.openweathermap.org/")
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .client(client)
-            .build()
-    }
+//    @Named("weather")
+//    @Provides
+//    fun provideWeatherRetrofit(moshi: Moshi): Retrofit {
+//        val loggingInterceptor = HttpLoggingInterceptor().apply {
+//            level = HttpLoggingInterceptor.Level.BODY
+//        }
+//
+//        val client = OkHttpClient.Builder()
+//            .addInterceptor(loggingInterceptor)
+//            .build()
+//
+//        return Retrofit.Builder()
+//            .baseUrl("https://api.openweathermap.org/")
+//            .addConverterFactory(MoshiConverterFactory.create(moshi))
+//            .client(client)
+//            .build()
+//    }
 
 
     @Provides
@@ -63,10 +63,24 @@ class NetworkModule {
 
     @Named("unsplash")
     @Provides
-    fun provideUnsplashRetrofit() : Retrofit = Retrofit.Builder()
-        .baseUrl("https://api.unsplash.com/")
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
+    fun provideUnsplashRetrofit() : Retrofit {
+        val loggingInterceptor = HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
+
+        val client = OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
+            .build()
+       return  Retrofit.Builder()
+            .baseUrl("https://api.unsplash.com/")
+            .addConverterFactory(GsonConverterFactory.create())
+           .client(client)
+            .build()
+
+
+
+    }
+
 
 
     @Provides
