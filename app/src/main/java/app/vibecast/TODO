@@ -1,10 +1,11 @@
-fix weather converter -stuck
 
-give search bar functionality -started NEED CONVERTER FIXED FOR PROGRESS
+give search bar functionality -started
 
 start working out fragment redraw mechanism -Not started yet
 
 integrate location into user/ account stuff -Not started yet
+
+change units for weather data
 
 
 SEARCH BAR / CACHING FUNCTIONALITY:

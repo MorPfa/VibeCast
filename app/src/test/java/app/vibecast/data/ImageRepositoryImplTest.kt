@@ -2,7 +2,6 @@ package app.vibecast.data
 
 import app.vibecast.data.data_repository.repository.ImageRepositoryImpl
 import app.vibecast.data.local.source.LocalImageDataSourceImpl
-import app.vibecast.data.remote.network.image.Image
 import app.vibecast.data.remote.network.image.ImageApiModel
 import app.vibecast.data.remote.source.RemoteImageDataSourceImpl
 import app.vibecast.domain.entity.ImageDto

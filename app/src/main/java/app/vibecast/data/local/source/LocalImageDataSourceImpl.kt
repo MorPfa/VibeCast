@@ -16,11 +16,11 @@ class LocalImageDataSourceImpl @Inject constructor(
     }
 
     override suspend fun addImage(image: ImageDto) = imageDao.addImage(
-        ImageEntity(image.id, image.description, image.urls.regular, image.user.name, image.user.id, image.user.userName, image.user.portfolioUrl)
+        ImageEntity(image.id, image.description, image.altDescription ,image.urls.regular, image.user.name, image.user.id, image.user.userName, image.user.portfolioUrl, image.links.user, image.links.downloadLink)
     )
-//TODO need to trigger api's download endpoint in order to be able to do this
+
     override suspend fun deleteImage(image: ImageDto) = imageDao.deleteImage(
-    ImageEntity(image.id, image.description, image.urls.regular,image.user.name, image.user.id, image.user.userName, image.user.portfolioUrl)
+    ImageEntity(image.id, image.description, image.altDescription, image.urls.regular,image.user.name, image.user.id, image.user.userName, image.user.portfolioUrl, image.links.user, image.links.downloadLink)
     )
 
 
@@ -28,6 +28,7 @@ class LocalImageDataSourceImpl @Inject constructor(
         return ImageDto(
             id = this.id,
             description = this.description,
+            altDescription = this.altDescription,
             urls = ImageDto.PhotoUrls(
                 raw = "",
                 full = "",
@@ -40,6 +41,9 @@ class LocalImageDataSourceImpl @Inject constructor(
                 name = this.name,
                 userName = this.userName,
                 portfolioUrl = this.portfolioUrl
+            ), links = ImageDto.PhotoLinks(
+                user = this.userLink,
+                downloadLink = this.downloadLink
             )
         )
     }

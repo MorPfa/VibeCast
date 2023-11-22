@@ -1,110 +1,157 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-
-    android:id="@+id/constraintLayout"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/constraintLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/osman_rana_gxezuwo5m4i_unsplash2"
+    android:background="@drawable/background_placeholder"
     tools:context=".presentation.CurrentLocationFragment">
 
 
-<include
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    layout="@layout/music_widget"
-    app:layout_constraintBottom_toTopOf="@id/center_temp_row"/>
-
-    <include
-        android:id="@+id/center_temp_row"
-        layout="@layout/center_temp_row"
-        app:layout_constraintBottom_toTopOf="@id/temp_location_display"/>
-
+    <ImageView
+        android:id="@+id/backgroundImageView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:scaleType="centerCrop" />
 
     <LinearLayout
-        android:id="@+id/temp_location_display"
-        android:layout_width="wrap_content"
+        android:id="@+id/upper_half"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginVertical="56dp"
-        android:gravity="center"
         android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@id/main_weather_widget"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/center_temp_row">
+        android:layout_marginBottom="24dp"
+        android:gravity="center_horizontal"
+        app:layout_constraintBottom_toTopOf="@+id/main_weather_widget">
 
 
+        <include
+            android:id="@+id/music_widget"
+            layout="@layout/music_widget"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@+id/center_temp_row"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
+
+        <include
+            android:id="@+id/center_temp_row"
+            layout="@layout/center_temp_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@+id/temp_location_display"
+            android:layout_marginBottom="150dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/music_widget" />
+
+        <LinearLayout
+            android:id="@+id/temp_location_display"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toTopOf="@+id/main_weather_widget"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/center_temp_row">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginStart="56dp"
+                android:gravity="center">
+
+
+                <TextView
+                    android:id="@+id/main_temp_display"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/center_temperature_text"
+                    android:textColor="#FFFFFF"
+                    android:textSize="102sp"
+
+                    />
+
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/next_screen_button_right"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:background="@android:color/transparent"
+                    android:contentDescription="@string/next_screen_forward_message"
+                    app:icon="@drawable/next_screen_forward"
+                    app:iconSize="60dp"
+                    app:iconTint="@color/white"
+                    />
+
+            </LinearLayout>
             <TextView
-                android:id="@+id/main_temp_display"
+                android:id="@+id/location_display"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/center_temperature_text"
-                android:textColor="#FFFFFF"
-                android:textSize="108sp"
+                android:text="@string/center_location_text"
+                android:textColor="#FFFFFF" />
 
-                />
+        </LinearLayout>
 
-
-
-        <TextView
-            android:id="@+id/location_display"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/center_location_text"
-            android:textColor="#FFFFFF" />
 
     </LinearLayout>
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/next_screen_button_right"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        android:contentDescription="@string/next_screen_forward_message"
-        app:icon="@drawable/next_screen_forward"
-        app:iconTint="@color/white"
-        app:iconSize="60dp"
-        app:layout_constraintBottom_toTopOf="@+id/main_weather_widget"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/temp_location_display"
-        app:layout_constraintTop_toTopOf="@+id/temp_location_display" />
 
 
 
     <include
         android:id="@+id/main_weather_widget"
         layout="@layout/main_screen_weather_widget"
-        app:layout_constraintTop_toBottomOf="@id/temp_location_display"/>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="12dp"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_row"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
 
 
     <LinearLayout
         android:id="@+id/bottom_row"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginVertical="18dp"
+        android:baselineAligned="false"
         android:orientation="horizontal"
-        android:paddingTop="20dp"
         android:layout_marginStart="60dp"
-        android:layout_marginBottom="36dp"
-        app:layout_constraintBottom_toBottomOf="parent">
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent">
 
         <LinearLayout
             android:id="@+id/bottom_row_humidity"
             android:layout_width="0dp"
-            android:layout_weight="0.7"
             android:layout_height="wrap_content"
+            android:layout_weight="0.7"
             android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/humidity_title"
-                android:textSize="15sp"
                 android:textAlignment="textStart"
                 android:textColor="#FFFFFF"
+                android:textSize="15sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -112,9 +159,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/humidity"
-                android:textSize="20sp"
                 android:textAlignment="textStart"
                 android:textColor="#FFFFFF"
+                android:textSize="20sp"
                 android:textStyle="bold" />
 
         </LinearLayout>
@@ -122,8 +169,8 @@
         <LinearLayout
             android:id="@+id/bottom_row_chance_of_rain"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:orientation="vertical">
 
             <TextView
@@ -131,8 +178,8 @@
                 android:layout_height="wrap_content"
                 android:text="@string/chance_of_rain"
                 android:textAlignment="textStart"
-                android:textSize="15sp"
                 android:textColor="#FFFFFF"
+                android:textSize="15sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -140,9 +187,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/chance_of_rain_value"
-                android:textSize="20sp"
                 android:textAlignment="textStart"
                 android:textColor="#FFFFFF"
+                android:textSize="20sp"
                 android:textStyle="bold" />
 
         </LinearLayout>
@@ -150,8 +197,8 @@
         <LinearLayout
             android:id="@+id/bottom_row_uv_index"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:orientation="vertical">
 
 
@@ -159,9 +206,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/uv_index"
-                android:textSize="15sp"
                 android:textAlignment="textStart"
                 android:textColor="#FFFFFF"
+                android:textSize="15sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -169,9 +216,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/uv_index_value"
-                android:textSize="20sp"
                 android:textAlignment="textStart"
                 android:textColor="#FFFFFF"
+                android:textSize="20sp"
                 android:textStyle="bold" />
 
 

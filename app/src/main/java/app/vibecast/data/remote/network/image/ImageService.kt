@@ -13,10 +13,11 @@ fun interface ImageService {
     }
 
     @Headers("Accept-Version: v1", "Authorization: Client-ID $CLIENT_ID")
-    @GET("/search/photos")
+    @GET("photos/random")
     suspend fun getImages(
         @Query("query") query: String,
-        @Query("orientation") orientation : String
-    ) : ImageApiModel
+        @Query("orientation") orientation : String,
+        @Query("count") page : Int,
+    ) : List<ImageApiModel>
 
 }

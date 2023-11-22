@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Background color -->
+    <item>
+        <shape>
+            <solid android:color="#ECECEC" />
+        </shape>
+    </item>
+
+    <!-- Horizontal lines (optional) -->
+    <item android:bottom="1dp">
+        <shape>
+            <solid android:color="#DDDDDD" />
+        </shape>
+    </item>
+    <item android:bottom="2dp">
+        <shape>
+            <solid android:color="#CCCCCC" />
+        </shape>
+    </item>
+
+    <!-- Vertical lines (optional) -->
+    <item android:right="1dp">
+        <shape>
+            <solid android:color="#DDDDDD" />
+        </shape>
+    </item>
+    <item android:right="2dp">
+        <shape>
+            <solid android:color="#CCCCCC" />
+        </shape>
+    </item>
+
+</layer-list>

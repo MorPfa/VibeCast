@@ -12,7 +12,7 @@ data class WeatherDto (
 
 
 data class CurrentWeather(
-    val timestamp: Long,
+    var timestamp: Long,
     val temperature: Double,
     val feelsLike: Double,
     val humidity: Int,
@@ -24,7 +24,7 @@ data class CurrentWeather(
 )
 
 data class HourlyWeather(
-    val timestamp: Long,
+    var timestamp: Long,
     val temperature: Double,
     val feelsLike: Double,
     val humidity: Int,

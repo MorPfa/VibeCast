@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.Flow
 
 fun interface RemoteImageDataSource {
 
-     fun getImages(query : String) : Flow<List<ImageDto>>
+     fun getImages(query : String) : Flow<ImageDto>
 }
