@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModel
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -21,11 +20,9 @@ import app.vibecast.domain.entity.ImageDto
 import app.vibecast.domain.entity.LocationWithWeatherDataDto
 import app.vibecast.domain.repository.ImageRepository
 import app.vibecast.domain.repository.LocationRepository
-import app.vibecast.domain.repository.WeatherRepository
 import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-
 
 
 @AndroidEntryPoint
@@ -34,7 +31,6 @@ class MainActivity : AppCompatActivity() , CurrentLocationFragment.OnActionBarIt
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private lateinit var searchView: SearchView
-    private lateinit var fragmentViewModel : ViewModel
     private lateinit var currentLocationFragment: Fragment
 
     @Inject
@@ -42,9 +38,6 @@ class MainActivity : AppCompatActivity() , CurrentLocationFragment.OnActionBarIt
 
     @Inject
     lateinit var  imageRepository: ImageRepository
-
-    @Inject
-    lateinit var weatherRepository: WeatherRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,13 +58,10 @@ class MainActivity : AppCompatActivity() , CurrentLocationFragment.OnActionBarIt
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-        currentLocationFragment = supportFragmentManager.findFragmentByTag("nav_home")
-            ?: CurrentLocationFragment.newInstance("param1", "param2")
-
-
-
-
-
+        if (savedInstanceState == null) {
+            currentLocationFragment = supportFragmentManager.findFragmentByTag("nav_home")
+                ?: CurrentLocationFragment.newInstance("param1", "param2")
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

@@ -18,6 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
@@ -58,9 +59,14 @@ class CurrentLocationFragment : Fragment() {
 
     private fun observeImageData(city : String, weather : String) {
         viewLifecycleOwner.lifecycleScope.launch {
-            currentLocationViewModel.loadImage(city, weather).flowOn(Dispatchers.IO).collect { imageDto ->
+            currentLocationViewModel.loadImage(city, weather)
+                .flowOn(Dispatchers.IO)
+                .collect { imageDto ->
                 imageDto?.urls?.regular?.let { imageUrl ->
-                    currentLocationViewModel.loadImageIntoImageView(imageUrl, binding.backgroundImageView)
+                    // Switch to Main dispatcher for UI-related operations
+                    withContext(Dispatchers.Main) {
+                        currentLocationViewModel.loadImageIntoImageView(imageUrl, binding.backgroundImageView)
+                    }
                 }
             }
         }

@@ -13,11 +13,13 @@ import app.vibecast.domain.entity.HourlyWeather
 import app.vibecast.domain.entity.UseCaseException
 import app.vibecast.domain.entity.WeatherCondition
 import app.vibecast.domain.entity.WeatherDto
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.single
+import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import java.math.RoundingMode
 import javax.inject.Inject
@@ -31,7 +33,9 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
 
     override fun getCoordinates(name: String): Flow<CoordinateApiModel> = flow {
         try {
-            val coordinatesList = weatherService.getCiyCoordinates(name, 1, BuildConfig.OWM_KEY)
+            val coordinatesList = withContext(Dispatchers.IO) {
+                weatherService.getCiyCoordinates(name, 1, BuildConfig.OWM_KEY)
+            }
             if (coordinatesList.isNotEmpty()) {
                 val firstCoordinate = coordinatesList[0]
                 emit(firstCoordinate)
@@ -46,8 +50,10 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
 
     override fun getWeather(name: String): Flow<WeatherDto> = flow {
         val coordinates = getCoordinates(name).single()
-        val weatherData = weatherService.getWeather(
-            coordinates.latitude, coordinates.longitude ,"minutely,daily" ,BuildConfig.OWM_KEY)
+        val weatherData = withContext(Dispatchers.IO) {
+            weatherService.getWeather(
+                coordinates.latitude, coordinates.longitude ,"minutely,daily" ,BuildConfig.OWM_KEY)
+        }
         weatherData.cityName = coordinates.name.plus(" - ").plus(coordinates.country)
         weatherData.hourlyWeather[1].temperature =  kelvinToFahrenheit(weatherData.hourlyWeather[1].temperature)
         weatherData.hourlyWeather[2].temperature =  kelvinToFahrenheit(weatherData.hourlyWeather[2].temperature)
@@ -62,7 +68,9 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
     }
 
     override fun getWeather(lat : Double, lon : Double): Flow<WeatherDto> = flow {
-        val weatherData = weatherService.getWeather(lat, lon, "minutely,daily", BuildConfig.OWM_KEY)
+        val weatherData = withContext(Dispatchers.IO) {
+            weatherService.getWeather(lat, lon, "minutely,daily", BuildConfig.OWM_KEY)
+        }
         emit(weatherData)
     }.map {weatherApiModel ->
         weatherApiModel.toWeather()
@@ -74,12 +82,6 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
         val result = (kelvin - 273.15) * 9 / 5 + 32
         return BigDecimal(result).setScale(1, RoundingMode.HALF_UP).toDouble()
     }
-
-
-
-
-
-
 
     companion object {
     //Converting Api response data to domain layer entity
