@@ -9,7 +9,9 @@ import app.vibecast.data.remote.network.weather.CoordinateApiModel
 import app.vibecast.domain.entity.WeatherDto
 import app.vibecast.domain.repository.WeatherRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
@@ -20,7 +22,8 @@ class WeatherRepositoryImpl @Inject constructor(
 ) : WeatherRepository{
 
 
-    override fun getCoordinates(cityName: String): Flow<CoordinateApiModel> = remoteWeatherDataSource.getCoordinates(cityName)
+    override fun getCoordinates(cityName: String): Flow<CoordinateApiModel> =
+        remoteWeatherDataSource.getCoordinates(cityName)
 
     override fun getWeather(cityName : String): Flow<WeatherDto> {
         return if(isInternetAvailable(context)) {
@@ -30,13 +33,15 @@ class WeatherRepositoryImpl @Inject constructor(
     }
 
 
-    override fun refreshWeather(cityName: String): Flow<WeatherDto> = remoteWeatherDataSource.getWeather(cityName)
+    override fun refreshWeather(cityName: String): Flow<WeatherDto> =
+        remoteWeatherDataSource.getWeather(cityName).flowOn(Dispatchers.IO)
         .onEach {
             localWeatherDataSource.addWeather(it)
         }
 
 
-    override fun refreshWeather(lat: Double, lon: Double): Flow<WeatherDto> = remoteWeatherDataSource.getWeather(lat, lon)
+    override fun refreshWeather(lat: Double, lon: Double): Flow<WeatherDto> =
+        remoteWeatherDataSource.getWeather(lat, lon)
     .onEach {
         localWeatherDataSource.addWeather(it)
     }

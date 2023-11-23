@@ -101,8 +101,6 @@ Capp/src/main/java/app/vibecast/domain/repository/ImageRepository.kt,2\5\256995
 Uapp/src/main/java/app/vibecast/data/data_repository/repository/ImageRepositoryImpl.kt,d\7\d761aaee687ba9107bd9555eed315d4c9a2b6b7e
 y
 Iapp/src/main/java/app/vibecast/data/remote/network/image/ImageApiModel.kt,4\0\405f5b39ed271e697acd2fd5237dcb868ba889d8
-q
-Aapp/src/main/java/app/vibecast/data/remote/network/image/Image.kt,a\8\a81dc4dbef8fa0a758195fa230374ed5cd1aead3
 x
 Happ/src/main/java/app/vibecast/data/remote/network/image/ImageService.kt,d\6\d642748fe85b15b7882a7031c6a18399413e646e
 t

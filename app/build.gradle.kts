@@ -34,6 +34,12 @@ android {
             name = "UNSPLASH_KEY",
             value = unsplashKey
         )
+        val spotifyKey = properties.getProperty("SPOTIFY_KEY")
+        buildConfigField(
+            type = "String",
+            name = "SPOTIFY_KEY",
+            value = spotifyKey
+        )
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
