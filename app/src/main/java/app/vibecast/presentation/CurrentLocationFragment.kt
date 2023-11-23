@@ -58,9 +58,8 @@ class CurrentLocationFragment : Fragment() {
 
 
     private fun observeImageData(city : String, weather : String) {
-        viewLifecycleOwner.lifecycleScope.launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             currentLocationViewModel.loadImage(city, weather)
-                .flowOn(Dispatchers.IO)
                 .collect { imageDto ->
                 imageDto?.urls?.regular?.let { imageUrl ->
                     // Switch to Main dispatcher for UI-related operations
@@ -92,7 +91,7 @@ class CurrentLocationFragment : Fragment() {
                 getString(R.string.center_temp, weatherData.currentWeather.temperature)
             //            Current hour values
             binding.centerTempRow.leftWeather.text =
-                weatherData.currentWeather.weatherConditions.get(0).mainDescription
+                weatherData.currentWeather.weatherConditions[0].mainDescription
             binding.centerTempRow.leftTemp.text = weatherData.currentWeather.temperature.toString()
             binding.centerTempRow.leftTime.text = weatherData.hourlyWeather?.get(0)?.timestamp
             //            Next hour values

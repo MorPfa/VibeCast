@@ -58,10 +58,7 @@ class MainActivity : AppCompatActivity() , CurrentLocationFragment.OnActionBarIt
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-        if (savedInstanceState == null) {
-            currentLocationFragment = supportFragmentManager.findFragmentByTag("nav_home")
-                ?: CurrentLocationFragment.newInstance("param1", "param2")
-        }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
