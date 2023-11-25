@@ -9,6 +9,7 @@ import app.vibecast.data.remote.network.weather.WeatherApiModel
 import app.vibecast.data.remote.network.weather.WeatherConditionRemote
 import app.vibecast.data.remote.network.weather.WeatherService
 import app.vibecast.data.remote.source.RemoteWeatherDataSourceImpl
+import app.vibecast.data.remote.source.RemoteWeatherDataSourceImpl.Companion.toWeather
 import app.vibecast.domain.entity.CurrentWeather
 import app.vibecast.domain.entity.HourlyWeather
 import app.vibecast.domain.entity.UseCaseException
@@ -18,6 +19,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -33,15 +35,13 @@ class RemoteWeatherDataSourceImplTest {
     private val weatherDataSource = RemoteWeatherDataSourceImpl(weatherService)
     private lateinit var remoteWeather: WeatherApiModel
     private lateinit var  expectedWeather : WeatherDto
-    private val cityName = "London"
-
-
+    private val cityName = "Seattle - US"
 
 
     @Before
     fun setUp() {
          remoteWeather = WeatherApiModel(
-            cityName = "London",
+            cityName = "Seattle - US",
             latitude = 51.5074,
             longitude = -0.1278,
             currentWeatherRemote = CurrentWeatherRemote(
@@ -136,17 +136,16 @@ class RemoteWeatherDataSourceImplTest {
     @Test
     fun testGetCityCoordinates() = runTest {
         val cityName = "London"
-        val remoteCoordinates = listOf(CoordinateApiModel(51.5073219,-0.1276474 ))
+        val remoteCoordinates = listOf(CoordinateApiModel("Seattle",51.5073219,-0.1276474, "US" ))
         whenever(weatherService.getCiyCoordinates(cityName,1,BuildConfig.OWM_KEY)).thenReturn(remoteCoordinates)
-        val result = weatherDataSource.getCoordinates(cityName).first()
+        val result = weatherDataSource.getCoordinates(cityName).single()
         assertEquals(remoteCoordinates[0], result)
     }
 
     @ExperimentalCoroutinesApi
     @Test
     fun testGetWeather() = runTest {
-        val cityName = "London"
-        val remoteCoordinates = listOf(CoordinateApiModel(51.5073219,-0.1276474 ))
+        val remoteCoordinates = listOf(CoordinateApiModel("Seattle",51.5073219,-0.1276474, "US" ))
 
         whenever(weatherService.getCiyCoordinates(cityName, 1, BuildConfig.OWM_KEY )).thenReturn(remoteCoordinates)
 
@@ -154,6 +153,8 @@ class RemoteWeatherDataSourceImplTest {
 
         val result = weatherDataSource.getWeather(cityName).first()
 
+
+        assertEquals(expectedWeather.cityName, result.cityName)
         assertEquals(expectedWeather.longitude, result.longitude,1.0)
         assertEquals(expectedWeather.latitude, result.latitude,1.0)
         assertEquals(expectedWeather.currentWeather?.timestamp, result.currentWeather?.timestamp)
@@ -175,10 +176,59 @@ class RemoteWeatherDataSourceImplTest {
     @Test
     fun testGetWeatherThrowsError() = runTest {
         val cityName = "London"
-        val remoteCoordinates = CoordinateApiModel(51.5073219,-0.1276474 )
+        val remoteCoordinates = CoordinateApiModel("Seattle",51.5073219,-0.1276474, "US" )
         whenever(weatherService.getWeather(remoteCoordinates.latitude, remoteCoordinates.longitude,"minutely,daily", BuildConfig.OWM_KEY)).thenThrow(RuntimeException())
         weatherDataSource.getWeather(cityName).catch {
             assertTrue(it is UseCaseException.WeatherException)
         }.collect()
     }
+
+
+    private fun WeatherApiModel.toWeather(): WeatherDto {
+        return WeatherDto(
+            cityName =cityName,
+            latitude = latitude,
+            longitude = longitude,
+            currentWeather = currentWeatherRemote.toCurrentWeather(),
+            hourlyWeather = hourlyWeather.map { it.toHourlyWeather() }
+        )
+    }
+
+    private fun CurrentWeatherRemote.toCurrentWeather(): CurrentWeather {
+        return CurrentWeather(
+            timestamp = timestamp,
+            temperature = temperature,
+            feelsLike = feelsLike,
+            humidity = humidity,
+            uvi = uvi,
+            cloudCover = cloudCover,
+            visibility = visibility,
+            windSpeed = windSpeed,
+            weatherConditions = weatherConditionRemotes.map { it.toWeatherCondition() }
+        )
+    }
+
+    private fun HourlyWeatherRemote.toHourlyWeather(): HourlyWeather {
+        return HourlyWeather(
+            timestamp = timestamp,
+            temperature = temperature,
+            feelsLike = feelsLike,
+            humidity = humidity,
+            uvi = uvi,
+            cloudCover = cloudCover,
+            windSpeed = windSpeed,
+            weatherConditions = weatherConditionRemotes.map { it.toWeatherCondition() },
+            chanceOfRain = chanceOfRain
+        )
+    }
+
+    private fun WeatherConditionRemote.toWeatherCondition(): WeatherCondition {
+        return WeatherCondition(
+            conditionId = conditionId,
+            mainDescription = mainDescription,
+            detailedDescription = detailedDescription,
+            icon = icon
+        )
+    }
 }
+

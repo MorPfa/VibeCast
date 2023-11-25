@@ -28,16 +28,20 @@ class LocalImageDataSourceImplTest {
         imageEntity = ImageEntity(
             id = "123456",
             description = "Beautiful landscape",
+            altDescription = "test",
             regularUrl = "https://example.com/image.jpg",
             name = "John Doe",
             userId = "789",
             userName = "john_doe",
-            portfolioUrl = "https://example.com/john_doe"
+            portfolioUrl = "https://example.com/john_doe",
+            userLink = "test",
+            downloadLink = "https://dummyurl.com/raw"
         )
 
         imageDto = ImageDto(
             id = "789012",
             description = "Amazing sunset",
+            altDescription = "test",
             urls = ImageDto.PhotoUrls(
                 raw = "https://example.com/raw_image.jpg",
                 full = "https://example.com/full_image.jpg",
@@ -50,6 +54,10 @@ class LocalImageDataSourceImplTest {
                 name = "Jane Doe",
                 userName = "jane_doe",
                 portfolioUrl = "https://example.com/jane_doe"
+            ),
+            links = ImageDto.PhotoLinks(
+                user = "test",
+                downloadLink = "https://dummyurl.com/raw"
             )
         )
     }
@@ -76,11 +84,14 @@ class LocalImageDataSourceImplTest {
             val imageEntity =  ImageEntity(
                 imageDto.id,
                 imageDto.description,
+                imageDto.altDescription,
                 imageDto.urls.regular,
                 imageDto.user.name,
                 imageDto.user.id,
                 imageDto.user.userName,
-                imageDto.user.portfolioUrl
+                imageDto.user.portfolioUrl,
+                imageDto.links.user,
+                imageDto.links.downloadLink
             )
             verify(imageDao).addImage(imageEntity)
 
@@ -95,11 +106,14 @@ class LocalImageDataSourceImplTest {
             val imageEntity =  ImageEntity(
                 imageDto.id,
                 imageDto.description,
+                imageDto.altDescription,
                 imageDto.urls.regular,
                 imageDto.user.name,
                 imageDto.user.id,
                 imageDto.user.userName,
-                imageDto.user.portfolioUrl
+                imageDto.user.portfolioUrl,
+                imageDto.links.user,
+                imageDto.links.downloadLink
             )
             verify(imageDao).deleteImage(imageEntity)
 
@@ -110,6 +124,7 @@ class LocalImageDataSourceImplTest {
         return ImageDto(
             id = this.id,
             description = this.description,
+            altDescription = this.altDescription,
             urls = ImageDto.PhotoUrls(
                 raw = "",
                 full = "",
@@ -122,6 +137,10 @@ class LocalImageDataSourceImplTest {
                 name = this.name,
                 userName = this.userName,
                 portfolioUrl = this.portfolioUrl
+            ),
+            links = ImageDto.PhotoLinks(
+                user = this.userLink,
+                downloadLink = this.downloadLink
             )
         )
     }
