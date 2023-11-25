@@ -8,7 +8,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.mock
@@ -20,34 +19,35 @@ class RemoteImageDataSourceImplTest {
     private val remoteImageDataSource = RemoteImageDataSourceImpl(imageService)
     private lateinit var imageApiModel: ImageApiModel
     private lateinit var imageDto: ImageDto
-    private lateinit var image : Image
 
 
     @Before
     fun setUp() {
-        image = Image(
-            id = "dummyId",
-            description = "This is a dummy image",
-            urls = Image.PhotoUrls(
+
+        imageApiModel = ImageApiModel(
+            id = "test",
+            description = "test",
+            altDescription = "test",
+            urls = ImageApiModel.PhotoUrls(
                 raw = "https://dummyurl.com/raw",
                 full = "https://dummyurl.com/full",
                 regular = "https://dummyurl.com/regular",
                 small = "https://dummyurl.com/small",
                 thumb = "https://dummyurl.com/thumb"
-            ),
-            user = Image.UnsplashUser(
-                id = "dummyUserId",
-                name = "Dummy User",
-                userName = "dummy_user",
-                portfolioUrl = "https://dummyurl.com/portfolio"
-            )
-        )
-
-        imageApiModel = ImageApiModel(listOf(image))
+            ), links = ImageApiModel.PhotoLinks(
+                user = "test",
+                downloadLink = "https://dummyurl.com/raw"
+            ), user = ImageApiModel.UnsplashUser(
+                id = "test",
+                userName = "test",
+                name = "test",
+                portfolioUrl = "https://dummyurl.com/raw"
+            ))
 
         imageDto = ImageDto(
             id = "dummyId",
             description = "This is a dummy image",
+            altDescription = "test",
             urls = ImageDto.PhotoUrls(
                 raw = "https://dummyurl.com/raw",
                 full = "https://dummyurl.com/full",
@@ -60,6 +60,10 @@ class RemoteImageDataSourceImplTest {
                 name = "Dummy User",
                 userName = "dummy_user",
                 portfolioUrl = "https://dummyurl.com/portfolio"
+            ),
+            links = ImageDto.PhotoLinks(
+                user = "test",
+                downloadLink = "https://dummyurl.com/raw"
             )
         )
     }
@@ -70,10 +74,37 @@ class RemoteImageDataSourceImplTest {
         runTest {
             val query = "Seattle rainy"
             val orientation = "portrait"
-            val expectedImages = listOf(imageDto)
-            whenever(imageService.getImages(query, orientation)).thenReturn(imageApiModel)
+            val remoteImages = listOf(imageApiModel)
+            val expectedImages = listOf(imageApiModel.toImageDto())
+            whenever(imageService.getImages(query, orientation, 1)).thenReturn(remoteImages)
             val result = remoteImageDataSource.getImages(query).first()
-            assertEquals(expectedImages, result)
+            assertEquals(expectedImages[0], result)
         }
+    }
+
+
+    private fun ImageApiModel.toImageDto(): ImageDto {
+        return ImageDto(
+            id = this.id,
+            description = this.description,
+            altDescription = this.altDescription,
+            urls = ImageDto.PhotoUrls(
+                raw = this.urls.raw,
+                full = this.urls.full,
+                regular = this.urls.regular,
+                small = this.urls.small,
+                thumb = this.urls.thumb
+            ),
+            user = ImageDto.UnsplashUser(
+                id = this.user.id,
+                name = this.user.name,
+                userName = this.user.userName,
+                portfolioUrl = this.user.portfolioUrl
+            ),
+            links = ImageDto.PhotoLinks(
+                user = this.links.user,
+                downloadLink = this.links.downloadLink
+            )
+        )
     }
 }

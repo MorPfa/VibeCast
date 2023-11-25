@@ -13,46 +13,24 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.mock
+import org.mockito.kotlin.verify
 
 import org.mockito.kotlin.whenever
 
 class ImageRepositoryImplTest {
 
-    //TODO add local data source tests
-
     private val remoteImageDataSource = mock<RemoteImageDataSourceImpl>()
     private val localImageDataSource = mock<LocalImageDataSourceImpl>()
     private val imageRepository = ImageRepositoryImpl(remoteImageDataSource, localImageDataSource)
-    private lateinit var imageApiModel: ImageApiModel
     private lateinit var imageDto: ImageDto
-    private lateinit var image : Image
 
 
     @Before
     fun setUp() {
-        image = Image(
-            id = "dummyId",
-            description = "This is a dummy image",
-            urls = Image.PhotoUrls(
-                raw = "https://dummyurl.com/raw",
-                full = "https://dummyurl.com/full",
-                regular = "https://dummyurl.com/regular",
-                small = "https://dummyurl.com/small",
-                thumb = "https://dummyurl.com/thumb"
-            ),
-            user = Image.UnsplashUser(
-                id = "dummyUserId",
-                name = "Dummy User",
-                userName = "dummy_user",
-                portfolioUrl = "https://dummyurl.com/portfolio"
-            )
-        )
-
-        imageApiModel = ImageApiModel(listOf(image))
-
         imageDto = ImageDto(
             id = "dummyId",
             description = "This is a dummy image",
+            altDescription = "test",
             urls = ImageDto.PhotoUrls(
                 raw = "https://dummyurl.com/raw",
                 full = "https://dummyurl.com/full",
@@ -65,16 +43,20 @@ class ImageRepositoryImplTest {
                 name = "Dummy User",
                 userName = "dummy_user",
                 portfolioUrl = "https://dummyurl.com/portfolio"
+            ),
+            links = ImageDto.PhotoLinks(
+                user = "test",
+                downloadLink = "https://dummyurl.com/raw"
             )
         )
     }
 
     @ExperimentalCoroutinesApi
     @Test
-    fun testGetImages() {
+    fun testGetRemoteImages() {
         runTest {
             val query = "Seattle rainy"
-            val expectedImages = listOf(imageDto)
+            val expectedImages = imageDto
             whenever(remoteImageDataSource.getImages(query)).thenReturn(flowOf(expectedImages))
             val result = imageRepository.getRemoteImages(query).first()
             assertEquals(expectedImages,result)
@@ -83,14 +65,31 @@ class ImageRepositoryImplTest {
 
     @ExperimentalCoroutinesApi
     @Test
-    fun testPickRandomImage() {
+    fun testGetLocalImages() {
         runTest {
-            val query = "Seattle rainy"
-            val expectedImage = imageDto
-            val listOfImageDtos = listOf(imageDto)
-            whenever(imageRepository.getRemoteImages(query)).thenReturn(flowOf(listOfImageDtos))
-            val result = imageRepository.pickRandomImage(query).first()
-            assertEquals(expectedImage, result)
+            val expectedImages = listOf(imageDto)
+            whenever(localImageDataSource.getImages()).thenReturn(flowOf(expectedImages))
+            val result = imageRepository.getLocalImages().first()
+            assertEquals(expectedImages, result)
+        }
+    }
+
+    @ExperimentalCoroutinesApi
+    @Test
+    fun testAddImage(){
+        runTest {
+            imageRepository.addImage(imageDto)
+            verify(localImageDataSource).addImage(imageDto)
+        }
+    }
+
+    @ExperimentalCoroutinesApi
+    @Test
+    fun testDeleteImages(){
+        runTest {
+            imageRepository.deleteImage(imageDto)
+            verify(localImageDataSource).deleteImage(imageDto)
+
         }
     }
 }
