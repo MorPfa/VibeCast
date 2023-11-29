@@ -2,8 +2,19 @@ package app.vibecast.presentation.weather
 
 import android.icu.text.SimpleDateFormat
 import android.widget.ImageView
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
+import app.vibecast.domain.entity.CurrentWeather
+import app.vibecast.domain.entity.HourlyWeather
 import app.vibecast.domain.entity.ImageDto
+import app.vibecast.domain.entity.LocationWithWeatherDataDto
+import app.vibecast.domain.entity.WeatherCondition
+import app.vibecast.domain.entity.WeatherDto
+import app.vibecast.domain.repository.ImageRepository
+import app.vibecast.domain.repository.LocationRepository
 import app.vibecast.domain.repository.WeatherRepository
 import app.vibecast.presentation.ImagePicker
 import app.vibecast.presentation.image.ImageLoader
@@ -12,6 +23,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.launch
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
@@ -19,16 +31,40 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CurrentLocationViewModel @Inject constructor(
-   private val weatherRepository: WeatherRepository,
+    private val imageRepository: ImageRepository,
+    private val weatherRepository: WeatherRepository,
+    private val locationRepository: LocationRepository,
     private val imageLoader: ImageLoader,
     private val imagePicker: ImagePicker
 ) : ViewModel() {
 
-    fun loadImage(query: String, weatherCondition: String): Flow<ImageDto?> = flow {
-        imagePicker.pickImage(query, weatherCondition).collect { imageDto ->
-            emit(imageDto)
+    private val mutableImage = MutableLiveData<ImageDto>()
+    val image : LiveData<ImageDto> get() = mutableImage
+
+
+    val galleryImages : LiveData<List<ImageDto>> = imageRepository.getLocalImages().asLiveData()
+    fun setImageLiveData(image: ImageDto){
+        mutableImage.value = image
+    }
+    fun addImage(imageDto: ImageDto) {
+        viewModelScope.launch {
+            imageRepository.addImage(imageDto)
         }
-    }.flowOn(Dispatchers.IO)
+    }
+
+
+    fun deleteImage(imageDto: ImageDto){
+        viewModelScope.launch {
+            imageRepository.deleteImage(imageDto)
+        }
+    }
+
+    fun addLocationWeather(location: LocationWithWeatherDataDto) {
+        locationRepository.addLocationWeather(location)
+    }
+
+    fun loadImage(query: String, weatherCondition: String): Flow<ImageDto?> =
+        imagePicker.pickImage(query, weatherCondition).flowOn(Dispatchers.IO)
 
 
     fun loadWeather(cityName: String): Flow<WeatherModel> = flow {
@@ -42,7 +78,7 @@ class CurrentLocationViewModel @Inject constructor(
         imageLoader.loadUrlIntoImageView(url, imageView)
     }
 
-    private fun convertWeatherDtoToWeatherModel(weatherDto: app.vibecast.domain.entity.WeatherDto): WeatherModel {
+    private fun convertWeatherDtoToWeatherModel(weatherDto: WeatherDto): WeatherModel {
         return WeatherModel(
             cityName = weatherDto.cityName,
             latitude = weatherDto.latitude,
@@ -52,7 +88,7 @@ class CurrentLocationViewModel @Inject constructor(
         )
     }
 
-    private fun convertCurrentWeather(dto: app.vibecast.domain.entity.CurrentWeather): WeatherModel.CurrentWeather {
+    private fun convertCurrentWeather(dto: CurrentWeather): WeatherModel.CurrentWeather {
         return WeatherModel.CurrentWeather(
             timestamp = convertUnixTimestampToAmPm(dto.timestamp),
             temperature = dto.temperature.toInt(),
@@ -66,7 +102,7 @@ class CurrentLocationViewModel @Inject constructor(
         )
     }
 
-    private fun convertHourlyWeather(dto: app.vibecast.domain.entity.HourlyWeather): WeatherModel.HourlyWeather {
+    private fun convertHourlyWeather(dto: HourlyWeather): WeatherModel.HourlyWeather {
         return WeatherModel.HourlyWeather(
             timestamp = convertUnixTimestampToAmPm(dto.timestamp),
             temperature = dto.temperature.toInt(),
@@ -80,11 +116,11 @@ class CurrentLocationViewModel @Inject constructor(
         )
     }
 
-    private fun convertWeatherConditions(dtoList: List<app.vibecast.domain.entity.WeatherCondition>): List<WeatherModel.WeatherCondition> {
+    private fun convertWeatherConditions(dtoList: List<WeatherCondition>): List<WeatherModel.WeatherCondition> {
         return dtoList.map { convertWeatherCondition(it) }
     }
 
-    private fun convertWeatherCondition(dto: app.vibecast.domain.entity.WeatherCondition): WeatherModel.WeatherCondition {
+    private fun convertWeatherCondition(dto: WeatherCondition): WeatherModel.WeatherCondition {
         return WeatherModel.WeatherCondition(
             conditionId = dto.conditionId,
             mainDescription = dto.mainDescription,

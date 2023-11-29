@@ -83,7 +83,6 @@
 
                     />
 
-
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/next_screen_button_right"
                     android:layout_width="wrap_content"
@@ -129,100 +128,49 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginVertical="18dp"
-        android:baselineAligned="false"
         android:orientation="horizontal"
-        android:layout_marginStart="60dp"
-
+        android:layout_marginStart="30dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent">
 
-        <LinearLayout
-            android:id="@+id/bottom_row_humidity"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.7"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/humidity_title"
-                android:textAlignment="textStart"
-                android:textColor="#FFFFFF"
-                android:textSize="15sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/bottom_humidity_display"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/humidity"
-                android:textAlignment="textStart"
-                android:textColor="#FFFFFF"
-                android:textSize="20sp"
-                android:textStyle="bold" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/bottom_row_chance_of_rain"
+        <!-- Humidity -->
+        <TextView
+            android:id="@+id/bottom_humidity_display"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical">
+            android:text="@string/humidity"
+            android:textAlignment="textStart"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/chance_of_rain"
-                android:textAlignment="textStart"
-                android:textColor="#FFFFFF"
-                android:textSize="15sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/bottom_chance_of_rain_display"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/chance_of_rain_value"
-                android:textAlignment="textStart"
-                android:textColor="#FFFFFF"
-                android:textSize="20sp"
-                android:textStyle="bold" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/bottom_row_uv_index"
+        <!-- Chance of Rain -->
+        <TextView
+            android:id="@+id/bottom_chance_of_rain_display"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical">
+            android:text="@string/chance_of_rain"
+            android:layout_marginEnd="24dp"
+            android:textAlignment="textStart"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/uv_index"
-                android:textAlignment="textStart"
-                android:textColor="#FFFFFF"
-                android:textSize="15sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/bottom_uv_index_display"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/uv_index_value"
-                android:textAlignment="textStart"
-                android:textColor="#FFFFFF"
-                android:textSize="20sp"
-                android:textStyle="bold" />
-
-
-        </LinearLayout>
+        <!-- UV Index -->
+        <TextView
+            android:id="@+id/bottom_uv_index_display"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/uv_index_value"
+            android:textAlignment="textStart"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
 

@@ -1,6 +1,4 @@
 
-give search bar functionality -started
-
 start working out fragment redraw mechanism -Not started yet
 
 integrate location into user/ account stuff -Not started yet
@@ -8,15 +6,11 @@ integrate location into user/ account stuff -Not started yet
 change units for weather data
 
 
-SEARCH BAR / CACHING FUNCTIONALITY:
-
-- modify viewmodel to update views according to which screen is shown:
-    - Implement mechanism (simple list to track index) to check which screen is being shown (current location being index 0)
-    - with each click on next screen button, index changes
-    - figure out how to use image picker with performSearch function
 
 FIND APPROPRIATE DEFAULT IMAGE FOR EACH WEATHER CONDITION IN CASE OF NO INTERNET
 DOUBLE CHECK APPROPRIATE NULL CHECKS / ERROR HANDLING IN EACH DATA FLOW
+FIX MEMORY LEAK IN GALLERY FRAGMENT
+ADD CHECK IF IMAGE IS SAVED TO CHANGE ICON
 
 
 FINISH GALLERY FRAGMENT:

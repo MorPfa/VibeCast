@@ -28,20 +28,16 @@
 
     <!--    Air Quality widget-->
     <string name="air_quality">Air Quality</string>
-    <string name="feels_like">Feels like</string>
-    <string name="feels_like_value">%1$d°</string>
-    <string name="wind_speed">Wind Speed</string>
-    <string name="wind_speed_value">%1$.1f mph</string>
-    <string name="visibility">Visibility</string>
-    <string name="visibility_value">%1$d</string>
-    <string name="chance_of_rain">Chance of rain</string>
-    <string name="chance_of_rain_value">%1$.1f%%</string>
+    <string name="feels_like">Feels like \n%1$d°</string>
+    <string name="wind_speed">Wind Speed \n%1$.1f mph</string>
+    <string name="visibility">Visibility \n%1$s</string>
+    <string name="chance_of_rain">Chance of rain \n%1$.1f%%</string>
     <string name="uv_index">UV index</string>
-    <string name="uv_index_value">%1$.1f</string>
+    <string name="uv_index_value">UV index \n%1$.1f</string>
     <string name="o3">o3</string>
     <string name="o3_value">%1$d</string>
     <string name="humidity_title">Humidity</string>
-    <string name="humidity" >%1$d%%</string>
+    <string name="humidity"> Humidity \n%1$d%%</string>
 
 
     <string name="my_account">My Account</string>
@@ -87,5 +83,8 @@
     <string name="allow_vibecast_to_use_your_location">Allow VibeCast to use your location</string>
     <string name="your_saved_images">Your saved images</string>
     <string name="settings_header">Settings</string>
+    <string name="photo_attribution">Photo by %1$s on %2$s</string>
+    <string name="gallery_card_title">Title</string>
+    <string name="saved_image">Saved Image</string>
 
 </resources>

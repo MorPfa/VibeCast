@@ -15,3 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "VibeCast"
 include(":app")
+include(":benchmark")

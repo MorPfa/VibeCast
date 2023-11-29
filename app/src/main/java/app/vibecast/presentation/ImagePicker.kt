@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class ImagePicker @Inject constructor(
-    private val imageRepository: ImageRepository, ) {
+    private val imageRepository: ImageRepository) {
 
     fun pickImage(cityName : String, weatherCondition : String) : Flow<ImageDto> {
         val weather = when (weatherCondition) {

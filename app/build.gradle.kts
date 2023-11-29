@@ -58,12 +58,19 @@ android {
                 "proguard-rules.pro"
             )
         }
+        create("benchmark") {
+            initWith(buildTypes.getByName("release"))
+            signingConfig = signingConfigs.getByName("debug")
+            matchingFallbacks += listOf("release")
+            isDebuggable = false
+        }
         release {
             isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {
@@ -76,7 +83,6 @@ android {
 }
 
 dependencies {
-
 
 //    Spotify
     implementation ("com.spotify.android:auth:1.2.3")
@@ -115,6 +121,7 @@ dependencies {
 
 //    Glide
     implementation ("com.github.bumptech.glide:glide:4.16.0")
+    kapt("com.github.bumptech.glide:compiler:4.16.0")
 
 //    Moshi
     implementation("com.squareup.moshi:moshi-kotlin:1.14.0")
@@ -122,7 +129,7 @@ dependencies {
 
 //    Viewmodel
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
-    kapt("androidx.lifecycle:lifecycle-compiler:$lifecycle_version")
+    implementation("androidx.lifecycle:lifecycle-common-java8:$lifecycle_version")
     implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
 //    LiveData
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version")
@@ -154,6 +161,10 @@ dependencies {
 
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+
+    //Memory leak detector
+    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.8.1")
+
 }
 kapt {
     correctErrorTypes = true
