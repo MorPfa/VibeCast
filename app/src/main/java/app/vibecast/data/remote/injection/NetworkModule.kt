@@ -61,25 +61,32 @@ class NetworkModule {
         retrofit.create(WeatherService::class.java)
 
 
+//    @Named("unsplash")
+//    @Provides
+//    fun provideUnsplashRetrofit() : Retrofit {
+//        val loggingInterceptor = HttpLoggingInterceptor().apply {
+//            level = HttpLoggingInterceptor.Level.BODY
+//        }
+//
+//        val client = OkHttpClient.Builder()
+//            .addInterceptor(loggingInterceptor)
+//            .build()
+//       return  Retrofit.Builder()
+//            .baseUrl("https://api.unsplash.com/")
+//            .addConverterFactory(GsonConverterFactory.create())
+//           .client(client)
+//            .build()
+//
+//
+//
+//    }
+
     @Named("unsplash")
     @Provides
-    fun provideUnsplashRetrofit() : Retrofit {
-        val loggingInterceptor = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
-        }
-
-        val client = OkHttpClient.Builder()
-            .addInterceptor(loggingInterceptor)
-            .build()
-       return  Retrofit.Builder()
+    fun provideUnsplashRetrofit() : Retrofit =  Retrofit.Builder()
             .baseUrl("https://api.unsplash.com/")
             .addConverterFactory(GsonConverterFactory.create())
-           .client(client)
             .build()
-
-
-
-    }
 
 
 

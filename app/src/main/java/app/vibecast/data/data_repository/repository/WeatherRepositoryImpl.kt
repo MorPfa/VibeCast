@@ -25,30 +25,35 @@ class WeatherRepositoryImpl @Inject constructor(
     override fun getCoordinates(cityName: String): Flow<CoordinateApiModel> =
         remoteWeatherDataSource.getCoordinates(cityName)
 
-    override fun getWeather(cityName : String): Flow<WeatherDto> {
-        return if(isInternetAvailable(context)) {
-                remoteWeatherDataSource.getWeather(cityName)} else {
-                localWeatherDataSource.getWeather(cityName)
-        }
+    override fun getWeather(cityName: String): Flow<WeatherDto> {
+        return if (isInternetAvailable(context)) {
+            remoteWeatherDataSource.getWeather(cityName)
+        } else {
+            localWeatherDataSource.getWeather(cityName)
+        }.flowOn(Dispatchers.IO)
     }
 
 
+
     override fun refreshWeather(cityName: String): Flow<WeatherDto> =
-        remoteWeatherDataSource.getWeather(cityName).flowOn(Dispatchers.IO)
-        .onEach {
-            localWeatherDataSource.addWeather(it)
+        remoteWeatherDataSource.getWeather(cityName)
+            .flowOn(Dispatchers.IO)
+            .onEach {
+                localWeatherDataSource.addWeather(it)
         }
 
 
     override fun refreshWeather(lat: Double, lon: Double): Flow<WeatherDto> =
         remoteWeatherDataSource.getWeather(lat, lon)
-    .onEach {
-        localWeatherDataSource.addWeather(it)
+            .flowOn(Dispatchers.IO)
+            .onEach {
+                localWeatherDataSource.addWeather(it)
     }
 
 
     private fun isInternetAvailable(context: Context): Boolean {
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
         val network = connectivityManager.activeNetwork
         val networkCapabilities = connectivityManager.getNetworkCapabilities(network)

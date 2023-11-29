@@ -2,12 +2,13 @@ package app.vibecast.presentation
 
 
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -16,34 +17,33 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import app.vibecast.R
 import app.vibecast.databinding.ActivityMainBinding
-import app.vibecast.domain.entity.ImageDto
-import app.vibecast.domain.entity.LocationWithWeatherDataDto
 import app.vibecast.domain.repository.ImageRepository
 import app.vibecast.domain.repository.LocationRepository
+import app.vibecast.presentation.weather.CurrentLocationViewModel
 import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 
-@AndroidEntryPoint
-class MainActivity : AppCompatActivity() , CurrentLocationFragment.OnActionBarItemClickListener{
+const val TAG = "TestTag"
 
+
+@AndroidEntryPoint
+class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private lateinit var searchView: SearchView
-    private lateinit var currentLocationFragment: Fragment
+    private val viewModel : CurrentLocationViewModel by viewModels()
+
 
     @Inject
     lateinit var locationRepository: LocationRepository
-
     @Inject
     lateinit var  imageRepository: ImageRepository
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_home) as NavHostFragment
@@ -58,7 +58,22 @@ class MainActivity : AppCompatActivity() , CurrentLocationFragment.OnActionBarIt
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
+    }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_save_image -> {
+                Log.d(TAG, "Save Image button clicked")
+                    viewModel.addImage(viewModel.image.value!!)
+
+
+                true
+            }
+            R.id.action_save_location -> {
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -86,38 +101,6 @@ class MainActivity : AppCompatActivity() , CurrentLocationFragment.OnActionBarIt
 
         return true
     }
-
-    override fun onSaveImageClicked(image: ImageDto) {
-        imageRepository.addImage(image)
-    }
-
-    override fun onSaveLocationClicked(location: LocationWithWeatherDataDto) {
-        locationRepository.addLocationWeather(location)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_save_image -> {
-                // Handle menu item 1 click
-                true
-            }
-            R.id.action_save_location -> {
-                // Handle menu item 2 click
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-
-    override fun onSearch(query: String) {
-        TODO("Not yet implemented")
-    }
-
-    //TODO make performSearch return a location with weather object
-
-
-
-
 
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_content_home)

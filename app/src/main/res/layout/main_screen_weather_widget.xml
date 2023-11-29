@@ -39,40 +39,12 @@
             android:columnCount="3"
             android:rowCount="4">
 
-            <!-- Row 1 -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/feels_like"
-                android:textAlignment="textStart"
-                android:textColor="#FFFFFF"
-                android:textSize="14sp"
-                android:layout_columnWeight="1" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/wind_speed"
-                android:textAlignment="textStart"
-                android:textColor="#FFFFFF"
-                android:textSize="14sp"
-                android:layout_columnWeight="1" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/visibility"
-                android:textColor="#FFFFFF"
-                android:textSize="14sp"
-                android:textAlignment="textStart"
-                android:layout_columnWeight="1" />
-
-            <!-- Row 2 -->
             <TextView
                 android:id="@+id/feels_like_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/feels_like_value"
+                android:text="@string/feels_like"
                 android:textColor="#FFFFFF"
                 android:textSize="14sp"
                 android:textAlignment="textStart"
@@ -82,7 +54,7 @@
                 android:id="@+id/wind_speed_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/wind_speed_value"
+                android:text="@string/wind_speed"
                 android:textColor="#FFFFFF"
                 android:textSize="14sp"
                 android:textAlignment="textStart"
@@ -92,49 +64,17 @@
                 android:id="@+id/visibility_value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/visibility_value"
+                android:text="@string/visibility"
                 android:textColor="#FFFFFF"
                 android:textSize="14sp"
                 android:textAlignment="textStart"
                 android:layout_columnWeight="1" />
 
-            <!-- Row 3 -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/chance_of_rain"
-                android:paddingTop="20dp"
-                android:textColor="#FFFFFF"
-                android:textSize="14sp"
-                android:textAlignment="textStart"
-                android:layout_columnWeight="1" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/uv_index"
-                android:paddingTop="20dp"
-                android:textColor="#FFFFFF"
-                android:textSize="14sp"
-                android:textAlignment="textStart"
-                android:layout_columnWeight="1" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/humidity_title"
-                android:paddingTop="20dp"
-                android:textColor="#FFFFFF"
-                android:textSize="14sp"
-                android:textAlignment="textStart"
-                android:layout_columnWeight="1" />
-
-            <!-- Row 4 -->
             <TextView
                 android:id="@+id/chance_of_rain_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/chance_of_rain_value"
+                android:text="@string/chance_of_rain"
                 android:textColor="#FFFFFF"
                 android:textSize="14sp"
                 android:textAlignment="textStart"
@@ -160,12 +100,6 @@
                 android:textAlignment="textStart"
                 android:layout_columnWeight="1" />
         </GridLayout>
-
-
-
     </LinearLayout>
-
-
-
 </androidx.cardview.widget.CardView>
 

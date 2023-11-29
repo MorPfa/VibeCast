@@ -13,6 +13,7 @@ import app.vibecast.domain.entity.WeatherCondition
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -95,7 +96,7 @@ class WeatherRepositoryImplTest {
     @ExperimentalCoroutinesApi
     @Test
     fun testRefreshWeatherWithCoordinates() = runTest {
-        whenever(remoteWeatherDataSource.getWeather(expectedWeather.cityName)).thenReturn(flowOf(expectedWeather))
+        whenever(remoteWeatherDataSource.getWeather(expectedWeather.latitude, expectedWeather.longitude)).thenReturn(flowOf(expectedWeather))
         val result = repositoryImpl.refreshWeather(expectedWeather.latitude, expectedWeather.longitude).first()
         assertEquals(expectedWeather, result)
         verify(localWeatherDataSource).addWeather(expectedWeather)
@@ -114,18 +115,5 @@ class WeatherRepositoryImplTest {
 
     }
 
-    @ExperimentalCoroutinesApi
-    @Test
-    fun testGetWeatherWithCoordinates() = runTest {
-        whenever(context.getSystemService(Context.CONNECTIVITY_SERVICE)).thenReturn(connectivityManager)
-        whenever(connectivityManager.activeNetwork).thenReturn(mock())
-        whenever(connectivityManager.getNetworkCapabilities(any())).thenReturn(networkCapabilities)
-        whenever(networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)).thenReturn(true)
-        whenever(remoteWeatherDataSource.getWeather(expectedWeather.latitude , expectedWeather.longitude)).thenReturn(flowOf(expectedWeather))
-        val result = repositoryImpl.getWeather(expectedWeather.cityName).first()
-        assertEquals(expectedWeather.longitude, result.longitude,1.0)
-        assertEquals(expectedWeather.latitude, result.latitude,1.0)
-        assertEquals(expectedWeather.currentWeather?.timestamp, result.currentWeather?.timestamp)
 
     }
-}

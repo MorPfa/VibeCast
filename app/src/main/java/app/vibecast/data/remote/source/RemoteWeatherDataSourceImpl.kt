@@ -17,13 +17,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import java.math.RoundingMode
 import javax.inject.Inject
-
 
 
 class RemoteWeatherDataSourceImpl @Inject constructor(
@@ -50,33 +49,27 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
 
     override fun getWeather(name: String): Flow<WeatherDto> = flow {
         val coordinates = getCoordinates(name).single()
-        val weatherData = withContext(Dispatchers.IO) {
-            weatherService.getWeather(
-                coordinates.latitude, coordinates.longitude ,"minutely,daily" ,BuildConfig.OWM_KEY)
-        }
-        weatherData.cityName = coordinates.name.plus(" - ").plus(coordinates.country)
-        weatherData.hourlyWeather[1].temperature =  kelvinToFahrenheit(weatherData.hourlyWeather[1].temperature)
-        weatherData.hourlyWeather[2].temperature =  kelvinToFahrenheit(weatherData.hourlyWeather[2].temperature)
-        weatherData.currentWeatherRemote.temperature =  kelvinToFahrenheit(weatherData.currentWeatherRemote.temperature)
+        val weatherData = weatherService.getWeather(
+            coordinates.latitude, coordinates.longitude, "minutely,daily", BuildConfig.OWM_KEY
+        )
+        weatherData.cityName = "${coordinates.name} - ${coordinates.country}"
+        weatherData.hourlyWeather[1].temperature = kelvinToFahrenheit(weatherData.hourlyWeather[1].temperature)
+        weatherData.hourlyWeather[2].temperature = kelvinToFahrenheit(weatherData.hourlyWeather[2].temperature)
+        weatherData.currentWeatherRemote.temperature = kelvinToFahrenheit(weatherData.currentWeatherRemote.temperature)
         weatherData.currentWeatherRemote.feelsLike = kelvinToFahrenheit(weatherData.currentWeatherRemote.feelsLike)
-
-        emit(weatherData)
-    }.map {weatherApiModel ->
-        weatherApiModel.toWeather()
+        emit(weatherData.toWeather())
     }.catch {
         throw UseCaseException.WeatherException(it)
-    }
+    }.flowOn(Dispatchers.IO)
 
-    override fun getWeather(lat : Double, lon : Double): Flow<WeatherDto> = flow {
-        val weatherData = withContext(Dispatchers.IO) {
-            weatherService.getWeather(lat, lon, "minutely,daily", BuildConfig.OWM_KEY)
-        }
-        emit(weatherData)
-    }.map {weatherApiModel ->
-        weatherApiModel.toWeather()
+
+
+    override fun getWeather(lat: Double, lon: Double): Flow<WeatherDto> = flow {
+        val weatherData = weatherService.getWeather(lat, lon, "minutely,daily", BuildConfig.OWM_KEY)
+        emit(weatherData.toWeather())
     }.catch {
         throw UseCaseException.WeatherException(it)
-    }
+    }.flowOn(Dispatchers.IO)
 
     private fun kelvinToFahrenheit(kelvin: Double): Double {
         val result = (kelvin - 273.15) * 9 / 5 + 32
