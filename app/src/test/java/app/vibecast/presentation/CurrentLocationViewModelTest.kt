@@ -8,6 +8,7 @@ import app.vibecast.domain.entity.ImageDto
 import app.vibecast.domain.entity.WeatherCondition
 import app.vibecast.domain.entity.WeatherDto
 import app.vibecast.domain.repository.ImageRepository
+import app.vibecast.domain.repository.LocationRepository
 import app.vibecast.domain.repository.WeatherRepository
 import app.vibecast.presentation.image.ImageLoader
 import app.vibecast.presentation.weather.CurrentLocationViewModel
@@ -26,10 +27,16 @@ import java.util.Locale
 class CurrentLocationViewModelTest{
 
     private val weatherRepository = mock<WeatherRepository>()
+    private val locationRepository = mock<LocationRepository>()
     private val imageLoader = mock<ImageLoader>()
     private val imageRepository = mock<ImageRepository>()
     private val imagePicker = ImagePicker(imageRepository)
-    private val viewModel = CurrentLocationViewModel(weatherRepository, imageLoader, imagePicker)
+    private val viewModel = CurrentLocationViewModel(
+                            imageRepository,
+                            weatherRepository,
+                            locationRepository,
+                            imageLoader,
+                            imagePicker)
     private lateinit var imageDto: ImageDto
     private lateinit var  weatherDto : WeatherDto
     private val dateFormat = mock<SimpleDateFormat>()

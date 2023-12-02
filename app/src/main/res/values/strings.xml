@@ -5,6 +5,8 @@
     <string name="search_bar_text">Search for city to get its vibe</string>
 
     <!--    Weather info underneath music widget-->
+
+
     <string name="left_weather_condition">%1$s</string>
     <string name="left_time">%1$s</string>
     <string name="left_temp">%1$.1f°</string>
@@ -31,7 +33,7 @@
     <string name="feels_like">Feels like \n%1$d°</string>
     <string name="wind_speed">Wind Speed \n%1$.1f mph</string>
     <string name="visibility">Visibility \n%1$s</string>
-    <string name="chance_of_rain">Chance of rain \n%1$.1f%%</string>
+    <string name="chance_of_rain">Chance of rain \n%1$d%%</string>
     <string name="uv_index">UV index</string>
     <string name="uv_index_value">UV index \n%1$.1f</string>
     <string name="o3">o3</string>
@@ -74,7 +76,7 @@
     <string name="next_screen_forward_message">Go to the screen to the right which holds another locations weather data if saved</string>
     <string name="lorem_ipusm">Lorem ipsum dolor sit amet, consectetur adipiscing elit. </string>
     <string name="remove_btn">Remove</string>
-    <string name="display_temperature_in_fahrenheit">Display Temperature in Fahrenheit</string>
+    <string name="display_temperature_in_fahrenheit">Display Temperature in Celsius</string>
     <string name="saved_locations">Saved Locations</string>
     <string name="profile_picture_content_desc">Users profile picture</string>
     <string name="name">%1$s</string>
@@ -86,5 +88,16 @@
     <string name="photo_attribution">Photo by %1$s on %2$s</string>
     <string name="gallery_card_title">Title</string>
     <string name="saved_image">Saved Image</string>
+    <string name="location_1">%1$s</string>
+    <string name="location_2">%1$s</string>
+    <string name="location_3">%1$s</string>
+    <string name="location_4">%1$s</string>
+    <string name="location_5">%1$s</string>
+    <string name="location_6">%1$s</string>
+    <string name="none_saved">You don\'t have any saved locations</string>
+    <string name="visited_places">Visited places</string>
+    <string name="saved_images">Saved Images</string>
+    <string name="saved_songs">Saved Songs</string>
+    <string name="location_reminder">You listened to this song in %1$s</string>
 
 </resources>

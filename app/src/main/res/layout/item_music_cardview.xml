@@ -13,7 +13,8 @@
         android:layout_height="120dp"
         android:paddingTop="16dp"
         android:contentDescription="@string/saved_image"
-        android:scaleType="centerCrop"
+        android:scaleType="centerInside"
+        android:src="@drawable/kanye_album_cover"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -23,11 +24,27 @@
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/title"
+        android:text="@string/gallery_card_title"
         android:textColor="@android:color/white"
         android:padding="6dp"
         android:textSize="11sp"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/saved_image"
+        app:layout_constraintBottom_toTopOf="@id/removeBtn" />
+
+
+
+    <TextView
+        android:id="@+id/location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/location_reminder"
+        android:textColor="@android:color/white"
+        android:padding="6dp"
+        android:textSize="11sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/saved_image"
         app:layout_constraintBottom_toTopOf="@id/removeBtn" />
 

@@ -1,15 +1,19 @@
 package app.vibecast.data.data_repository.repository
 
+import android.util.Log
 import app.vibecast.data.data_repository.data_source.local.LocalLocationDataSource
 import app.vibecast.data.data_repository.data_source.remote.RemoteWeatherDataSource
 import app.vibecast.domain.entity.LocationDto
 import app.vibecast.domain.entity.LocationWithWeatherDataDto
 import app.vibecast.domain.entity.WeatherDto
 import app.vibecast.domain.repository.LocationRepository
+import app.vibecast.presentation.TAG
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.launch
@@ -25,16 +29,11 @@ class LocationRepositoryImpl @Inject constructor(
             localLocationDataSource.getLocationWithWeather().map { locationWithWeatherDataList ->
                     locationWithWeatherDataList.map { locationWithWeatherData ->
                         val cityName = locationWithWeatherData.location.cityName
-
-                        // Asynchronously fetch the latest weather data for the city from the remote data source
                         val newWeatherData = remoteWeatherDataSource.getWeather(cityName).firstOrNull()
-
-                        // Update the weather data in the combined entity
                         if (newWeatherData != null) {
                             locationWithWeatherData.weather = newWeatherData
                         }
 
-                        // Save the updated location with weather entity to the database
                         localLocationDataSource.addLocationWithWeather(locationWithWeatherData )
 
                     }
@@ -63,8 +62,7 @@ class LocationRepositoryImpl @Inject constructor(
     }
 
 
-    override fun getLocations(): Flow<List<LocationDto>> = localLocationDataSource.getAllLocations()
-
+    override fun getLocations(): Flow<List<LocationDto>> =  localLocationDataSource.getLocations()
 
     override fun getLocation(cityName: String): Flow<LocationDto> = localLocationDataSource.getLocation(cityName)
 
@@ -73,7 +71,7 @@ class LocationRepositoryImpl @Inject constructor(
     }
 
     override fun deleteLocation(location: LocationDto) =
-        CoroutineScope(Dispatchers.Main).launch {
+        CoroutineScope(Dispatchers.IO).launch {
             localLocationDataSource.deleteLocation(location)
         }
 
