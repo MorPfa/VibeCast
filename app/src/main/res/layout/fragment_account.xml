@@ -6,144 +6,199 @@
     android:layout_height="match_parent"
     android:background="@drawable/generic_background"
     android:fitsSystemWindows="true"
-    tools:context=".presentation.navigation.AccountFragment">
+    tools:context=".presentation.navigation.AccountFragment"
+   >
+
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        android:layout_marginHorizontal="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5">
-
+        >
 
         <androidx.cardview.widget.CardView
-            app:contentPadding="10dp"
-            app:cardCornerRadius="16dp"
+            android:id="@+id/cardView"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_gravity="center"
+            app:cardCornerRadius="60dp"
+            android:layout_marginTop="100dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/profilePicture"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/profile_picture_content_desc"
+            android:scaleType="centerCrop"
+            android:src="@drawable/osman_rana_gxezuwo5m4i_unsplash2" />
+
+    </androidx.cardview.widget.CardView>
+
+
+        <TextView
+            android:id="@+id/username"
+            android:layout_gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:cardBackgroundColor="@color/black"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.5">
+            android:text="John Doe"
+            android:textColor="@android:color/white"
+            android:textSize="26sp"
+            tools:layout_editor_absoluteX="120dp"
+            tools:layout_editor_absoluteY="136dp" />
 
-            <LinearLayout
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Seattle - US"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:layout_marginBottom="12dp"
+            android:layout_gravity="center"
+
+            />
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            app:cardBackgroundColor="@color/black"
+            app:strokeColor="#11FFFFFF"
+            app:strokeWidth="8dp"
+            app:cardCornerRadius="16dp"
+            >
+
+            <GridLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:id="@+id/profilePicture"
-                    android:contentDescription="@string/profile_picture_content_desc"
-                    android:layout_width="100dp"
-                    android:layout_height="100dp"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/osman_rana_gxezuwo5m4i_unsplash2" />
+                android:orientation="horizontal"
+                android:columnCount="3"
+                android:rowCount="2"
+                android:padding="12dp"
+                >
 
                 <TextView
-                    android:id="@+id/username"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="8dp"
-                    android:text="@string/username"
-                    android:textColor="@android:color/white"
-                    android:textSize="18sp" />
+                    android:textColor="@color/white"
+                    android:text="21"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:layout_gravity="center"
+                    android:textAlignment="center"
+                    android:paddingHorizontal="12dp"
+                    android:paddingTop="12dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:text="8"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:paddingHorizontal="12dp"
+                    android:paddingTop="12dp"
+                    android:layout_gravity="center"
+                    android:textAlignment="center"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:text="17"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:paddingHorizontal="12dp"
+                    android:paddingTop="12dp"
+                    android:layout_gravity="center"
+                    android:textAlignment="center"/>
 
                 <TextView
-                    android:id="@+id/email"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="4dp"
-                    android:text="@string/email"
-                    android:textColor="#B0B0B0"
-                    android:textSize="16sp" />
+                    android:textColor="@color/white"
+                    android:text="@string/visited_places"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:textAlignment="center"
+                    android:layout_gravity="center"
+                    android:paddingHorizontal="12dp"
+                    android:paddingBottom="12dp"
+                    android:paddingTop="6dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:text="@string/saved_images"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:paddingHorizontal="12dp"
+                    android:paddingBottom="12dp"
+                    android:paddingTop="6dp"
+                    android:layout_gravity="center"
+                    android:textAlignment="center"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:text="@string/saved_songs"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    android:paddingHorizontal="12dp"
+                    android:paddingBottom="12dp"
+                    android:paddingTop="6dp"
+                    android:layout_gravity="center"
+                    android:textAlignment="center"/>
 
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
+            </GridLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:id="@+id/saved_locations_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            android:padding="8dp"
+            android:text="@string/saved_locations"
+            android:textColor="@color/white"
+            android:textSize="22sp" />
 
         <LinearLayout
+            android:id="@+id/saved_locations"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            >
+            android:gravity="center"
+            android:padding="6dp"
+            android:layout_marginHorizontal="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_gravity="center"
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:text="@string/saved_locations"
-                android:textColor="#000000"
-                android:textSize="20sp" />
+             />
+        
+        
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/saved_songs"
+            android:layout_gravity="center"
+            android:textSize="18sp"/>
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:layout_marginBottom="8dp"
-                android:background="@drawable/rounded_black_background"
-                android:textColor="@color/white"
-                android:text="Location 1: New York"
-                android:textSize="16sp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:background="@drawable/rounded_black_background"
-                android:textColor="@color/white"
-                android:layout_marginBottom="8dp"
-                android:text="Location 2: Los Angeles"
-                android:textSize="16sp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:layout_marginBottom="8dp"
-                android:background="@drawable/rounded_black_background"
-                android:textColor="@color/white"
-                android:text="Location 3: Chicago"
-                android:textSize="16sp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:layout_marginBottom="8dp"
-                android:background="@drawable/rounded_black_background"
-                android:textColor="@color/white"
-                android:text="Location 4: San Francisco"
-                android:textSize="16sp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:padding="8dp"
-                android:background="@drawable/rounded_black_background"
-                android:textColor="@color/white"
-                android:text="Location 5: Miami"
-                android:textSize="16sp" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="8dp"
-                android:background="@drawable/rounded_black_background"
-                android:textColor="@color/white"
-                android:text="Location 6: Seattle"
-                android:textSize="16sp" />
-
-        </LinearLayout>
-
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/savedSongs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/your_saved_images"
+            app:layout_constraintVertical_bias="0.5"
+            app:spanCount="3"
+            tools:listitem="@layout/item_music_cardview" />
 
     </LinearLayout>
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,14 +1,13 @@
 package app.vibecast.presentation.navigation
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import app.vibecast.R
+import androidx.fragment.app.Fragment
+import app.vibecast.databinding.FragmentSettingsBinding
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
@@ -18,7 +17,7 @@ private const val ARG_PARAM2 = "param2"
  * create an instance of this fragment.
  */
 class SettingsFragment : Fragment() {
-    // TODO: Rename and change types of parameters
+    private lateinit var binding : FragmentSettingsBinding
     private var param1: String? = null
     private var param2: String? = null
 
@@ -34,8 +33,26 @@ class SettingsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_settings, container, false)
+        binding = FragmentSettingsBinding.inflate(inflater, container, false)
+        binding.allowLocationSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked) {
+                // Switch is ON
+                // Perform actions for ON state
+            } else {
+                // Switch is OFF
+                // Perform actions for OFF state
+            }
+        }
+        binding.celsiusFahrenheitSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked) {
+                // Switch is ON
+                // Perform actions for ON state
+            } else {
+                // Switch is OFF
+                // Perform actions for OFF state
+            }
+        }
+        return binding.root
     }
 
     companion object {
@@ -47,7 +64,7 @@ class SettingsFragment : Fragment() {
          * @param param2 Parameter 2.
          * @return A new instance of fragment SettingsFragment.
          */
-        // TODO: Rename and change types and number of parameters
+
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
             SettingsFragment().apply {
