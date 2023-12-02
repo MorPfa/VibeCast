@@ -19,6 +19,7 @@ import androidx.navigation.ui.setupWithNavController
 import app.vibecast.R
 import app.vibecast.databinding.ActivityMainBinding
 import app.vibecast.domain.entity.ImageDto
+import app.vibecast.domain.entity.LocationDto
 import app.vibecast.domain.repository.ImageRepository
 import app.vibecast.domain.repository.LocationRepository
 import app.vibecast.presentation.navigation.AccountViewModel
@@ -40,6 +41,7 @@ class MainActivity : AppCompatActivity() {
     private val accountViewModel : AccountViewModel by viewModels()
     private lateinit var imageList : List<ImageDto>
     private lateinit var currentImage : ImageDto
+    private lateinit var currentLocation : LocationDto
 
     @Inject
     lateinit var locationRepository: LocationRepository
@@ -66,10 +68,16 @@ class MainActivity : AppCompatActivity() {
         currentLocationViewModel.galleryImages.observe(this){
 //            Log.d(TAG, it[0].id)
             imageList = it
+
         }
         currentLocationViewModel.image.observe(this){
             currentImage = it
         }
+        currentLocationViewModel.weather.observe(this){
+            currentLocation = LocationDto(it.location.cityName, it.location.locationIndex)
+
+        }
+
 
     }
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -78,11 +86,9 @@ class MainActivity : AppCompatActivity() {
         val search = menu.findItem(R.id.action_search)
         searchView = search.actionView as SearchView
 
-        val saveImage = menu.findItem(R.id.action_save_image)
 //        Log.d(TAG, currentLocationViewModel.galleryImages.value.toString())
         Log.d(TAG, currentLocationViewModel.image.value.toString())
 
-        val saveLocation = menu.findItem(R.id.action_save_location)
 
         // Set up the OnQueryTextListener
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
@@ -107,14 +113,31 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_save_image -> {
-                    currentLocationViewModel.addImage(currentImage)
-                    item.icon = ContextCompat.getDrawable(this, R.drawable.favorite_selected)
-
+                if (item.isCheckable) {
+                    if (!item.isChecked) {
+                        item.isChecked = true
+                        currentLocationViewModel.addImage(currentImage)
+                        item.icon = ContextCompat.getDrawable(this, R.drawable.favorite_selected)
+                    } else {
+                        item.isChecked = false
+                        currentLocationViewModel.deleteImage(currentImage)
+                        item.icon = ContextCompat.getDrawable(this, R.drawable.favorite_unselected)
+                    }
+                }
                 true
             }
             R.id.action_save_location -> {
-                accountViewModel.addLocation(currentLocationViewModel.weather.value!!.location)
-                item.icon = ContextCompat.getDrawable(this, R.drawable.delete_location_icon)
+                if (item.isCheckable) {
+                    if (!item.isChecked) {
+                        item.isChecked = true
+                        accountViewModel.addLocation(currentLocationViewModel.weather.value!!.location)
+                        item.icon = ContextCompat.getDrawable(this, R.drawable.delete_location_icon)
+                    } else {
+                        item.isChecked = false
+                        accountViewModel.deleteLocation(currentLocation)
+                        item.icon = ContextCompat.getDrawable(this, R.drawable.save_location_icon)
+                    }
+                }
                 true
             }
             else -> super.onOptionsItemSelected(item)
