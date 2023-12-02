@@ -29,15 +29,12 @@ data class HourlyWeather(
     val feelsLike: Double,
     val humidity: Int,
     val uvi: Double,
-    val cloudCover: Int,
     val windSpeed: Double,
     val weatherConditions: List<WeatherCondition>,
     val chanceOfRain: Double
 )
 
 data class WeatherCondition(
-    val conditionId: Int,
     val mainDescription: String,
-    val detailedDescription: String,
     val icon: String
 )

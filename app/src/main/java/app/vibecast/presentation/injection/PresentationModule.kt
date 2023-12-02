@@ -1,4 +1,4 @@
-package app.vibecast.presentation
+package app.vibecast.presentation.injection
 
 import android.content.Context
 import app.vibecast.presentation.image.ImageLoader

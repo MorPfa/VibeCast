@@ -111,21 +111,19 @@ class AccountFragment : Fragment() {
         val removeButton = customView.findViewById<MaterialButton>(R.id.removeBtn)
         val cancelButton = customView.findViewById<MaterialButton>(R.id.cancelBtn)
 
-        // Set click listeners
+
         removeButton.setOnClickListener {
-            // Handle click on the "Remove" button
+
             removeFixedItem(index, location)
-            alertDialog?.dismiss() // Dismiss the dialog after handling the action
+            alertDialog?.dismiss()
         }
 
         cancelButton.setOnClickListener {
-            // Handle click on the "Cancel" button
-            alertDialog?.dismiss() // Dismiss the dialog without performing the action
+
+            alertDialog?.dismiss()
         }
 
         alertDialogBuilder.setView(customView)
-
-        // Create the dialog and assign it to the global variable
         alertDialog = alertDialogBuilder.create()
 
         // Set background color of the dialog window to be transparent

@@ -1,6 +1,6 @@
 package app.vibecast.data.local.source
 
-import android.util.Log
+
 import app.vibecast.data.data_repository.data_source.local.LocalLocationDataSource
 import app.vibecast.data.local.db.location.LocationDao
 import app.vibecast.data.local.db.location.LocationEntity
@@ -8,10 +8,8 @@ import app.vibecast.data.local.db.weather.WeatherEntity
 import app.vibecast.domain.entity.LocationDto
 import app.vibecast.domain.entity.LocationWithWeatherDataDto
 import app.vibecast.domain.entity.WeatherDto
-import app.vibecast.presentation.TAG
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 

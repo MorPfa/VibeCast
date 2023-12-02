@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import app.vibecast.databinding.ItemCardviewBinding
 import app.vibecast.domain.entity.ImageDto
-import app.vibecast.presentation.weather.CurrentLocationViewModel
+import app.vibecast.presentation.mainscreen.CurrentLocationViewModel
 
 class ImageAdapter(
     private val imageLoader: ImageLoader,

@@ -50,7 +50,7 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
     override fun getWeather(name: String): Flow<WeatherDto> = flow {
         val coordinates = getCoordinates(name).single()
         val weatherData = weatherService.getWeather(
-            coordinates.latitude, coordinates.longitude, "minutely,daily", BuildConfig.OWM_KEY
+            coordinates.latitude, coordinates.longitude, "minutely,daily,alerts", BuildConfig.OWM_KEY
         )
         weatherData.cityName = "${coordinates.name} - ${coordinates.country}"
         weatherData.hourlyWeather[1].temperature = kelvinToFahrenheit(weatherData.hourlyWeather[1].temperature)
@@ -65,7 +65,7 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
 
 
     override fun getWeather(lat: Double, lon: Double): Flow<WeatherDto> = flow {
-        val weatherData = weatherService.getWeather(lat, lon, "minutely,daily", BuildConfig.OWM_KEY)
+        val weatherData = weatherService.getWeather(lat, lon, "minutely,daily,alerts", BuildConfig.OWM_KEY)
         emit(weatherData.toWeather())
     }.catch {
         throw UseCaseException.WeatherException(it)
@@ -109,7 +109,6 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
             feelsLike = feelsLike,
             humidity = humidity,
             uvi = uvi,
-            cloudCover = cloudCover,
             windSpeed = windSpeed,
             weatherConditions = weatherConditionRemotes.map { it.toWeatherCondition() },
             chanceOfRain = chanceOfRain
@@ -118,9 +117,7 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
 
     private fun WeatherConditionRemote.toWeatherCondition(): WeatherCondition {
         return WeatherCondition(
-            conditionId = conditionId,
             mainDescription = mainDescription,
-            detailedDescription = detailedDescription,
             icon = icon
         )
     }

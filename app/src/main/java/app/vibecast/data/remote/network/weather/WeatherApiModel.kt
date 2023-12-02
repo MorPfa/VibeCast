@@ -31,15 +31,12 @@ data class HourlyWeatherRemote(
     @Json(name = "feels_like") val feelsLike: Double,
     @Json(name = "humidity") val humidity: Int,
     @Json(name = "uvi") val uvi: Double,
-    @Json(name = "clouds") val cloudCover: Int,
     @Json(name = "wind_speed") val windSpeed: Double,
     @Json(name = "weather") val weatherConditionRemotes: List<WeatherConditionRemote>,
     @Json(name = "pop") val chanceOfRain: Double
 )
 
 data class WeatherConditionRemote(
-    @Json(name = "id") val conditionId: Int,
     @Json(name = "main") val mainDescription: String,
-    @Json(name = "description") val detailedDescription: String,
     @Json(name = "icon") val icon: String
 )

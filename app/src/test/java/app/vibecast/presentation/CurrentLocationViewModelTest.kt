@@ -1,6 +1,5 @@
 package app.vibecast.presentation
 
-import android.icu.text.DateFormat
 import android.icu.text.SimpleDateFormat
 import app.vibecast.domain.entity.CurrentWeather
 import app.vibecast.domain.entity.HourlyWeather
@@ -11,7 +10,8 @@ import app.vibecast.domain.repository.ImageRepository
 import app.vibecast.domain.repository.LocationRepository
 import app.vibecast.domain.repository.WeatherRepository
 import app.vibecast.presentation.image.ImageLoader
-import app.vibecast.presentation.weather.CurrentLocationViewModel
+import app.vibecast.presentation.image.ImagePicker
+import app.vibecast.presentation.mainscreen.CurrentLocationViewModel
 import app.vibecast.presentation.weather.WeatherModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -51,7 +51,6 @@ class CurrentLocationViewModelTest{
             description = "This is a dummy image",
             altDescription = "test",
             urls = ImageDto.PhotoUrls(
-                raw = "https://dummyurl.com/raw",
                 full = "https://dummyurl.com/full",
                 regular = "https://dummyurl.com/regular",
                 small = "https://dummyurl.com/small",
@@ -83,9 +82,7 @@ class CurrentLocationViewModelTest{
                 windSpeed = 12.0,
                 weatherConditions = listOf(
                     WeatherCondition(
-                        conditionId = 800,
                         mainDescription = "Clear",
-                        detailedDescription = "Clear sky",
                         icon = "01d"
                     )
                 )
@@ -97,13 +94,12 @@ class CurrentLocationViewModelTest{
                     feelsLike = 13.0,
                     humidity = 65,
                     uvi = 5.5,
-                    cloudCover = 45,
+
                     windSpeed = 11.0,
                     weatherConditions = listOf(
                         WeatherCondition(
-                            conditionId = 800,
                             mainDescription = "Clear",
-                            detailedDescription = "Clear sky",
+
                             icon = "01d"
                         )
                     ),
@@ -173,7 +169,6 @@ class CurrentLocationViewModelTest{
             feelsLike = dto.feelsLike,
             humidity = dto.humidity,
             uvi = dto.uvi,
-            cloudCover = dto.cloudCover,
             windSpeed = dto.windSpeed,
             weatherConditions = convertWeatherConditions(dto.weatherConditions),
             chanceOfRain = dto.chanceOfRain
@@ -186,9 +181,7 @@ class CurrentLocationViewModelTest{
 
     private fun convertWeatherCondition(dto: WeatherCondition): WeatherModel.WeatherCondition {
         return WeatherModel.WeatherCondition(
-            conditionId = dto.conditionId,
             mainDescription = dto.mainDescription,
-            detailedDescription = dto.detailedDescription,
             icon = dto.icon
         )
     }

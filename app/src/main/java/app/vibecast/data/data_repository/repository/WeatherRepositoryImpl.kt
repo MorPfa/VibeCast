@@ -110,7 +110,6 @@ class WeatherRepositoryImpl @Inject constructor(
             feelsLike = dto.feelsLike,
             humidity = dto.humidity,
             uvi = dto.uvi,
-            cloudCover = dto.cloudCover,
             windSpeed = dto.windSpeed,
             weatherConditions = dto.weatherConditions,
             chanceOfRain = dto.chanceOfRain

@@ -43,7 +43,6 @@ class LocalImageDataSourceImplTest {
             description = "Amazing sunset",
             altDescription = "test",
             urls = ImageDto.PhotoUrls(
-                raw = "https://example.com/raw_image.jpg",
                 full = "https://example.com/full_image.jpg",
                 regular = "https://example.com/regular_image.jpg",
                 small = "https://example.com/small_image.jpg",
@@ -126,7 +125,6 @@ class LocalImageDataSourceImplTest {
             description = this.description,
             altDescription = this.altDescription,
             urls = ImageDto.PhotoUrls(
-                raw = "",
                 full = "",
                 regular = this.regularUrl,
                 small = "",

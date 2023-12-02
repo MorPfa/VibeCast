@@ -1,4 +1,4 @@
-package app.vibecast.presentation
+package app.vibecast.presentation.permissions
 
 import android.app.AlertDialog
 import android.content.Context
