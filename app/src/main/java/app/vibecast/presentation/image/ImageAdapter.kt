@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.text.SpannableString
+import android.text.SpannableStringBuilder
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.view.LayoutInflater
@@ -12,7 +13,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import app.vibecast.R
 import app.vibecast.databinding.ItemCardviewBinding
 import app.vibecast.domain.entity.ImageDto
 import app.vibecast.presentation.weather.CurrentLocationViewModel
@@ -36,7 +36,8 @@ class ImageAdapter(
     }
 
     override fun onBindViewHolder(holder: PictureViewHolder, position: Int) {
-        val image = getItem(position)
+        val reversedPosition = itemCount - position - 1
+        val image = getItem(reversedPosition)
         imageLoader.loadUrlIntoImageView(image.urls.regular, holder.savedImage)
 
         val userName = image.user.name
@@ -60,7 +61,12 @@ class ImageAdapter(
         userLink.setSpan(clickableSpanUser, 0, userName.length, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
         unsplashLink.setSpan(clickableSpanUnsplash, 0, unsplashText.length, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
 
-        holder.title.text = context.getString(R.string.photo_attribution, userLink, unsplashLink)
+        val spannableStringBuilder = SpannableStringBuilder()
+            .append("Photo by")
+            .append(userLink)
+            .append(" on ") // Add a space or any other separator if needed
+            .append(unsplashLink)
+        holder.title.text = spannableStringBuilder
         holder.title.movementMethod = LinkMovementMethod.getInstance()
 
         holder.removeButton.setOnClickListener {

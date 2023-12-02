@@ -5,10 +5,12 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowTranslucentStatus" >true</item>
         <item name="actionBarStyle">@style/ActionBar</item>
+    </style>
 
 
-
-
+    <style name="CustomSearchView" parent="Widget.AppCompat.SearchView">
+        <!-- Customize other attributes as needed -->
+        <item name="iconTint">@color/white</item>
     </style>
 
 

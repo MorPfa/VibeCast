@@ -83,71 +83,69 @@ class CurrentLocationFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.loadWeather("Seattle").collect { weatherData ->
-                weather = weatherData
-                withContext(Dispatchers.Main) {
-                    val city = weatherData.cityName
-                    val weather =
-                        weatherData.currentWeather?.weatherConditions?.get(0)?.mainDescription
-                    observeImageData(city, weather!!)
-                    binding.mainTempDisplay.text =
-                        getString(R.string.center_temp, weatherData.currentWeather.temperature)
-                    //            Current hour values
-                    binding.centerTempRow.leftWeather.text =
-                        weatherData.currentWeather.weatherConditions[0].mainDescription
-                    binding.centerTempRow.leftTemp.text =
-                        weatherData.currentWeather.temperature.toString()
-                    binding.centerTempRow.leftTime.text =
-                        weatherData.hourlyWeather?.get(0)?.timestamp
-                    //            Next hour values
-                    binding.centerTempRow.centerWeather.text =
-                        weatherData.hourlyWeather?.get(1)?.weatherConditions?.get(0)?.mainDescription
-                    binding.centerTempRow.centerTemp.text =
-                        weatherData.hourlyWeather?.get(1)?.temperature.toString()
-                    binding.centerTempRow.centerTime.text =
-                        weatherData.hourlyWeather?.get(1)?.timestamp.toString()
-                    //            2 hours from now values
-                    binding.centerTempRow.rightWeather.text =
-                        weatherData.hourlyWeather?.get(2)?.weatherConditions?.get(0)?.mainDescription
-                    binding.centerTempRow.rightTemp.text =
-                        weatherData.hourlyWeather?.get(2)?.temperature.toString()
-                    binding.centerTempRow.rightTime.text =
-                        weatherData.hourlyWeather?.get(2)?.timestamp.toString()
-                    binding.locationDisplay.text = weatherData.cityName
-                    binding.mainWeatherWidget.feelsLikeTv.text =
-                        getString(R.string.feels_like, weatherData.currentWeather.feelsLike)
-                    binding.mainWeatherWidget.windSpeedTv.text =
-                        getString(R.string.wind_speed, weatherData.currentWeather.windSpeed)
-                    binding.mainWeatherWidget.visibilityValue.text =
-                        getString(R.string.visibility, weatherData.currentWeather.visibility )
+        viewModel.weather.observe(viewLifecycleOwner) { weatherData ->
+                weather = weatherData.weather
+                weatherData.weather.currentWeather?.let { currentWeather ->
+                        val city = weatherData.weather.cityName
+                        val weather =
+                            weatherData.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
+                        observeImageData(city, weather!!)
+                        binding.mainTempDisplay.text =
+                            getString(R.string.center_temp, currentWeather.temperature)
+                        //            Current hour values
+                        binding.centerTempRow.leftWeather.text =
+                            currentWeather.weatherConditions[0].mainDescription
+                        binding.centerTempRow.leftTemp.text = currentWeather.temperature.toString()
+                        binding.centerTempRow.leftTime.text =
+                            weatherData.weather.hourlyWeather?.get(0)?.timestamp
+                        //            Next hour values
+                        binding.centerTempRow.centerWeather.text =
+                            weatherData.weather.hourlyWeather?.get(1)?.weatherConditions?.get(0)?.mainDescription
+                        binding.centerTempRow.centerTemp.text =
+                            weatherData.weather.hourlyWeather?.get(1)?.temperature.toString()
+                        binding.centerTempRow.centerTime.text =
+                            weatherData.weather.hourlyWeather?.get(1)?.timestamp.toString()
+                        //            2 hours from now values
+                        binding.centerTempRow.rightWeather.text =
+                            weatherData.weather.hourlyWeather?.get(2)?.weatherConditions?.get(0)?.mainDescription
+                        binding.centerTempRow.rightTemp.text =
+                            weatherData.weather.hourlyWeather?.get(2)?.temperature.toString()
+                        binding.centerTempRow.rightTime.text =
+                            weatherData.weather.hourlyWeather?.get(2)?.timestamp.toString()
+                        binding.locationDisplay.text = weatherData.weather.cityName
+                        binding.mainWeatherWidget.feelsLikeTv.text =
+                            getString(R.string.feels_like, currentWeather.feelsLike)
+                        binding.mainWeatherWidget.windSpeedTv.text =
+                            getString(R.string.wind_speed, currentWeather.windSpeed)
+                        binding.mainWeatherWidget.visibilityValue.text =
+                            getString(R.string.visibility, currentWeather.visibility)
 
-                    binding.mainWeatherWidget.chanceOfRainTv.text =
-                        getString(
-                            R.string.chance_of_rain,
-                            weatherData.hourlyWeather?.get(0)?.chanceOfRain
-                        )
-                    binding.mainWeatherWidget.uvIndexTv.text =
-                        getString(R.string.uv_index_value, weatherData.currentWeather.uvi)
-                    binding.mainWeatherWidget.humidtyTv.text =
-                        getString(
-                            R.string.humidity,
-                            weatherData.currentWeather.humidity
-                        )
-                    binding.bottomHumidityDisplay.text = getString(
-                        R.string.humidity,
-                        weatherData.currentWeather.humidity
-                    )
-                    binding.bottomChanceOfRainDisplay.text =
-                        getString(
-                            R.string.chance_of_rain,
-                            weatherData.hourlyWeather?.get(0)?.chanceOfRain
-                        )
-                    binding.bottomUvIndexDisplay.text =
-                        getString(R.string.uv_index_value, weatherData.currentWeather.uvi)
-                }
-            }
+                        binding.mainWeatherWidget.chanceOfRainTv.text =
+                            getString(
+                                R.string.chance_of_rain,
+                                weatherData.weather.hourlyWeather?.get(0)?.chanceOfRain
+                            )
+                        binding.mainWeatherWidget.uvIndexTv.text =
+                            getString(R.string.uv_index_value, currentWeather.uvi)
+                        binding.mainWeatherWidget.humidtyTv.text =
+                            getString(
+                                R.string.humidity, currentWeather.humidity
+                            )
+//                        binding.bottomHumidityDisplay.text = getString(
+//                            R.string.humidity, currentWeather.humidity
+//                        )
+//                        binding.bottomChanceOfRainDisplay.text =
+//                            getString(
+//                                R.string.chance_of_rain,
+//                                weatherData.weather.hourlyWeather?.get(0)?.chanceOfRain
+//                            )
+//                        binding.bottomUvIndexDisplay.text =
+//                            getString(
+//                                R.string.uv_index_value, currentWeather.uvi
+//                            )
+                    }
         }
+
     }
 
     companion object {

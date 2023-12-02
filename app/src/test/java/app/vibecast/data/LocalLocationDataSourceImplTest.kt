@@ -172,7 +172,7 @@ class LocalLocationDataSourceImplTest {
         runTest {
             val localList = listOf(locationWithWeatherData)
             val expectedList = listOf(locationWithWeatherDataDto)
-            whenever(locationDao.getLocationWithWeather()).thenReturn(flowOf(localList))
+            whenever(locationDao.getLocationsWithWeather()).thenReturn(flowOf(localList))
             val result = locationDataSource.getLocationWithWeather().first()
             assertEquals(expectedList, result)
 
@@ -199,7 +199,7 @@ class LocalLocationDataSourceImplTest {
             val expectedList = listOf(locationDto)
             val localList = listOf(locationEntity)
             whenever(locationDao.getLocations()).thenReturn(flowOf(localList))
-            val result = locationDataSource.getAllLocations().first()
+            val result = locationDataSource.getLocations().first()
             assertEquals(expectedList, result)
 
         }

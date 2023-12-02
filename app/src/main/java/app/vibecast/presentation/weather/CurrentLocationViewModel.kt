@@ -10,7 +10,7 @@ import androidx.lifecycle.viewModelScope
 import app.vibecast.domain.entity.CurrentWeather
 import app.vibecast.domain.entity.HourlyWeather
 import app.vibecast.domain.entity.ImageDto
-import app.vibecast.domain.entity.LocationWithWeatherDataDto
+import app.vibecast.domain.entity.LocationDto
 import app.vibecast.domain.entity.WeatherCondition
 import app.vibecast.domain.entity.WeatherDto
 import app.vibecast.domain.repository.ImageRepository
@@ -21,8 +21,8 @@ import app.vibecast.presentation.image.ImageLoader
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.util.Date
 import java.util.Locale
@@ -41,8 +41,26 @@ class CurrentLocationViewModel @Inject constructor(
     private val mutableImage = MutableLiveData<ImageDto>()
     val image : LiveData<ImageDto> get() = mutableImage
 
-
     val galleryImages : LiveData<List<ImageDto>> = imageRepository.getLocalImages().asLiveData()
+
+    val weather: LiveData<LocationWeatherModel> = weatherRepository.getWeather("Chicago")
+        .map { locationWithWeatherDataDto ->
+            // Here, complete the mapping of locationWithWeatherDataDto to LocationWeatherModel
+            val weatherData = convertWeatherDtoToWeatherModel(locationWithWeatherDataDto.weather)
+            val locationData = LocationModel(
+                locationWithWeatherDataDto.location.cityName,
+                locationWithWeatherDataDto.location.locationIndex
+            )
+            LocationWeatherModel(location = locationData, weather = weatherData)
+        }
+        .asLiveData()
+
+
+
+
+
+    private val mutableLocationList = MutableLiveData<LocationDto>()
+    val locations : LiveData<LocationDto> get() = mutableLocationList
     fun setImageLiveData(image: ImageDto){
         mutableImage.value = image
     }
@@ -59,23 +77,86 @@ class CurrentLocationViewModel @Inject constructor(
         }
     }
 
-    fun addLocationWeather(location: LocationWithWeatherDataDto) {
-        locationRepository.addLocationWeather(location)
-    }
-
     fun loadImage(query: String, weatherCondition: String): Flow<ImageDto?> =
         imagePicker.pickImage(query, weatherCondition).flowOn(Dispatchers.IO)
 
 
-    fun loadWeather(cityName: String): Flow<WeatherModel> = flow {
-        weatherRepository.getWeather(cityName).collect { weatherDto ->
-            val convertedWeatherModel = convertWeatherDtoToWeatherModel(weatherDto)
-            emit(convertedWeatherModel)
-        }
+    fun loadWeather(cityName: String): Flow<LocationWeatherModel> = weatherRepository.getWeather(cityName).map { data ->
+            val weatherData = convertWeatherDtoToWeatherModel(data.weather)
+            val locationData = LocationModel(data.location.cityName, data.location.locationIndex)
+        LocationWeatherModel(location = locationData, weather = weatherData)
     }
 
     fun loadImageIntoImageView(url: String, imageView: ImageView) {
         imageLoader.loadUrlIntoImageView(url, imageView)
+    }
+
+
+    // Extension functions for WeatherCondition
+    private fun WeatherCondition.toWeatherConditionModel(): WeatherModel.WeatherCondition {
+        return WeatherModel.WeatherCondition(
+            conditionId = conditionId,
+            mainDescription = mainDescription,
+            detailedDescription = detailedDescription,
+            icon = icon
+        )
+    }
+
+    // Extension function for List<WeatherCondition>
+    private fun List<WeatherCondition>.toWeatherConditionModelList(): List<WeatherModel.WeatherCondition> {
+        return map { it.toWeatherConditionModel() }
+    }
+    fun CurrentWeather.toCurrentWeatherModel(): WeatherModel.CurrentWeather {
+        return WeatherModel.CurrentWeather(
+            timestamp = convertUnixTimestampToAmPm(timestamp),
+            temperature = temperature.toInt(),
+            feelsLike = feelsLike.toInt(),
+            humidity = humidity,
+            uvi = formatUvi(uvi),
+            cloudCover = cloudCover,
+            visibility = formatVisibility(visibility),
+            windSpeed = windSpeed,
+            weatherConditions = weatherConditions.toWeatherConditionModelList()
+        )
+    }
+
+    // Extension functions for HourlyWeather
+    fun HourlyWeather.toHourlyWeatherModel(): WeatherModel.HourlyWeather {
+        return WeatherModel.HourlyWeather(
+            timestamp = convertUnixTimestampToAmPm(timestamp),
+            temperature = temperature.toInt(),
+            feelsLike = feelsLike,
+            humidity = humidity,
+            uvi = formatUvi(uvi),
+            cloudCover = cloudCover,
+            windSpeed = windSpeed,
+            weatherConditions = weatherConditions.toWeatherConditionModelList(),
+            chanceOfRain = formatProp(chanceOfRain)
+        )
+    }
+
+    private fun convertUnixTimestampToAmPm(unixTimestamp: Long): String {
+        val date = Date(unixTimestamp * 1000L)
+        val sdf = SimpleDateFormat("ha", Locale.getDefault())
+        return sdf.format(date)
+    }
+
+    private fun formatProp(prop : Double) : Int = (prop * 100).toInt()
+
+
+    private fun formatUvi(uvi : Double) : Double = uvi * 10
+
+
+    private fun formatVisibility(visibility: Int): String {
+        return when {
+            visibility >= 1000 -> {
+                val miles = visibility / 1000.0 * 0.621371
+                String.format("%.1f miles", miles)
+            }
+            else -> {
+                "$visibility meters"
+            }
+        }
     }
 
     private fun convertWeatherDtoToWeatherModel(weatherDto: WeatherDto): WeatherModel {
@@ -94,7 +175,7 @@ class CurrentLocationViewModel @Inject constructor(
             temperature = dto.temperature.toInt(),
             feelsLike = dto.feelsLike.toInt(),
             humidity = dto.humidity,
-            uvi = dto.uvi,
+            uvi = formatUvi(dto.uvi),
             cloudCover = dto.cloudCover,
             visibility = formatVisibility(dto.visibility) ,
             windSpeed = dto.windSpeed,
@@ -108,11 +189,11 @@ class CurrentLocationViewModel @Inject constructor(
             temperature = dto.temperature.toInt(),
             feelsLike = dto.feelsLike,
             humidity = dto.humidity,
-            uvi = dto.uvi,
+            uvi = formatUvi(dto.uvi),
             cloudCover = dto.cloudCover,
             windSpeed = dto.windSpeed,
             weatherConditions = convertWeatherConditions(dto.weatherConditions),
-            chanceOfRain = dto.chanceOfRain
+            chanceOfRain = formatProp(dto.chanceOfRain)
         )
     }
 
@@ -127,25 +208,6 @@ class CurrentLocationViewModel @Inject constructor(
             detailedDescription = dto.detailedDescription,
             icon = dto.icon
         )
-    }
-
-    private fun convertUnixTimestampToAmPm(unixTimestamp: Long): String {
-        val date = Date(unixTimestamp * 1000L)
-        val sdf = SimpleDateFormat("hh:mm a", Locale.getDefault())
-        return sdf.format(date)
-    }
-
-
-    private fun formatVisibility(visibility: Int): String {
-        return when {
-            visibility >= 1000 -> {
-                val kilometers = visibility / 1000.0
-                String.format("%.1f km", kilometers)
-            }
-            else -> {
-                "$visibility meters"
-            }
-        }
     }
 }
 

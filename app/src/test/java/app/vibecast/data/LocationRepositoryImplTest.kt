@@ -198,7 +198,7 @@ class LocationRepositoryImplTest {
     fun testGetAllLocations() {
         runTest {
             val expectedList = listOf(locationDto)
-            whenever(localLocationDataSource.getAllLocations()).thenReturn(flowOf(expectedList))
+            whenever(localLocationDataSource.getLocations()).thenReturn(flowOf(expectedList))
             val result = locationRepository.getLocations().first()
             assertEquals(expectedList, result)
         }
