@@ -1,4 +1,4 @@
-package app.vibecast.presentation
+package app.vibecast.presentation.image
 
 import app.vibecast.domain.entity.ImageDto
 import app.vibecast.domain.repository.ImageRepository

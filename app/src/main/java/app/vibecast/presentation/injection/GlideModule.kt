@@ -1,4 +1,4 @@
-package app.vibecast
+package app.vibecast.presentation.injection
 
 import com.bumptech.glide.annotation.GlideModule
 import com.bumptech.glide.module.AppGlideModule

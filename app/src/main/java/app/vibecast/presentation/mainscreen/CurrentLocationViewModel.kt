@@ -1,4 +1,4 @@
-package app.vibecast.presentation.weather
+package app.vibecast.presentation.mainscreen
 
 import android.icu.text.SimpleDateFormat
 import android.widget.ImageView
@@ -16,8 +16,11 @@ import app.vibecast.domain.entity.WeatherDto
 import app.vibecast.domain.repository.ImageRepository
 import app.vibecast.domain.repository.LocationRepository
 import app.vibecast.domain.repository.WeatherRepository
-import app.vibecast.presentation.ImagePicker
+import app.vibecast.presentation.image.ImagePicker
 import app.vibecast.presentation.image.ImageLoader
+import app.vibecast.presentation.weather.LocationModel
+import app.vibecast.presentation.weather.LocationWeatherModel
+import app.vibecast.presentation.weather.WeatherModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -95,9 +98,7 @@ class CurrentLocationViewModel @Inject constructor(
     // Extension functions for WeatherCondition
     private fun WeatherCondition.toWeatherConditionModel(): WeatherModel.WeatherCondition {
         return WeatherModel.WeatherCondition(
-            conditionId = conditionId,
             mainDescription = mainDescription,
-            detailedDescription = detailedDescription,
             icon = icon
         )
     }
@@ -128,7 +129,6 @@ class CurrentLocationViewModel @Inject constructor(
             feelsLike = feelsLike,
             humidity = humidity,
             uvi = formatUvi(uvi),
-            cloudCover = cloudCover,
             windSpeed = windSpeed,
             weatherConditions = weatherConditions.toWeatherConditionModelList(),
             chanceOfRain = formatProp(chanceOfRain)
@@ -177,7 +177,7 @@ class CurrentLocationViewModel @Inject constructor(
             humidity = dto.humidity,
             uvi = formatUvi(dto.uvi),
             cloudCover = dto.cloudCover,
-            visibility = formatVisibility(dto.visibility) ,
+            visibility = formatVisibility(dto.visibility),
             windSpeed = dto.windSpeed,
             weatherConditions = convertWeatherConditions(dto.weatherConditions)
         )
@@ -190,7 +190,6 @@ class CurrentLocationViewModel @Inject constructor(
             feelsLike = dto.feelsLike,
             humidity = dto.humidity,
             uvi = formatUvi(dto.uvi),
-            cloudCover = dto.cloudCover,
             windSpeed = dto.windSpeed,
             weatherConditions = convertWeatherConditions(dto.weatherConditions),
             chanceOfRain = formatProp(dto.chanceOfRain)
@@ -203,9 +202,7 @@ class CurrentLocationViewModel @Inject constructor(
 
     private fun convertWeatherCondition(dto: WeatherCondition): WeatherModel.WeatherCondition {
         return WeatherModel.WeatherCondition(
-            conditionId = dto.conditionId,
             mainDescription = dto.mainDescription,
-            detailedDescription = dto.detailedDescription,
             icon = dto.icon
         )
     }

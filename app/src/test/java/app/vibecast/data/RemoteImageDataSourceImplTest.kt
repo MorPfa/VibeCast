@@ -29,7 +29,6 @@ class RemoteImageDataSourceImplTest {
             description = "test",
             altDescription = "test",
             urls = ImageApiModel.PhotoUrls(
-                raw = "https://dummyurl.com/raw",
                 full = "https://dummyurl.com/full",
                 regular = "https://dummyurl.com/regular",
                 small = "https://dummyurl.com/small",
@@ -49,7 +48,6 @@ class RemoteImageDataSourceImplTest {
             description = "This is a dummy image",
             altDescription = "test",
             urls = ImageDto.PhotoUrls(
-                raw = "https://dummyurl.com/raw",
                 full = "https://dummyurl.com/full",
                 regular = "https://dummyurl.com/regular",
                 small = "https://dummyurl.com/small",
@@ -89,7 +87,6 @@ class RemoteImageDataSourceImplTest {
             description = this.description,
             altDescription = this.altDescription,
             urls = ImageDto.PhotoUrls(
-                raw = this.urls.raw,
                 full = this.urls.full,
                 regular = this.urls.regular,
                 small = this.urls.small,

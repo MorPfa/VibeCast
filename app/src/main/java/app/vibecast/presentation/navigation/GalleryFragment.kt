@@ -12,7 +12,7 @@ import app.vibecast.databinding.FragmentPicturesBinding
 import app.vibecast.domain.repository.ImageRepository
 import app.vibecast.presentation.image.ImageAdapter
 import app.vibecast.presentation.image.ImageLoader
-import app.vibecast.presentation.weather.CurrentLocationViewModel
+import app.vibecast.presentation.mainscreen.CurrentLocationViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

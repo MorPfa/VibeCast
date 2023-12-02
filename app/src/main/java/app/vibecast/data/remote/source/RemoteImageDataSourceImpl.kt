@@ -24,7 +24,6 @@ class RemoteImageDataSourceImpl @Inject constructor(
                 description = this.description,
                 altDescription = this.altDescription,
                 urls = ImageDto.PhotoUrls(
-                    raw = this.urls.raw,
                     full = this.urls.full,
                     regular = this.urls.regular,
                     small = this.urls.small,

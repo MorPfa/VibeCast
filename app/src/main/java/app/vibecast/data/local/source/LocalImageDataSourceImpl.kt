@@ -30,7 +30,6 @@ class LocalImageDataSourceImpl @Inject constructor(
             description = this.description,
             altDescription = this.altDescription,
             urls = ImageDto.PhotoUrls(
-                raw = "",
                 full = "",
                 regular = this.regularUrl,
                 small = "",

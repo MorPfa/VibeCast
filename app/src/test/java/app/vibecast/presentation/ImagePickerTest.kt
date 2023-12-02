@@ -2,6 +2,7 @@ package app.vibecast.presentation
 
 import app.vibecast.domain.entity.ImageDto
 import app.vibecast.domain.repository.ImageRepository
+import app.vibecast.presentation.image.ImagePicker
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -25,7 +26,6 @@ class ImagePickerTest {
             description = "This is a dummy image",
             altDescription = "test",
             urls = ImageDto.PhotoUrls(
-                raw = "https://dummyurl.com/raw",
                 full = "https://dummyurl.com/full",
                 regular = "https://dummyurl.com/regular",
                 small = "https://dummyurl.com/small",

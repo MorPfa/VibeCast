@@ -29,16 +29,13 @@ data class WeatherModel (
         val feelsLike: Double,
         val humidity: Int,
         val uvi: Double,
-        val cloudCover: Int,
         val windSpeed: Double,
         val weatherConditions: List<WeatherCondition>,
         val chanceOfRain: Int
     )
 
     data class WeatherCondition(
-        val conditionId: Int,
         val mainDescription: String,
-        val detailedDescription: String,
         val icon: String
     )
 }

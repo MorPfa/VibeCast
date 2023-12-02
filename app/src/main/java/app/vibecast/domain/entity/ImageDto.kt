@@ -11,7 +11,7 @@ data class ImageDto(
     val links : PhotoLinks
 ){
     data class PhotoUrls(
-        val raw : String,
+
         val full : String,
         val regular : String,
         val small : String,

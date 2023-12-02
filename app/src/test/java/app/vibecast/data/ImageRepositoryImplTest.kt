@@ -2,7 +2,6 @@ package app.vibecast.data
 
 import app.vibecast.data.data_repository.repository.ImageRepositoryImpl
 import app.vibecast.data.local.source.LocalImageDataSourceImpl
-import app.vibecast.data.remote.network.image.ImageApiModel
 import app.vibecast.data.remote.source.RemoteImageDataSourceImpl
 import app.vibecast.domain.entity.ImageDto
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -32,7 +31,6 @@ class ImageRepositoryImplTest {
             description = "This is a dummy image",
             altDescription = "test",
             urls = ImageDto.PhotoUrls(
-                raw = "https://dummyurl.com/raw",
                 full = "https://dummyurl.com/full",
                 regular = "https://dummyurl.com/regular",
                 small = "https://dummyurl.com/small",

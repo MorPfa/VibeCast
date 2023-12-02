@@ -38,9 +38,7 @@ class AccountViewModel @Inject constructor(
 
     private fun WeatherModel.WeatherCondition.toWeatherConditionDto(): WeatherCondition {
         return WeatherCondition(
-            conditionId = conditionId,
             mainDescription = mainDescription,
-            detailedDescription = detailedDescription,
             icon = icon
         )
     }
@@ -70,7 +68,6 @@ class AccountViewModel @Inject constructor(
             feelsLike = feelsLike,
             humidity = humidity,
             uvi = uvi,
-            cloudCover = cloudCover,
             windSpeed = windSpeed,
             weatherConditions = weatherConditions.toWeatherConditionDtoList(),
             chanceOfRain = chanceOfRain.toDouble()

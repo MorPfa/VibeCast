@@ -10,8 +10,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import app.vibecast.R
 import app.vibecast.databinding.FragmentCurrentLocationBinding
-import app.vibecast.domain.entity.ImageDto
-import app.vibecast.presentation.weather.CurrentLocationViewModel
+import app.vibecast.presentation.mainscreen.CurrentLocationViewModel
+import app.vibecast.presentation.permissions.PermissionHelper
 import app.vibecast.presentation.weather.WeatherModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +27,7 @@ class CurrentLocationFragment : Fragment() {
     private lateinit var binding : FragmentCurrentLocationBinding
     private lateinit var permissionHelper: PermissionHelper
     private val viewModel: CurrentLocationViewModel by activityViewModels()
-    private lateinit var image : ImageDto
+
     private lateinit var weather : WeatherModel
 
     private var param1: String? = null
@@ -66,8 +66,7 @@ class CurrentLocationFragment : Fragment() {
         lifecycleScope.launch(Dispatchers.IO) {
             viewModel.loadImage(city, weather)
                 .collect { imageDto ->
-                    image = imageDto!!
-                    imageDto.urls.regular.let { imageUrl ->
+                    imageDto!!.urls.regular.let { imageUrl ->
                         // Switch to Main dispatcher for UI-related operations
                         withContext(Dispatchers.Main) {
                             viewModel.setImageLiveData(imageDto) // Set the LiveData value
@@ -131,18 +130,7 @@ class CurrentLocationFragment : Fragment() {
                             getString(
                                 R.string.humidity, currentWeather.humidity
                             )
-//                        binding.bottomHumidityDisplay.text = getString(
-//                            R.string.humidity, currentWeather.humidity
-//                        )
-//                        binding.bottomChanceOfRainDisplay.text =
-//                            getString(
-//                                R.string.chance_of_rain,
-//                                weatherData.weather.hourlyWeather?.get(0)?.chanceOfRain
-//                            )
-//                        binding.bottomUvIndexDisplay.text =
-//                            getString(
-//                                R.string.uv_index_value, currentWeather.uvi
-//                            )
+
                     }
         }
 

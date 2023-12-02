@@ -7,13 +7,12 @@ import app.vibecast.domain.entity.LocationDto
 import app.vibecast.domain.entity.LocationWithWeatherDataDto
 import app.vibecast.domain.entity.WeatherDto
 import app.vibecast.domain.repository.LocationRepository
-import app.vibecast.presentation.TAG
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
+
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flow
+
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.launch

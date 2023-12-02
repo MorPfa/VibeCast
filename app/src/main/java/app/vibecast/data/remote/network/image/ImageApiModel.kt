@@ -11,7 +11,6 @@ data class ImageApiModel(
    @SerializedName("links") val links : PhotoLinks
 ) {
    data class PhotoUrls(
-      @SerializedName("raw") val raw: String,
       @SerializedName("full") val full: String,
       @SerializedName("regular") val regular: String,
       @SerializedName("small") val small: String,
