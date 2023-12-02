@@ -1,14 +1,23 @@
 package app.vibecast.presentation.navigation
 
+import android.graphics.Color
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import app.vibecast.R
 import app.vibecast.databinding.FragmentAccountBinding
+import app.vibecast.domain.entity.LocationDto
+import app.vibecast.domain.repository.LocationRepository
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
@@ -17,11 +26,18 @@ private const val ARG_PARAM2 = "param2"
  * Use the [AccountFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
+@AndroidEntryPoint
 class AccountFragment : Fragment() {
-    // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
     private lateinit var binding: FragmentAccountBinding
+    private lateinit var locationList : LinearLayout
+    private val viewModel: AccountViewModel by activityViewModels()
+
+
+
+    @Inject
+    lateinit var locationRepository: LocationRepository
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -35,9 +51,65 @@ class AccountFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentAccountBinding.inflate(inflater,container,false)
-
+        locationList = binding.savedLocations
+        loadLocations()
         return binding.root
+    }
 
+
+    private fun loadLocations() {
+        viewModel.savedLocations.observe(viewLifecycleOwner) { locations ->
+            val currentItemCount = locationList.childCount
+            val max = locations.size
+            if (max == 0) {
+                val item = createDefaultTv()
+                locationList.addView(item)
+            } else {
+                for (i in currentItemCount until max) {
+                    val item = createItemView(i, locations)
+                    locationList.addView(item)
+                }
+            }
+        }
+    }
+    private fun createItemView(index: Int, locations: List<LocationDto>): View {
+        val item = TextView(requireContext())
+        item.text = locations.getOrNull(index)?.cityName ?: ""
+        item.setTextColor(Color.WHITE)
+        item.setBackgroundResource(R.drawable.rounded_black_background)
+        item.gravity = Gravity.START
+        item.textSize = 18f
+        val paddingInDpVertical = 8
+        val paddingInPxVertical = (paddingInDpVertical * resources.displayMetrics.density).toInt()
+        val paddingInDpLeft = 12
+        val paddingInPxLeft = (paddingInDpLeft * resources.displayMetrics.density).toInt()
+        val paddingInDpRight = 12
+        val paddingInPxRight = (paddingInDpRight * resources.displayMetrics.density).toInt()
+        item.setPadding(paddingInPxLeft, paddingInPxVertical, paddingInPxRight, paddingInPxVertical)
+        item.setOnLongClickListener {
+            removeFixedItem(index, locations[index])
+            true // Consume the event to prevent regular click handling
+        }
+
+        return item
+    }
+
+    private fun removeFixedItem(index: Int, location: LocationDto) {
+        if (index >= 0 && index < locationList.childCount) {
+            locationList.removeViewAt(index)
+            viewModel.deleteLocation(location)
+        }
+    }
+
+    private fun createDefaultTv(): View {
+        val item = TextView(requireContext())
+        item.text = getString(R.string.none_saved)
+        item.setTextColor(Color.WHITE)
+        item.textSize = 18.0f
+        item.gravity = 1
+
+
+        return item
     }
 
     companion object {
@@ -49,7 +121,6 @@ class AccountFragment : Fragment() {
          * @param param2 Parameter 2.
          * @return A new instance of fragment CurrentLocationFragment.
          */
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
             AccountFragment().apply {

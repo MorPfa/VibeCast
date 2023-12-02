@@ -12,7 +12,7 @@ interface LocalLocationDataSource {
 
     suspend fun addLocationWithWeather(location: LocationWithWeatherDataDto)
 
-    fun getAllLocations() : Flow<List<LocationDto>>
+    fun getLocations() : Flow<List<LocationDto>>
 
     fun getLocation(cityName : String) : Flow<LocationDto>
 

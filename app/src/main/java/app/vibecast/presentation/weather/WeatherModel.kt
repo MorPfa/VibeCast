@@ -32,7 +32,7 @@ data class WeatherModel (
         val cloudCover: Int,
         val windSpeed: Double,
         val weatherConditions: List<WeatherCondition>,
-        val chanceOfRain: Double
+        val chanceOfRain: Int
     )
 
     data class WeatherCondition(

@@ -1,22 +1,13 @@
 
-start working out fragment redraw mechanism -Not started yet
-
-integrate location into user/ account stuff -Not started yet
-
-change units for weather data
-
-
 
 FIND APPROPRIATE DEFAULT IMAGE FOR EACH WEATHER CONDITION IN CASE OF NO INTERNET
 DOUBLE CHECK APPROPRIATE NULL CHECKS / ERROR HANDLING IN EACH DATA FLOW
 FIX MEMORY LEAK IN GALLERY FRAGMENT
 ADD CHECK IF IMAGE IS SAVED TO CHANGE ICON
+GET RID OF ANY UNNECESSARILY FETCHED WEATHER DATA
+IMPLEMENT WEATHER UNIT CHANGING BY CHANGING QUERY PARAMETER
 
-
-FINISH GALLERY FRAGMENT:
-- add  functionality to save image button -almost done, just need to figure out how to pass
-  values to save functions in fragment
-- write unit tests for new stuff
+start working out fragment redraw mechanism -Not started yet
 
 consider using paging3 to get images from db
 

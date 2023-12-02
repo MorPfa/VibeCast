@@ -127,11 +127,10 @@ dependencies {
     implementation("com.squareup.moshi:moshi-kotlin:1.14.0")
     implementation ("com.squareup.retrofit2:converter-moshi:2.9.0")
 
-//    Viewmodel
+//    Viewmodel and LiveData
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
     implementation("androidx.lifecycle:lifecycle-common-java8:$lifecycle_version")
-    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
-//    LiveData
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version")
 //    Coroutines
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")

@@ -2,12 +2,12 @@ package app.vibecast.presentation
 
 
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
@@ -19,6 +19,7 @@ import app.vibecast.R
 import app.vibecast.databinding.ActivityMainBinding
 import app.vibecast.domain.repository.ImageRepository
 import app.vibecast.domain.repository.LocationRepository
+import app.vibecast.presentation.navigation.AccountViewModel
 import app.vibecast.presentation.weather.CurrentLocationViewModel
 import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
@@ -33,7 +34,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private lateinit var searchView: SearchView
-    private val viewModel : CurrentLocationViewModel by viewModels()
+    private val currentLocationViewModel : CurrentLocationViewModel by viewModels()
+    private val accountViewModel : AccountViewModel by viewModels()
 
 
     @Inject
@@ -63,13 +65,13 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_save_image -> {
-                Log.d(TAG, "Save Image button clicked")
-                    viewModel.addImage(viewModel.image.value!!)
-
-
+                currentLocationViewModel.addImage(currentLocationViewModel.image.value!!)
+                item.icon = ContextCompat.getDrawable(this, R.drawable.favorite_selected)
                 true
             }
             R.id.action_save_location -> {
+                accountViewModel.addLocation(currentLocationViewModel.weather.value!!.location)
+                item.icon = ContextCompat.getDrawable(this, R.drawable.delete_location_icon)
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -80,8 +82,20 @@ class MainActivity : AppCompatActivity() {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.main, menu)
 
-        val searchItem = menu.findItem(R.id.action_search)
-        searchView = searchItem.actionView as SearchView
+        val search = menu.findItem(R.id.action_search)
+        searchView = search.actionView as SearchView
+
+        val saveImage = menu.findItem(R.id.action_save_image)
+        if(currentLocationViewModel.galleryImages.value?.contains(currentLocationViewModel.image.value!!) == true){
+            saveImage.icon = ContextCompat.getDrawable(this, R.drawable.favorite_selected)
+        }
+        else {
+            // If you want to set a different icon when the condition is not met
+            saveImage.icon = ContextCompat.getDrawable(this, R.drawable.favorite_unselected)
+        }
+        val saveLocation = menu.findItem(R.id.action_save_location)
+
+
 
         // Set up the OnQueryTextListener
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {

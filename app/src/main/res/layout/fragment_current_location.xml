@@ -5,7 +5,6 @@
     android:id="@+id/constraintLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background_placeholder"
     tools:context=".presentation.CurrentLocationFragment">
 
 
@@ -13,20 +12,30 @@
         android:id="@+id/backgroundImageView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintTop_toTopOf="parent"
+        android:scaleType="centerCrop"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:scaleType="centerCrop" />
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5" />
 
     <LinearLayout
         android:id="@+id/upper_half"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginBottom="24dp"
         android:gravity="center_horizontal"
+        android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@+id/main_weather_widget">
+
+        <TextView
+            android:id="@+id/location_display"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/center_location_text"
+            android:layout_marginBottom="68dp"
+            android:textColor="#FFFFFF"
+            android:textSize="32sp" />
 
 
         <include
@@ -46,8 +55,8 @@
             layout="@layout/center_temp_row"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="46dp"
             app:layout_constraintBottom_toTopOf="@+id/temp_location_display"
-            android:layout_marginBottom="150dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
@@ -59,6 +68,7 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="vertical"
+            android:layout_marginBottom="24dp"
             app:layout_constraintBottom_toTopOf="@+id/main_weather_widget"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
@@ -68,9 +78,9 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:layout_marginStart="56dp"
-                android:gravity="center">
+                android:gravity="center"
+                android:orientation="horizontal">
 
 
                 <TextView
@@ -92,24 +102,14 @@
                     android:contentDescription="@string/next_screen_forward_message"
                     app:icon="@drawable/next_screen_forward"
                     app:iconSize="60dp"
-                    app:iconTint="@color/white"
-                    />
+                    app:iconTint="@color/white" />
 
             </LinearLayout>
-            <TextView
-                android:id="@+id/location_display"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/center_location_text"
-                android:textColor="#FFFFFF" />
+
+
 
         </LinearLayout>
-
-
     </LinearLayout>
-
-
-
 
     <include
         android:id="@+id/main_weather_widget"
@@ -117,61 +117,61 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginVertical="12dp"
-        app:layout_constraintBottom_toTopOf="@+id/bottom_row"
+        app:layout_constraintBottom_toBottomOf="@+id/backgroundImageView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent" />
 
 
-    <LinearLayout
-        android:id="@+id/bottom_row"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginVertical="18dp"
-        android:orientation="horizontal"
-        android:layout_marginStart="30dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent">
+    <!--    <LinearLayout-->
+    <!--        android:id="@+id/bottom_row"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginVertical="18dp"-->
+    <!--        android:orientation="horizontal"-->
+    <!--        android:layout_marginStart="30dp"-->
+    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent"-->
+    <!--        app:layout_constraintHorizontal_bias="0.5"-->
+    <!--        app:layout_constraintStart_toStartOf="parent">-->
 
-        <!-- Humidity -->
-        <TextView
-            android:id="@+id/bottom_humidity_display"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/humidity"
-            android:textAlignment="textStart"
-            android:textColor="#FFFFFF"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+    <!--        &lt;!&ndash; Humidity &ndash;&gt;-->
+    <!--        <TextView-->
+    <!--            android:id="@+id/bottom_humidity_display"-->
+    <!--            android:layout_width="0dp"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:layout_weight="1"-->
+    <!--            android:text="@string/humidity"-->
+    <!--            android:textAlignment="textStart"-->
+    <!--            android:textColor="#FFFFFF"-->
+    <!--            android:textSize="18sp"-->
+    <!--            android:textStyle="bold" />-->
 
-        <!-- Chance of Rain -->
-        <TextView
-            android:id="@+id/bottom_chance_of_rain_display"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/chance_of_rain"
-            android:layout_marginEnd="24dp"
-            android:textAlignment="textStart"
-            android:textColor="#FFFFFF"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+    <!--        &lt;!&ndash; Chance of Rain &ndash;&gt;-->
+    <!--        <TextView-->
+    <!--            android:id="@+id/bottom_chance_of_rain_display"-->
+    <!--            android:layout_width="0dp"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:layout_weight="1"-->
+    <!--            android:text="@string/chance_of_rain"-->
+    <!--            android:layout_marginEnd="24dp"-->
+    <!--            android:textAlignment="textStart"-->
+    <!--            android:textColor="#FFFFFF"-->
+    <!--            android:textSize="18sp"-->
+    <!--            android:textStyle="bold" />-->
 
-        <!-- UV Index -->
-        <TextView
-            android:id="@+id/bottom_uv_index_display"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/uv_index_value"
-            android:textAlignment="textStart"
-            android:textColor="#FFFFFF"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-    </LinearLayout>
+    <!--        &lt;!&ndash; UV Index &ndash;&gt;-->
+    <!--        <TextView-->
+    <!--            android:id="@+id/bottom_uv_index_display"-->
+    <!--            android:layout_width="0dp"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:layout_weight="1"-->
+    <!--            android:text="@string/uv_index_value"-->
+    <!--            android:textAlignment="textStart"-->
+    <!--            android:textColor="#FFFFFF"-->
+    <!--            android:textSize="18sp"-->
+    <!--            android:textStyle="bold" />-->
+    <!--    </LinearLayout>-->
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
