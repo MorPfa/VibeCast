@@ -1,6 +1,8 @@
 package app.vibecast.presentation.navigation
 
+import android.app.AlertDialog
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -8,12 +10,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import app.vibecast.R
 import app.vibecast.databinding.FragmentAccountBinding
 import app.vibecast.domain.entity.LocationDto
 import app.vibecast.domain.repository.LocationRepository
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.circularreveal.cardview.CircularRevealCardView
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -87,12 +92,50 @@ class AccountFragment : Fragment() {
         val paddingInPxRight = (paddingInDpRight * resources.displayMetrics.density).toInt()
         item.setPadding(paddingInPxLeft, paddingInPxVertical, paddingInPxRight, paddingInPxVertical)
         item.setOnLongClickListener {
-            removeFixedItem(index, locations[index])
-            true // Consume the event to prevent regular click handling
+            showDeleteConfirmationDialog(index, locations[index])
+            true
         }
 
         return item
     }
+    private var alertDialog: AlertDialog? = null
+
+    private fun showDeleteConfirmationDialog(index: Int, location: LocationDto) {
+        val alertDialogBuilder = AlertDialog.Builder(requireContext())
+        val customView = LayoutInflater.from(requireContext()).inflate(R.layout.confirm_delete_dialog, null)
+        val cardView = customView.findViewById<CircularRevealCardView>(R.id.dialog_card)
+        cardView.setCardBackgroundColor(ContextCompat.getColor(requireContext(), R.color.black))
+        cardView.radius = 36f
+        cardView.clipToOutline = true
+
+        val removeButton = customView.findViewById<MaterialButton>(R.id.removeBtn)
+        val cancelButton = customView.findViewById<MaterialButton>(R.id.cancelBtn)
+
+        // Set click listeners
+        removeButton.setOnClickListener {
+            // Handle click on the "Remove" button
+            removeFixedItem(index, location)
+            alertDialog?.dismiss() // Dismiss the dialog after handling the action
+        }
+
+        cancelButton.setOnClickListener {
+            // Handle click on the "Cancel" button
+            alertDialog?.dismiss() // Dismiss the dialog without performing the action
+        }
+
+        alertDialogBuilder.setView(customView)
+
+        // Create the dialog and assign it to the global variable
+        alertDialog = alertDialogBuilder.create()
+
+        // Set background color of the dialog window to be transparent
+        alertDialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        // Show the dialog
+        alertDialog?.show()
+    }
+
+
 
     private fun removeFixedItem(index: Int, location: LocationDto) {
         if (index >= 0 && index < locationList.childCount) {
