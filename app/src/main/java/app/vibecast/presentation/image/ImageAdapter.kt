@@ -36,8 +36,7 @@ class ImageAdapter(
     }
 
     override fun onBindViewHolder(holder: PictureViewHolder, position: Int) {
-        val reversedPosition = itemCount - position - 1
-        val image = getItem(reversedPosition)
+        val image = getItem(position)
         imageLoader.loadUrlIntoImageView(image.urls.regular, holder.savedImage)
 
         val userName = image.user.name

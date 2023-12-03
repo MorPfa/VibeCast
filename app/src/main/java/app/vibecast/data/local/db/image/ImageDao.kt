@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ImageDao {
 
-    @Query("SELECT * FROM images")
+    @Query("SELECT * FROM images ORDER BY timestamp DESC")
     fun getAllImages() : Flow<List<ImageEntity>>
 
 

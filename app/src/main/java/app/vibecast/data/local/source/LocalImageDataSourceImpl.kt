@@ -16,11 +16,11 @@ class LocalImageDataSourceImpl @Inject constructor(
     }
 
     override suspend fun addImage(image: ImageDto) = imageDao.addImage(
-        ImageEntity(image.id, image.description, image.altDescription ,image.urls.regular, image.user.name, image.user.id, image.user.userName, image.user.portfolioUrl, image.links.user, image.links.downloadLink)
+        ImageEntity(image.id, image.description, image.altDescription ,image.urls.regular, image.user.name, image.user.id, image.user.userName, image.user.portfolioUrl, image.links.user, image.links.downloadLink, System.currentTimeMillis())
     )
 
     override suspend fun deleteImage(image: ImageDto) = imageDao.deleteImage(
-    ImageEntity(image.id, image.description, image.altDescription, image.urls.regular,image.user.name, image.user.id, image.user.userName, image.user.portfolioUrl, image.links.user, image.links.downloadLink)
+    ImageEntity(image.id, image.description, image.altDescription, image.urls.regular,image.user.name, image.user.id, image.user.userName, image.user.portfolioUrl, image.links.user, image.links.downloadLink,0)
     )
 
 
