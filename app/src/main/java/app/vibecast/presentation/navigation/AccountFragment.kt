@@ -66,7 +66,7 @@ class AccountFragment : Fragment() {
         viewModel.savedLocations.observe(viewLifecycleOwner) { locations ->
             val currentItemCount = locationList.childCount
             val max = locations.size
-            if (max == 0) {
+            if (max == 0 && currentItemCount == 0) {
                 val item = createDefaultTv()
                 locationList.addView(item)
             } else {

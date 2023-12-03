@@ -13,6 +13,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
@@ -22,8 +23,8 @@ import app.vibecast.domain.entity.ImageDto
 import app.vibecast.domain.entity.LocationDto
 import app.vibecast.domain.repository.ImageRepository
 import app.vibecast.domain.repository.LocationRepository
-import app.vibecast.presentation.navigation.AccountViewModel
 import app.vibecast.presentation.mainscreen.CurrentLocationViewModel
+import app.vibecast.presentation.navigation.AccountViewModel
 import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -42,6 +43,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var imageList : List<ImageDto>
     private lateinit var currentImage : ImageDto
     private lateinit var currentLocation : LocationDto
+    private var isCurrentLocationFragmentVisible: Boolean = true
 
     @Inject
     lateinit var locationRepository: LocationRepository
@@ -78,6 +80,14 @@ class MainActivity : AppCompatActivity() {
 
         }
 
+        NavigationUI.setupWithNavController(binding.navView, navController)
+
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            isCurrentLocationFragmentVisible = destination.id == R.id.nav_home
+            if (isCurrentLocationFragmentVisible) {
+                invalidateOptionsMenu()
+            }
+        }
 
     }
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -87,7 +97,7 @@ class MainActivity : AppCompatActivity() {
         searchView = search.actionView as SearchView
 
 //        Log.d(TAG, currentLocationViewModel.galleryImages.value.toString())
-        Log.d(TAG, currentLocationViewModel.image.value.toString())
+//        Log.d(TAG, currentLocationViewModel.image.value.toString())
 
 
         // Set up the OnQueryTextListener
@@ -107,6 +117,18 @@ class MainActivity : AppCompatActivity() {
         })
 
         return true
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        val saveImageItem = menu.findItem(R.id.action_save_image)
+        Log.d(TAG, "prepare")
+        if (isCurrentLocationFragmentVisible) {
+            saveImageItem?.icon = ContextCompat.getDrawable(this, R.drawable.favorite_unselected)
+        } else {
+            saveImageItem?.icon = ContextCompat.getDrawable(this, R.drawable.favorite_selected)
+        }
+
+        return super.onPrepareOptionsMenu(menu)
     }
 
 
