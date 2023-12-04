@@ -13,6 +13,7 @@ interface WeatherDao {
     @Query("SELECT * FROM weather WHERE cityName = :cityName")
     fun getWeather(cityName: String) : Flow<WeatherEntity>
 
+
     @Upsert
     suspend fun addWeather(weatherEntity: WeatherEntity)
 

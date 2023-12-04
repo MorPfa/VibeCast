@@ -2,7 +2,6 @@ package app.vibecast.presentation
 
 
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
@@ -10,6 +9,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.activityViewModels
+import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -21,17 +22,13 @@ import app.vibecast.R
 import app.vibecast.databinding.ActivityMainBinding
 import app.vibecast.domain.entity.ImageDto
 import app.vibecast.domain.entity.LocationDto
-import app.vibecast.domain.repository.ImageRepository
-import app.vibecast.domain.repository.LocationRepository
 import app.vibecast.presentation.mainscreen.CurrentLocationViewModel
 import app.vibecast.presentation.navigation.AccountViewModel
 import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 
 const val TAG = "TestTag"
-
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -40,15 +37,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var searchView: SearchView
     private val currentLocationViewModel : CurrentLocationViewModel by viewModels()
     private val accountViewModel : AccountViewModel by viewModels()
+    private val savedLocationViewModel: SavedLocationViewmodel by viewModels()
     private lateinit var imageList : List<ImageDto>
     private lateinit var currentImage : ImageDto
     private lateinit var currentLocation : LocationDto
     private var isCurrentLocationFragmentVisible: Boolean = true
 
-    @Inject
-    lateinit var locationRepository: LocationRepository
-    @Inject
-    lateinit var  imageRepository: ImageRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -67,19 +62,6 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-        currentLocationViewModel.galleryImages.observe(this){
-//            Log.d(TAG, it[0].id)
-            imageList = it
-
-        }
-        currentLocationViewModel.image.observe(this){
-            currentImage = it
-        }
-        currentLocationViewModel.weather.observe(this){
-            currentLocation = LocationDto(it.location.cityName, it.location.locationIndex)
-
-        }
-
         NavigationUI.setupWithNavController(binding.navView, navController)
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
@@ -88,31 +70,31 @@ class MainActivity : AppCompatActivity() {
                 invalidateOptionsMenu()
             }
         }
+        currentLocationViewModel.weather.observe(this){
+            currentLocation = LocationDto(it.location.cityName, it.location.locationIndex)
+
+        }
+
+
 
     }
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main, menu)
-
         val search = menu.findItem(R.id.action_search)
         searchView = search.actionView as SearchView
 
-//        Log.d(TAG, currentLocationViewModel.galleryImages.value.toString())
-//        Log.d(TAG, currentLocationViewModel.image.value.toString())
 
-
-        // Set up the OnQueryTextListener
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
-                // This method is called when the user submits their search query
+                val action = CurrentLocationFragmentDirections.actionNavHomeToSavedLocationFragment()
+                savedLocationViewModel.getSearchedLocationWeather(query)
+                findNavController(R.id.nav_host_fragment_content_home).navigate(action)
 
-                return true // Return true to indicate that query change has been handled
+                return true
             }
 
             override fun onQueryTextChange(newText: String): Boolean {
-                // This method is called when the text in the search view changes
-                // used for real-time search suggestions or filtering
-                // newText parameter represents the current query
-                return true // Return true to indicate that query change has been handled
+                return true
             }
         })
 
@@ -121,7 +103,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         val saveImageItem = menu.findItem(R.id.action_save_image)
-        Log.d(TAG, "prepare")
         if (isCurrentLocationFragmentVisible) {
             saveImageItem?.icon = ContextCompat.getDrawable(this, R.drawable.favorite_unselected)
         } else {
@@ -133,6 +114,14 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        currentLocationViewModel.galleryImages.observe(this){
+            imageList = it
+
+        }
+        currentLocationViewModel.image.observe(this){
+            currentImage = it
+        }
+
         return when (item.itemId) {
             R.id.action_save_image -> {
                 if (item.isCheckable) {

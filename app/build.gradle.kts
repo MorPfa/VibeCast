@@ -40,6 +40,12 @@ android {
             name = "SPOTIFY_KEY",
             value = spotifyKey
         )
+        val mapsKey = properties.getProperty("MAPS_KEY")
+        buildConfigField(
+            type = "String",
+            name = "MAPS_KEY",
+            value = mapsKey
+        )
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -95,7 +101,8 @@ dependencies {
     val lifecycle_version = "2.6.2"
     val work_version = "2.8.1"
 
-
+//Places SDK
+    implementation("com.google.android.libraries.places:places:3.3.0")
 
 
 //    Work manager

@@ -11,7 +11,10 @@
         android:name="app.vibecast.presentation.CurrentLocationFragment"
         tools:layout="@layout/fragment_current_location" >
 
-</fragment>
+        <action
+            android:id="@+id/action_nav_home_to_savedLocationFragment"
+            app:destination="@id/savedLocationFragment" />
+    </fragment>
 
 
 <fragment
@@ -30,6 +33,11 @@
     <fragment
         android:id="@+id/nav_settings"
         android:name="app.vibecast.presentation.navigation.SettingsFragment"
-
         tools:layout="@layout/fragment_settings" />
+    <fragment
+        android:id="@+id/savedLocationFragment"
+        android:name="app.vibecast.presentation.SavedLocationFragment"
+        android:label="fragment_saved_location"
+        tools:layout="@layout/fragment_saved_location" />
+
 </navigation>
