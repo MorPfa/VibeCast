@@ -28,8 +28,6 @@ class CurrentLocationFragment : Fragment() {
     private lateinit var permissionHelper: PermissionHelper
     private val viewModel: CurrentLocationViewModel by activityViewModels()
 
-    private lateinit var weather : WeatherModel
-
     private var param1: String? = null
     private var param2: String? = null
 
@@ -83,7 +81,6 @@ class CurrentLocationFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.weather.observe(viewLifecycleOwner) { weatherData ->
-                weather = weatherData.weather
                 weatherData.weather.currentWeather?.let { currentWeather ->
                         val city = weatherData.weather.cityName
                         val weather =

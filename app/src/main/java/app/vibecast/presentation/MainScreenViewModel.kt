@@ -1,139 +1,82 @@
-package app.vibecast.presentation.mainscreen
+package app.vibecast.presentation
 
+import android.annotation.SuppressLint
 import android.icu.text.SimpleDateFormat
-import android.widget.ImageView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import app.vibecast.data.remote.LocationGetter
 import app.vibecast.domain.entity.CurrentWeather
 import app.vibecast.domain.entity.HourlyWeather
 import app.vibecast.domain.entity.ImageDto
-import app.vibecast.domain.entity.LocationDto
 import app.vibecast.domain.entity.WeatherCondition
 import app.vibecast.domain.entity.WeatherDto
 import app.vibecast.domain.repository.ImageRepository
-import app.vibecast.domain.repository.LocationRepository
 import app.vibecast.domain.repository.WeatherRepository
-import app.vibecast.presentation.image.ImagePicker
 import app.vibecast.presentation.image.ImageLoader
+import app.vibecast.presentation.image.ImagePicker
 import app.vibecast.presentation.weather.LocationModel
 import app.vibecast.presentation.weather.LocationWeatherModel
 import app.vibecast.presentation.weather.WeatherModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
 
-
 @HiltViewModel
-class CurrentLocationViewModel @Inject constructor(
-    private val imageRepository: ImageRepository,
+class MainScreenViewModel @Inject constructor(
+    private val locationGetter: LocationGetter,
     private val weatherRepository: WeatherRepository,
-    private val locationRepository: LocationRepository,
+    private val imageRepository: ImageRepository,
     private val imageLoader: ImageLoader,
-    private val imagePicker: ImagePicker
-) : ViewModel() {
+    private val imagePicker: ImagePicker,
+): ViewModel() {
 
-    private val mutableImage = MutableLiveData<ImageDto>()
-    val image : LiveData<ImageDto> get() = mutableImage
+    private val _image = MutableLiveData<ImageDto>()
+    val image : LiveData<ImageDto> get() = _image
 
     val galleryImages : LiveData<List<ImageDto>> = imageRepository.getLocalImages().asLiveData()
 
-
-
-    val weather: LiveData<LocationWeatherModel> = weatherRepository.getWeather("Chicago")
-        .map { locationWithWeatherDataDto ->
-            val weatherData = convertWeatherDtoToWeatherModel(locationWithWeatherDataDto.weather)
-            val locationData = LocationModel(
-                locationWithWeatherDataDto.location.cityName,
-                locationWithWeatherDataDto.location.locationIndex
-            )
-            LocationWeatherModel(location = locationData, weather = weatherData)
-        }
-        .asLiveData()
+    private val _weather = MutableLiveData<LocationWeatherModel>()
+    val weather : LiveData<LocationWeatherModel> get() = _weather
 
 
 
-
-
-    private val mutableLocationList = MutableLiveData<LocationDto>()
-    val locations : LiveData<LocationDto> get() = mutableLocationList
-    fun setImageLiveData(image: ImageDto){
-        mutableImage.value = image
-    }
-    fun addImage(imageDto: ImageDto) {
+    private val _locationPermissionState = MutableStateFlow<LocationPermissionState>(LocationPermissionState.Granted)
+    val locationPermissionState: StateFlow<LocationPermissionState> = _locationPermissionState
+    @SuppressLint("MissingPermission")
+    fun loadCurrentLocationWeather() {
         viewModelScope.launch {
-            imageRepository.addImage(imageDto)
+            if (locationGetter.isPermissionGranted()) {
+                _locationPermissionState.value = LocationPermissionState.Granted
+                weatherRepository.getWeather(
+                    locationGetter.client.lastLocation.result.latitude,
+                    locationGetter.client.lastLocation.result.longitude
+                ).map { locationWithWeatherDataDto ->
+                    val weatherData =
+                        convertWeatherDtoToWeatherModel(locationWithWeatherDataDto.weather)
+                    val locationData = LocationModel(
+                        locationWithWeatherDataDto.location.cityName,
+                        locationWithWeatherDataDto.location.locationIndex
+                    )
+                    LocationWeatherModel(location = locationData, weather = weatherData)
+                }.collect {
+                    _weather.value = it
+                }
+            }
+            else {
+                _locationPermissionState.value = LocationPermissionState.RequestPermission
+                if (_locationPermissionState.value == LocationPermissionState.Granted) {
+
+                }
+            }
         }
-    }
-
-
-    fun deleteImage(imageDto: ImageDto){
-        viewModelScope.launch {
-            imageRepository.deleteImage(imageDto)
-        }
-    }
-
-    fun loadImage(query: String, weatherCondition: String): Flow<ImageDto?> =
-        imagePicker.pickImage(query, weatherCondition).flowOn(Dispatchers.IO)
-
-
-    fun loadWeather(cityName: String): Flow<LocationWeatherModel> = weatherRepository.getWeather(cityName).map { data ->
-            val weatherData = convertWeatherDtoToWeatherModel(data.weather)
-            val locationData = LocationModel(data.location.cityName, data.location.locationIndex)
-        LocationWeatherModel(location = locationData, weather = weatherData)
-    }
-
-    fun loadImageIntoImageView(url: String, imageView: ImageView) {
-        imageLoader.loadUrlIntoImageView(url, imageView)
-    }
-
-
-    // Extension functions for WeatherCondition
-    private fun WeatherCondition.toWeatherConditionModel(): WeatherModel.WeatherCondition {
-        return WeatherModel.WeatherCondition(
-            mainDescription = mainDescription,
-            icon = icon
-        )
-    }
-
-    // Extension function for List<WeatherCondition>
-    private fun List<WeatherCondition>.toWeatherConditionModelList(): List<WeatherModel.WeatherCondition> {
-        return map { it.toWeatherConditionModel() }
-    }
-    fun CurrentWeather.toCurrentWeatherModel(): WeatherModel.CurrentWeather {
-        return WeatherModel.CurrentWeather(
-            timestamp = convertUnixTimestampToAmPm(timestamp),
-            temperature = temperature.toInt(),
-            feelsLike = feelsLike.toInt(),
-            humidity = humidity,
-            uvi = formatUvi(uvi),
-            cloudCover = cloudCover,
-            visibility = formatVisibility(visibility),
-            windSpeed = windSpeed,
-            weatherConditions = weatherConditions.toWeatherConditionModelList()
-        )
-    }
-
-    // Extension functions for HourlyWeather
-    fun HourlyWeather.toHourlyWeatherModel(): WeatherModel.HourlyWeather {
-        return WeatherModel.HourlyWeather(
-            timestamp = convertUnixTimestampToAmPm(timestamp),
-            temperature = temperature.toInt(),
-            feelsLike = feelsLike,
-            humidity = humidity,
-            uvi = formatUvi(uvi),
-            windSpeed = windSpeed,
-            weatherConditions = weatherConditions.toWeatherConditionModelList(),
-            chanceOfRain = formatProp(chanceOfRain)
-        )
     }
 
     private fun convertUnixTimestampToAmPm(unixTimestamp: Long): String {
@@ -207,5 +150,5 @@ class CurrentLocationViewModel @Inject constructor(
             icon = dto.icon
         )
     }
-}
 
+    }

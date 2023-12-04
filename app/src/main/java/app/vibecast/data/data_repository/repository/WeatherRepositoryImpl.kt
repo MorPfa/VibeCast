@@ -15,6 +15,8 @@ import app.vibecast.domain.repository.WeatherRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -40,6 +42,31 @@ class WeatherRepositoryImpl @Inject constructor(
             localWeatherDataSource.getLocationWithWeather(cityName)
         }.flowOn(Dispatchers.IO)
     }
+
+
+    override fun getWeather(lat: Double, lon: Double): Flow<LocationWithWeatherDataDto> = flow {
+        remoteWeatherDataSource.getCity(lat, lon).collect { data ->
+            val cityName = data.cityName
+            if (cityName.isNotBlank()) {
+                val localWeatherFlow = localWeatherDataSource.getLocationWithWeather(cityName)
+                val localWeatherData = localWeatherFlow.firstOrNull()
+
+                if (localWeatherData != null) {
+                    // Location found in the local database, emit the data
+                    emit(localWeatherData)
+                } else {
+                    // Location not found in the local database, fetch from the remote source
+                    remoteWeatherDataSource.getWeather(cityName)
+                        .map { weatherDto ->
+                            convertWeatherToLocationWithWeather(weatherDto)
+                        }.collect {
+                            emit(it)
+                        }
+                }
+            }
+        }
+    }.flowOn(Dispatchers.IO)
+
 
 
 

@@ -2,6 +2,7 @@ package app.vibecast.data.remote.source
 
 import app.vibecast.BuildConfig
 import app.vibecast.data.data_repository.data_source.remote.RemoteWeatherDataSource
+import app.vibecast.data.remote.network.weather.CityApiModel
 import app.vibecast.data.remote.network.weather.CoordinateApiModel
 import app.vibecast.data.remote.network.weather.CurrentWeatherRemote
 import app.vibecast.data.remote.network.weather.HourlyWeatherRemote
@@ -46,6 +47,11 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
         }
     }
 
+
+    override fun getCity(lat: Double, lon: Double): Flow<CityApiModel> = flow {
+        val weatherData = weatherService.getCiyName(lat, lon, 1, BuildConfig.OWM_KEY)[0]
+        emit(weatherData)
+    }.flowOn(Dispatchers.IO)
 
     override fun getWeather(name: String): Flow<WeatherDto> = flow {
         val coordinates = getCoordinates(name).single()

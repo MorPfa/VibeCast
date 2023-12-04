@@ -12,8 +12,9 @@
     tools:openDrawer="start">
 
 
-
     <include layout="@layout/content_main" />
+
+
 
 
     <com.google.android.material.navigation.NavigationView

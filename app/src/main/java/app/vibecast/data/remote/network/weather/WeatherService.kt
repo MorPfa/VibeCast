@@ -11,6 +11,13 @@ interface WeatherService {
         @Query("appid") apiKey: String): List<CoordinateApiModel>
 
 
+    @GET("geo/1.0/reverse")
+    suspend fun getCiyName(
+        @Query("lat") latitude: Double,
+        @Query("lon") longitude: Double,
+        @Query("limit") limit: Int,
+        @Query("appid") apiKey: String): List<CityApiModel>
+
     @GET("data/3.0/onecall")
     suspend fun getWeather(
         @Query("lat") latitude: Double,
