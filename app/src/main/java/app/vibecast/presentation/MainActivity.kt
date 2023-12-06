@@ -63,9 +63,6 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_account,
                 R.id.nav_pictures,
                 R.id.nav_settings,
-//TODO make it so back button from saved location fragment and maybe search fragment goes back to current location fragment
-                // use  onBackPressedDispatcher
-                R.id.nav_search
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
@@ -140,8 +137,8 @@ class MainActivity : AppCompatActivity() {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
                     viewModel.getSearchedLocationWeather(query)
-//                    val action = CurrentLocationFragmentDirections.actionNavHomeToSearchResultFragment()
-//                    findNavController(R.id.nav_host_fragment_content_home).navigate(action)
+                    val action = CurrentLocationFragmentDirections.actionNavHomeToSearchResultFragment()
+                    findNavController(R.id.nav_host_fragment_content_home).navigate(action)
 
                 return true
             }
@@ -204,6 +201,7 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onSupportNavigateUp(): Boolean {
+        viewModel.loadCurrentLocationWeather()
         val navController = findNavController(R.id.nav_host_fragment_content_home)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
