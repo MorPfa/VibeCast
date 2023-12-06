@@ -18,7 +18,7 @@ interface LocationDao {
 
     @Transaction
     @Query("SELECT * FROM locations WHERE cityName = :cityName")
-    fun getLocationWithWeather(cityName: String) : Flow<LocationWithWeatherData>
+    fun getLocationWithWeather(cityName: String) : Flow<LocationWithWeatherData?>
 
 
     @Transaction

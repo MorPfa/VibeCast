@@ -3,7 +3,7 @@ package app.vibecast.domain.entity
 
 
 data class WeatherDto (
-    val cityName : String,
+    var cityName : String,
     val latitude: Double,
     val longitude: Double,
     val currentWeather: CurrentWeather?,

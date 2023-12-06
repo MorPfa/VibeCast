@@ -3,7 +3,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/nav_home">
+    app:startDestination="@+id/nav_loading">
+
+
+    <fragment
+        android:id="@+id/nav_loading"
+        android:name="app.vibecast.presentation.LoadingFragment"
+        android:label="fragment_loading"
+        tools:layout="@layout/fragment_loading" >
+        <action
+            android:id="@+id/action_splashFragment_to_nav_home"
+            app:destination="@id/nav_home"
+            app:popUpTo="@id/nav_loading"
+            app:popUpToInclusive="true" />
+    </fragment>
 
 
     <fragment
@@ -13,7 +26,12 @@
 
         <action
             android:id="@+id/action_nav_home_to_savedLocationFragment"
-            app:destination="@id/savedLocationFragment" />
+            app:destination="@id/nav_saved" />
+
+
+        <action
+            android:id="@+id/action_nav_home_to_searchResultFragment"
+            app:destination="@id/nav_search" />
     </fragment>
 
 
@@ -35,9 +53,26 @@
         android:name="app.vibecast.presentation.navigation.SettingsFragment"
         tools:layout="@layout/fragment_settings" />
     <fragment
-        android:id="@+id/savedLocationFragment"
+        android:id="@+id/nav_saved"
         android:name="app.vibecast.presentation.SavedLocationFragment"
         android:label="fragment_saved_location"
-        tools:layout="@layout/fragment_saved_location" />
+        tools:layout="@layout/fragment_saved_location" >
+        <action
+            android:id="@+id/action_nav_saved_to_nav_search"
+            app:destination="@id/nav_search" />
+        <action
+            android:id="@+id/action_nav_saved_to_nav_home"
+            app:destination="@id/nav_home" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_search"
+        android:name="app.vibecast.presentation.SearchResultFragment"
+        android:label="fragment_search_result"
+        tools:layout="@layout/fragment_search_result" >
+        <action
+            android:id="@+id/action_nav_search_to_nav_home"
+            app:destination="@id/nav_home" />
+    </fragment>
+
 
 </navigation>

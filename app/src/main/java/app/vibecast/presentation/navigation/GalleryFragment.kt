@@ -9,30 +9,21 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import app.vibecast.databinding.FragmentPicturesBinding
-import app.vibecast.domain.repository.ImageRepository
+import app.vibecast.presentation.MainScreenViewModel
 import app.vibecast.presentation.image.ImageAdapter
 import app.vibecast.presentation.image.ImageLoader
-import app.vibecast.presentation.mainscreen.CurrentLocationViewModel
-import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [GalleryFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-@AndroidEntryPoint
+
 class GalleryFragment : Fragment() {
 
-    @Inject
-    lateinit var imageRepository: ImageRepository
 
-    private lateinit var binding : FragmentPicturesBinding
-    private val viewModel: CurrentLocationViewModel by activityViewModels()
+    private var _binding: FragmentPicturesBinding? = null
+    private val binding get() = _binding!!
+    private val viewModel: MainScreenViewModel by activityViewModels()
     private var param1: String? = null
     private var param2: String? = null
 
@@ -48,7 +39,7 @@ class GalleryFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentPicturesBinding.inflate(inflater,container,false)
+        _binding = FragmentPicturesBinding.inflate(inflater,container,false)
         val recyclerView: RecyclerView = binding.recyclerView
         val imageLoader = ImageLoader(requireContext())
         val adapter = ImageAdapter(imageLoader, requireContext(), viewModel)
@@ -63,15 +54,15 @@ class GalleryFragment : Fragment() {
         return binding.root
     }
 
+
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment PicturesFragment.
-         */
+
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
             GalleryFragment().apply {

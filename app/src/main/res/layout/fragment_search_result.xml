@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/constraintLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".presentation.CurrentLocationFragment">
+    tools:context=".presentation.SearchResultFragment">
 
 
     <ImageView
@@ -63,25 +62,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/music_widget" />
 
-        <LinearLayout
-            android:id="@+id/temp_location_display"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:layout_marginBottom="24dp"
-            app:layout_constraintBottom_toTopOf="@+id/main_weather_widget"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/center_temp_row">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="56dp"
-                android:gravity="center"
-                android:orientation="horizontal">
 
 
                 <TextView
@@ -91,25 +71,21 @@
                     android:text="@string/center_temperature_text"
                     android:textColor="#FFFFFF"
                     android:textSize="102sp"
-
+                    android:layout_marginBottom="24dp"
+                    app:layout_constraintBottom_toTopOf="@+id/main_weather_widget"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/center_temp_row"
                     />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/next_screen_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:background="@android:color/transparent"
-                    android:contentDescription="@string/next_screen_forward_message"
-                    app:icon="@drawable/next_screen_forward"
-                    app:iconSize="60dp"
-                    app:iconTint="@color/white" />
-
-            </LinearLayout>
 
 
 
-        </LinearLayout>
+
+
+
+
     </LinearLayout>
 
     <include
@@ -122,6 +98,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent" />
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
