@@ -1,12 +1,15 @@
 package app.vibecast.presentation
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.addCallback
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import app.vibecast.R
 import app.vibecast.databinding.FragmentSearchResultBinding
 import kotlinx.coroutines.Dispatchers
@@ -18,6 +21,7 @@ private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
 
+
 class SearchResultFragment : Fragment() {
 
     private var param1: String? = null
@@ -26,6 +30,11 @@ class SearchResultFragment : Fragment() {
     private val viewModel : MainScreenViewModel by activityViewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val callback = requireActivity().onBackPressedDispatcher.addCallback(this) {
+            Log.d(TAG,"back pressed")
+            viewModel.loadCurrentLocationWeather()
+            findNavController().navigate(R.id.nav_home)
+        }
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
