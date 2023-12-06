@@ -1,18 +1,19 @@
 package app.vibecast.presentation
 
-import android.Manifest
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.appcompat.app.ActionBar
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import app.vibecast.R
 import app.vibecast.databinding.FragmentCurrentLocationBinding
-import app.vibecast.presentation.mainscreen.CurrentLocationViewModel
 import app.vibecast.presentation.permissions.PermissionHelper
-import app.vibecast.presentation.weather.WeatherModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -23,10 +24,12 @@ private const val ARG_PARAM2 = "param2"
 
 @AndroidEntryPoint
 class CurrentLocationFragment : Fragment() {
-
-    private lateinit var binding : FragmentCurrentLocationBinding
+    private var _binding: FragmentCurrentLocationBinding? = null
+    private val binding get() = _binding!!
     private lateinit var permissionHelper: PermissionHelper
-    private val viewModel: CurrentLocationViewModel by activityViewModels()
+    private lateinit var actionBar: ActionBar
+//    private val viewModel: CurrentLocationViewModel by activityViewModels()
+    private val viewModel : MainScreenViewModel by activityViewModels()
 
     private var param1: String? = null
     private var param2: String? = null
@@ -36,24 +39,43 @@ class CurrentLocationFragment : Fragment() {
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
+
+
         }
-        permissionHelper =  PermissionHelper(this)
-        val permission = Manifest.permission.ACCESS_COARSE_LOCATION
-        val rationale = "We need this permission to provide location-based services."
-        val requestCode = 1
-        if (!permissionHelper.isPermissionGranted(permission)) {
-            permissionHelper.requestPermission(permission, rationale, requestCode)
-        }
+
+
+//        val permission = Manifest.permission.ACCESS_COARSE_LOCATION
+//        val rationale = "We need this permission to provide location-based services."
+//        val requestCode = 1
+//        if (!permissionHelper.isPermissionGranted(permission)) {
+//            permissionHelper.requestPermission(permission, rationale, requestCode)
+//        }
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentCurrentLocationBinding.inflate(inflater,container,false)
-        val nextScreenButton = binding.nextScreenButtonRight
+        _binding = FragmentCurrentLocationBinding.inflate(inflater,container,false)
+        actionBar = (requireActivity() as AppCompatActivity).supportActionBar!!
+        actionBar.show()
+        val nextScreenButton = binding.nextScreenButton
         nextScreenButton.setOnClickListener {
-            binding.constraintLayout.setBackgroundResource(R.drawable.pexels_karl_solano_2884590)
+            if (viewModel.locations.value?.size != 0){
+                viewModel.getSavedLocationWeather()
+                val action = CurrentLocationFragmentDirections.actionNavHomeToSavedLocationFragment()
+                findNavController().navigate(action)
+            }
+            else {
+                Toast.makeText(
+                    requireContext(),
+                    getString(R.string.none_saved_warning),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+
+
         }
         return binding.root
     }
@@ -80,8 +102,9 @@ class CurrentLocationFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.weather.observe(viewLifecycleOwner) { weatherData ->
-                weatherData.weather.currentWeather?.let { currentWeather ->
+        lifecycleScope.launch {
+            viewModel.currentWeather.observe(viewLifecycleOwner) { weatherData ->
+                    weatherData.weather.currentWeather?.let { currentWeather ->
                         val city = weatherData.weather.cityName
                         val weather =
                             weatherData.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
@@ -129,9 +152,19 @@ class CurrentLocationFragment : Fragment() {
                             )
 
                     }
+                }
+
+            }
         }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewModel.currentWeather.removeObservers(viewLifecycleOwner)
+        _binding = null
     }
+
+
+
 
     companion object {
         /**

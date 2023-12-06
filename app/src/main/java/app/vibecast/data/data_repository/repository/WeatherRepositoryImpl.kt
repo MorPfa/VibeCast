@@ -12,7 +12,6 @@ import app.vibecast.domain.entity.LocationDto
 import app.vibecast.domain.entity.LocationWithWeatherDataDto
 import app.vibecast.domain.entity.WeatherDto
 import app.vibecast.domain.repository.WeatherRepository
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
@@ -25,41 +24,52 @@ import javax.inject.Inject
 class WeatherRepositoryImpl @Inject constructor(
     private val remoteWeatherDataSource: RemoteWeatherDataSource,
     private val localWeatherDataSource: LocalWeatherDataSource,
-    @ApplicationContext private val context: Context
 ) : WeatherRepository{
 
 
     override fun getCoordinates(cityName: String): Flow<CoordinateApiModel> =
         remoteWeatherDataSource.getCoordinates(cityName)
 
-    override fun getWeather(cityName: String): Flow<LocationWithWeatherDataDto> {
-        return if (isInternetAvailable(context)) {
-            remoteWeatherDataSource.getWeather(cityName)
-                .map { weatherDto ->
-                    convertWeatherToLocationWithWeather(weatherDto)
-                }
-        } else {
-            localWeatherDataSource.getLocationWithWeather(cityName)
-        }.flowOn(Dispatchers.IO)
+//    override fun getWeather(cityName: String): Flow<LocationWithWeatherDataDto> {
+//        return if (isInternetAvailable(context)) {
+//            remoteWeatherDataSource.getWeather(cityName)
+//                .map { weatherDto ->
+//                    convertWeatherToLocationWithWeather(weatherDto)
+//                }
+//        } else {
+//            localWeatherDataSource.getLocationWithWeather(cityName)
+//        }.flowOn(Dispatchers.IO) as Flow<LocationWithWeatherDataDto>
+//    }
+override fun getWeather(cityName: String): Flow<LocationWithWeatherDataDto> = flow {
+    val strippedName = cityName.substringBefore(" - ")
+    remoteWeatherDataSource.getWeather(strippedName).collect{ weatherDto ->
+        emit(convertWeatherToLocationWithWeather(weatherDto))
+
     }
+}.flowOn(Dispatchers.IO)
 
 
     override fun getWeather(lat: Double, lon: Double): Flow<LocationWithWeatherDataDto> = flow {
         remoteWeatherDataSource.getCity(lat, lon).collect { data ->
             val cityName = data.cityName
+//            Log.d(TAG, data.cityName)
             if (cityName.isNotBlank()) {
                 val localWeatherFlow = localWeatherDataSource.getLocationWithWeather(cityName)
                 val localWeatherData = localWeatherFlow.firstOrNull()
 
+
                 if (localWeatherData != null) {
                     // Location found in the local database, emit the data
+//                    Log.d(TAG, localWeatherData.weather.cityName)
                     emit(localWeatherData)
                 } else {
                     // Location not found in the local database, fetch from the remote source
-                    remoteWeatherDataSource.getWeather(cityName)
+                    remoteWeatherDataSource.getWeather(lat, lon)
                         .map { weatherDto ->
                             convertWeatherToLocationWithWeather(weatherDto)
+
                         }.collect {
+                            it.weather.cityName = "${data.cityName} - ${data.countryName}"
                             emit(it)
                         }
                 }

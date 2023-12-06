@@ -10,19 +10,23 @@ import android.text.style.ClickableSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import app.vibecast.databinding.ItemCardviewBinding
 import app.vibecast.domain.entity.ImageDto
+import app.vibecast.presentation.MainScreenViewModel
 import app.vibecast.presentation.mainscreen.CurrentLocationViewModel
+import java.lang.ref.WeakReference
 
 class ImageAdapter(
     private val imageLoader: ImageLoader,
     private val context: Context,
-    private val viewModel: CurrentLocationViewModel
+    private val viewModel: MainScreenViewModel
 ) : ListAdapter<ImageDto, ImageAdapter.PictureViewHolder>(ImageDiffCallback()) {
 
+    private val contextReference: WeakReference<Context> = WeakReference(context)
     class PictureViewHolder(binding: ItemCardviewBinding) : RecyclerView.ViewHolder(binding.root) {
         val savedImage = binding.savedImage
         val title = binding.title
@@ -46,19 +50,22 @@ class ImageAdapter(
         val userLink = SpannableString(userName)
         val unsplashLink = SpannableString(unsplashText)
 
-        val clickableSpanUser = object : ClickableSpan() {
-            override fun onClick(widget: View) {
-                openUrlInBrowser(context, userUrl)
+        val context = contextReference.get()
+        if (context != null) {
+            val clickableSpanUser = object : ClickableSpan() {
+                override fun onClick(widget: View) {
+                    openUrlInBrowser(context, userUrl)
+                }
             }
-        }
-        val clickableSpanUnsplash = object : ClickableSpan() {
-            override fun onClick(widget: View) {
-                openUrlInBrowser(context, unsplashUrl)
+            val clickableSpanUnsplash = object : ClickableSpan() {
+                override fun onClick(widget: View) {
+                    openUrlInBrowser(context, unsplashUrl)
+                }
             }
+            userLink.setSpan(clickableSpanUser, 0, userName.length, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
+            unsplashLink.setSpan(clickableSpanUnsplash, 0, unsplashText.length, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
 
-        userLink.setSpan(clickableSpanUser, 0, userName.length, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
-        unsplashLink.setSpan(clickableSpanUnsplash, 0, unsplashText.length, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
 
         val spannableStringBuilder = SpannableStringBuilder()
             .append("Photo by")

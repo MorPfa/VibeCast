@@ -20,31 +20,31 @@ import app.vibecast.domain.repository.LocationRepository
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.circularreveal.cardview.CircularRevealCardView
 import dagger.hilt.android.AndroidEntryPoint
+import java.lang.ref.WeakReference
 import javax.inject.Inject
 
 
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [AccountFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
+
 @AndroidEntryPoint
 class AccountFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
-    private lateinit var binding: FragmentAccountBinding
+    private var _binding: FragmentAccountBinding? = null
+    private val binding get() = _binding!!
+
     private lateinit var locationList : LinearLayout
     private val viewModel: AccountViewModel by activityViewModels()
-
+    private var locationListRef: WeakReference<LinearLayout>? = null
 
 
     @Inject
     lateinit var locationRepository: LocationRepository
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
@@ -55,9 +55,11 @@ class AccountFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentAccountBinding.inflate(inflater,container,false)
+        _binding = FragmentAccountBinding.inflate(inflater,container,false)
+        locationListRef = WeakReference(binding.savedLocations)
         locationList = binding.savedLocations
         loadLocations()
+
         return binding.root
     }
 
@@ -153,15 +155,13 @@ class AccountFragment : Fragment() {
         return item
     }
 
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+        viewModel.savedLocations.removeObservers(viewLifecycleOwner)
+    }
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment CurrentLocationFragment.
-         */
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
             AccountFragment().apply {

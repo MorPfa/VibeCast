@@ -9,17 +9,19 @@ import androidx.lifecycle.viewModelScope
 import app.vibecast.domain.entity.CurrentWeather
 import app.vibecast.domain.entity.HourlyWeather
 import app.vibecast.domain.entity.ImageDto
+import app.vibecast.domain.entity.LocationDto
 import app.vibecast.domain.entity.WeatherCondition
 import app.vibecast.domain.entity.WeatherDto
+import app.vibecast.domain.repository.LocationRepository
 import app.vibecast.domain.repository.WeatherRepository
 import app.vibecast.presentation.image.ImageLoader
 import app.vibecast.presentation.image.ImagePicker
-import app.vibecast.presentation.weather.LocationModel
 import app.vibecast.presentation.weather.LocationWeatherModel
 import app.vibecast.presentation.weather.WeatherModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import java.util.Date
@@ -27,11 +29,26 @@ import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
-class SavedLocationViewmodel @Inject constructor(
+class SavedLocationViewModel @Inject constructor(
     private val weatherRepository: WeatherRepository,
+    private val locationRepository: LocationRepository,
     private val imageLoader: ImageLoader,
     private val imagePicker: ImagePicker
 ): ViewModel() {
+
+
+    fun loadLocations() {
+        viewModelScope.launch {
+            locationRepository.getLocations().collect{
+                _locations.value = it
+            }
+        }
+
+
+    }
+
+    private var _locations = MutableLiveData<List<LocationDto>>()
+    val locations : LiveData<List<LocationDto>> get() = _locations
 
     private val _weather = MutableLiveData<LocationWeatherModel>()
     val weather: LiveData<LocationWeatherModel> get() = _weather
@@ -39,18 +56,9 @@ class SavedLocationViewmodel @Inject constructor(
     private val mutableImage = MutableLiveData<ImageDto>()
     val image : LiveData<ImageDto> get() = mutableImage
 
-    fun getSearchedLocationWeather(query: String) {
-        viewModelScope.launch {
-            val updatedWeatherData = weatherRepository.getWeather(query).collect{
-                val weatherData = convertWeatherDtoToWeatherModel(it.weather)
-                _weather.value = LocationWeatherModel(
-                    location = LocationModel(it.location.cityName, it.location.locationIndex),
-                    weather = weatherData
-                )
-            }
 
-        }
-    }
+
+
     fun setImageLiveData(image: ImageDto){
         mutableImage.value = image
     }

@@ -15,6 +15,5 @@ class ImageLoader @Inject constructor(@ApplicationContext private val context: C
             .placeholder(R.drawable.gallery_image_placeholder)
             .into(imageView)
 
-        //TODO figure out DiskCacheStrategy
     }
 }

@@ -22,18 +22,19 @@ class LocalWeatherDataSourceImpl @Inject constructor(
             weatherEntity -> weatherEntity.toWeather()
     }.flowOn(Dispatchers.IO)
 
-    override fun getLocationWithWeather(cityName: String): Flow<LocationWithWeatherDataDto> =
+    override fun getLocationWithWeather(cityName: String): Flow<LocationWithWeatherDataDto?> =
         locationDao.getLocationWithWeather(cityName)
             .map { locationWithWeatherEntity ->
-                // Assuming getLocationWithWeather returns a Flow<LocationWithWeatherEntity>
-                val locationDto = LocationDto(
-                    cityName = locationWithWeatherEntity.location.cityname,
-                    locationIndex = locationWithWeatherEntity.location.locationIndex
-                )
+                locationWithWeatherEntity?.let {
+                    val locationDto = LocationDto(
+                        cityName = it.location.cityname,
+                        locationIndex = it.location.locationIndex
+                    )
 
-                val weatherDto = locationWithWeatherEntity.weather.weatherData // Assuming weatherData is a WeatherDto
+                    val weatherDto = it.weather.weatherData // Assuming weatherData is a WeatherDto
 
-                LocationWithWeatherDataDto(location = locationDto, weather = weatherDto)
+                    LocationWithWeatherDataDto(location = locationDto, weather = weatherDto)
+                }
             }
 
 

@@ -13,6 +13,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
@@ -59,30 +61,30 @@ class NetworkModule {
         retrofit.create(WeatherService::class.java)
 
 
-//    @Named("unsplash")
-//    @Provides
-//    fun provideUnsplashRetrofit() : Retrofit {
-//        val loggingInterceptor = HttpLoggingInterceptor().apply {
-//            level = HttpLoggingInterceptor.Level.BODY
-//        }
-//
-//        val client = OkHttpClient.Builder()
-//            .addInterceptor(loggingInterceptor)
-//            .build()
-//       return  Retrofit.Builder()
-//            .baseUrl("https://api.unsplash.com/")
-//            .addConverterFactory(GsonConverterFactory.create())
-//           .client(client)
-//            .build()
-//
-//    }
-
     @Named("unsplash")
     @Provides
-    fun provideUnsplashRetrofit() : Retrofit =  Retrofit.Builder()
+    fun provideUnsplashRetrofit() : Retrofit {
+        val loggingInterceptor = HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
+
+        val client = OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
+            .build()
+       return  Retrofit.Builder()
             .baseUrl("https://api.unsplash.com/")
             .addConverterFactory(GsonConverterFactory.create())
+           .client(client)
             .build()
+
+    }
+
+//    @Named("unsplash")
+//    @Provides
+//    fun provideUnsplashRetrofit() : Retrofit =  Retrofit.Builder()
+//            .baseUrl("https://api.unsplash.com/")
+//            .addConverterFactory(GsonConverterFactory.create())
+//            .build()
 
 
 

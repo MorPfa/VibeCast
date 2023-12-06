@@ -90,6 +90,9 @@ android {
 
 dependencies {
 
+    // Location
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+
 //    Spotify
     implementation ("com.spotify.android:auth:1.2.3")
 
