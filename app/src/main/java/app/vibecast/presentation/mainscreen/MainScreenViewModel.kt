@@ -20,9 +20,9 @@ import app.vibecast.domain.repository.DataStoreRepository
 import app.vibecast.domain.repository.ImageRepository
 import app.vibecast.domain.repository.LocationRepository
 import app.vibecast.domain.repository.WeatherRepository
-import app.vibecast.presentation.permissions.LocationPermissionState
 import app.vibecast.presentation.image.ImageLoader
 import app.vibecast.presentation.image.ImagePicker
+import app.vibecast.presentation.permissions.LocationPermissionState
 import app.vibecast.presentation.weather.LocationModel
 import app.vibecast.presentation.weather.LocationWeatherModel
 import app.vibecast.presentation.weather.WeatherModel
@@ -93,7 +93,7 @@ class MainScreenViewModel @Inject constructor(
             weatherRepository.getWeather(query).collect {
                 val weatherData = convertWeatherDtoToWeatherModel(it.weather)
                 _currentWeather.value = LocationWeatherModel(
-                    location = LocationModel(it.location.cityName, it.location.locationIndex),
+                    location = LocationModel(it.location.cityName, it.location.country),
                     weather = weatherData
                 )
             }
@@ -127,7 +127,7 @@ class MainScreenViewModel @Inject constructor(
                             _savedWeather.value = LocationWeatherModel(
                                 location = LocationModel(
                                     data.location.cityName,
-                                    data.location.locationIndex
+                                    data.location.country
                                 ),
                                 weather = weatherData
                             )
@@ -172,7 +172,7 @@ class MainScreenViewModel @Inject constructor(
                                                 )
                                             val locationData = LocationModel(
                                                 locationWithWeatherDataDto.location.cityName,
-                                                locationWithWeatherDataDto.location.locationIndex
+                                                locationWithWeatherDataDto.location.country
                                             )
                                             LocationWeatherModel(
                                                 location = locationData,
@@ -181,7 +181,7 @@ class MainScreenViewModel @Inject constructor(
                                         }
                                         .collect {
                                             _currentWeather.value = it
-//                                            Log.d(TAG, it.weather.cityName)
+
                                         }
                                 }
                             } else {
@@ -196,7 +196,7 @@ class MainScreenViewModel @Inject constructor(
                                                 )
                                             val locationData = LocationModel(
                                                 locationWithWeatherDataDto.location.cityName,
-                                                locationWithWeatherDataDto.location.locationIndex
+                                                locationWithWeatherDataDto.location.country
                                             )
                                             LocationWeatherModel(
                                                 location = locationData,
@@ -205,7 +205,7 @@ class MainScreenViewModel @Inject constructor(
                                         }
                                         .collect {
                                             _currentWeather.value = it
-//                                            Log.d(TAG, it.weather.cityName)
+//
                                         }
                                 }
                             }
@@ -221,7 +221,7 @@ class MainScreenViewModel @Inject constructor(
                                     convertWeatherDtoToWeatherModel(locationWithWeatherDataDto.weather)
                                 val locationData = LocationModel(
                                     locationWithWeatherDataDto.location.cityName,
-                                    locationWithWeatherDataDto.location.locationIndex
+                                    locationWithWeatherDataDto.location.country
                                 )
                                 LocationWeatherModel(location = locationData, weather = weatherData)
                             }

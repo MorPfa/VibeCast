@@ -1,5 +1,6 @@
 package app.vibecast.data.remote.source
 
+import android.util.Log
 import app.vibecast.BuildConfig
 import app.vibecast.data.data_repository.data_source.remote.RemoteWeatherDataSource
 import app.vibecast.data.data_repository.repository.Unit
@@ -12,10 +13,13 @@ import app.vibecast.data.remote.network.weather.WeatherConditionRemote
 import app.vibecast.data.remote.network.weather.WeatherService
 import app.vibecast.domain.entity.CurrentWeather
 import app.vibecast.domain.entity.HourlyWeather
+import app.vibecast.domain.entity.LocationDto
+import app.vibecast.domain.entity.LocationWithWeatherDataDto
 import app.vibecast.domain.entity.UseCaseException
 import app.vibecast.domain.entity.WeatherCondition
 import app.vibecast.domain.entity.WeatherDto
 import app.vibecast.domain.repository.DataStoreRepository
+import app.vibecast.presentation.TAG
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -53,7 +57,7 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
         emit(weatherData)
     }.flowOn(Dispatchers.IO)
 
-    override fun getWeather(name: String): Flow<WeatherDto> = flow {
+    override fun getWeather(name: String): Flow<LocationWithWeatherDataDto> = flow {
         getCoordinates(name).collect{
             val weatherData : WeatherApiModel
             val preferredUnit = dataStoreRepository.getUnit()
@@ -64,8 +68,9 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
                     weatherService.getWeather(it.latitude, it.longitude, "minutely,daily,alerts", "imperial",BuildConfig.OWM_KEY)
                 }
             }
-            weatherData.cityName = "${it.name} - ${it.country}"
-            emit(weatherData.toWeather())
+
+            val combinedData = LocationWithWeatherDataDto(LocationDto(it.name, it.country), weatherData.toWeatherDto())
+            emit(combinedData)
         }
 
     }.catch {
@@ -74,7 +79,7 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
 
 
 
-    override fun getWeather(lat: Double, lon: Double): Flow<WeatherDto> = flow {
+    override fun getWeather(lat: Double, lon: Double): Flow<LocationWithWeatherDataDto> = flow {
         val weatherData : WeatherApiModel
         val preferredUnit = dataStoreRepository.getUnit()
         weatherData = when(preferredUnit){
@@ -84,8 +89,7 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
                 weatherService.getWeather(lat, lon, "minutely,daily,alerts", "imperial",BuildConfig.OWM_KEY)
             }
         }
-
-        emit(weatherData.toWeather())
+        emit(LocationWithWeatherDataDto(LocationDto(weatherData.cityName, ""), weatherData.toWeatherDto()))
     }.catch {
         throw UseCaseException.WeatherException(it)
     }.flowOn(Dispatchers.IO)
@@ -93,7 +97,7 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
 
     companion object {
     //Converting Api response data to domain layer entity
-    fun WeatherApiModel.toWeather(): WeatherDto {
+    fun WeatherApiModel.toWeatherDto(): WeatherDto {
         return WeatherDto(
             cityName =cityName,
             latitude = latitude,

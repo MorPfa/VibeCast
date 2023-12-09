@@ -24,7 +24,7 @@ class ImagePicker @Inject constructor(
             else -> weatherCondition
         }
 
-        val searchQuery = "$cityName$weather"
+        val searchQuery = "$weather $cityName"
 
          return imageRepository.getRemoteImages(searchQuery)
     }

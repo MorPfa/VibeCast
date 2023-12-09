@@ -1,6 +1,7 @@
 package app.vibecast.presentation
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,7 +13,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import app.vibecast.R
-import app.vibecast.databinding.FragmentCurrentLocationBinding
+import app.vibecast.databinding.FragmentMainScreenBinding
+
 import app.vibecast.presentation.mainscreen.MainScreenViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -23,8 +25,8 @@ private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
 @AndroidEntryPoint
-class CurrentLocationFragment : Fragment() {
-    private var _binding: FragmentCurrentLocationBinding? = null
+class MainScreenFragment : Fragment() {
+    private var _binding: FragmentMainScreenBinding? = null
     private val binding get() = _binding!!
     private lateinit var actionBar: ActionBar
     private val viewModel : MainScreenViewModel by activityViewModels()
@@ -49,14 +51,14 @@ class CurrentLocationFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentCurrentLocationBinding.inflate(inflater,container,false)
+        _binding = FragmentMainScreenBinding.inflate(inflater,container,false)
         actionBar = (requireActivity() as AppCompatActivity).supportActionBar!!
         actionBar.show()
         val nextScreenButton = binding.nextScreenButton
         nextScreenButton.setOnClickListener {
             if (viewModel.locations.value?.size != 0){
                 viewModel.getSavedLocationWeather()
-                val action = CurrentLocationFragmentDirections.actionNavHomeToSavedLocationFragment()
+                val action = MainScreenFragmentDirections.actionNavHomeToSavedLocationFragment()
                 findNavController().navigate(action)
             }
             else {
@@ -98,10 +100,11 @@ class CurrentLocationFragment : Fragment() {
         lifecycleScope.launch {
             viewModel.currentWeather.observe(viewLifecycleOwner) { weatherData ->
                     weatherData.weather.currentWeather?.let { currentWeather ->
-                        val city = weatherData.weather.cityName
+                        val city = weatherData.location.cityName
                         val weather =
                             weatherData.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
                         observeImageData(city, weather!!)
+                        Log.d(TAG, city)
                         binding.mainTempDisplay.text =
                             getString(R.string.center_temp, currentWeather.temperature)
                         //            Current hour values
@@ -124,7 +127,8 @@ class CurrentLocationFragment : Fragment() {
                             weatherData.weather.hourlyWeather?.get(2)?.temperature.toString()
                         binding.centerTempRow.rightTime.text =
                             weatherData.weather.hourlyWeather?.get(2)?.timestamp.toString()
-                        binding.locationDisplay.text = weatherData.weather.cityName
+                        binding.locationDisplay.text =
+                            getString(R.string.center_location_text, weatherData.location.cityName, weatherData.location.country)
                         binding.mainWeatherWidget.feelsLikeTv.text =
                             getString(R.string.feels_like, currentWeather.feelsLike)
                         binding.mainWeatherWidget.windSpeedTv.text =
@@ -170,7 +174,7 @@ class CurrentLocationFragment : Fragment() {
          */
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
-            CurrentLocationFragment().apply {
+            MainScreenFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_PARAM1, param1)
                     putString(ARG_PARAM2, param2)

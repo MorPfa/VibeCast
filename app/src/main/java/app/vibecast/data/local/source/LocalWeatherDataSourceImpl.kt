@@ -27,8 +27,8 @@ class LocalWeatherDataSourceImpl @Inject constructor(
             .map { locationWithWeatherEntity ->
                 locationWithWeatherEntity?.let {
                     val locationDto = LocationDto(
-                        cityName = it.location.cityname,
-                        locationIndex = it.location.locationIndex
+                        cityName = it.location.cityName,
+                        country = it.location.country
                     )
 
                     val weatherDto = it.weather.weatherData // Assuming weatherData is a WeatherDto

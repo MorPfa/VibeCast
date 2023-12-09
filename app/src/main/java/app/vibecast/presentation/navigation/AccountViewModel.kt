@@ -20,11 +20,11 @@ class AccountViewModel @Inject constructor(
 ) : ViewModel() {
 
     fun addLocation(location: LocationModel) {
-        locationRepository.addLocation(LocationDto(location.cityName, location.locationIndex))
+        locationRepository.addLocation(LocationDto(location.cityName, location.country))
     }
 
     fun deleteLocation(location: LocationDto) {
-        locationRepository.deleteLocation(LocationDto(location.cityName, location.locationIndex))
+        locationRepository.deleteLocation(LocationDto(location.cityName, location.country))
     }
 
     var savedLocations : LiveData<List<LocationDto>> = locationRepository.getLocations().asLiveData()

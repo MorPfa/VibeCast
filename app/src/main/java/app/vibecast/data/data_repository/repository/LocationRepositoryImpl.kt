@@ -1,6 +1,5 @@
 package app.vibecast.data.data_repository.repository
 
-import android.util.Log
 import app.vibecast.data.data_repository.data_source.local.LocalLocationDataSource
 import app.vibecast.data.data_repository.data_source.remote.RemoteWeatherDataSource
 import app.vibecast.domain.entity.LocationDto
@@ -9,10 +8,8 @@ import app.vibecast.domain.entity.WeatherDto
 import app.vibecast.domain.repository.LocationRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
-
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.launch
@@ -30,7 +27,7 @@ class LocationRepositoryImpl @Inject constructor(
                         val cityName = locationWithWeatherData.location.cityName
                         val newWeatherData = remoteWeatherDataSource.getWeather(cityName).firstOrNull()
                         if (newWeatherData != null) {
-                            locationWithWeatherData.weather = newWeatherData
+                            locationWithWeatherData.weather = newWeatherData.weather
                         }
 
                         localLocationDataSource.addLocationWithWeather(locationWithWeatherData )

@@ -18,12 +18,8 @@ class LocalLocationDataSourceImpl @Inject constructor(
 ) : LocalLocationDataSource {
 
     override suspend fun addLocationWithWeather(location: LocationWithWeatherDataDto)  {
-        val currentLocations = locationDao.getLocations().first()
-        val newIndex = currentLocations.size + 1
-
-        location.location.locationIndex = newIndex
         locationDao.addLocationWithWeather(
-            LocationEntity(location.location.cityName, location.location.locationIndex),
+            LocationEntity(location.location.cityName, location.location.country),
             WeatherEntity(location.location.cityName, location.weather)
             )
     }
@@ -33,7 +29,7 @@ class LocalLocationDataSourceImpl @Inject constructor(
         locationDao.getLocationsWithWeather().map { locationWithWeatherList ->
             locationWithWeatherList.map { locationWithWeatherData ->
                 LocationWithWeatherDataDto(
-                    location = LocationDto(locationWithWeatherData.location.cityname, locationWithWeatherData.location.locationIndex),
+                    location = LocationDto(locationWithWeatherData.location.cityName, locationWithWeatherData.location.country),
                     weather = locationWithWeatherData.weather.toWeatherDto() // Assuming a conversion function
                 )
             }
@@ -42,21 +38,21 @@ class LocalLocationDataSourceImpl @Inject constructor(
 
     override fun getLocations(): Flow<List<LocationDto>> = locationDao.getLocations().map { locations ->
         locations.map {
-            LocationDto(it.cityname, it.locationIndex)
+            LocationDto(it.cityName, it.country)
         }
     }
 
 
     override fun getLocation(cityName: String): Flow<LocationDto> = locationDao.getLocation(cityName).map {
-        LocationDto(it.cityname, it.locationIndex)
+        LocationDto(it.cityName, it.country)
     }
 
     override suspend fun addLocation(location: LocationDto) = locationDao.addLocation(
-        LocationEntity(location.cityName, location.locationIndex)
+        LocationEntity(location.cityName, location.country)
     )
 
     override suspend fun deleteLocation(location: LocationDto) = locationDao.deleteLocation(
-        LocationEntity(location.cityName, location.locationIndex)
+        LocationEntity(location.cityName, location.country)
     )
 
 

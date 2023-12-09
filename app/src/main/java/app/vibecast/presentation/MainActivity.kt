@@ -83,7 +83,7 @@ class MainActivity : AppCompatActivity() {
         handleLocationAndWeather()
         viewModel.getSavedLocationWeather()
         viewModel.currentWeather.observe(this){
-            currentLocation = LocationDto(it.location.cityName, it.location.locationIndex)
+            currentLocation = LocationDto(it.location.cityName, it.location.country)
 
         }
         viewModel.galleryImages.observe(this){
@@ -142,7 +142,7 @@ class MainActivity : AppCompatActivity() {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
                     viewModel.getSearchedLocationWeather(query)
-                    val action = CurrentLocationFragmentDirections.actionNavHomeToSearchResultFragment()
+                    val action = MainScreenFragmentDirections.actionNavHomeToSearchResultFragment()
                     findNavController(R.id.nav_host_fragment_content_home).navigate(action)
 
                 return true

@@ -21,8 +21,8 @@
 
     <fragment
         android:id="@+id/nav_home"
-        android:name="app.vibecast.presentation.CurrentLocationFragment"
-        tools:layout="@layout/fragment_current_location" >
+        android:name="app.vibecast.presentation.MainScreenFragment"
+        tools:layout="@layout/fragment_main_screen" >
 
         <action
             android:id="@+id/action_nav_home_to_savedLocationFragment"

@@ -25,7 +25,7 @@
 
     <!--    Main temperature display-->
     <string name="center_temperature_text">%1$.1f°</string>
-    <string name="center_location_text">%1$s</string>
+    <string name="center_location_text">%1$s - %2$s</string>
 
     <!--    Air Quality widget-->
     <string name="air_quality">Air Quality</string>

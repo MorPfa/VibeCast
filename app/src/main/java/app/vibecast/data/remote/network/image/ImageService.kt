@@ -17,7 +17,8 @@ fun interface ImageService {
     suspend fun getImages(
         @Query("query") query: String,
         @Query("orientation") orientation : String,
-        @Query("count") page : Int,
+        @Query("count") count : Int,
+        @Query("content_filter") contentFilter : String
     ) : List<ImageApiModel>
 
 }

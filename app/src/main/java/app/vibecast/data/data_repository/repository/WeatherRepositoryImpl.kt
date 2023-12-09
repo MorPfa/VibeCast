@@ -3,21 +3,19 @@ package app.vibecast.data.data_repository.repository
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.util.Log
 import app.vibecast.data.data_repository.data_source.local.LocalWeatherDataSource
 import app.vibecast.data.data_repository.data_source.remote.RemoteWeatherDataSource
 import app.vibecast.data.remote.network.weather.CoordinateApiModel
-import app.vibecast.domain.entity.CurrentWeather
-import app.vibecast.domain.entity.HourlyWeather
-import app.vibecast.domain.entity.LocationDto
 import app.vibecast.domain.entity.LocationWithWeatherDataDto
 import app.vibecast.domain.entity.WeatherDto
 import app.vibecast.domain.repository.WeatherRepository
+import app.vibecast.presentation.TAG
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
@@ -31,9 +29,8 @@ class WeatherRepositoryImpl @Inject constructor(
         remoteWeatherDataSource.getCoordinates(cityName)
 
     override fun getWeather(cityName: String): Flow<LocationWithWeatherDataDto> = flow {
-        val strippedName = cityName.substringBefore(" - ")
-        remoteWeatherDataSource.getWeather(strippedName).collect{ weatherDto ->
-        emit(convertWeatherToLocationWithWeather(weatherDto))
+        remoteWeatherDataSource.getWeather(cityName).collect{
+            emit(it)
 
         }
     }.flowOn(Dispatchers.IO)
@@ -42,12 +39,10 @@ class WeatherRepositoryImpl @Inject constructor(
     override fun getWeather(lat: Double, lon: Double): Flow<LocationWithWeatherDataDto> = flow {
         remoteWeatherDataSource.getCity(lat, lon).collect { data ->
             val cityName = data.cityName
-//            Log.d(TAG, data.cityName)
+
             if (cityName.isNotBlank()) {
                 val localWeatherFlow = localWeatherDataSource.getLocationWithWeather(cityName)
                 val localWeatherData = localWeatherFlow.firstOrNull()
-
-
                 if (localWeatherData != null) {
                     // Location found in the local database, emit the data
 //                    Log.d(TAG, localWeatherData.weather.cityName)
@@ -55,11 +50,11 @@ class WeatherRepositoryImpl @Inject constructor(
                 } else {
                     // Location not found in the local database, fetch from the remote source
                     remoteWeatherDataSource.getWeather(lat, lon)
-                        .map { weatherDto ->
-                            convertWeatherToLocationWithWeather(weatherDto)
-
-                        }.collect {
-                            it.weather.cityName = "${data.cityName} - ${data.countryName}"
+                        .collect {
+                            it.location.cityName = data.cityName
+                            it.location.country = data.countryName
+                            Log.d(TAG, data.cityName)
+                            Log.d(TAG, data.countryName)
                             emit(it)
                         }
                 }
@@ -71,20 +66,25 @@ class WeatherRepositoryImpl @Inject constructor(
 
 
 
-    override fun refreshWeather(cityName: String): Flow<WeatherDto> =
+    override fun refreshWeather(cityName: String): Flow<WeatherDto> = flow {
         remoteWeatherDataSource.getWeather(cityName)
-            .flowOn(Dispatchers.IO)
             .onEach {
-                localWeatherDataSource.addWeather(it)
-        }
+                localWeatherDataSource.addWeather(it.weather)
+                emit(it.weather)
+            }
+
+    }.flowOn(Dispatchers.IO)
 
 
-    override fun refreshWeather(lat: Double, lon: Double): Flow<WeatherDto> =
+    override fun refreshWeather(lat: Double, lon: Double): Flow<WeatherDto> = flow {
         remoteWeatherDataSource.getWeather(lat, lon)
-            .flowOn(Dispatchers.IO)
             .onEach {
-                localWeatherDataSource.addWeather(it)
-    }
+                localWeatherDataSource.addWeather(it.weather)
+                emit(it.weather)
+            }
+
+    }.flowOn(Dispatchers.IO)
+
 
 
     private fun isInternetAvailable(context: Context): Boolean {
@@ -97,49 +97,4 @@ class WeatherRepositoryImpl @Inject constructor(
         return networkCapabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
     }
 
-
-
-    private fun convertWeatherToLocationWithWeather(weatherDto: WeatherDto): LocationWithWeatherDataDto {
-        val convertedCurrentWeather = convertCurrentWeather(weatherDto.currentWeather)
-        val convertedHourlyWeather = weatherDto.hourlyWeather?.map { convertHourlyWeather(it) }
-        return LocationWithWeatherDataDto(
-            location = LocationDto(cityName = weatherDto.cityName, locationIndex = 0), // Replace with the actual location data
-            weather = WeatherDto(
-                cityName = weatherDto.cityName,
-                latitude = weatherDto.latitude,
-                longitude = weatherDto.longitude,
-                currentWeather = convertedCurrentWeather,
-                hourlyWeather = convertedHourlyWeather
-            )
-        )
-    }
-
-    private fun convertCurrentWeather(dto: CurrentWeather?): CurrentWeather? {
-        return dto?.let {
-            CurrentWeather(
-                timestamp = dto.timestamp,
-                temperature = dto.temperature,
-                feelsLike = dto.feelsLike,
-                humidity = dto.humidity,
-                uvi = dto.uvi,
-                cloudCover = dto.cloudCover,
-                visibility = dto.visibility,
-                windSpeed = dto.windSpeed,
-                weatherConditions = dto.weatherConditions
-            )
-        }
-    }
-
-    private fun convertHourlyWeather(dto: HourlyWeather): HourlyWeather {
-        return HourlyWeather(
-            timestamp = dto.timestamp,
-            temperature = dto.temperature,
-            feelsLike = dto.feelsLike,
-            humidity = dto.humidity,
-            uvi = dto.uvi,
-            windSpeed = dto.windSpeed,
-            weatherConditions = dto.weatherConditions,
-            chanceOfRain = dto.chanceOfRain
-        )
-    }
 }

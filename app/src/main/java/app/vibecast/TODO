@@ -1,21 +1,20 @@
 
 
-FIND APPROPRIATE DEFAULT IMAGE FOR EACH WEATHER CONDITION IN CASE OF NO INTERNET
+Today:
 DOUBLE CHECK APPROPRIATE NULL CHECKS / ERROR HANDLING IN EACH DATA FLOW
+Fix crash when navigating from search to search
+
+
+
+Make it so that users can get images based on locations or weather
+optimize image accuracy (maybe go back to GET /search/photos endpoint and combine query with collections)
+
 CREATE CUSTOM ACTIONBAR FOR FRAGMENT
-
-
-fix navigation from search to search
-
-
 
 consider data binding
 
 
 
-Fix crash when navigationg from search to search
-ADD STATE OR COUNTRY CODE FOR LOCATION
 
-Today:
-IMPLEMENT WEATHER UNIT CHANGING BY CHANGING QUERY PARAMETER
-REMOVE LOCATION INDEX FROM LOCATION DTO AND ENTITY, INSTEAD ADD COUNTRY AND STATE TO IT FOR BETTER ACCURACY
+ADD STATE OR COUNTRY CODE FOR LOCATION
+FIND APPROPRIATE DEFAULT IMAGE FOR EACH WEATHER CONDITION IN CASE OF NO INTERNET

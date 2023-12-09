@@ -9,7 +9,6 @@ import app.vibecast.data.remote.network.weather.WeatherApiModel
 import app.vibecast.data.remote.network.weather.WeatherConditionRemote
 import app.vibecast.data.remote.network.weather.WeatherService
 import app.vibecast.data.remote.source.RemoteWeatherDataSourceImpl
-import app.vibecast.data.remote.source.RemoteWeatherDataSourceImpl.Companion.toWeather
 import app.vibecast.domain.entity.CurrentWeather
 import app.vibecast.domain.entity.HourlyWeather
 import app.vibecast.domain.entity.UseCaseException

@@ -87,7 +87,7 @@ class LocalLocationDataSourceImplTest {
         )
 
         locationEntity = LocationEntity(
-            cityname = "London",
+            cityName = "London",
             locationIndex = 1)
 
 

@@ -32,7 +32,6 @@ class SearchResultFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requireActivity().onBackPressedDispatcher.addCallback(this) {
-            Log.d(TAG,"back pressed")
             viewModel.loadCurrentLocationWeather()
             findNavController().navigate(R.id.nav_home)
         }
@@ -97,7 +96,8 @@ class SearchResultFragment : Fragment() {
                     weatherData.weather.hourlyWeather?.get(2)?.temperature.toString()
                 binding.centerTempRow.rightTime.text =
                     weatherData.weather.hourlyWeather?.get(2)?.timestamp.toString()
-                binding.locationDisplay.text = weatherData.weather.cityName
+                binding.locationDisplay.text =
+                    getString(R.string.center_location_text, weatherData.location.cityName, weatherData.location.country)
                 binding.mainWeatherWidget.feelsLikeTv.text =
                     getString(R.string.feels_like, currentWeather.feelsLike)
                 binding.mainWeatherWidget.windSpeedTv.text =

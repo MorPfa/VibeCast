@@ -32,7 +32,6 @@ class DataStoreRepositoryImpl @Inject constructor(
     override suspend fun getUnit(): Unit? {
         return try {
             val preferences = context.dataStore.data.first()
-            Log.d(TAG, preferences.toString())
             val unitString = preferences[unitKey]
             unitString?.let { Unit.valueOf(it) }
         } catch (e: Exception) {
