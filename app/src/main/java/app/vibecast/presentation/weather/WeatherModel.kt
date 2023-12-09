@@ -19,7 +19,7 @@ data class WeatherModel (
         val uvi: Double,
         val cloudCover: Int,
         val visibility: String,
-        val windSpeed: Double,
+        val windSpeed: String,
         val weatherConditions: List<WeatherCondition>
     )
 

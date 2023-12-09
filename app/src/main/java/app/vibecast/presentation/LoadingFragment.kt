@@ -51,7 +51,7 @@ class LoadingFragment : Fragment() {
 
         Handler(Looper.getMainLooper()).postDelayed({
             navigateToNextScreen()
-        }, 2000)
+        }, 2200)
     }
     private fun navigateToNextScreen() {
         // Navigate to the next screen (e.g., your main fragment)

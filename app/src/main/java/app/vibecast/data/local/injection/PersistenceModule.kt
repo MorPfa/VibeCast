@@ -2,21 +2,31 @@ package app.vibecast.data.local.injection
 
 import android.content.Context
 import androidx.room.Room
+import app.vibecast.data.data_repository.repository.DataStoreRepositoryImpl
 import app.vibecast.data.local.db.AppDatabase
 import app.vibecast.data.local.db.location.LocationDao
 import app.vibecast.data.local.db.image.ImageDao
 import app.vibecast.data.local.db.user.UserDao
 import app.vibecast.data.local.db.weather.WeatherDao
+import app.vibecast.domain.repository.DataStoreRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
 
 @Module
 @InstallIn(SingletonComponent::class)
 class PersistenceModule {
+
+
+    @Singleton
+    @Provides
+    fun providesDataStoreRepo(
+        @ApplicationContext context: Context
+    ) : DataStoreRepository = DataStoreRepositoryImpl(context)
 
 
     @Provides

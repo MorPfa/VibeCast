@@ -13,7 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import app.vibecast.R
 import app.vibecast.databinding.FragmentCurrentLocationBinding
-import app.vibecast.presentation.permissions.PermissionHelper
+import app.vibecast.presentation.mainscreen.MainScreenViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -26,9 +26,7 @@ private const val ARG_PARAM2 = "param2"
 class CurrentLocationFragment : Fragment() {
     private var _binding: FragmentCurrentLocationBinding? = null
     private val binding get() = _binding!!
-    private lateinit var permissionHelper: PermissionHelper
     private lateinit var actionBar: ActionBar
-//    private val viewModel: CurrentLocationViewModel by activityViewModels()
     private val viewModel : MainScreenViewModel by activityViewModels()
 
     private var param1: String? = null
@@ -44,12 +42,7 @@ class CurrentLocationFragment : Fragment() {
         }
 
 
-//        val permission = Manifest.permission.ACCESS_COARSE_LOCATION
-//        val rationale = "We need this permission to provide location-based services."
-//        val requestCode = 1
-//        if (!permissionHelper.isPermissionGranted(permission)) {
-//            permissionHelper.requestPermission(permission, rationale, requestCode)
-//        }
+
     }
 
     override fun onCreateView(

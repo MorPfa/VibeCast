@@ -23,7 +23,9 @@ import app.vibecast.R
 import app.vibecast.databinding.ActivityMainBinding
 import app.vibecast.domain.entity.ImageDto
 import app.vibecast.domain.entity.LocationDto
+import app.vibecast.presentation.mainscreen.MainScreenViewModel
 import app.vibecast.presentation.navigation.AccountViewModel
+import app.vibecast.presentation.permissions.LocationPermissionState
 import app.vibecast.presentation.permissions.PermissionHelper
 import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
@@ -44,6 +46,7 @@ class MainActivity : AppCompatActivity() {
     private var isCurrentLocationFragmentVisible: Boolean = true
     private lateinit var permissionHelper: PermissionHelper
 
+
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
     }
@@ -51,6 +54,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         permissionHelper = PermissionHelper(this)
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
@@ -77,6 +81,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
         handleLocationAndWeather()
+        viewModel.getSavedLocationWeather()
         viewModel.currentWeather.observe(this){
             currentLocation = LocationDto(it.location.cityName, it.location.locationIndex)
 
@@ -201,8 +206,11 @@ class MainActivity : AppCompatActivity() {
 
 
     override fun onSupportNavigateUp(): Boolean {
-        viewModel.loadCurrentLocationWeather()
         val navController = findNavController(R.id.nav_host_fragment_content_home)
+        if (navController.currentDestination?.id == R.id.nav_search) {
+            viewModel.loadCurrentLocationWeather()
+        }
+
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 }

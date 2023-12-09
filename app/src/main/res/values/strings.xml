@@ -30,7 +30,7 @@
     <!--    Air Quality widget-->
     <string name="air_quality">Air Quality</string>
     <string name="feels_like">Feels like \n%1$d°</string>
-    <string name="wind_speed">Wind Speed \n%1$.1f mph</string>
+    <string name="wind_speed">Wind Speed \n%1$s</string>
     <string name="visibility">Visibility \n%1$s</string>
     <string name="chance_of_rain">Chance of rain \n%1$d%%</string>
     <string name="uv_index">UV index</string>
@@ -74,7 +74,7 @@
     <string name="next_screen_forward_message">Go to the screen to the right which holds another locations weather data if saved</string>
     <string name="lorem_ipusm">Lorem ipsum dolor sit amet, consectetur adipiscing elit. </string>
     <string name="remove_btn">Remove</string>
-    <string name="display_temperature_in_fahrenheit">Display Temperature in Celsius</string>
+    <string name="display_temperature_in_fahrenheit">Use Metric System</string>
     <string name="saved_locations">Saved Locations</string>
     <string name="profile_picture_content_desc">Users profile picture</string>
     <string name="name">%1$s</string>
@@ -103,5 +103,7 @@
     <string name="none_saved_warning">You dont have any saved locations yet</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="imperial">Imperial</string>
+    <string name="metric">Metric</string>
 
 </resources>

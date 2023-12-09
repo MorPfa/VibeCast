@@ -10,14 +10,12 @@ import android.text.style.ClickableSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import app.vibecast.databinding.ItemCardviewBinding
 import app.vibecast.domain.entity.ImageDto
-import app.vibecast.presentation.MainScreenViewModel
-import app.vibecast.presentation.mainscreen.CurrentLocationViewModel
+import app.vibecast.presentation.mainscreen.MainScreenViewModel
 import java.lang.ref.WeakReference
 
 class ImageAdapter(

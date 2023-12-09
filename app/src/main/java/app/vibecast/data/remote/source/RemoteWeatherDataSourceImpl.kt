@@ -2,6 +2,7 @@ package app.vibecast.data.remote.source
 
 import app.vibecast.BuildConfig
 import app.vibecast.data.data_repository.data_source.remote.RemoteWeatherDataSource
+import app.vibecast.data.data_repository.repository.Unit
 import app.vibecast.data.remote.network.weather.CityApiModel
 import app.vibecast.data.remote.network.weather.CoordinateApiModel
 import app.vibecast.data.remote.network.weather.CurrentWeatherRemote
@@ -14,19 +15,19 @@ import app.vibecast.domain.entity.HourlyWeather
 import app.vibecast.domain.entity.UseCaseException
 import app.vibecast.domain.entity.WeatherCondition
 import app.vibecast.domain.entity.WeatherDto
+import app.vibecast.domain.repository.DataStoreRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
-import java.math.BigDecimal
-import java.math.RoundingMode
 import javax.inject.Inject
 
 
 class RemoteWeatherDataSourceImpl @Inject constructor(
     private val weatherService: WeatherService,
+    private val dataStoreRepository: DataStoreRepository
 ) : RemoteWeatherDataSource {
 
 
@@ -54,14 +55,16 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
 
     override fun getWeather(name: String): Flow<WeatherDto> = flow {
         getCoordinates(name).collect{
-            val weatherData = weatherService.getWeather(
-                it.latitude, it.longitude, "minutely,daily,alerts", BuildConfig.OWM_KEY
-            )
+            val weatherData : WeatherApiModel
+            val preferredUnit = dataStoreRepository.getUnit()
+            weatherData = when(preferredUnit){
+                Unit.IMPERIAL -> weatherService.getWeather(it.latitude, it.longitude, "minutely,daily,alerts", "imperial",BuildConfig.OWM_KEY)
+                Unit.METRIC -> weatherService.getWeather(it.latitude, it.longitude, "minutely,daily,alerts", "metric",BuildConfig.OWM_KEY)
+                else -> {
+                    weatherService.getWeather(it.latitude, it.longitude, "minutely,daily,alerts", "imperial",BuildConfig.OWM_KEY)
+                }
+            }
             weatherData.cityName = "${it.name} - ${it.country}"
-            weatherData.hourlyWeather[1].temperature = kelvinToFahrenheit(weatherData.hourlyWeather[1].temperature)
-            weatherData.hourlyWeather[2].temperature = kelvinToFahrenheit(weatherData.hourlyWeather[2].temperature)
-            weatherData.currentWeatherRemote.temperature = kelvinToFahrenheit(weatherData.currentWeatherRemote.temperature)
-            weatherData.currentWeatherRemote.feelsLike = kelvinToFahrenheit(weatherData.currentWeatherRemote.feelsLike)
             emit(weatherData.toWeather())
         }
 
@@ -72,23 +75,21 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
 
 
     override fun getWeather(lat: Double, lon: Double): Flow<WeatherDto> = flow {
-        val weatherData = weatherService.getWeather(lat, lon, "minutely,daily,alerts", BuildConfig.OWM_KEY)
-        weatherData.hourlyWeather[1].temperature = kelvinToFahrenheit(weatherData.hourlyWeather[1].temperature)
-        weatherData.hourlyWeather[2].temperature = kelvinToFahrenheit(weatherData.hourlyWeather[2].temperature)
-        weatherData.currentWeatherRemote.temperature = kelvinToFahrenheit(weatherData.currentWeatherRemote.temperature)
-        weatherData.currentWeatherRemote.feelsLike = kelvinToFahrenheit(weatherData.currentWeatherRemote.feelsLike)
+        val weatherData : WeatherApiModel
+        val preferredUnit = dataStoreRepository.getUnit()
+        weatherData = when(preferredUnit){
+            Unit.IMPERIAL -> weatherService.getWeather(lat, lon, "minutely,daily,alerts", "imperial",BuildConfig.OWM_KEY)
+            Unit.METRIC -> weatherService.getWeather(lat, lon, "minutely,daily,alerts", "metric",BuildConfig.OWM_KEY)
+            else -> {
+                weatherService.getWeather(lat, lon, "minutely,daily,alerts", "imperial",BuildConfig.OWM_KEY)
+            }
+        }
+
         emit(weatherData.toWeather())
     }.catch {
         throw UseCaseException.WeatherException(it)
     }.flowOn(Dispatchers.IO)
 
-
-
-
-    private fun kelvinToFahrenheit(kelvin: Double): Double {
-        val result = (kelvin - 273.15) * 9 / 5 + 32
-        return BigDecimal(result).setScale(1, RoundingMode.HALF_UP).toDouble()
-    }
 
     companion object {
     //Converting Api response data to domain layer entity

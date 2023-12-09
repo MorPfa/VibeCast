@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import app.vibecast.R
 import app.vibecast.databinding.FragmentSavedLocationBinding
 import app.vibecast.domain.entity.LocationDto
+import app.vibecast.presentation.mainscreen.MainScreenViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -40,6 +41,28 @@ class SavedLocationFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentSavedLocationBinding.inflate(inflater,container,false)
+
+        return binding.root
+    }
+    private fun observeImageData(city: String, weather: String) {
+        Log.d(TAG, "observing")
+        lifecycleScope.launch(Dispatchers.IO) {
+            viewModel.loadImage(city, weather)
+                .collect { imageDto ->
+                    imageDto!!.urls.regular.let { imageUrl ->
+                        // Switch to Main dispatcher for UI-related operations
+                        withContext(Dispatchers.Main) {
+                            viewModel.setImageLiveData(imageDto) // Set the LiveData value
+                            viewModel.loadImageIntoImageView(
+                                imageUrl, binding.backgroundImageView
+                            )
+                        }
+                    }
+                }
+        }
+    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         lifecycleScope.launch {
             val mediatorLiveData = MediatorLiveData<Pair<List<LocationDto>, Int>>()
             mediatorLiveData.addSource(viewModel.locations) { locations ->
@@ -90,27 +113,6 @@ class SavedLocationFragment : Fragment() {
             }
         }
 
-        return binding.root
-    }
-    private fun observeImageData(city: String, weather: String) {
-        Log.d(TAG, "observing")
-        lifecycleScope.launch(Dispatchers.IO) {
-            viewModel.loadImage(city, weather)
-                .collect { imageDto ->
-                    imageDto!!.urls.regular.let { imageUrl ->
-                        // Switch to Main dispatcher for UI-related operations
-                        withContext(Dispatchers.Main) {
-                            viewModel.setImageLiveData(imageDto) // Set the LiveData value
-                            viewModel.loadImageIntoImageView(
-                                imageUrl, binding.backgroundImageView
-                            )
-                        }
-                    }
-                }
-        }
-    }
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
         lifecycleScope.launch {
             viewModel.savedWeather.observe(viewLifecycleOwner) { weatherData ->
                 weatherData.weather.currentWeather?.let { currentWeather ->

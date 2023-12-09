@@ -7,6 +7,7 @@ plugins {
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
     id("androidx.navigation.safeargs")
+    id("org.jetbrains.kotlin.plugin.serialization")
 }
 
 android {
@@ -90,6 +91,11 @@ android {
 
 dependencies {
 
+    //Datastore
+//    implementation("androidx.datastore:datastore:1.0.0")
+//    implementation ("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5")
+//    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
     // Location
     implementation("com.google.android.gms:play-services-location:21.0.1")
 

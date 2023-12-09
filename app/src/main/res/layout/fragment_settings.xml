@@ -23,18 +23,32 @@
             android:padding="16dp" />
 
         <!-- Celsius/Fahrenheit switch -->
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/celsiusFahrenheitSwitch"
-            android:layout_width="match_parent"
+        <RadioGroup
+            android:id="@+id/weatherUnitRadioGroup"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/display_temperature_in_fahrenheit"
-            android:padding="16dp"
-          android:theme="@style/SwitchTheme"/>
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/radioImperial"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/imperial"
+                android:checked="true" />
+
+            <RadioButton
+                android:id="@+id/radioMetric"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/metric" />
+        </RadioGroup>
+
+
 
 
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/allowLocationSwitch"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/allow_vibecast_to_use_your_location"
             android:padding="16dp"

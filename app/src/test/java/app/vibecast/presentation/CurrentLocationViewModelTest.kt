@@ -11,7 +11,6 @@ import app.vibecast.domain.repository.LocationRepository
 import app.vibecast.domain.repository.WeatherRepository
 import app.vibecast.presentation.image.ImageLoader
 import app.vibecast.presentation.image.ImagePicker
-import app.vibecast.presentation.mainscreen.CurrentLocationViewModel
 import app.vibecast.presentation.weather.WeatherModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf

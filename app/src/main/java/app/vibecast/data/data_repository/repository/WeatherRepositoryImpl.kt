@@ -30,23 +30,13 @@ class WeatherRepositoryImpl @Inject constructor(
     override fun getCoordinates(cityName: String): Flow<CoordinateApiModel> =
         remoteWeatherDataSource.getCoordinates(cityName)
 
-//    override fun getWeather(cityName: String): Flow<LocationWithWeatherDataDto> {
-//        return if (isInternetAvailable(context)) {
-//            remoteWeatherDataSource.getWeather(cityName)
-//                .map { weatherDto ->
-//                    convertWeatherToLocationWithWeather(weatherDto)
-//                }
-//        } else {
-//            localWeatherDataSource.getLocationWithWeather(cityName)
-//        }.flowOn(Dispatchers.IO) as Flow<LocationWithWeatherDataDto>
-//    }
-override fun getWeather(cityName: String): Flow<LocationWithWeatherDataDto> = flow {
-    val strippedName = cityName.substringBefore(" - ")
-    remoteWeatherDataSource.getWeather(strippedName).collect{ weatherDto ->
+    override fun getWeather(cityName: String): Flow<LocationWithWeatherDataDto> = flow {
+        val strippedName = cityName.substringBefore(" - ")
+        remoteWeatherDataSource.getWeather(strippedName).collect{ weatherDto ->
         emit(convertWeatherToLocationWithWeather(weatherDto))
 
-    }
-}.flowOn(Dispatchers.IO)
+        }
+    }.flowOn(Dispatchers.IO)
 
 
     override fun getWeather(lat: Double, lon: Double): Flow<LocationWithWeatherDataDto> = flow {
