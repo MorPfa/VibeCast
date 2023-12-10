@@ -1,8 +1,12 @@
 package app.vibecast.presentation.image
 
+import android.util.Log
+import app.vibecast.data.TAGS.IMAGE_ERROR
 import app.vibecast.domain.entity.ImageDto
 import app.vibecast.domain.repository.ImageRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
 class ImagePicker @Inject constructor(
@@ -26,8 +30,12 @@ class ImagePicker @Inject constructor(
 
         val searchQuery = "$weather $cityName"
 
-         return imageRepository.getRemoteImages(searchQuery)
+         return try {
+             imageRepository.getRemoteImages(searchQuery)
+         }
+         catch(e : Exception) {
+             Log.e(IMAGE_ERROR, "Error fetching remote images: $e")
+             throw e
+         }.flowOn(Dispatchers.IO)
+         }
     }
-
-
-}

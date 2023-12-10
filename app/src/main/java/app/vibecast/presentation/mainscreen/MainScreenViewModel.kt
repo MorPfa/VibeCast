@@ -2,12 +2,14 @@ package app.vibecast.presentation.mainscreen
 
 import android.annotation.SuppressLint
 import android.icu.text.SimpleDateFormat
+import android.util.Log
 import android.widget.ImageView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import app.vibecast.data.TAGS.IMAGE_ERROR
 import app.vibecast.data.data_repository.repository.Unit
 import app.vibecast.data.remote.LocationGetter
 import app.vibecast.domain.entity.CurrentWeather
@@ -31,6 +33,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -60,8 +65,12 @@ class MainScreenViewModel @Inject constructor(
         imageLoader.loadUrlIntoImageView(url, imageView)
     }
 
-    fun loadImage(query: String, weatherCondition: String): Flow<ImageDto?> =
-        imagePicker.pickImage(query, weatherCondition).flowOn(Dispatchers.IO)
+    fun loadImage(query: String, weatherCondition: String): Flow<ImageDto?> = flow {
+        emitAll(imagePicker.pickImage(query, weatherCondition).flowOn(Dispatchers.IO))
+    }.catch { e ->
+        Log.e(IMAGE_ERROR, "Error loading image: $e")
+        throw e
+    }
 
     fun setImageLiveData(image: ImageDto) {
         _image.value = image
@@ -69,15 +78,26 @@ class MainScreenViewModel @Inject constructor(
 
     fun addImage(imageDto: ImageDto) {
         viewModelScope.launch {
-            imageRepository.addImage(imageDto)
+            try {
+                imageRepository.addImage(imageDto)
+            } catch (e: Exception) {
+                Log.e(IMAGE_ERROR,e.toString())
+                throw e
+            }
         }
     }
 
     fun deleteImage(imageDto: ImageDto) {
         viewModelScope.launch {
-            imageRepository.deleteImage(imageDto)
+            try {
+                imageRepository.deleteImage(imageDto)
+            } catch (e: Exception) {
+                Log.e(IMAGE_ERROR,e.toString())
+                throw e
+            }
         }
     }
+
 
     val galleryImages: LiveData<List<ImageDto>> = imageRepository.getLocalImages().asLiveData()
 

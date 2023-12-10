@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MediatorLiveData
@@ -45,20 +46,30 @@ class SavedLocationFragment : Fragment() {
         return binding.root
     }
     private fun observeImageData(city: String, weather: String) {
-        Log.d(TAG, "observing")
         lifecycleScope.launch(Dispatchers.IO) {
-            viewModel.loadImage(city, weather)
-                .collect { imageDto ->
-                    imageDto!!.urls.regular.let { imageUrl ->
-                        // Switch to Main dispatcher for UI-related operations
-                        withContext(Dispatchers.Main) {
-                            viewModel.setImageLiveData(imageDto) // Set the LiveData value
-                            viewModel.loadImageIntoImageView(
-                                imageUrl, binding.backgroundImageView
-                            )
+            try {
+                viewModel.loadImage(city, weather)
+                    .collect { imageDto ->
+                        imageDto!!.urls.regular.let { imageUrl ->
+                            withContext(Dispatchers.Main) {
+                                viewModel.setImageLiveData(imageDto)
+                                viewModel.loadImageIntoImageView(
+                                    imageUrl, binding.backgroundImageView
+                                )
+                            }
                         }
                     }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    showToast("Error loading image")
                 }
+            }
+        }
+    }
+
+    private suspend fun showToast(message: String) {
+        withContext(Dispatchers.Main) {
+            Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
         }
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

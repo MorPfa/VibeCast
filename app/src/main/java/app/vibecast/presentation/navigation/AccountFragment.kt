@@ -81,7 +81,10 @@ class AccountFragment : Fragment() {
     }
     private fun createItemView(index: Int, locations: List<LocationDto>): View {
         val item = TextView(requireContext())
-        item.text = locations.getOrNull(index)?.cityName ?: ""
+        val formattedLocation = locations.getOrNull(index)?.cityName
+                                .plus(" - ")
+                                .plus(locations.getOrNull(index)?.country)
+        item.text = formattedLocation
         item.setTextColor(Color.WHITE)
         item.setBackgroundResource(R.drawable.rounded_black_background)
         item.gravity = Gravity.START

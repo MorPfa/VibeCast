@@ -141,9 +141,12 @@ class MainActivity : AppCompatActivity() {
         searchView = search.actionView as SearchView
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
-                    viewModel.getSearchedLocationWeather(query)
+                viewModel.getSearchedLocationWeather(query)
+                val currentDestination = findNavController(R.id.nav_host_fragment_content_home).currentDestination
+                if (currentDestination?.id != R.id.nav_search) {
                     val action = MainScreenFragmentDirections.actionNavHomeToSearchResultFragment()
                     findNavController(R.id.nav_host_fragment_content_home).navigate(action)
+                }
 
                 return true
             }

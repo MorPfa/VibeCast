@@ -8,15 +8,31 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import retrofit2.HttpException
 import javax.inject.Inject
 
 class RemoteImageDataSourceImpl @Inject constructor(
     private val imageService: ImageService) : RemoteImageDataSource {
 
     override fun getImages(query: String): Flow<ImageDto> = flow {
-        emit(imageService.getImages(query, "portrait", 1, "high")[0].toImagesDto())
+        try {
+            val images = imageService.getImages(query, "portrait", 1, "high")
+            if (images.isNotEmpty()) {
+                emit(images[0].toImagesDto())
+            } else {
+                throw EmptyApiResponseException("Empty API response")
+            }
+        } catch (e: EmptyApiResponseException) {
+            throw e  // Rethrow the same exception
+        } catch (e: HttpException) {
+            throw ImageFetchException("HTTP error fetching images", e)
+        }
     }.flowOn(Dispatchers.IO)
 
+
+
+    class EmptyApiResponseException(message: String) : Exception(message)
+    class ImageFetchException(message: String, cause: Throwable? = null) : Exception(message, cause)
 
     private fun ImageApiModel.toImagesDto(): ImageDto {
         return ImageDto(
