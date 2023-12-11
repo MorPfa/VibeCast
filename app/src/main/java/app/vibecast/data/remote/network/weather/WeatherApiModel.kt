@@ -6,6 +6,7 @@ data class WeatherApiModel(
     var cityName : String = "",
     @Json(name = "lat") val latitude: Double,
     @Json(name = "lon") val longitude: Double,
+    @Json(name = "timezone") val timezone : String,
     @Json(name = "current") val currentWeatherRemote: CurrentWeatherRemote,
     @Json(name = "hourly") val hourlyWeather: List<HourlyWeatherRemote>,
 

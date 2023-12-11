@@ -3,10 +3,11 @@ package app.vibecast.presentation.weather
 
 
 
-data class WeatherModel (
+data class WeatherModel(
     val cityName : String,
     val latitude: Double,
     val longitude: Double,
+    val timezone : String,
     val currentWeather: CurrentWeather?,
     val hourlyWeather: List<HourlyWeather>?
 ) {

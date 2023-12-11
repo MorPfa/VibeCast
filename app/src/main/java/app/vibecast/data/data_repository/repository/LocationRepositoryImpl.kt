@@ -52,7 +52,14 @@ class LocationRepositoryImpl @Inject constructor(
                 selectedLocationWithWeather.weather
             } else {
                 //TODO Handle index out of bounds or other error cases here
-                WeatherDto(cityName = "", latitude = 0.0, longitude = 0.0, currentWeather = null, hourlyWeather = null)
+                WeatherDto(
+                    cityName = "",
+                    latitude = 0.0,
+                    longitude = 0.0,
+                    timezone = "",
+                    currentWeather = null,
+                    hourlyWeather = null
+                )
             }
         }
     }

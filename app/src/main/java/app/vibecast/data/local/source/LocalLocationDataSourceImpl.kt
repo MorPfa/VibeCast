@@ -9,7 +9,6 @@ import app.vibecast.domain.entity.LocationDto
 import app.vibecast.domain.entity.LocationWithWeatherDataDto
 import app.vibecast.domain.entity.WeatherDto
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -61,6 +60,7 @@ class LocalLocationDataSourceImpl @Inject constructor(
             cityName = cityName,
             latitude = weatherData.latitude,
             longitude = weatherData.longitude,
+            timezone = weatherData.timezone,
             currentWeather = weatherData.currentWeather,
             hourlyWeather = weatherData.hourlyWeather
         )

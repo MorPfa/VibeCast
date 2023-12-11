@@ -33,7 +33,7 @@ class LocalWeatherDataSourceImplTest {
         return WeatherDto(
             cityName = cityName,
             latitude = weatherData.latitude,
-            longitude = weatherData.longitude,
+            longitude = weatherData.longitude,,
             currentWeather = weatherData.currentWeather,
             hourlyWeather = weatherData.hourlyWeather
         )
@@ -46,7 +46,7 @@ class LocalWeatherDataSourceImplTest {
             weatherData = WeatherDto(
                 cityName = cityName,
                 latitude = 51.5074,
-                longitude = -0.1278,
+                longitude = -0.1278,,
                 currentWeather = CurrentWeather(
                     timestamp = 1637094000,
                     temperature = 15.0,
@@ -90,7 +90,7 @@ class LocalWeatherDataSourceImplTest {
         expectedWeather =  WeatherDto(
             cityName = cityName,
             latitude = 51.5074,
-            longitude = -0.1278,
+            longitude = -0.1278,,
             currentWeather = CurrentWeather(
                 timestamp = 1637094000,
                 temperature = 15.0,

@@ -68,9 +68,6 @@ class MainScreenFragment : Fragment() {
                     Toast.LENGTH_SHORT
                 ).show()
             }
-
-
-
         }
         return binding.root
     }

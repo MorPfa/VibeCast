@@ -64,7 +64,7 @@ class CreateFakeWeather {
             )
         }
 
-        return WeatherDto(cityName, latitude, longitude, currentWeather, hourlyWeather)
+        return WeatherDto(cityName, latitude, longitude,, currentWeather, hourlyWeather)
     }
 
 }

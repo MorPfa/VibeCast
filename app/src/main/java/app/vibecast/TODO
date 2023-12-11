@@ -1,8 +1,8 @@
 
 
 Today:
-DOUBLE CHECK APPROPRIATE NULL CHECKS / ERROR HANDLING IN EACH DATA FLOW
-
+fix crash when navigating from saved to searched
+look into fixing weather entity
 
 
 Make it so that users can get images based on locations or weather
@@ -10,10 +10,7 @@ optimize image accuracy (maybe go back to GET /search/photos endpoint and combin
 (re)write unit tests
 fix saved locations not being available right after saving location
 
+
 CREATE CUSTOM ACTIONBAR FOR FRAGMENT
-
 consider data binding
-
-
-
 FIND APPROPRIATE DEFAULT IMAGE FOR EACH WEATHER CONDITION IN CASE OF NO INTERNET

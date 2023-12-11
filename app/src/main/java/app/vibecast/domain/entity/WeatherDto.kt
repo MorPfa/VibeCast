@@ -2,10 +2,11 @@ package app.vibecast.domain.entity
 
 
 
-data class WeatherDto (
+data class WeatherDto(
     var cityName : String,
     val latitude: Double,
     val longitude: Double,
+    val timezone : String,
     val currentWeather: CurrentWeather?,
     val hourlyWeather: List<HourlyWeather>?
 )

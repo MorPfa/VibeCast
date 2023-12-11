@@ -69,7 +69,7 @@ class CurrentLocationViewModelTest{
         weatherDto =  WeatherDto(
             cityName = "seattle",
             latitude = 51.5074,
-            longitude = -0.1278,
+            longitude = -0.1278,,
             currentWeather = CurrentWeather(
                 timestamp = 1637094000,
                 temperature = 15.0,
@@ -141,7 +141,7 @@ class CurrentLocationViewModelTest{
         return WeatherModel(
             cityName = weatherDto.cityName,
             latitude = weatherDto.latitude,
-            longitude = weatherDto.longitude,
+            longitude = weatherDto.longitude,,
             currentWeather = weatherDto.currentWeather?.let { convertCurrentWeather(it) },
             hourlyWeather = weatherDto.hourlyWeather?.map { convertHourlyWeather(it) }
         )

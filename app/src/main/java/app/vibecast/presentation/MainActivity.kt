@@ -40,7 +40,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var searchView: SearchView
     private val accountViewModel : AccountViewModel by viewModels()
     private val viewModel : MainScreenViewModel by viewModels()
-    private lateinit var imageList : List<ImageDto>
     private lateinit var currentImage : ImageDto
     private lateinit var currentLocation : LocationDto
     private var isCurrentLocationFragmentVisible: Boolean = true
@@ -54,8 +53,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         permissionHelper = PermissionHelper(this)
+        handleLocationAndWeather()
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_home) as NavHostFragment
@@ -80,14 +79,10 @@ class MainActivity : AppCompatActivity() {
                 invalidateOptionsMenu()
             }
         }
-        handleLocationAndWeather()
-        viewModel.getSavedLocationWeather()
+
+
         viewModel.currentWeather.observe(this){
             currentLocation = LocationDto(it.location.cityName, it.location.country)
-
-        }
-        viewModel.galleryImages.observe(this){
-            imageList = it
 
         }
         viewModel.image.observe(this){

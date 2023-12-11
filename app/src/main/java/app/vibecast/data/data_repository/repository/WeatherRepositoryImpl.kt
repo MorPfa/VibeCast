@@ -13,11 +13,12 @@ import app.vibecast.domain.repository.WeatherRepository
 import app.vibecast.presentation.TAG
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 
 class WeatherRepositoryImpl @Inject constructor(
     private val remoteWeatherDataSource: RemoteWeatherDataSource,
@@ -25,45 +26,56 @@ class WeatherRepositoryImpl @Inject constructor(
 ) : WeatherRepository{
 
 
-    override fun getCoordinates(cityName: String): Flow<CoordinateApiModel> =
+    override fun getCoordinates(cityName: String): Flow<CoordinateApiModel> = flow {
         remoteWeatherDataSource.getCoordinates(cityName)
+            .onCompletion { cause ->
+                if (cause != null && cause !is CancellationException) {
+                    Log.e(TAG, "Error during flow completion for getCoordinates: $cause")
+                }
+            }
+            .collect { emit(it) }
+    }.flowOn(Dispatchers.IO)
+
 
     override fun getWeather(cityName: String): Flow<LocationWithWeatherDataDto> = flow {
-        remoteWeatherDataSource.getWeather(cityName).collect{
-            emit(it)
-
-        }
+        remoteWeatherDataSource.getWeather(cityName)
+            .onCompletion { cause ->
+                if (cause != null && cause !is CancellationException) {
+                    Log.e(TAG, "Error during flow completion for getWeather: $cause")
+                }
+            }
+            .collect { emit(it) }
     }.flowOn(Dispatchers.IO)
 
 
     override fun getWeather(lat: Double, lon: Double): Flow<LocationWithWeatherDataDto> = flow {
-        remoteWeatherDataSource.getCity(lat, lon).collect { data ->
-            val cityName = data.cityName
-
-            if (cityName.isNotBlank()) {
-                val localWeatherFlow = localWeatherDataSource.getLocationWithWeather(cityName)
-                val localWeatherData = localWeatherFlow.firstOrNull()
-                if (localWeatherData != null) {
-                    // Location found in the local database, emit the data
-//                    Log.d(TAG, localWeatherData.weather.cityName)
-                    emit(localWeatherData)
-                } else {
-                    // Location not found in the local database, fetch from the remote source
-                    remoteWeatherDataSource.getWeather(lat, lon)
-                        .collect {
-                            it.location.cityName = data.cityName
-                            it.location.country = data.countryName
-                            Log.d(TAG, data.cityName)
-                            Log.d(TAG, data.countryName)
-                            emit(it)
-                        }
+        remoteWeatherDataSource.getCity(lat, lon)
+            .onCompletion { cause ->
+                if (cause != null && cause !is CancellationException) {
+                    Log.e(TAG, "Error during flow completion for getWeather with lat=$lat, lon=$lon: $cause")
                 }
             }
-        }
+            .collect { data ->
+                val cityName = data.cityName
+                if (cityName.isNotBlank()) {
+                    val localWeatherFlow = localWeatherDataSource.getLocationWithWeather(cityName)
+                    localWeatherFlow.collect { weatherData ->
+                        if (weatherData != null) {
+                            // Location found in the local database, emit the data
+                            emit(weatherData)
+                        } else {
+                            // Fetch data from the remote source
+                            remoteWeatherDataSource.getWeather(lat, lon)
+                                .collect {
+                                    it.location.cityName = data.cityName
+                                    it.location.country = data.countryName
+                                    emit(it)
+                                }
+                        }
+                    }
+                }
+            }
     }.flowOn(Dispatchers.IO)
-
-
-
 
 
     override fun refreshWeather(cityName: String): Flow<WeatherDto> = flow {
@@ -72,9 +84,12 @@ class WeatherRepositoryImpl @Inject constructor(
                 localWeatherDataSource.addWeather(it.weather)
                 emit(it.weather)
             }
-
+            .onCompletion { cause ->
+                if (cause != null && cause !is CancellationException) {
+                    Log.e(TAG, "Error during flow completion for refreshWeather with $cityName: $cause")
+                }
+            }
     }.flowOn(Dispatchers.IO)
-
 
     override fun refreshWeather(lat: Double, lon: Double): Flow<WeatherDto> = flow {
         remoteWeatherDataSource.getWeather(lat, lon)
@@ -82,7 +97,11 @@ class WeatherRepositoryImpl @Inject constructor(
                 localWeatherDataSource.addWeather(it.weather)
                 emit(it.weather)
             }
-
+            .onCompletion { cause ->
+                if (cause != null && cause !is CancellationException) {
+                    Log.e(TAG, "Error during flow completion for refreshWeather with lat=$lat, lon=$lon: $cause")
+                }
+            }
     }.flowOn(Dispatchers.IO)
 
 

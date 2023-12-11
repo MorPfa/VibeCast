@@ -51,6 +51,7 @@ class LocalWeatherDataSourceImpl @Inject constructor(
             cityName = cityName,
             latitude = weatherData.latitude,
             longitude = weatherData.longitude,
+            timezone = weatherData.timezone,
             currentWeather = weatherData.currentWeather,
             hourlyWeather = weatherData.hourlyWeather
         )

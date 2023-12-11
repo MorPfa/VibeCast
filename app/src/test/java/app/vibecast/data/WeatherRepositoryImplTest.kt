@@ -13,7 +13,6 @@ import app.vibecast.domain.entity.WeatherCondition
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -40,7 +39,7 @@ class WeatherRepositoryImplTest {
         expectedWeather =  WeatherDto(
             cityName = cityName,
             latitude = 51.5074,
-            longitude = -0.1278,
+            longitude = -0.1278,,
             currentWeather = CurrentWeather(
                 timestamp = 1637094000,
                 temperature = 15.0,

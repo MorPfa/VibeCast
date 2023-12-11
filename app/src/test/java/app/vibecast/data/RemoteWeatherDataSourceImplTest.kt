@@ -40,53 +40,53 @@ class RemoteWeatherDataSourceImplTest {
     @Before
     fun setUp() {
          remoteWeather = WeatherApiModel(
-            cityName = "Seattle - US",
-            latitude = 51.5074,
-            longitude = -0.1278,
-            currentWeatherRemote = CurrentWeatherRemote(
-                timestamp = 1637094000,
-                temperature = 15.0,
-                feelsLike = 14.0,
-                humidity = 70,
-                uvi = 5.2,
-                cloudCover = 40,
-                visibility = 10,
-                windSpeed = 12.0,
-                weatherConditionRemotes = listOf(
-                    WeatherConditionRemote(
-                        conditionId = 800,
-                        mainDescription = "Clear",
-                        detailedDescription = "Clear sky",
-                        icon = "01d"
-                    )
-                )
-            ),
-            hourlyWeather = List(24) {
-                HourlyWeatherRemote(
-                    timestamp = (1637094000 + it * 3600).toLong(),
-                    temperature = 14.0,
-                    feelsLike = 13.0,
-                    humidity = 65,
-                    uvi = 5.5,
-                    cloudCover = 45,
-                    windSpeed = 11.0,
-                    weatherConditionRemotes = listOf(
-                        WeatherConditionRemote(
-                            conditionId = 800,
-                            mainDescription = "Clear",
-                            detailedDescription = "Clear sky",
-                            icon = "01d"
-                        )
-                    ),
-                    chanceOfRain = 10.0
-                )
-            }
-        )
+             cityName = "Seattle - US",
+             latitude = 51.5074,
+             longitude = -0.1278,,
+             currentWeatherRemote = CurrentWeatherRemote(
+                 timestamp = 1637094000,
+                 temperature = 15.0,
+                 feelsLike = 14.0,
+                 humidity = 70,
+                 uvi = 5.2,
+                 cloudCover = 40,
+                 visibility = 10,
+                 windSpeed = 12.0,
+                 weatherConditionRemotes = listOf(
+                     WeatherConditionRemote(
+                         conditionId = 800,
+                         mainDescription = "Clear",
+                         detailedDescription = "Clear sky",
+                         icon = "01d"
+                     )
+                 )
+             ),
+             hourlyWeather = List(24) {
+                 HourlyWeatherRemote(
+                     timestamp = (1637094000 + it * 3600).toLong(),
+                     temperature = 14.0,
+                     feelsLike = 13.0,
+                     humidity = 65,
+                     uvi = 5.5,
+                     cloudCover = 45,
+                     windSpeed = 11.0,
+                     weatherConditionRemotes = listOf(
+                         WeatherConditionRemote(
+                             conditionId = 800,
+                             mainDescription = "Clear",
+                             detailedDescription = "Clear sky",
+                             icon = "01d"
+                         )
+                     ),
+                     chanceOfRain = 10.0
+                 )
+             }
+         )
 
         expectedWeather =  WeatherDto(
             cityName = cityName,
             latitude = 51.5074,
-            longitude = -0.1278,
+            longitude = -0.1278,,
             currentWeather = CurrentWeather(
                 timestamp = 1637094000,
                 temperature = 15.0,
@@ -187,7 +187,7 @@ class RemoteWeatherDataSourceImplTest {
         return WeatherDto(
             cityName =cityName,
             latitude = latitude,
-            longitude = longitude,
+            longitude = longitude,,
             currentWeather = currentWeatherRemote.toCurrentWeather(),
             hourlyWeather = hourlyWeather.map { it.toHourlyWeather() }
         )

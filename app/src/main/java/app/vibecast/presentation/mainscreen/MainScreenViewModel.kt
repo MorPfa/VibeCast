@@ -2,6 +2,7 @@ package app.vibecast.presentation.mainscreen
 
 import android.annotation.SuppressLint
 import android.icu.text.SimpleDateFormat
+import android.icu.util.TimeZone
 import android.util.Log
 import android.widget.ImageView
 import androidx.lifecycle.LiveData
@@ -16,12 +17,14 @@ import app.vibecast.domain.entity.CurrentWeather
 import app.vibecast.domain.entity.HourlyWeather
 import app.vibecast.domain.entity.ImageDto
 import app.vibecast.domain.entity.LocationDto
+import app.vibecast.domain.entity.LocationWithWeatherDataDto
 import app.vibecast.domain.entity.WeatherCondition
 import app.vibecast.domain.entity.WeatherDto
 import app.vibecast.domain.repository.DataStoreRepository
 import app.vibecast.domain.repository.ImageRepository
 import app.vibecast.domain.repository.LocationRepository
 import app.vibecast.domain.repository.WeatherRepository
+import app.vibecast.presentation.TAG
 import app.vibecast.presentation.image.ImageLoader
 import app.vibecast.presentation.image.ImagePicker
 import app.vibecast.presentation.permissions.LocationPermissionState
@@ -37,8 +40,8 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
@@ -56,6 +59,8 @@ class MainScreenViewModel @Inject constructor(
     private val imagePicker: ImagePicker,
     private val dataStoreRepository: DataStoreRepository
 ): ViewModel() {
+
+
 
 
     private val _image = MutableLiveData<ImageDto>()
@@ -110,19 +115,37 @@ class MainScreenViewModel @Inject constructor(
 
     fun getSearchedLocationWeather(query: String) {
         viewModelScope.launch {
-            weatherRepository.getWeather(query).collect {
-                val weatherData = convertWeatherDtoToWeatherModel(it.weather)
-                _currentWeather.value = LocationWeatherModel(
-                    location = LocationModel(it.location.cityName, it.location.country),
-                    weather = weatherData
-                )
+            try {
+                weatherRepository.getWeather(query).collect { data ->
+                    try {
+                        val weatherData = convertWeatherDtoToWeatherModel(data.weather)
+                        _currentWeather.value = LocationWeatherModel(
+                            location = LocationModel(data.location.cityName, data.location.country),
+                            weather = weatherData
+                        )
+                    } catch (e: Exception) {
+                        handleError(e)
+                    }
+                }
+            } catch (e: Exception) {
+                handleError(e)
             }
-
         }
     }
 
+
     private var _locations = MutableLiveData<List<LocationDto>>()
     val locations: LiveData<List<LocationDto>> get() = _locations
+
+    init {
+        viewModelScope.launch {
+            locationRepository.getLocations().collect { locations ->
+                withContext(Dispatchers.Main){   _locations.value = locations}
+
+            }
+        }
+
+        }
 
     private var _locationIndex = MutableLiveData(0)
 
@@ -138,25 +161,37 @@ class MainScreenViewModel @Inject constructor(
 
     fun getSavedLocationWeather() {
         viewModelScope.launch {
-            locationRepository.getLocations().collect {
-                _locations.value = it
-                if (locationIndex.value != null && it.isNotEmpty()) {
-                    weatherRepository.getWeather(it[_locationIndex.value!!].cityName)
-                        .collect { data ->
-                            val weatherData = convertWeatherDtoToWeatherModel(data.weather)
-                            _savedWeather.value = LocationWeatherModel(
-                                location = LocationModel(
-                                    data.location.cityName,
-                                    data.location.country
-                                ),
-                                weather = weatherData
-                            )
+            try {
+                locationRepository.getLocations().collect { locations ->
+                    _locations.value = locations
+                    if (locationIndex.value != null && locations.isNotEmpty()) {
+                        try {
+                            weatherRepository.getWeather(locations[locationIndex.value!!].cityName)
+                                .collect { data ->
+                                    try {
+                                        val weatherData = convertWeatherDtoToWeatherModel(data.weather)
+                                        _savedWeather.value = LocationWeatherModel(
+                                            location = LocationModel(
+                                                data.location.cityName,
+                                                data.location.country
+                                            ),
+                                            weather = weatherData
+                                        )
+                                    } catch (e: Exception) {
+                                        handleError(e)
+                                    }
+                                }
+                        } catch (e: Exception) {
+                            handleError(e)
                         }
+                    }
                 }
+            } catch (e: Exception) {
+                handleError(e)
             }
-
         }
     }
+
 
     private val _locationPermissionState =
         MutableStateFlow<LocationPermissionState>(LocationPermissionState.Granted)
@@ -167,95 +202,100 @@ class MainScreenViewModel @Inject constructor(
         _locationPermissionState.value = state
     }
 
-    @SuppressLint("MissingPermission")
+
     fun loadCurrentLocationWeather() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO)  {
             when (locationPermissionState.value) {
-                LocationPermissionState.Granted -> {
-//                    Log.d(TAG, "permission granted")
-                    locationGetter.client.lastLocation
-                        .addOnSuccessListener { location ->
-//                            Log.d(TAG, location.latitude.toString())
-//                            Log.d(TAG, location.longitude.toString())
-                            // Check if the location is not null before proceeding
-                            if (location != null) {
-//                                Log.d(TAG, "location not null")
-                                viewModelScope.launch {
-                                    weatherRepository.getWeather(
-                                        location.latitude,
-                                        location.longitude
-                                    )
-                                        .map { locationWithWeatherDataDto ->
-                                            val weatherData =
-                                                convertWeatherDtoToWeatherModel(
-                                                    locationWithWeatherDataDto.weather
-                                                )
-                                            val locationData = LocationModel(
-                                                locationWithWeatherDataDto.location.cityName,
-                                                locationWithWeatherDataDto.location.country
-                                            )
-                                            LocationWeatherModel(
-                                                location = locationData,
-                                                weather = weatherData
-                                            )
-                                        }
-                                        .collect {
-                                            _currentWeather.value = it
-
-                                        }
-                                }
-                            } else {
-                                // location is null show seattle
-//                                Log.d(TAG, "location is null")
-                                viewModelScope.launch {
-                                    weatherRepository.getWeather("Chicago")
-                                        .map { locationWithWeatherDataDto ->
-                                            val weatherData =
-                                                convertWeatherDtoToWeatherModel(
-                                                    locationWithWeatherDataDto.weather
-                                                )
-                                            val locationData = LocationModel(
-                                                locationWithWeatherDataDto.location.cityName,
-                                                locationWithWeatherDataDto.location.country
-                                            )
-                                            LocationWeatherModel(
-                                                location = locationData,
-                                                weather = weatherData
-                                            )
-                                        }
-                                        .collect {
-                                            _currentWeather.value = it
-//
-                                        }
-                                }
-                            }
-                        }
-                }
-
-                else -> {
-                    //location permission is denied
-                    viewModelScope.launch {
-                        weatherRepository.getWeather("Seattle")
-                            .map { locationWithWeatherDataDto ->
-                                val weatherData =
-                                    convertWeatherDtoToWeatherModel(locationWithWeatherDataDto.weather)
-                                val locationData = LocationModel(
-                                    locationWithWeatherDataDto.location.cityName,
-                                    locationWithWeatherDataDto.location.country
-                                )
-                                LocationWeatherModel(location = locationData, weather = weatherData)
-                            }
-                    }
-                }
+                LocationPermissionState.Granted -> handleLocationGranted()
+                else -> handleLocationDenied()
             }
         }
     }
 
+    @SuppressLint("MissingPermission")
+    private suspend fun handleLocationGranted() {
+        locationGetter.client.lastLocation
+            .addOnSuccessListener { location ->
+                if (location != null) {
+                    viewModelScope.launch(Dispatchers.IO) {
+                        try {
+                            fetchWeatherData(location.latitude, location.longitude)
+                        } catch (e: Exception) {
+                            // Handle specific error for fetching weather data
+                            handleError(e)
+                        }
+                    }
+                } else {
+                    // location is null, show default location
+                    viewModelScope.launch(Dispatchers.IO)  {
+                        try {
+                            fetchDefaultWeatherData()
+                        } catch (e: Exception) {
+                            handleError(e)
+                        }
+                    }
+                }
+            }
+    }
 
-    private fun convertUnixTimestampToAmPm(unixTimestamp: Long): String {
+    private suspend fun handleLocationDenied() {
+        try {
+            fetchDefaultWeatherData()
+        } catch (e: Exception) {
+            handleError(e)
+        }
+    }
+
+    private suspend fun fetchWeatherData(lat: Double, lon: Double) {
+        try {
+            weatherRepository.getWeather(lat, lon).collect { weatherData ->
+                updateWeatherData(weatherData)
+            }
+        } catch (e: Exception) {
+            handleError(e)
+        }
+    }
+
+    private suspend fun fetchDefaultWeatherData() {
+        val defaultLocation = getDefaultLocation()
+        try {
+            weatherRepository.getWeather(defaultLocation).collect { weatherData ->
+                updateWeatherData(weatherData)
+            }
+        } catch (e: Exception) {
+            handleError(e)
+        }
+    }
+
+    private suspend fun updateWeatherData(locationWithWeatherDataDto: LocationWithWeatherDataDto) {
+        try {
+            val weatherData = convertWeatherDtoToWeatherModel(locationWithWeatherDataDto.weather)
+            val locationData = LocationModel(
+                locationWithWeatherDataDto.location.cityName,
+                locationWithWeatherDataDto.location.country
+            )
+            withContext(Dispatchers.Main){
+                _currentWeather.value = LocationWeatherModel(location = locationData, weather = weatherData)
+            }
+        } catch (e: Exception) {
+            handleError(e)
+        }
+    }
+
+    private fun getDefaultLocation(): String {
+        return "Chicago"
+    }
+
+    private fun handleError(e: Exception) {
+        Log.e(TAG, "Error: $e")
+        throw e
+    }
+
+
+    private fun convertUnixTimestamp(unixTimestamp: Long, timeZoneId: String): String {
         val date = Date(unixTimestamp * 1000L)
         val sdf = SimpleDateFormat("ha", Locale.getDefault())
-        //TODO fix time format
+        sdf.timeZone = TimeZone.getTimeZone(timeZoneId)
         return sdf.format(date)
     }
 
@@ -311,7 +351,6 @@ class MainScreenViewModel @Inject constructor(
     }
 
 
-
     private fun formatWindSpeed(ws : Double) : String {
         var formattedWs = String.format("%.1f mph", ws)
         viewModelScope.launch {
@@ -328,24 +367,20 @@ class MainScreenViewModel @Inject constructor(
     }
 
 
-
-
-
-
-
     private suspend fun convertWeatherDtoToWeatherModel(weatherDto: WeatherDto): WeatherModel {
         return WeatherModel(
             cityName = weatherDto.cityName,
             latitude = weatherDto.latitude,
             longitude = weatherDto.longitude,
-            currentWeather = weatherDto.currentWeather?.let { convertCurrentWeather(it) },
-            hourlyWeather = weatherDto.hourlyWeather?.map { convertHourlyWeather(it) }
+            timezone = weatherDto.timezone,
+            currentWeather = weatherDto.currentWeather?.let { convertCurrentWeather(it, weatherDto.timezone) },
+            hourlyWeather = weatherDto.hourlyWeather?.map { convertHourlyWeather(it, weatherDto.timezone) }
         )
     }
 
-    private suspend fun convertCurrentWeather(dto: CurrentWeather): WeatherModel.CurrentWeather {
+    private suspend fun convertCurrentWeather(dto: CurrentWeather, timeZoneId: String): WeatherModel.CurrentWeather {
         return WeatherModel.CurrentWeather(
-            timestamp = convertUnixTimestampToAmPm(dto.timestamp),
+            timestamp = convertUnixTimestamp(dto.timestamp,timeZoneId),
             temperature = dto.temperature.toInt(),
             feelsLike = dto.feelsLike.toInt(),
             humidity = dto.humidity,
@@ -357,9 +392,9 @@ class MainScreenViewModel @Inject constructor(
         )
     }
 
-    private fun convertHourlyWeather(dto: HourlyWeather): WeatherModel.HourlyWeather {
+    private fun convertHourlyWeather(dto: HourlyWeather, timeZoneId: String): WeatherModel.HourlyWeather {
         return WeatherModel.HourlyWeather(
-            timestamp = convertUnixTimestampToAmPm(dto.timestamp),
+            timestamp = convertUnixTimestamp(dto.timestamp, timeZoneId),
             temperature = dto.temperature.toInt(),
             feelsLike = dto.feelsLike,
             humidity = dto.humidity,

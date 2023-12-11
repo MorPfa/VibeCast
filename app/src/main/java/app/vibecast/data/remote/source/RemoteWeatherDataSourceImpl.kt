@@ -2,6 +2,7 @@ package app.vibecast.data.remote.source
 
 import android.util.Log
 import app.vibecast.BuildConfig
+import app.vibecast.data.TAGS.WEATHER_ERROR
 import app.vibecast.data.data_repository.data_source.remote.RemoteWeatherDataSource
 import app.vibecast.data.data_repository.repository.Unit
 import app.vibecast.data.remote.network.weather.CityApiModel
@@ -11,21 +12,20 @@ import app.vibecast.data.remote.network.weather.HourlyWeatherRemote
 import app.vibecast.data.remote.network.weather.WeatherApiModel
 import app.vibecast.data.remote.network.weather.WeatherConditionRemote
 import app.vibecast.data.remote.network.weather.WeatherService
+import app.vibecast.data.remote.source.RemoteImageDataSourceImpl.EmptyApiResponseException
 import app.vibecast.domain.entity.CurrentWeather
 import app.vibecast.domain.entity.HourlyWeather
 import app.vibecast.domain.entity.LocationDto
 import app.vibecast.domain.entity.LocationWithWeatherDataDto
-import app.vibecast.domain.entity.UseCaseException
 import app.vibecast.domain.entity.WeatherCondition
 import app.vibecast.domain.entity.WeatherDto
 import app.vibecast.domain.repository.DataStoreRepository
-import app.vibecast.presentation.TAG
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
+import retrofit2.HttpException
 import javax.inject.Inject
 
 
@@ -44,56 +44,130 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
                 val firstCoordinate = coordinatesList[0]
                 emit(firstCoordinate)
             } else {
-                throw UseCaseException.WeatherException(Throwable("Coordinates list is empty."))
+                throw EmptyApiResponseException("Coordinates list is empty.")
             }
-        } catch (e: Exception) {
-            throw UseCaseException.WeatherException(e)
+        }
+        catch (e: HttpException) {
+            throw WeatherFetchException("HTTP error fetching images", e)
+        }
+        catch (e: Exception) {
+            throw e
         }
     }
 
 
     override fun getCity(lat: Double, lon: Double): Flow<CityApiModel> = flow {
-        val weatherData = weatherService.getCiyName(lat, lon, 1, BuildConfig.OWM_KEY)[0]
-        emit(weatherData)
+        try {
+            val weatherData = weatherService.getCiyName(lat, lon, 1, BuildConfig.OWM_KEY)
+            if (weatherData.isNotEmpty()){
+                emit(weatherData[0])
+            }
+        }
+        catch (e: HttpException) {
+            Log.e(WEATHER_ERROR, "Error fetching city: $e")
+            throw WeatherFetchException("HTTP error fetching weather data", e)
+        }
+        catch (e: Exception) {
+            Log.e(WEATHER_ERROR, "Error fetching city: $e")
+            throw WeatherFetchException("Error fetching weather data", e)
+        }
     }.flowOn(Dispatchers.IO)
 
     override fun getWeather(name: String): Flow<LocationWithWeatherDataDto> = flow {
         getCoordinates(name).collect{
-            val weatherData : WeatherApiModel
-            val preferredUnit = dataStoreRepository.getUnit()
-            weatherData = when(preferredUnit){
-                Unit.IMPERIAL -> weatherService.getWeather(it.latitude, it.longitude, "minutely,daily,alerts", "imperial",BuildConfig.OWM_KEY)
-                Unit.METRIC -> weatherService.getWeather(it.latitude, it.longitude, "minutely,daily,alerts", "metric",BuildConfig.OWM_KEY)
-                else -> {
-                    weatherService.getWeather(it.latitude, it.longitude, "minutely,daily,alerts", "imperial",BuildConfig.OWM_KEY)
+            try {
+                val weatherData : WeatherApiModel
+                val preferredUnit = dataStoreRepository.getUnit()
+                weatherData = when(preferredUnit){
+                    Unit.IMPERIAL -> weatherService.getWeather(
+                        it.latitude,
+                        it.longitude,
+                        "minutely,daily,alerts",
+                        "imperial",
+                        BuildConfig.OWM_KEY
+                    )
+                    Unit.METRIC -> weatherService.getWeather(
+                        it.latitude,
+                        it.longitude,
+                        "minutely,daily,alerts",
+                        "metric",
+                        BuildConfig.OWM_KEY
+                    )
+                    else -> {
+                        weatherService.getWeather(
+                            it.latitude,
+                            it.longitude,
+                            "minutely,daily,alerts",
+                            "imperial",
+                            BuildConfig.OWM_KEY
+                        )
+                    }
                 }
+                val combinedData = LocationWithWeatherDataDto(
+                    LocationDto(it.name, it.country),
+                    weatherData.toWeatherDto()
+                )
+                emit(combinedData)
             }
-
-            val combinedData = LocationWithWeatherDataDto(LocationDto(it.name, it.country), weatherData.toWeatherDto())
-            emit(combinedData)
+            catch (e: HttpException) {
+                Log.e(WEATHER_ERROR, "Error fetching weather data: $e")
+                throw WeatherFetchException("HTTP error fetching weather data", e)
+            }
+            catch (e: Exception) {
+                Log.e(WEATHER_ERROR, "Error fetching weather data: $e")
+                throw WeatherFetchException("Error fetching weather data", e)
+            }
         }
-
-    }.catch {
-        throw UseCaseException.WeatherException(it)
     }.flowOn(Dispatchers.IO)
+
 
 
 
     override fun getWeather(lat: Double, lon: Double): Flow<LocationWithWeatherDataDto> = flow {
-        val weatherData : WeatherApiModel
-        val preferredUnit = dataStoreRepository.getUnit()
-        weatherData = when(preferredUnit){
-            Unit.IMPERIAL -> weatherService.getWeather(lat, lon, "minutely,daily,alerts", "imperial",BuildConfig.OWM_KEY)
-            Unit.METRIC -> weatherService.getWeather(lat, lon, "minutely,daily,alerts", "metric",BuildConfig.OWM_KEY)
-            else -> {
-                weatherService.getWeather(lat, lon, "minutely,daily,alerts", "imperial",BuildConfig.OWM_KEY)
+        try {
+            val weatherData: WeatherApiModel
+            val preferredUnit = dataStoreRepository.getUnit()
+            weatherData = when (preferredUnit) {
+                Unit.IMPERIAL -> weatherService.getWeather(
+                    lat,
+                    lon,
+                    "minutely,daily,alerts",
+                    "imperial",
+                    BuildConfig.OWM_KEY
+                )
+                Unit.METRIC -> weatherService.getWeather(
+                    lat,
+                    lon,
+                    "minutely,daily,alerts",
+                    "metric",
+                    BuildConfig.OWM_KEY
+                )
+                else -> {
+                    weatherService.getWeather(
+                        lat,
+                        lon,
+                        "minutely,daily,alerts",
+                        "imperial",
+                        BuildConfig.OWM_KEY
+                    )
+                }
             }
+            emit(LocationWithWeatherDataDto(LocationDto(
+                weatherData.cityName, ""),
+                weatherData.toWeatherDto()))
+        } catch (e: HttpException) {
+            Log.e(WEATHER_ERROR, "Error fetching weather data: $e")
+            throw WeatherFetchException("HTTP error fetching weather data", e)
         }
-        emit(LocationWithWeatherDataDto(LocationDto(weatherData.cityName, ""), weatherData.toWeatherDto()))
-    }.catch {
-        throw UseCaseException.WeatherException(it)
+        catch (e: Exception) {
+            Log.e(WEATHER_ERROR, "Error fetching weather data: $e")
+            throw WeatherFetchException("Error fetching weather data", e)
+        }
     }.flowOn(Dispatchers.IO)
 
+
+
+    class WeatherFetchException(message: String, cause: Throwable? = null) : Exception(message, cause)
 
     companion object {
     //Converting Api response data to domain layer entity
@@ -102,6 +176,7 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
             cityName =cityName,
             latitude = latitude,
             longitude = longitude,
+            timezone = timezone,
             currentWeather = currentWeatherRemote.toCurrentWeather(),
             hourlyWeather = hourlyWeather.map { it.toHourlyWeather() }
         )
