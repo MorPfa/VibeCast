@@ -138,8 +138,12 @@ class MainActivity : AppCompatActivity() {
             override fun onQueryTextSubmit(query: String): Boolean {
                 viewModel.getSearchedLocationWeather(query)
                 val currentDestination = findNavController(R.id.nav_host_fragment_content_home).currentDestination
-                if (currentDestination?.id != R.id.nav_search) {
+                if (currentDestination?.id == R.id.nav_home) {
                     val action = MainScreenFragmentDirections.actionNavHomeToSearchResultFragment()
+                    findNavController(R.id.nav_host_fragment_content_home).navigate(action)
+                }
+                else if(currentDestination?.id == R.id.nav_saved) {
+                    val action = SavedLocationFragmentDirections.actionNavSavedToNavSearch()
                     findNavController(R.id.nav_host_fragment_content_home).navigate(action)
                 }
 
