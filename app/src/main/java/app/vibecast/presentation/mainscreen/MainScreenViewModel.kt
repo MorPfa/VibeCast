@@ -171,7 +171,7 @@ class MainScreenViewModel @Inject constructor(
                 locationRepository.getLocations().distinctUntilChanged().collect { locations ->
                     if (locationIndex.value != null && locations.isNotEmpty()) {
                         try {
-                            weatherRepository.getWeather(locations[locationIndex.value!!].cityName)
+                            weatherRepository.getWeather(locations[locationIndex.value!!].cityName).distinctUntilChanged()
                                 .collect { data ->
                                     try {
                                         val weatherData = convertWeatherDtoToWeatherModel(data.weather)

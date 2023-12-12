@@ -81,7 +81,7 @@ class SearchResultFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         viewModel.currentWeather.observe(viewLifecycleOwner) { weatherData ->
             weatherData.weather.currentWeather?.let { currentWeather ->
-                val city = weatherData.weather.cityName
+                val city = weatherData.location.cityName
                 val weather =
                     weatherData.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
                 observeImageData(city, weather!!)

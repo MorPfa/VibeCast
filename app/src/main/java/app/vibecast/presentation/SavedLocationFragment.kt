@@ -47,6 +47,7 @@ class SavedLocationFragment : Fragment() {
     private fun observeImageData(city: String, weather: String) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
+                Log.d(TAG, city)
                 viewModel.loadImage(city, weather)
                     .collect { imageDto ->
                         imageDto!!.urls.regular.let { imageUrl ->
@@ -91,7 +92,7 @@ class SavedLocationFragment : Fragment() {
             mediatorLiveData.observe(viewLifecycleOwner) { (locations, locationIndex) ->
                 Log.d(TAG, locationIndex.toString())
                 Log.d(TAG, locations.size.toString())
-                Log.d(TAG, locations[0].cityName)
+                Log.d(TAG, locations[locationIndex].cityName)
                 val endOfList = locationIndex >= locations.size - 1
                 val startOfList = (locationIndex == 0 && locations.isNotEmpty())
                 Log.d(TAG, endOfList.toString())
@@ -127,7 +128,7 @@ class SavedLocationFragment : Fragment() {
         lifecycleScope.launch {
             viewModel.savedWeather.observe(viewLifecycleOwner) { weatherData ->
                 weatherData.weather.currentWeather?.let { currentWeather ->
-                    val city = weatherData.weather.cityName
+                    val city = weatherData.location.cityName
                     val weather =
                         weatherData.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
                     observeImageData(city, weather!!)
