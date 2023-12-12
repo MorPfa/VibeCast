@@ -5,7 +5,7 @@ CREATE CUSTOM ACTIONBAR FOR FRAGMENT
 
 
 
-
+fix bug where image gets updated twice
 optimize image accuracy (maybe go back to GET /search/photos endpoint and combine query with collections)
 (re)write unit tests
 
