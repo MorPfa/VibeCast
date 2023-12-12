@@ -74,6 +74,21 @@ class MainScreenViewModel @Inject constructor(
     private val _image = MutableLiveData<ImageDto>()
     val image: LiveData<ImageDto> get() = _image
 
+    private val _imageCount = MutableLiveData(0)
+
+    val imageCount = _imageCount
+
+    fun setImageCountLiveData(){
+        viewModelScope.launch {
+            imageRepository.getLocalImages().collect{
+                withContext(Dispatchers.Main){
+                    _imageCount.value = it.size
+                }
+            }
+        }
+
+    }
+
     fun loadImageIntoImageView(url: String, imageView: ImageView) {
         imageLoader.loadUrlIntoImageView(url, imageView)
     }

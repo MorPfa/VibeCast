@@ -89,10 +89,11 @@
                     android:paddingHorizontal="12dp"
                     android:paddingTop="12dp"/>
                 <TextView
+                    android:id="@+id/savedImageCount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/white"
-                    android:text="8"
+                    android:text="@string/saved_image_count"
                     android:textStyle="bold"
                     android:textSize="18sp"
                     android:paddingHorizontal="12dp"

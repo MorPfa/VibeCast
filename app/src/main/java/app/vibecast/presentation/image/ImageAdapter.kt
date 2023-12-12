@@ -20,7 +20,7 @@ import java.lang.ref.WeakReference
 
 class ImageAdapter(
     private val imageLoader: ImageLoader,
-    private val context: Context,
+    context: Context,
     private val viewModel: MainScreenViewModel
 ) : ListAdapter<ImageDto, ImageAdapter.PictureViewHolder>(ImageDiffCallback()) {
 

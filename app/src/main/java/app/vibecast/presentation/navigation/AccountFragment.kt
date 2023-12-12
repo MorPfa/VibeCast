@@ -13,6 +13,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import app.vibecast.R
 import app.vibecast.databinding.FragmentAccountBinding
 import app.vibecast.domain.entity.LocationDto
@@ -20,6 +21,7 @@ import app.vibecast.presentation.mainscreen.MainScreenViewModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.circularreveal.cardview.CircularRevealCardView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import java.lang.ref.WeakReference
 
 
@@ -42,7 +44,7 @@ class AccountFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        viewModel.setImageCountLiveData()
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
@@ -56,6 +58,12 @@ class AccountFragment : Fragment() {
         _binding = FragmentAccountBinding.inflate(inflater,container,false)
         locationListRef = WeakReference(binding.savedLocations)
         locationList = binding.savedLocations
+        lifecycleScope.launch {
+            viewModel.imageCount.observe(viewLifecycleOwner){
+                binding.savedImageCount.text = getString(R.string.saved_image_count, it)
+            }
+        }
+
         loadLocations()
 
         return binding.root

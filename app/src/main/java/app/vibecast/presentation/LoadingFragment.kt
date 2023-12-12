@@ -44,7 +44,6 @@ class LoadingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Hide ActionBar
         actionBar = (requireActivity() as AppCompatActivity).supportActionBar!!
         actionBar.hide()
 
@@ -54,7 +53,6 @@ class LoadingFragment : Fragment() {
         }, 2200)
     }
     private fun navigateToNextScreen() {
-        // Navigate to the next screen (e.g., your main fragment)
         findNavController().navigate(R.id.action_splashFragment_to_nav_home)
     }
 
