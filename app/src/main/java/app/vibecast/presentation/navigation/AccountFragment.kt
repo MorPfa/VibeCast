@@ -16,12 +16,11 @@ import androidx.fragment.app.activityViewModels
 import app.vibecast.R
 import app.vibecast.databinding.FragmentAccountBinding
 import app.vibecast.domain.entity.LocationDto
-import app.vibecast.domain.repository.LocationRepository
+import app.vibecast.presentation.mainscreen.MainScreenViewModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.circularreveal.cardview.CircularRevealCardView
 import dagger.hilt.android.AndroidEntryPoint
 import java.lang.ref.WeakReference
-import javax.inject.Inject
 
 
 private const val ARG_PARAM1 = "param1"
@@ -36,12 +35,11 @@ class AccountFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var locationList : LinearLayout
-    private val viewModel: AccountViewModel by activityViewModels()
+    private val viewModel: MainScreenViewModel by activityViewModels()
     private var locationListRef: WeakReference<LinearLayout>? = null
 
 
-    @Inject
-    lateinit var locationRepository: LocationRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -65,7 +63,7 @@ class AccountFragment : Fragment() {
 
 
     private fun loadLocations() {
-        viewModel.savedLocations.observe(viewLifecycleOwner) { locations ->
+        viewModel.locations.observe(viewLifecycleOwner) { locations ->
             val currentItemCount = locationList.childCount
             val max = locations.size
             if (max == 0 && currentItemCount == 0) {
@@ -162,7 +160,7 @@ class AccountFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-        viewModel.savedLocations.removeObservers(viewLifecycleOwner)
+        viewModel.locations.removeObservers(viewLifecycleOwner)
     }
     companion object {
         @JvmStatic

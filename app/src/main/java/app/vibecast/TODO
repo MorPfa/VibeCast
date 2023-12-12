@@ -1,15 +1,13 @@
 
 
 Today:
-look into fixing weather entity
+CREATE CUSTOM ACTIONBAR FOR FRAGMENT
 
 
-Make it so that users can get images based on locations or weather
+
+
 optimize image accuracy (maybe go back to GET /search/photos endpoint and combine query with collections)
 (re)write unit tests
-fix saved locations not being available right after saving location
 
-
-CREATE CUSTOM ACTIONBAR FOR FRAGMENT
 consider data binding
 FIND APPROPRIATE DEFAULT IMAGE FOR EACH WEATHER CONDITION IN CASE OF NO INTERNET

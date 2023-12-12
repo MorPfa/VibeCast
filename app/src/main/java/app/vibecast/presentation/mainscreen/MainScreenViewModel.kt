@@ -37,6 +37,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -60,7 +61,14 @@ class MainScreenViewModel @Inject constructor(
     private val dataStoreRepository: DataStoreRepository
 ): ViewModel() {
 
+    init {
+        viewModelScope.launch {
+            locationRepository.getLocations().collect { locations ->
+                withContext(Dispatchers.Main){   _locations.value = locations}
 
+            }
+        }
+    }
 
 
     private val _image = MutableLiveData<ImageDto>()
@@ -137,15 +145,13 @@ class MainScreenViewModel @Inject constructor(
     private var _locations = MutableLiveData<List<LocationDto>>()
     val locations: LiveData<List<LocationDto>> get() = _locations
 
-    init {
-        viewModelScope.launch {
-            locationRepository.getLocations().collect { locations ->
-                withContext(Dispatchers.Main){   _locations.value = locations}
+    fun addLocation(location: LocationModel) {
+        locationRepository.addLocation(LocationDto(location.cityName, location.country))
+    }
 
-            }
-        }
-
-        }
+    fun deleteLocation(location: LocationDto) {
+        locationRepository.deleteLocation(LocationDto(location.cityName, location.country))
+    }
 
     private var _locationIndex = MutableLiveData(0)
 
@@ -162,8 +168,7 @@ class MainScreenViewModel @Inject constructor(
     fun getSavedLocationWeather() {
         viewModelScope.launch {
             try {
-                locationRepository.getLocations().collect { locations ->
-                    _locations.value = locations
+                locationRepository.getLocations().distinctUntilChanged().collect { locations ->
                     if (locationIndex.value != null && locations.isNotEmpty()) {
                         try {
                             weatherRepository.getWeather(locations[locationIndex.value!!].cityName)

@@ -1,7 +1,6 @@
 package app.vibecast.presentation
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,7 +13,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import app.vibecast.R
 import app.vibecast.databinding.FragmentMainScreenBinding
-
 import app.vibecast.presentation.mainscreen.MainScreenViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -112,7 +110,6 @@ class MainScreenFragment : Fragment() {
                         val weather =
                             weatherData.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
                         observeImageData(city, weather!!)
-                        Log.d(TAG, city)
                         binding.mainTempDisplay.text =
                             getString(R.string.center_temp, currentWeather.temperature)
                         //            Current hour values

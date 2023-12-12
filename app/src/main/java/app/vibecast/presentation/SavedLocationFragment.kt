@@ -42,7 +42,6 @@ class SavedLocationFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentSavedLocationBinding.inflate(inflater,container,false)
-
         return binding.root
     }
     private fun observeImageData(city: String, weather: String) {
@@ -103,6 +102,7 @@ class SavedLocationFragment : Fragment() {
 
                 }
                 else {
+                    binding.nextScreenButton.visibility = View.VISIBLE
                     binding.nextScreenButton.setOnClickListener {
                         viewModel.getSavedLocationWeather()
                         viewModel.incrementIndex()

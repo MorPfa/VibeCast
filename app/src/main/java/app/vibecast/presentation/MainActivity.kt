@@ -24,7 +24,6 @@ import app.vibecast.databinding.ActivityMainBinding
 import app.vibecast.domain.entity.ImageDto
 import app.vibecast.domain.entity.LocationDto
 import app.vibecast.presentation.mainscreen.MainScreenViewModel
-import app.vibecast.presentation.navigation.AccountViewModel
 import app.vibecast.presentation.permissions.LocationPermissionState
 import app.vibecast.presentation.permissions.PermissionHelper
 import com.google.android.material.navigation.NavigationView
@@ -38,7 +37,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private lateinit var searchView: SearchView
-    private val accountViewModel : AccountViewModel by viewModels()
+
     private val viewModel : MainScreenViewModel by viewModels()
     private lateinit var currentImage : ImageDto
     private lateinit var currentLocation : LocationDto
@@ -175,7 +174,7 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_save_image -> {
-                if (item.isCheckable) {
+                if (viewModel.image.value != null) {
                     if (!item.isChecked) {
                         item.isChecked = true
                         viewModel.addImage(currentImage)
@@ -192,11 +191,11 @@ class MainActivity : AppCompatActivity() {
                 if (item.isCheckable) {
                     if (!item.isChecked) {
                         item.isChecked = true
-                        accountViewModel.addLocation(viewModel.currentWeather.value!!.location)
+                        viewModel.addLocation(viewModel.currentWeather.value!!.location)
                         item.icon = ContextCompat.getDrawable(this, R.drawable.delete_location_icon)
                     } else {
                         item.isChecked = false
-                        accountViewModel.deleteLocation(currentLocation)
+                        viewModel.deleteLocation(currentLocation)
                         item.icon = ContextCompat.getDrawable(this, R.drawable.save_location_icon)
                     }
                 }
