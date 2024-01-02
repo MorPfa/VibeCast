@@ -85,7 +85,7 @@ class SearchResultFragment : Fragment() {
                 val weather =
                     weatherData.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
                 observeImageData(city, weather!!)
-                binding.mainTempDisplay.text =
+                binding.mainTemp.text =
                     getString(R.string.center_temp, currentWeather.temperature)
                 //            Current hour values
                 binding.centerTempRow.leftWeather.text =

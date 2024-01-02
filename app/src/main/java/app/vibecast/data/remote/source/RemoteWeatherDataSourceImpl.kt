@@ -48,7 +48,7 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
             }
         }
         catch (e: HttpException) {
-            throw WeatherFetchException("HTTP error fetching images", e)
+            throw WeatherFetchException("HTTP error fetching weather", e)
         }
         catch (e: Exception) {
             throw e
@@ -58,23 +58,23 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
 
     override fun getCity(lat: Double, lon: Double): Flow<CityApiModel> = flow {
         try {
-            val weatherData = weatherService.getCiyName(lat, lon, 1, BuildConfig.OWM_KEY)
-            if (weatherData.isNotEmpty()){
-                emit(weatherData[0])
+            val locationInfo = weatherService.getCiyName(lat, lon, 1, BuildConfig.OWM_KEY)
+            if (locationInfo.isNotEmpty()){
+                emit(locationInfo[0])
             }
         }
         catch (e: HttpException) {
-            Log.e(WEATHER_ERROR, "Error fetching city: $e")
+            Log.e(WEATHER_ERROR, "$e")
             throw WeatherFetchException("HTTP error fetching weather data", e)
         }
         catch (e: Exception) {
-            Log.e(WEATHER_ERROR, "Error fetching city: $e")
-            throw WeatherFetchException("Error fetching weather data", e)
+            Log.e(WEATHER_ERROR, "$e in Datasource")
+            throw WeatherFetchException("Error fetching city for lat $lat lon $lon", e)
         }
     }.flowOn(Dispatchers.IO)
 
-    override fun getWeather(name: String): Flow<LocationWithWeatherDataDto> = flow {
-        getCoordinates(name).collect{
+    override fun getWeather(cityName: String): Flow<LocationWithWeatherDataDto> = flow {
+        getCoordinates(cityName).collect{
             try {
                 val weatherData : WeatherApiModel
                 val preferredUnit = dataStoreRepository.getUnit()
@@ -110,12 +110,12 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
                 emit(combinedData)
             }
             catch (e: HttpException) {
-                Log.e(WEATHER_ERROR, "Error fetching weather data: $e")
+                Log.e(WEATHER_ERROR, "$e in DataSource")
                 throw WeatherFetchException("HTTP error fetching weather data", e)
             }
             catch (e: Exception) {
-                Log.e(WEATHER_ERROR, "Error fetching weather data: $e")
-                throw WeatherFetchException("Error fetching weather data", e)
+                Log.e(WEATHER_ERROR, "$e in DataSource")
+                throw WeatherFetchException("Error fetching weather data for $cityName", e)
             }
         }
     }.flowOn(Dispatchers.IO)
@@ -156,11 +156,11 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
                 weatherData.cityName, ""),
                 weatherData.toWeatherDto()))
         } catch (e: HttpException) {
-            Log.e(WEATHER_ERROR, "Error fetching weather data: $e")
+            Log.e(WEATHER_ERROR, "$e in DataSource")
             throw WeatherFetchException("HTTP error fetching weather data", e)
         }
         catch (e: Exception) {
-            Log.e(WEATHER_ERROR, "Error fetching weather data: $e")
+            Log.e(WEATHER_ERROR, "$e in DataSource")
             throw WeatherFetchException("Error fetching weather data", e)
         }
     }.flowOn(Dispatchers.IO)

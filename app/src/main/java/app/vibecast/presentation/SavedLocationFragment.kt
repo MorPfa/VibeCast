@@ -47,7 +47,6 @@ class SavedLocationFragment : Fragment() {
     private fun observeImageData(city: String, weather: String) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                Log.d(TAG, city)
                 viewModel.loadImage(city, weather)
                     .collect { imageDto ->
                         imageDto!!.urls.regular.let { imageUrl ->
@@ -132,7 +131,7 @@ class SavedLocationFragment : Fragment() {
                     val weather =
                         weatherData.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
                     observeImageData(city, weather!!)
-                    binding.mainTempDisplay.text =
+                    binding.mainTemp.text =
                         getString(R.string.center_temp, currentWeather.temperature)
                     //            Current hour values
                     binding.centerTempRow.leftWeather.text =

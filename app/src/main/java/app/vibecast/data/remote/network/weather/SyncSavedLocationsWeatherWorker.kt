@@ -33,7 +33,7 @@ class SyncSavedLocationsWeatherWorker @Inject constructor(
             .build()
 
         val periodicWorkRequest = PeriodicWorkRequestBuilder<SyncCurrentLocationWeatherWorker>(
-            repeatInterval = 10, // Set the desired interval
+            repeatInterval = 10,
             repeatIntervalTimeUnit = TimeUnit.MINUTES
         )
             .setConstraints(constraints)

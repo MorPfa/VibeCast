@@ -51,7 +51,7 @@ class LocalImageDataSourceImpl @Inject constructor(
                 )
 
             } catch (e: CancellationException) {
-                Log.e(COROUTINE_ERROR, "Coroutine got cancelled $e")
+                Log.e(COROUTINE_ERROR, "Coroutine got cancelled test 2 $e")
                 throw e
 
             } catch (e: Exception) {
@@ -80,7 +80,7 @@ class LocalImageDataSourceImpl @Inject constructor(
                     )
                 )
             } catch (e: CancellationException) {
-                Log.e(COROUTINE_ERROR, "Coroutine got cancelled $e")
+                Log.e(COROUTINE_ERROR, "Coroutine got cancelled test 3 $e")
                 throw e
             }
             catch(e: Exception) {

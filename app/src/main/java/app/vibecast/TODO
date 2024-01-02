@@ -1,10 +1,16 @@
 
 
 Today:
-CREATE CUSTOM ACTIONBAR FOR FRAGMENT
 
 
 
+
+Make it so that holding down on image card shows image
+Look into actually downloading images instead of just favoriting them
+fix landscape orientation for secondary nav destinations
+
+fix top of image card in gallery fragment
+Allow user to choose themes
 fix bug where image gets updated twice
 optimize image accuracy (maybe go back to GET /search/photos endpoint and combine query with collections)
 (re)write unit tests

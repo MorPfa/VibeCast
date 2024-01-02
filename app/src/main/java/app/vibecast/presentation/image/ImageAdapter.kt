@@ -66,7 +66,7 @@ class ImageAdapter(
 
 
         val spannableStringBuilder = SpannableStringBuilder()
-            .append("Photo by")
+            .append("Photo by ")
             .append(userLink)
             .append(" on ") // Add a space or any other separator if needed
             .append(unsplashLink)

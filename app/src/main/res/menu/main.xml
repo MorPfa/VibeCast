@@ -6,7 +6,8 @@
         android:icon="@drawable/save_location_icon"
         android:title="@string/save_location"
         android:checkable="true"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="ifRoom"
+        />
 
     <item
         android:id="@+id/action_save_image"

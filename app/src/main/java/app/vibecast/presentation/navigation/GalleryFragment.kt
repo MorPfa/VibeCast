@@ -1,9 +1,14 @@
 package app.vibecast.presentation.navigation
 
+import android.app.Activity
+import android.content.Context
+import android.os.Build
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowInsets
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
@@ -12,6 +17,8 @@ import app.vibecast.databinding.FragmentPicturesBinding
 import app.vibecast.presentation.mainscreen.MainScreenViewModel
 import app.vibecast.presentation.image.ImageAdapter
 import app.vibecast.presentation.image.ImageLoader
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 
 private const val ARG_PARAM1 = "param1"
@@ -44,7 +51,8 @@ class GalleryFragment : Fragment() {
         val imageLoader = ImageLoader(requireContext())
         val adapter = ImageAdapter(imageLoader, requireContext(), viewModel)
         recyclerView.adapter = adapter
-        val layoutManager = GridLayoutManager(requireContext(), 3)
+        val spanCount = if (isTablet(requireActivity())) 4 else 3
+        val layoutManager = GridLayoutManager(requireContext(), spanCount)
         recyclerView.layoutManager = layoutManager
         // Observe the LiveData in the ViewModel
         viewModel.galleryImages.observe(viewLifecycleOwner) { images ->
@@ -54,6 +62,29 @@ class GalleryFragment : Fragment() {
         return binding.root
     }
 
+    @Suppress("DEPRECATION")
+    private fun isTablet(activity: Activity): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val metrics = activity.windowManager.currentWindowMetrics
+            val insets = metrics.windowInsets.getInsetsIgnoringVisibility(WindowInsets.Type.systemBars())
+            val screenSize = metrics.bounds.width() - insets.left - insets.right
+            screenSize >= dpToPixels(activity, 600) // Adjust the threshold as needed
+        } else {
+            val display = activity.windowManager.defaultDisplay
+            val metrics = DisplayMetrics()
+            display.getMetrics(metrics)
+            val screenSize = sqrt(
+                (metrics.widthPixels / metrics.xdpi.toDouble()).pow(2.0)
+                        + (metrics.heightPixels / metrics.ydpi.toDouble()).pow(2.0)
+            )
+            screenSize >= 7 // Adjust the threshold as needed
+        }
+    }
+
+    private fun dpToPixels(context: Context, dp: Int): Int {
+        val density = context.resources.displayMetrics.density
+        return (dp * density).toInt()
+    }
 
 
     override fun onDestroyView() {

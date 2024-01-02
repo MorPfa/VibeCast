@@ -1,5 +1,6 @@
 package app.vibecast.data.local.source
 
+import android.util.Log
 import app.vibecast.data.data_repository.data_source.local.LocalWeatherDataSource
 import app.vibecast.data.local.db.location.LocationDao
 import app.vibecast.data.local.db.weather.WeatherDao
@@ -7,6 +8,7 @@ import app.vibecast.data.local.db.weather.WeatherEntity
 import app.vibecast.domain.entity.LocationDto
 import app.vibecast.domain.entity.LocationWithWeatherDataDto
 import app.vibecast.domain.entity.WeatherDto
+import app.vibecast.presentation.TAG
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -22,16 +24,17 @@ class LocalWeatherDataSourceImpl @Inject constructor(
             weatherEntity -> weatherEntity.toWeather()
     }.flowOn(Dispatchers.IO)
 
-    override fun getLocationWithWeather(cityName: String): Flow<LocationWithWeatherDataDto?> =
+    override fun getLocationWithWeather(cityName: String): Flow<LocationWithWeatherDataDto> =
         locationDao.getLocationWithWeather(cityName)
             .map { locationWithWeatherEntity ->
-                locationWithWeatherEntity?.let {
+                locationWithWeatherEntity.let {
+
                     val locationDto = LocationDto(
                         cityName = it.location.cityName,
                         country = it.location.country
                     )
 
-                    val weatherDto = it.weather.weatherData // Assuming weatherData is a WeatherDto
+                    val weatherDto = it.weather.weatherData
 
                     LocationWithWeatherDataDto(location = locationDto, weather = weatherDto)
                 }

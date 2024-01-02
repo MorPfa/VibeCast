@@ -96,7 +96,7 @@ class MainScreenViewModel @Inject constructor(
     fun loadImage(query: String, weatherCondition: String): Flow<ImageDto?> = flow {
         emitAll(imagePicker.pickImage(query, weatherCondition).flowOn(Dispatchers.IO))
     }.catch { e ->
-        Log.e(IMAGE_ERROR, "Error loading image: $e")
+        Log.e(IMAGE_ERROR, "Error loading image: $e in ViewModel")
         throw e
     }
 

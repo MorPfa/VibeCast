@@ -37,11 +37,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private lateinit var searchView: SearchView
-
     private val viewModel : MainScreenViewModel by viewModels()
     private lateinit var currentImage : ImageDto
     private lateinit var currentLocation : LocationDto
-    private var isCurrentLocationFragmentVisible: Boolean = true
+    private var showIcons : Boolean = true
     private lateinit var permissionHelper: PermissionHelper
 
 
@@ -73,9 +72,25 @@ class MainActivity : AppCompatActivity() {
         NavigationUI.setupWithNavController(binding.navView, navController)
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            isCurrentLocationFragmentVisible = destination.id == R.id.nav_home
-            if (isCurrentLocationFragmentVisible) {
-                invalidateOptionsMenu()
+            when(destination.id){
+                R.id.nav_account -> {   showIcons = false
+                                        invalidateOptionsMenu()
+                }
+                R.id.nav_pictures -> {  showIcons = false
+                                        invalidateOptionsMenu()
+                }
+                R.id.nav_settings -> {  showIcons = false
+                                        invalidateOptionsMenu()
+                }
+                R.id.nav_home -> {      showIcons = true
+                                        invalidateOptionsMenu()
+                }
+                R.id.nav_search -> {  showIcons = true
+                                        invalidateOptionsMenu()
+                }
+                R.id.nav_saved -> {  showIcons = true
+                                        invalidateOptionsMenu()
+                }
             }
         }
 
@@ -135,6 +150,8 @@ class MainActivity : AppCompatActivity() {
         searchView = search.actionView as SearchView
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
+                search.collapseActionView()
+
                 viewModel.getSearchedLocationWeather(query)
                 val currentDestination = findNavController(R.id.nav_host_fragment_content_home).currentDestination
                 if (currentDestination?.id == R.id.nav_home) {
@@ -145,6 +162,8 @@ class MainActivity : AppCompatActivity() {
                     val action = SavedLocationFragmentDirections.actionNavSavedToNavSearch()
                     findNavController(R.id.nav_host_fragment_content_home).navigate(action)
                 }
+
+                searchView.clearFocus()
 
                 return true
             }
@@ -157,12 +176,21 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         val saveImageItem = menu.findItem(R.id.action_save_image)
-        if (isCurrentLocationFragmentVisible) {
+        val saveLocationItem = menu.findItem(R.id.action_save_location)
+        val searchItem = menu.findItem(R.id.action_search)
+        if (showIcons) {
+            saveImageItem?.isVisible = true
+            saveLocationItem?.isVisible = true
+            searchItem?.isVisible = true
             saveImageItem?.icon = ContextCompat.getDrawable(this, R.drawable.favorite_unselected)
         } else {
             saveImageItem?.icon = ContextCompat.getDrawable(this, R.drawable.favorite_selected)
+            saveImageItem?.isVisible = false
+            saveLocationItem?.isVisible = false
+            searchItem?.isVisible = false
         }
 
         return super.onPrepareOptionsMenu(menu)
@@ -214,4 +242,6 @@ class MainActivity : AppCompatActivity() {
 
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
+
+
 }

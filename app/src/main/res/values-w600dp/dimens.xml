@@ -1,3 +1,5 @@
 <resources>
     <dimen name="fab_margin">48dp</dimen>
+    <dimen name="nav_item_textsize">20sp</dimen>
+    <dimen name="nav_item_padding">38dp</dimen>
 </resources>

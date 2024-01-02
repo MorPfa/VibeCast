@@ -19,7 +19,8 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5" />
+        app:layout_constraintVertical_bias="0.5"
+        android:importantForAccessibility="no" />
 
     <LinearLayout
         android:id="@+id/upper_half"
@@ -36,32 +37,30 @@
             android:text="@string/center_location_text"
             android:layout_marginBottom="68dp"
             android:textColor="#FFFFFF"
-            android:textSize="42sp" />
+            android:textSize="76sp" />
 
 
         <include
             android:id="@+id/music_widget"
             layout="@layout/music_widget"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="600dp"
+            android:layout_height="200dp"
+            android:layout_marginBottom="25dp"
             app:layout_constraintBottom_toTopOf="@+id/center_temp_row"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintStart_toStartOf="parent" />
 
 
         <include
             android:id="@+id/center_temp_row"
             layout="@layout/center_temp_row"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="46dp"
-            app:layout_constraintBottom_toTopOf="@+id/temp_location_display"
+            app:layout_constraintBottom_toTopOf="@+id/main_temp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/music_widget" />
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <LinearLayout
             android:id="@+id/temp_location_display"
@@ -113,15 +112,12 @@
     <include
         android:id="@+id/main_weather_widget"
         layout="@layout/main_screen_weather_widget"
-        android:layout_width="match_parent"
+        android:layout_width="600dp"
         android:layout_height="wrap_content"
         android:layout_marginVertical="12dp"
-        app:layout_constraintBottom_toBottomOf="@+id/backgroundImageView"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent" />
-
-
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

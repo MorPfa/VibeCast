@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.view.marginBottom
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -94,7 +95,7 @@ class AccountFragment : Fragment() {
         item.setTextColor(Color.WHITE)
         item.setBackgroundResource(R.drawable.rounded_black_background)
         item.gravity = Gravity.START
-        item.textSize = 18f
+        item.textSize = 20f
         val paddingInDpVertical = 8
         val paddingInPxVertical = (paddingInDpVertical * resources.displayMetrics.density).toInt()
         val paddingInDpLeft = 12
@@ -102,6 +103,14 @@ class AccountFragment : Fragment() {
         val paddingInDpRight = 12
         val paddingInPxRight = (paddingInDpRight * resources.displayMetrics.density).toInt()
         item.setPadding(paddingInPxLeft, paddingInPxVertical, paddingInPxRight, paddingInPxVertical)
+        val marginInDp = 2
+        val marginInPx = (marginInDp * resources.displayMetrics.density).toInt()
+        val layoutParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        layoutParams.setMargins(marginInPx, marginInPx, marginInPx, marginInPx)
+        item.layoutParams = layoutParams
         item.setOnLongClickListener {
             showDeleteConfirmationDialog(index, locations[index])
             true

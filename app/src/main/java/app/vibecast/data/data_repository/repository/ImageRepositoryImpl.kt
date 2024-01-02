@@ -36,7 +36,7 @@ class ImageRepositoryImpl @Inject constructor(
         try {
             emitAll(localImageDataSource.getImages())
         } catch (e: CancellationException) {
-            Log.e(COROUTINE_ERROR, "Coroutine cancelled: $e")
+            Log.e(COROUTINE_ERROR, "Coroutine cancelled 1: $e")
         } catch (e: Exception) {
             Log.e(IMAGE_ERROR, "Error fetching local images: $e")
         }
@@ -48,7 +48,7 @@ class ImageRepositoryImpl @Inject constructor(
             try {
                 localImageDataSource.addImage(imageDto)
             } catch (e: CancellationException) {
-                Log.e(COROUTINE_ERROR, e.toString())
+                Log.e(COROUTINE_ERROR, e.toString().plus("test"))
             } catch (e: Exception) {
                 Log.e(IMAGE_ERROR, e.toString())
             }
@@ -61,7 +61,7 @@ class ImageRepositoryImpl @Inject constructor(
             try {
                 localImageDataSource.deleteImage(imageDto)
             } catch (e: CancellationException) {
-                Log.e(COROUTINE_ERROR, e.toString())
+                Log.e(COROUTINE_ERROR, e.toString().plus("test"))
             } catch (e: Exception) {
                 Log.e(IMAGE_ERROR, e.toString())
             }
