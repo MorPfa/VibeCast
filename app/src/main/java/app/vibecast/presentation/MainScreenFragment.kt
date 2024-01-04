@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -16,6 +17,7 @@ import androidx.navigation.fragment.findNavController
 import app.vibecast.R
 import app.vibecast.databinding.FragmentMainScreenBinding
 import app.vibecast.presentation.mainscreen.MainScreenViewModel
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -61,11 +63,15 @@ class MainScreenFragment : Fragment() {
                 findNavController().navigate(action)
             }
             else {
-                Toast.makeText(
-                    requireContext(),
+
+                val snackbar = Snackbar.make(
+                    requireView(),
                     getString(R.string.none_saved_warning),
-                    Toast.LENGTH_SHORT
-                ).show()
+                    Snackbar.LENGTH_SHORT
+                )
+                val snackbarView = snackbar.view
+                snackbarView.background = ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
+                snackbar.show()
             }
         }
         return binding.root

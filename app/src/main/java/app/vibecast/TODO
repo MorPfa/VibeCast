@@ -1,12 +1,11 @@
 
 
 Today:
-fix permission options
 fix error warning icon
 replace placeholders with dashes
 
 
-
+fix app saving locations when looked up
 fix landscape orientation for gallery fragment
 fix top of image card in gallery fragment
 -> both of those can be fixed by fixing the way the fragment/ activity gets recreated on config changes

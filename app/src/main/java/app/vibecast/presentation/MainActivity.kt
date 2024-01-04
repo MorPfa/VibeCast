@@ -115,7 +115,6 @@ class MainActivity : AppCompatActivity() {
             // Permission not granted, request it
             permissionHelper.requestPermission(
                 Manifest.permission.ACCESS_COARSE_LOCATION,
-                "Location permission is required to get weather data for your current location.",
                 LOCATION_PERMISSION_REQUEST_CODE
             )
         }

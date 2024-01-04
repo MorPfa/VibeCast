@@ -62,7 +62,6 @@ class SettingsFragment : Fragment() {
                 // Switch is ON / permission has been granted
                 permissionHelper.requestPermission(
                     Manifest.permission.ACCESS_COARSE_LOCATION,
-                    "Location permission is required to get weather data for your current location.",
                     LOCATION_PERMISSION_REQUEST_CODE
                 )
 

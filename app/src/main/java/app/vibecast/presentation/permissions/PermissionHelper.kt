@@ -20,34 +20,19 @@ class PermissionHelper(private val activity: Activity) {
     }
 
 
-    fun requestPermission(permission: String, rationale: String, requestCode: Int) {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
-            showRationaleDialog(rationale) { _, _ ->
-                ActivityCompat.requestPermissions(
-                   activity,
-                    arrayOf(permission),
-                    requestCode
-                )
-            }
-        } else {
-            ActivityCompat.requestPermissions(
+    fun requestPermission(permission: String, requestCode: Int) {
+        ActivityCompat.requestPermissions(
                activity,
                 arrayOf(permission),
                 requestCode
             )
         }
-    }
 
 
-    private fun showRationaleDialog(message: String, onPositiveClick: (DialogInterface, Int) -> Unit) {
 
-        AlertDialog.Builder(activity)
-            .setTitle("Location permission Required")
-            .setMessage(message)
-            .setPositiveButton("OK", onPositiveClick)
-            .setNegativeButton("Cancel", null)
-            .show()
-    }
+
+
+
 
     fun openAppSettings() {
         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
@@ -56,7 +41,4 @@ class PermissionHelper(private val activity: Activity) {
         activity.startActivity(intent)
     }
 
-    companion object {
-        private const val REVOKE_PERMISSION_REQUEST_CODE = 999
-    }
 }

@@ -15,18 +15,7 @@
               </deviceKey>
             </Target>
           </runningDeviceTargetSelectedWithDropDown>
-          <targetSelectedWithDropDown>
-            <Target>
-              <type value="QUICK_BOOT_TARGET" />
-              <deviceKey>
-                <Key>
-                  <type value="VIRTUAL_DEVICE_PATH" />
-                  <value value="C:\Users\morit\.android\avd\Pixel_7_Pro_API_31.avd" />
-                </Key>
-              </deviceKey>
-            </Target>
-          </targetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-01-04T00:05:59.339100300Z" />
+          <timeTargetWasSelectedWithDropDown value="2024-01-04T01:28:53.551873500Z" />
         </State>
       </entry>
     </value>
