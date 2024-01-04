@@ -34,7 +34,7 @@
             android:id="@+id/location_display"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/center_location_text"
+            android:text="@string/loading_placeholder"
             android:layout_marginBottom="68dp"
             android:textColor="#FFFFFF"
             android:textSize="76sp" />
@@ -90,7 +90,7 @@
                 android:id="@+id/main_temp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/center_temperature_text"
+                android:text="@string/loading_placeholder"
                 android:textColor="#FFFFFF"
                 android:textSize="102sp" />
 

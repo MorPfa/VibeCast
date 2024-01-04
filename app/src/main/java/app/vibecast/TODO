@@ -1,16 +1,16 @@
 
 
 Today:
-fix error warning icon
-replace placeholders with dashes
-
-
 fix app saving locations when looked up
+change the way the image gets loaded/ updated maybe through viemodel livedata instead of fragment
+
+
+
 fix landscape orientation for gallery fragment
 fix top of image card in gallery fragment
 -> both of those can be fixed by fixing the way the fragment/ activity gets recreated on config changes
 
-change the way the image gets loaded/ updated maybe through viemodel livedata instead of fragment
+
 
 
 Make it so that holding down on image card shows image

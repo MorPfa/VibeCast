@@ -95,18 +95,18 @@ class MainScreenFragment : Fragment() {
                     }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    showToast("Error loading image")
+                    val snackbar = Snackbar.make(
+                        requireView(),
+                        getString(R.string.none_saved_warning),
+                        Snackbar.LENGTH_SHORT
+                    )
+                    val snackbarView = snackbar.view
+                    snackbarView.background = ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
+                    snackbar.show()
                 }
             }
         }
     }
-
-    private suspend fun showToast(message: String) {
-        withContext(Dispatchers.Main) {
-            Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
-        }
-    }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

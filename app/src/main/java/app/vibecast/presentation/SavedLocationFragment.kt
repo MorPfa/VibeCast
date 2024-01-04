@@ -1,11 +1,10 @@
 package app.vibecast.presentation
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MediatorLiveData
@@ -14,6 +13,7 @@ import app.vibecast.R
 import app.vibecast.databinding.FragmentSavedLocationBinding
 import app.vibecast.domain.entity.LocationDto
 import app.vibecast.presentation.mainscreen.MainScreenViewModel
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -60,17 +60,19 @@ class SavedLocationFragment : Fragment() {
                     }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    showToast("Error loading image")
+                    val snackbar = Snackbar.make(
+                        requireView(),
+                        getString(R.string.none_saved_warning),
+                        Snackbar.LENGTH_SHORT
+                    )
+                    val snackbarView = snackbar.view
+                    snackbarView.background = ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
+                    snackbar.show()
                 }
             }
         }
     }
 
-    private suspend fun showToast(message: String) {
-        withContext(Dispatchers.Main) {
-            Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
-        }
-    }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         lifecycleScope.launch {

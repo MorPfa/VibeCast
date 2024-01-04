@@ -28,7 +28,7 @@
         android:id="@+id/location_display"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/center_location_text"
+        android:text="@string/loading_placeholder"
         android:textColor="#FFFFFF"
         android:textSize="76sp"
         app:layout_constraintBottom_toTopOf="@+id/music_widget"
@@ -80,7 +80,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:text="@string/center_temperature_text"
+            android:text="@string/loading_placeholder"
             android:textColor="#FFFFFF"
             android:textSize="96sp"
 

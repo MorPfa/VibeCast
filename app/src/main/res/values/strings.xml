@@ -104,5 +104,6 @@
     <string name="imperial">Imperial</string>
     <string name="metric">Metric</string>
     <string name="saved_image_count">%1$d</string>
+    <string name="loading_placeholder">-</string>
 
 </resources>
