@@ -159,6 +159,7 @@ class AccountFragment : Fragment() {
         if (index >= 0 && index < locationList.childCount) {
             locationList.removeViewAt(index)
             viewModel.deleteLocation(location)
+
         }
     }
 

@@ -160,6 +160,7 @@ class MainScreenViewModel @Inject constructor(
     private var _locations = MutableLiveData<List<LocationDto>>()
     val locations: LiveData<List<LocationDto>> get() = _locations
 
+
     fun addLocation(location: LocationModel) {
         locationRepository.addLocation(LocationDto(location.cityName, location.country))
     }

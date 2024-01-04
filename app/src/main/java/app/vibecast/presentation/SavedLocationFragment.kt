@@ -89,13 +89,13 @@ class SavedLocationFragment : Fragment() {
                 }
             }
             mediatorLiveData.observe(viewLifecycleOwner) { (locations, locationIndex) ->
-                Log.d(TAG, locationIndex.toString())
-                Log.d(TAG, locations.size.toString())
-                Log.d(TAG, locations[locationIndex].cityName)
+//                Log.d(TAG, locationIndex.toString())
+//                Log.d(TAG, locations.size.toString())
+//                Log.d(TAG, locations[locationIndex].cityName)
                 val endOfList = locationIndex >= locations.size - 1
                 val startOfList = (locationIndex == 0 && locations.isNotEmpty())
-                Log.d(TAG, endOfList.toString())
-                Log.d(TAG, startOfList.toString())
+//                Log.d(TAG, endOfList.toString())
+//                Log.d(TAG, startOfList.toString())
 
                 if (endOfList){
                     binding.nextScreenButton.visibility = View.INVISIBLE

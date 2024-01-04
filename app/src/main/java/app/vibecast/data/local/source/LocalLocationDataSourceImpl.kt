@@ -19,7 +19,7 @@ class LocalLocationDataSourceImpl @Inject constructor(
     override suspend fun addLocationWithWeather(location: LocationWithWeatherDataDto)  {
         locationDao.addLocationWithWeather(
             LocationEntity(location.location.cityName, location.location.country),
-            WeatherEntity(location.location.cityName, location.weather)
+            WeatherEntity(location.location.cityName, location.weather, System.currentTimeMillis())
             )
     }
 
@@ -60,6 +60,7 @@ class LocalLocationDataSourceImpl @Inject constructor(
             cityName = cityName,
             latitude = weatherData.latitude,
             longitude = weatherData.longitude,
+            dataTimestamp = dataTimestamp,
             timezone = weatherData.timezone,
             currentWeather = weatherData.currentWeather,
             hourlyWeather = weatherData.hourlyWeather

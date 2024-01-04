@@ -1,14 +1,13 @@
 package app.vibecast.data.local.source
 
-import android.util.Log
 import app.vibecast.data.data_repository.data_source.local.LocalWeatherDataSource
 import app.vibecast.data.local.db.location.LocationDao
+import app.vibecast.data.local.db.location.LocationEntity
 import app.vibecast.data.local.db.weather.WeatherDao
 import app.vibecast.data.local.db.weather.WeatherEntity
 import app.vibecast.domain.entity.LocationDto
 import app.vibecast.domain.entity.LocationWithWeatherDataDto
 import app.vibecast.domain.entity.WeatherDto
-import app.vibecast.presentation.TAG
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -42,7 +41,12 @@ class LocalWeatherDataSourceImpl @Inject constructor(
 
 
 
-
+    override suspend fun addLocationWithWeather(location: LocationWithWeatherDataDto)  {
+        locationDao.addLocationWithWeather(
+            LocationEntity(location.location.cityName, location.location.country),
+            WeatherEntity(location.location.cityName, location.weather, System.currentTimeMillis())
+        )
+    }
 
     override suspend fun addWeather(weather : WeatherDto) {
        weatherDao.addWeather(weather.toWeatherEntity(weather.cityName))
@@ -54,6 +58,7 @@ class LocalWeatherDataSourceImpl @Inject constructor(
             cityName = cityName,
             latitude = weatherData.latitude,
             longitude = weatherData.longitude,
+            dataTimestamp = dataTimestamp,
             timezone = weatherData.timezone,
             currentWeather = weatherData.currentWeather,
             hourlyWeather = weatherData.hourlyWeather
@@ -62,7 +67,8 @@ class LocalWeatherDataSourceImpl @Inject constructor(
     private fun WeatherDto.toWeatherEntity(cityName: String): WeatherEntity {
         return WeatherEntity(
             cityName = cityName,
-            weatherData = this
+            weatherData = this,
+            dataTimestamp = System.currentTimeMillis()
         )
     }
 }

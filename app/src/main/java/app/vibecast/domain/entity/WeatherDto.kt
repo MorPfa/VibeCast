@@ -6,6 +6,7 @@ data class WeatherDto(
     var cityName : String,
     val latitude: Double,
     val longitude: Double,
+    val dataTimestamp : Long,
     val timezone : String,
     val currentWeather: CurrentWeather?,
     val hourlyWeather: List<HourlyWeather>?

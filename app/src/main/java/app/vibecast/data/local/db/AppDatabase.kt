@@ -14,7 +14,7 @@ import app.vibecast.data.local.db.weather.WeatherEntity
 import app.vibecast.data.local.db.weather.WeatherTypeConverter
 
 @TypeConverters(WeatherTypeConverter::class)
-@Database(entities = [WeatherEntity::class, UserEntity::class, LocationEntity::class, ImageEntity::class], version = 5)
+@Database(entities = [WeatherEntity::class, UserEntity::class, LocationEntity::class, ImageEntity::class], version = 6)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun weatherDao() : WeatherDao
 

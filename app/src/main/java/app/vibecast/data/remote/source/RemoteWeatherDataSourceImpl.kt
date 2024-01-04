@@ -176,6 +176,7 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
             cityName =cityName,
             latitude = latitude,
             longitude = longitude,
+            dataTimestamp = System.currentTimeMillis(),
             timezone = timezone,
             currentWeather = currentWeatherRemote.toCurrentWeather(),
             hourlyWeather = hourlyWeather.map { it.toHourlyWeather() }
