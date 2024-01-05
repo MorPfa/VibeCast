@@ -4,6 +4,7 @@ package app.vibecast.domain.entity
 
 data class WeatherDto(
     var cityName : String,
+    var country : String,
     val latitude: Double,
     val longitude: Double,
     val dataTimestamp : Long,

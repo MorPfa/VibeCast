@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import android.widget.TextView
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -63,13 +63,14 @@ class MainScreenFragment : Fragment() {
                 findNavController().navigate(action)
             }
             else {
-
                 val snackbar = Snackbar.make(
                     requireView(),
                     getString(R.string.none_saved_warning),
                     Snackbar.LENGTH_SHORT
                 )
                 val snackbarView = snackbar.view
+                val snackbarText = snackbarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+                snackbarText.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
                 snackbarView.background = ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
                 snackbar.show()
             }
@@ -97,10 +98,12 @@ class MainScreenFragment : Fragment() {
                 withContext(Dispatchers.Main) {
                     val snackbar = Snackbar.make(
                         requireView(),
-                        getString(R.string.none_saved_warning),
+                        getString(R.string.error_loading_image),
                         Snackbar.LENGTH_SHORT
                     )
                     val snackbarView = snackbar.view
+                    val snackbarText = snackbarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+                    snackbarText.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
                     snackbarView.background = ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
                     snackbar.show()
                 }

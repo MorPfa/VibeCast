@@ -164,7 +164,7 @@ class RemoteWeatherDataSourceImplTest {
     @Test
     fun testGetWeatherWithCoordinates() = runTest {
         whenever(weatherService.getWeather(expectedWeather.latitude, expectedWeather.longitude,"minutely,daily",  BuildConfig.OWM_KEY)).thenReturn(remoteWeather)
-        val result = weatherDataSource.getWeather(expectedWeather.latitude , expectedWeather.longitude).first()
+        val result = weatherDataSource.getWeather(expectedWeather.latitude, expectedWeather.longitude).first()
         assertEquals(expectedWeather.longitude, result.longitude,1.0)
         assertEquals(expectedWeather.latitude, result.latitude,1.0)
         assertEquals(expectedWeather.currentWeather?.timestamp, result.currentWeather?.timestamp)

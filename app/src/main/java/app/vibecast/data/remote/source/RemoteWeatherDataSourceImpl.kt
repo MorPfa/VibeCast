@@ -174,6 +174,7 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
     fun WeatherApiModel.toWeatherDto(): WeatherDto {
         return WeatherDto(
             cityName =cityName,
+            country = "",
             latitude = latitude,
             longitude = longitude,
             dataTimestamp = System.currentTimeMillis(),

@@ -54,6 +54,7 @@ class LocationRepositoryImpl @Inject constructor(
                 //TODO Handle index out of bounds or other error cases here
                 WeatherDto(
                     cityName = "",
+                    country = "",
                     latitude = 0.0,
                     longitude = 0.0,
                     dataTimestamp = System.currentTimeMillis(),

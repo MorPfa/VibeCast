@@ -139,7 +139,7 @@ class MainScreenViewModel @Inject constructor(
     fun getSearchedLocationWeather(query: String) {
         viewModelScope.launch {
             try {
-                weatherRepository.getWeather(query).collect { data ->
+                weatherRepository.getSearchedWeather(query).collect { data ->
                     try {
                         val weatherData = convertWeatherDtoToWeatherModel(data.weather)
                         _currentWeather.value = LocationWeatherModel(

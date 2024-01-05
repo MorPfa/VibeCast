@@ -17,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -40,40 +41,42 @@ class WeatherRepositoryImpl @Inject constructor(
     }.flowOn(Dispatchers.IO)
 
 
+    override fun getSearchedWeather(cityName: String): Flow<LocationWithWeatherDataDto> = flow{
+        remoteWeatherDataSource.getWeather(cityName).collect{
+            emit(it)
+        }
+    }.flowOn(Dispatchers.IO)
+
     override fun getWeather(cityName: String): Flow<LocationWithWeatherDataDto> = flow {
         try {
-            Log.d(TAG, "local city")
-            val localWeatherFlow = localWeatherDataSource.getLocationWithWeather(cityName)
+            val localWeatherFlow = localWeatherDataSource.getWeather(cityName)
             localWeatherFlow.collect { weatherData ->
-                val timestamp = weatherData.weather.dataTimestamp
+                val timestamp = weatherData.dataTimestamp
                 if (isDataOutdated(timestamp) && isInternetAvailable(appContext)){
                     throw DataOutdatedException("Timestamp: $timestamp current time: ${System.currentTimeMillis()}")
                 }
                 else {
                     Log.d(TAG, "local city")
-                    emit(weatherData)
+                    val output = LocationWithWeatherDataDto(LocationDto(weatherData.cityName, weatherData.country), weatherData)
+                    Log.d(TAG, output.weather.cityName)
+                    emit(output)
                 }
-                emit(weatherData)
+
             }
         }
         catch (e : Exception){
             Log.d(TAG, "remote city ")
             Log.d(TAG, "$e")
-            remoteWeatherDataSource.getWeather(cityName).onEach {  localWeatherDataSource.addLocationWithWeather(
-                LocationWithWeatherDataDto(LocationDto(it.location.cityName, it.location.country),it.weather)
-            ) }
+            remoteWeatherDataSource.getWeather(cityName).map { data ->
+                data.weather.country = data.location.country
+                data.weather.cityName = data.location.cityName
+                data
+            }.onEach {  localWeatherDataSource.addWeather(it.weather) }
                 .collect {
+                    Log.d(TAG, it.weather.cityName)
                     emit(it)
-
                 }
         }
-        remoteWeatherDataSource.getWeather(cityName)
-            .onCompletion { cause ->
-                if (cause != null && cause !is CancellationException) {
-                    Log.e(TAG, "Error during flow completion for getWeather: $cause in Repository")
-                }
-            }
-            .collect { emit(it) }
     }.flowOn(Dispatchers.IO)
 
 
@@ -89,34 +92,39 @@ class WeatherRepositoryImpl @Inject constructor(
                 val cityName = data.cityName
                 if (cityName.isNotBlank()) {
                     try {
-                        val localWeatherFlow = localWeatherDataSource.getLocationWithWeather(cityName)
+                        val localWeatherFlow = localWeatherDataSource.getWeather(cityName)
                         localWeatherFlow.collect { weatherData ->
-                            val timestamp = weatherData.weather.dataTimestamp
+                            val timestamp = weatherData.dataTimestamp
                             if (isDataOutdated(timestamp) && isInternetAvailable(appContext)){
                                 throw DataOutdatedException("Timestamp: $timestamp current time: ${System.currentTimeMillis()}")
                             }
                             else {
                                 Log.d(TAG, "local coordinates")
-                                emit(weatherData)
+                                val output = LocationWithWeatherDataDto(LocationDto(weatherData.cityName, weatherData.country), weatherData)
+                                emit(output)
                             }
                         }
                     }
                     catch (e : Exception){
                         Log.d(TAG, "remote coordinates")
                         Log.d(TAG, "$e")
-                            remoteWeatherDataSource.getWeather(lat, lon).onEach {  localWeatherDataSource.addLocationWithWeather(
-                                LocationWithWeatherDataDto(LocationDto(data.cityName, data.countryName),it.weather)
-                            ) }
-                                .collect {
-                                    it.location.cityName = data.cityName
-                                    it.location.country = data.countryName
-                                    emit(it)
-
-                        }
+                        remoteWeatherDataSource.getWeather(lat, lon)
+                            .map { weather ->
+                                weather.weather.country = data.countryName
+                                weather
+                            }
+                            .onEach { localWeatherDataSource.addWeather(it.weather) }
+                            .collect {
+                                it.location.cityName = data.cityName
+                                it.location.country = data.countryName
+                                emit(it)
+                            }
                     }
                 }
             }
     }.flowOn(Dispatchers.IO)
+
+
 
 
     override fun refreshWeather(cityName: String): Flow<WeatherDto> = flow {
