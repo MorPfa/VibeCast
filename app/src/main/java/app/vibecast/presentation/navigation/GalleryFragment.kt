@@ -14,6 +14,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import app.vibecast.databinding.FragmentPicturesBinding
+import app.vibecast.domain.entity.ImageDto
 import app.vibecast.presentation.mainscreen.MainScreenViewModel
 import app.vibecast.presentation.image.ImageAdapter
 import app.vibecast.presentation.image.ImageLoader
@@ -51,10 +52,16 @@ class GalleryFragment : Fragment() {
         val imageLoader = ImageLoader(requireContext())
         val adapter = ImageAdapter(imageLoader, requireContext(), viewModel)
         recyclerView.adapter = adapter
+        recyclerView.setHasFixedSize(true)
         val spanCount = if (isTablet(requireActivity())) 4 else 3
         val layoutManager = GridLayoutManager(requireContext(), spanCount)
         recyclerView.layoutManager = layoutManager
-        // Observe the LiveData in the ViewModel
+
+        adapter.setOnItemClickListener { position ->
+            val clickedImage = adapter.currentList[position]
+            showImageDialog(clickedImage)
+        }
+
         viewModel.galleryImages.observe(viewLifecycleOwner) { images ->
             adapter.submitList(images)
         }
@@ -62,6 +69,12 @@ class GalleryFragment : Fragment() {
         return binding.root
     }
 
+    private fun showImageDialog(image: ImageDto) {
+        val dialogFragment = ImageItemFragment.newInstance(image)
+        dialogFragment.show(childFragmentManager, "image_dialog")
+
+
+    }
     @Suppress("DEPRECATION")
     private fun isTablet(activity: Activity): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {

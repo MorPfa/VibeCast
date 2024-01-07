@@ -24,11 +24,23 @@ class ImageAdapter(
     private val viewModel: MainScreenViewModel
 ) : ListAdapter<ImageDto, ImageAdapter.PictureViewHolder>(ImageDiffCallback()) {
 
+
+    private var onItemClickListener: ((Int) -> Unit)? = null
+
+    fun setOnItemClickListener(listener: (Int) -> Unit) {
+        onItemClickListener = listener
+    }
+
     private val contextReference: WeakReference<Context> = WeakReference(context)
-    class PictureViewHolder(binding: ItemCardviewBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class PictureViewHolder(binding: ItemCardviewBinding) : RecyclerView.ViewHolder(binding.root) {
         val savedImage = binding.savedImage
         val title = binding.title
         val removeButton = binding.removeBtn
+        init {
+            itemView.setOnClickListener{
+                onItemClickListener?.invoke(bindingAdapterPosition)
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PictureViewHolder {

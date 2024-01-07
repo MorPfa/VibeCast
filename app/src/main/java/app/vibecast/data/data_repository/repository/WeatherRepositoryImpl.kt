@@ -168,16 +168,16 @@ class WeatherRepositoryImpl @Inject constructor(
 
     private fun isDataOutdated(savedTimestamp: Long): Boolean {
         val currentTimestamp = System.currentTimeMillis()
-        val outdatedThreshold = 20 * 60 * 1000
+        val outdatedThreshold = 20 * 60
 
-        // Ensure both timestamps have the same number of digits (10 digits)
-        val adjustedCurrentTimestamp = currentTimestamp.toString().take(10).padStart(10, '0')
-        val adjustedSavedTimestamp = savedTimestamp.toString().take(10).padStart(10, '0')
+        val currentTimestampInSeconds = currentTimestamp / 1000
+        val savedTimestampInSeconds = savedTimestamp / 1000
 
-        val difference = adjustedCurrentTimestamp.toLong() - adjustedSavedTimestamp.toLong()
 
-        Log.d(TAG, "Current Timestamp: $adjustedCurrentTimestamp")
-        Log.d(TAG, "Saved Timestamp: $adjustedSavedTimestamp")
+        val difference = currentTimestampInSeconds - savedTimestampInSeconds
+
+        Log.d(TAG, "Current Timestamp: $currentTimestampInSeconds")
+        Log.d(TAG, "Saved Timestamp: $savedTimestampInSeconds")
         Log.d(TAG, "Difference: $difference")
 
         return difference > outdatedThreshold

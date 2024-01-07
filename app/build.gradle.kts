@@ -8,6 +8,7 @@ plugins {
     id("com.google.dagger.hilt.android")
     id("androidx.navigation.safeargs")
     id("org.jetbrains.kotlin.plugin.serialization")
+    id("kotlin-parcelize")
 }
 
 android {
