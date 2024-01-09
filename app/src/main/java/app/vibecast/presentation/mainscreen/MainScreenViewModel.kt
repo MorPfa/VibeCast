@@ -89,6 +89,8 @@ class MainScreenViewModel @Inject constructor(
 
     }
 
+    fun pickDefaultImage(weatherCondition: String) : Int = imagePicker.pickDefaultImage(weatherCondition)
+
     fun loadImageIntoImageView(url: String, imageView: ImageView) {
         imageLoader.loadUrlIntoImageView(url, imageView)
     }

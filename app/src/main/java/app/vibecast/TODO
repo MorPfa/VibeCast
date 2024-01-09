@@ -1,15 +1,14 @@
 
 
 Today:
-FIND APPROPRIATE DEFAULT IMAGE FOR EACH WEATHER CONDITION IN CASE OF NO INTERNET
+
+prepare for application for request limit raise
 fix landscape orientation for gallery fragment
 fix top of image card in gallery fragment
 -> both of those can be fixed by fixing the way the fragment/ activity gets recreated on config changes
 
 
-
-test
-
+fix invalid input crashing app
 Look into actually downloading images instead of just favoriting them
 Make another attempt at autocomplete but with autocomplete intent
 

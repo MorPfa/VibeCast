@@ -66,6 +66,8 @@ class SavedLocationFragment : Fragment() {
                         getString(R.string.error_loading_image),
                         Snackbar.LENGTH_SHORT
                     )
+                    val image = viewModel.pickDefaultImage(weather)
+                    binding.backgroundImageView.setImageDrawable(ContextCompat.getDrawable(requireContext(), image))
                     val snackbarView = snackbar.view
                     val snackbarText = snackbarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
                     snackbarText.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))

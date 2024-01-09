@@ -105,8 +105,7 @@
     <string name="metric">Metric</string>
     <string name="saved_image_count">%1$d</string>
     <string name="loading_placeholder">-</string>
-    <string name="error_loading_image">Error loading Image</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="error_loading_image">Error loading Image for desired location</string>
+
 
 </resources>
