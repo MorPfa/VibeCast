@@ -9,17 +9,21 @@ import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import app.vibecast.R
 import app.vibecast.databinding.FragmentImageItemBinding
 import app.vibecast.domain.entity.ImageDto
+import app.vibecast.presentation.TAG
 import app.vibecast.presentation.image.ImageLoader
+import app.vibecast.presentation.image.ImageSaver
 import app.vibecast.presentation.mainscreen.MainScreenViewModel
+import kotlinx.coroutines.launch
 
 private const val IMAGE = "image"
 class ImageItemFragment : DialogFragment() {
@@ -79,6 +83,19 @@ class ImageItemFragment : DialogFragment() {
 
         binding.removeBtn.setOnClickListener {
             image?.let { imageDto -> viewModel.deleteImage(imageDto) }
+        }
+        binding.downloadBtn.setOnClickListener{
+            Log.d(TAG, "clicked")
+            lifecycleScope.launch {
+                viewModel.getImageForDownload(image?.links!!.downloadLink).collect{ image ->
+                    Log.d(TAG, image)
+                    ImageSaver.saveImageFromUrlToGallery(
+                       image, requireContext()
+                    )
+                }
+            }
+
+
         }
         return binding.root
     }

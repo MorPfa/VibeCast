@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface ImageRepository {
 
+    fun getImageForDownload(query: String) : Flow<String>
+
     fun getRemoteImages(query:  String) : Flow<ImageDto>
 
     fun getLocalImages() : Flow<List<ImageDto>>

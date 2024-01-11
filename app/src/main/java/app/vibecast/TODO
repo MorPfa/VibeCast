@@ -5,8 +5,8 @@ Look into actually downloading images instead of just favoriting them
 prepare for application for request limit raise
 - hotlinking works
 - download events dont work yet
+Look into improving api calls by using call etc
 
-fix invalid input crashing app
 
 
 

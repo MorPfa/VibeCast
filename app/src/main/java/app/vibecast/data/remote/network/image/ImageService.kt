@@ -4,13 +4,20 @@ import app.vibecast.BuildConfig
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.Query
+import retrofit2.http.Url
 
 
-fun interface ImageService {
+interface ImageService {
 
     companion object {
         const val CLIENT_ID = BuildConfig.UNSPLASH_KEY
     }
+
+    @Headers("Authorization: Client-ID $CLIENT_ID")
+    @GET
+    suspend fun getImageForDownload(
+        @Url query: String,
+    ) : DownloadUrl
 
     @Headers("Accept-Version: v1", "Authorization: Client-ID $CLIENT_ID")
     @GET("photos/random")

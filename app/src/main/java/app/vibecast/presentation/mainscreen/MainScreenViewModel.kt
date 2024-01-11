@@ -38,6 +38,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
@@ -128,6 +129,13 @@ class MainScreenViewModel @Inject constructor(
                 throw e
             }
         }
+    }
+
+    fun getImageForDownload(query: String) : Flow<String> = flow {
+        imageRepository.getImageForDownload(query).collect{
+            emit(it)
+        }
+
     }
 
 

@@ -32,6 +32,13 @@ class ImageRepositoryImpl @Inject constructor(
     }.flowOn(Dispatchers.IO)
 
 
+    override fun getImageForDownload(query: String): Flow<String> = flow {
+       remoteImageDataSource.getImageForDownload(query).collect{
+            emit(it)
+        }
+
+    }
+
     override fun getLocalImages(): Flow<List<ImageDto>> = flow {
         try {
             emitAll(localImageDataSource.getImages())

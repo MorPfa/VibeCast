@@ -30,6 +30,10 @@ class RemoteImageDataSourceImpl @Inject constructor(
     }.flowOn(Dispatchers.IO)
 
 
+    override fun getImageForDownload(query: String): Flow<String> = flow {
+        val image = imageService.getImageForDownload(query).url
+        emit(image)
+    }
 
     class EmptyApiResponseException(message: String) : Exception(message)
     class ImageFetchException(message: String, cause: Throwable? = null) : Exception(message, cause)
