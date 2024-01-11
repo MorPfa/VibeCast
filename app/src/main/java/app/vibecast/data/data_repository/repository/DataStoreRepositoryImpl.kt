@@ -1,7 +1,6 @@
 package app.vibecast.data.data_repository.repository
 
 import android.content.Context
-import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -10,7 +9,6 @@ import androidx.datastore.preferences.preferencesDataStore
 import app.vibecast.data.data_repository.repository.Constants.DATASTORE_NAME
 import app.vibecast.data.data_repository.repository.Constants.UNIT
 import app.vibecast.domain.repository.DataStoreRepository
-import app.vibecast.presentation.TAG
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 

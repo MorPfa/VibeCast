@@ -23,8 +23,6 @@ import kotlinx.coroutines.withContext
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
-
-
 class SearchResultFragment : Fragment() {
 
     private var param1: String? = null
@@ -86,6 +84,7 @@ class SearchResultFragment : Fragment() {
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
         super.onViewCreated(view, savedInstanceState)
         viewModel.currentWeather.observe(viewLifecycleOwner) { weatherData ->
             weatherData.weather.currentWeather?.let { currentWeather ->

@@ -106,6 +106,7 @@
     <string name="saved_image_count">%1$d</string>
     <string name="loading_placeholder">-</string>
     <string name="error_loading_image">Error loading Image for desired location</string>
+    <string name="invalid_query_input">Could not find results for this input</string>
 
 
 </resources>

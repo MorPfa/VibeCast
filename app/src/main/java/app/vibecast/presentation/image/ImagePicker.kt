@@ -21,14 +21,14 @@ class ImagePicker @Inject constructor(
             R.drawable.snow_image_3
         )
         val rainList = listOf(
-            R.drawable.rain_image_1,
-            R.drawable.rain_image_2,
-            R.drawable.rain_image_3
+            R.drawable.rainy_image_1,
+            R.drawable.rainy_image_2,
+            R.drawable.rainy_image_3
         )
         val sunList = listOf(
-            R.drawable.sun_image_1,
-            R.drawable.sun_image_2,
-            R.drawable.sun_image_3
+            R.drawable.sunny_image_1,
+            R.drawable.sunny_image_2,
+            R.drawable.sunny_image_3
         )
         val stormList = listOf(
             R.drawable.storm_image_1,

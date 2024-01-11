@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import app.vibecast.data.TAGS.IMAGE_ERROR
+import app.vibecast.data.TAGS.WEATHER_ERROR
 import app.vibecast.data.data_repository.repository.Unit
 import app.vibecast.data.remote.LocationGetter
 import app.vibecast.domain.entity.CurrentWeather
@@ -41,6 +42,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Date
@@ -139,7 +141,7 @@ class MainScreenViewModel @Inject constructor(
 
 
     fun getSearchedLocationWeather(query: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Main) {
             try {
                 weatherRepository.getSearchedWeather(query).collect { data ->
                     try {
@@ -149,14 +151,17 @@ class MainScreenViewModel @Inject constructor(
                             weather = weatherData
                         )
                     } catch (e: Exception) {
-                        handleError(e)
+                        Log.d(WEATHER_ERROR, "$query viewmodel")
+                        throw e
                     }
                 }
             } catch (e: Exception) {
-                handleError(e)
+                Log.d(WEATHER_ERROR, "$query viewmodel")
+                throw e
             }
         }
     }
+
 
 
     private var _locations = MutableLiveData<List<LocationDto>>()
@@ -313,6 +318,8 @@ class MainScreenViewModel @Inject constructor(
         Log.e(TAG, "Error: $e")
         throw e
     }
+
+
 
 
     private fun convertUnixTimestamp(unixTimestamp: Long, timeZoneId: String): String {

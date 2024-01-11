@@ -1,15 +1,22 @@
 
 
 Today:
-
+Look into actually downloading images instead of just favoriting them
 prepare for application for request limit raise
+- hotlinking works
+- download events dont work yet
+
+fix invalid input crashing app
+
+
+
+give nav destinations their own viewmodel
 fix landscape orientation for gallery fragment
 fix top of image card in gallery fragment
 -> both of those can be fixed by fixing the way the fragment/ activity gets recreated on config changes
 
 
-fix invalid input crashing app
-Look into actually downloading images instead of just favoriting them
+
 Make another attempt at autocomplete but with autocomplete intent
 
 
@@ -18,4 +25,4 @@ fix bug where image gets updated twice
 optimize image accuracy (maybe go back to GET /search/photos endpoint and combine query with collections)
 (re)write unit tests
 
-consider data binding
+

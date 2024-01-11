@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.util.Log
+import app.vibecast.data.TAGS.WEATHER_ERROR
 import app.vibecast.data.data_repository.data_source.local.LocalWeatherDataSource
 import app.vibecast.data.data_repository.data_source.remote.RemoteWeatherDataSource
 import app.vibecast.data.remote.network.weather.CoordinateApiModel
@@ -30,21 +31,17 @@ class WeatherRepositoryImpl @Inject constructor(
 ) : WeatherRepository{
 
 
-    override fun getCoordinates(cityName: String): Flow<CoordinateApiModel> = flow {
-        remoteWeatherDataSource.getCoordinates(cityName)
-            .onCompletion { cause ->
-                if (cause != null && cause !is CancellationException) {
-                    Log.e(TAG, "Error during flow completion for getCoordinates: $cause in Repository")
-                }
-            }
-            .collect { emit(it) }
-    }.flowOn(Dispatchers.IO)
-
-
     override fun getSearchedWeather(cityName: String): Flow<LocationWithWeatherDataDto> = flow{
-        remoteWeatherDataSource.getWeather(cityName).collect{
-            emit(it)
+        try{
+            remoteWeatherDataSource.getWeather(cityName).collect{
+                emit(it)
+            }
         }
+        catch (e : Exception){
+            Log.e(WEATHER_ERROR, "Error fetching weather data for $cityName", e)
+            throw e
+        }
+
     }.flowOn(Dispatchers.IO)
 
     override fun getWeather(cityName: String): Flow<LocationWithWeatherDataDto> = flow {

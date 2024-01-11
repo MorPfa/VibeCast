@@ -3,13 +3,20 @@ package app.vibecast.presentation
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.os.Bundle
+import android.util.TypedValue
+import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.FrameLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.findNavController
@@ -27,6 +34,7 @@ import app.vibecast.presentation.mainscreen.MainScreenViewModel
 import app.vibecast.presentation.permissions.LocationPermissionState
 import app.vibecast.presentation.permissions.PermissionHelper
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -149,32 +157,65 @@ class MainActivity : AppCompatActivity() {
         searchView = search.actionView as SearchView
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
-                search.collapseActionView()
+                if (isInputValid(query)){
+                    search.collapseActionView()
+                    viewModel.getSearchedLocationWeather(query)
+                    val currentDestination = findNavController(R.id.nav_host_fragment_content_home).currentDestination
+                    if (currentDestination?.id == R.id.nav_home) {
+                        val action = MainScreenFragmentDirections.actionNavHomeToSearchResultFragment()
+                        findNavController(R.id.nav_host_fragment_content_home).navigate(action)
+                    }
+                    else if (currentDestination?.id == R.id.nav_saved) {
+                        val action =
+                            SavedLocationFragmentDirections.actionNavSavedToNavSearch()
+                        findNavController(R.id.nav_host_fragment_content_home).navigate(action)
+                    }
+                    searchView.clearFocus()
 
-                viewModel.getSearchedLocationWeather(query)
-                val currentDestination = findNavController(R.id.nav_host_fragment_content_home).currentDestination
-                if (currentDestination?.id == R.id.nav_home) {
-                    val action = MainScreenFragmentDirections.actionNavHomeToSearchResultFragment()
-                    findNavController(R.id.nav_host_fragment_content_home).navigate(action)
                 }
-                else if(currentDestination?.id == R.id.nav_saved) {
-                    val action = SavedLocationFragmentDirections.actionNavSavedToNavSearch()
-                    findNavController(R.id.nav_host_fragment_content_home).navigate(action)
+                else {
+                    val snackbar = Snackbar.make(
+                        findViewById(android.R.id.content),
+                        getString(R.string.invalid_query_input),
+                        Snackbar.LENGTH_SHORT
+                    )
+
+                    val snackbarView = snackbar.view
+                    val snackbarText = snackbarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+                    snackbarText.setTextColor(ContextCompat.getColor(this@MainActivity, R.color.white))
+                    snackbarView.background = ContextCompat.getDrawable(this@MainActivity, R.drawable.snackbar_background)
+                    val params = snackbarView.layoutParams as FrameLayout.LayoutParams
+                    params.gravity = Gravity.TOP
+                    snackbarView.layoutParams = params
+                    val actionBarHeight = getActionBarHeight()
+                    params.setMargins(0, actionBarHeight, 0, 0)
+                    snackbarView.layoutParams = params
+                    if (resources.configuration.screenLayout and Configuration.SCREENLAYOUT_SIZE_MASK >= Configuration.SCREENLAYOUT_SIZE_LARGE) {
+                        params.gravity = Gravity.CENTER_HORIZONTAL
+                    }
+                    snackbar.show()
                 }
-
-                searchView.clearFocus()
-
                 return true
             }
-
             override fun onQueryTextChange(newText: String): Boolean {
                 return true
             }
-        })
-
+        }
+        )
         return true
     }
+    fun isInputValid(input: String): Boolean {
+        val validCharacters = Regex("[a-zA-Z]+")
+        return input.matches(validCharacters)
+    }
 
+    fun getActionBarHeight(): Int {
+        val typedValue = TypedValue()
+        if (theme.resolveAttribute(android.R.attr.actionBarSize, typedValue, true)) {
+            return (TypedValue.complexToDimensionPixelSize(typedValue.data, resources.displayMetrics)) + 100
+        }
+        return 0
+    }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         val saveImageItem = menu.findItem(R.id.action_save_image)
