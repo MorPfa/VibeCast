@@ -62,7 +62,7 @@ class RemoteImageDataSourceImplTest {
             links = ImageDto.PhotoLinks(
                 user = "test",
                 downloadLink = "https://dummyurl.com/raw"
-            )
+            ),
         )
     }
 
@@ -101,7 +101,7 @@ class RemoteImageDataSourceImplTest {
             links = ImageDto.PhotoLinks(
                 user = this.links.user,
                 downloadLink = this.links.downloadLink
-            )
+            ),
         )
     }
 }

@@ -57,7 +57,7 @@ class LocalImageDataSourceImplTest {
             links = ImageDto.PhotoLinks(
                 user = "test",
                 downloadLink = "https://dummyurl.com/raw"
-            )
+            ),
         )
     }
 
@@ -139,7 +139,7 @@ class LocalImageDataSourceImplTest {
             links = ImageDto.PhotoLinks(
                 user = this.userLink,
                 downloadLink = this.downloadLink
-            )
+            ),
         )
     }
 

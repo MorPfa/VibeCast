@@ -7,12 +7,15 @@ import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
+import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import app.vibecast.R
 import app.vibecast.databinding.ItemCardviewBinding
 import app.vibecast.domain.entity.ImageDto
 import app.vibecast.presentation.mainscreen.MainScreenViewModel
@@ -34,7 +37,7 @@ class ImageAdapter(
     private val contextReference: WeakReference<Context> = WeakReference(context)
     inner class PictureViewHolder(binding: ItemCardviewBinding) : RecyclerView.ViewHolder(binding.root) {
         val savedImage = binding.savedImage
-        val title = binding.title
+        val attributionText = binding.attributionText
         val removeButton = binding.removeBtn
         init {
             itemView.setOnClickListener{
@@ -60,6 +63,11 @@ class ImageAdapter(
         val userLink = SpannableString(userName)
         val unsplashLink = SpannableString(unsplashText)
 
+        val linkColor = ContextCompat.getColor(contextReference.get()!!, R.color.white)
+        val linkColorSpanUser = ForegroundColorSpan(linkColor)
+        val linkColorSpanUnsplash = ForegroundColorSpan(linkColor)
+
+
         val context = contextReference.get()
         if (context != null) {
             val clickableSpanUser = object : ClickableSpan() {
@@ -73,17 +81,21 @@ class ImageAdapter(
                 }
             }
             userLink.setSpan(clickableSpanUser, 0, userName.length, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
+            userLink.setSpan(linkColorSpanUser, 0, userName.length, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
+
             unsplashLink.setSpan(clickableSpanUnsplash, 0, unsplashText.length, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
+            unsplashLink.setSpan(linkColorSpanUnsplash, 0, unsplashText.length, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
+
         }
 
 
         val spannableStringBuilder = SpannableStringBuilder()
             .append("Photo by ")
             .append(userLink)
-            .append(" on ") // Add a space or any other separator if needed
+            .append(" on ")
             .append(unsplashLink)
-        holder.title.text = spannableStringBuilder
-        holder.title.movementMethod = LinkMovementMethod.getInstance()
+        holder.attributionText.text = spannableStringBuilder
+        holder.attributionText.movementMethod = LinkMovementMethod.getInstance()
 
         holder.removeButton.setOnClickListener {
             viewModel.deleteImage(image)

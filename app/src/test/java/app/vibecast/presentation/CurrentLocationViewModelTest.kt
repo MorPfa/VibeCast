@@ -64,7 +64,7 @@ class CurrentLocationViewModelTest{
             links = ImageDto.PhotoLinks(
                 user = "test",
                 downloadLink = "https://dummyurl.com/raw"
-            )
+            ),
         )
         weatherDto =  WeatherDto(
             cityName = "seattle",

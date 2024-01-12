@@ -111,6 +111,7 @@ class SavedLocationFragment : Fragment() {
                 else {
                     binding.nextScreenButton.visibility = View.VISIBLE
                     binding.nextScreenButton.setOnClickListener {
+                       requireActivity().invalidateOptionsMenu()
                         viewModel.getSavedLocationWeather()
                         viewModel.incrementIndex()
                     }
@@ -122,6 +123,7 @@ class SavedLocationFragment : Fragment() {
                 else {
                     binding.prevScreenButton.visibility =  View.VISIBLE
                     binding.prevScreenButton.setOnClickListener {
+                        requireActivity().invalidateOptionsMenu()
                         viewModel.getSavedLocationWeather()
                         viewModel.decrementIndex()
                     }

@@ -2,10 +2,7 @@
 
 Today:
 
-prepare for application for request limit raise
-- hotlinking works
-- download events dont work yet
-Look into improving api calls by using call etc
+
 
 
 
@@ -16,7 +13,7 @@ fix top of image card in gallery fragment
 -> both of those can be fixed by fixing the way the fragment/ activity gets recreated on config changes
 
 
-
+Fix memory leaks
 Make another attempt at autocomplete but with autocomplete intent
 
 

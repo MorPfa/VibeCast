@@ -107,10 +107,12 @@ class LocalImageDataSourceImpl @Inject constructor(
                 name = this.name,
                 userName = this.userName,
                 portfolioUrl = this.portfolioUrl
-            ), links = ImageDto.PhotoLinks(
+            ),
+            links = ImageDto.PhotoLinks(
                 user = this.userLink,
                 downloadLink = this.downloadLink
-            )
+            ),
+            timestamp = this.timestamp
         )
     }
 }

@@ -40,26 +40,27 @@ class RemoteImageDataSourceImpl @Inject constructor(
 
     private fun ImageApiModel.toImagesDto(): ImageDto {
         return ImageDto(
-                id = this.id,
-                description = this.description,
-                altDescription = this.altDescription,
-                urls = ImageDto.PhotoUrls(
-                    full = this.urls.full,
-                    regular = this.urls.regular,
-                    small = this.urls.small,
-                    thumb = this.urls.thumb
-                ),
-                user = ImageDto.UnsplashUser(
-                    id = this.user.id,
-                    name = this.user.name,
-                    userName = this.user.userName,
-                    portfolioUrl = this.user.portfolioUrl
-                ),
-                links = ImageDto.PhotoLinks(
-                    user = this.links.user,
-                    downloadLink =  this.links.downloadLink
-                )
-            )
+            id = this.id,
+            description = this.description,
+            altDescription = this.altDescription,
+            urls = ImageDto.PhotoUrls(
+                full = this.urls.full,
+                regular = this.urls.regular,
+                small = this.urls.small,
+                thumb = this.urls.thumb
+            ),
+            user = ImageDto.UnsplashUser(
+                id = this.user.id,
+                name = this.user.name,
+                userName = this.user.userName,
+                portfolioUrl = this.user.portfolioUrl
+            ),
+            links = ImageDto.PhotoLinks(
+                user = this.links.user,
+                downloadLink =  this.links.downloadLink
+            ),
+            timestamp = null
+        )
         }
     }
 

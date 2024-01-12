@@ -40,7 +40,7 @@ class ImagePickerTest {
             links = ImageDto.PhotoLinks(
                 user = "test",
                 downloadLink = "https://dummyurl.com/raw"
-            )
+            ),
         )
     }
 

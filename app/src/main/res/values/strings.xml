@@ -50,7 +50,7 @@
     <!--    Picture gallery-->
     <string name="header">Header</string>
     <string name="sub_head">Subhead</string>
-    <string name="title">Title</string>
+    <string name="title">-</string>
     <string name="sub_title">Subtitle</string>
     <string name="description">Description</string>
     <string name="remove_btn_text">Remove</string>

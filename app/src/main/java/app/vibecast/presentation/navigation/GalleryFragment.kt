@@ -1,3 +1,5 @@
+@file:Suppress("SameParameterValue")
+
 package app.vibecast.presentation.navigation
 
 import android.app.Activity
@@ -81,7 +83,7 @@ class GalleryFragment : Fragment() {
             val metrics = activity.windowManager.currentWindowMetrics
             val insets = metrics.windowInsets.getInsetsIgnoringVisibility(WindowInsets.Type.systemBars())
             val screenSize = metrics.bounds.width() - insets.left - insets.right
-            screenSize >= dpToPixels(activity, 600) // Adjust the threshold as needed
+            screenSize >= dpToPixels(activity, 600)
         } else {
             val display = activity.windowManager.defaultDisplay
             val metrics = DisplayMetrics()
@@ -90,7 +92,7 @@ class GalleryFragment : Fragment() {
                 (metrics.widthPixels / metrics.xdpi.toDouble()).pow(2.0)
                         + (metrics.heightPixels / metrics.ydpi.toDouble()).pow(2.0)
             )
-            screenSize >= 7 // Adjust the threshold as needed
+            screenSize >= 7
         }
     }
 
