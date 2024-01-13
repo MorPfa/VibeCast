@@ -1,19 +1,18 @@
 
 
 Today:
-
+fix landscape orientation for gallery fragment
+fix top of image card in gallery fragment
+-> both of those can be fixed by fixing the way the fragment/ activity gets recreated on config changes
 
 
 
 
 
 give nav destinations their own viewmodel
-fix landscape orientation for gallery fragment
-fix top of image card in gallery fragment
--> both of those can be fixed by fixing the way the fragment/ activity gets recreated on config changes
 
 
-Fix memory leaks
+
 Make another attempt at autocomplete but with autocomplete intent
 
 

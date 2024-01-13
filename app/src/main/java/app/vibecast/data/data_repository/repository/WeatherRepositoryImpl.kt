@@ -55,7 +55,6 @@ class WeatherRepositoryImpl @Inject constructor(
                 else {
                     Log.d(TAG, "local city")
                     val output = LocationWithWeatherDataDto(LocationDto(weatherData.cityName, weatherData.country), weatherData)
-                    Log.d(TAG, output.weather.cityName)
                     emit(output)
                 }
 
@@ -70,7 +69,6 @@ class WeatherRepositoryImpl @Inject constructor(
                 data
             }.onEach {  localWeatherDataSource.addWeather(it.weather) }
                 .collect {
-                    Log.d(TAG, it.weather.cityName)
                     emit(it)
                 }
         }

@@ -106,10 +106,8 @@ class ImageItemFragment : DialogFragment() {
             dialog?.dismiss()
         }
         binding.downloadBtn.setOnClickListener{
-            Log.d(TAG, "clicked")
             lifecycleScope.launch {
                 viewModel.getImageForDownload(image?.links!!.downloadLink).collect{ image ->
-                    Log.d(TAG, image)
                     ImageSaver.saveImageFromUrlToGallery(
                        image, requireContext()
                     )

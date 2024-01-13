@@ -38,12 +38,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Date
@@ -194,6 +192,10 @@ class MainScreenViewModel @Inject constructor(
 
     fun decrementIndex() {
         _locationIndex.value = _locationIndex.value?.minus(1)
+    }
+
+    fun resetIndex(){
+        _locationIndex.value = 0
     }
 
     fun getSavedLocationWeather() {

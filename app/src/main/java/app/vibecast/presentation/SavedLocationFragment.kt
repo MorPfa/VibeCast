@@ -1,6 +1,7 @@
 package app.vibecast.presentation
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -96,9 +97,9 @@ class SavedLocationFragment : Fragment() {
                 }
             }
             mediatorLiveData.observe(viewLifecycleOwner) { (locations, locationIndex) ->
-//                Log.d(TAG, locationIndex.toString())
-//                Log.d(TAG, locations.size.toString())
-//                Log.d(TAG, locations[locationIndex].cityName)
+                Log.d(TAG, "curr location index in saved fragment $locationIndex")
+                Log.d(TAG, "location list size in saved fragment${locations.size}")
+                Log.d(TAG, "current index city name in saved fragment ${locations[locationIndex].cityName}")
                 val endOfList = locationIndex >= locations.size - 1
                 val startOfList = (locationIndex == 0 && locations.isNotEmpty())
 //                Log.d(TAG, endOfList.toString())
@@ -192,6 +193,8 @@ class SavedLocationFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+        viewModel.resetIndex()
+
     }
 
     companion object {

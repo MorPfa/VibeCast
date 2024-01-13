@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -11,19 +12,18 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.core.view.marginBottom
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import app.vibecast.R
 import app.vibecast.databinding.FragmentAccountBinding
 import app.vibecast.domain.entity.LocationDto
+import app.vibecast.presentation.TAG
 import app.vibecast.presentation.mainscreen.MainScreenViewModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.circularreveal.cardview.CircularRevealCardView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import java.lang.ref.WeakReference
 
 
 private const val ARG_PARAM1 = "param1"
@@ -37,9 +37,9 @@ class AccountFragment : Fragment() {
     private var _binding: FragmentAccountBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var locationList : LinearLayout
+    private var locationList : LinearLayout? = null
     private val viewModel: MainScreenViewModel by activityViewModels()
-    private var locationListRef: WeakReference<LinearLayout>? = null
+
 
 
 
@@ -57,8 +57,8 @@ class AccountFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentAccountBinding.inflate(inflater,container,false)
-        locationListRef = WeakReference(binding.savedLocations)
         locationList = binding.savedLocations
+
         lifecycleScope.launch {
             viewModel.imageCount.observe(viewLifecycleOwner){
                 binding.savedImageCount.text = getString(R.string.saved_image_count, it)
@@ -73,15 +73,19 @@ class AccountFragment : Fragment() {
 
     private fun loadLocations() {
         viewModel.locations.observe(viewLifecycleOwner) { locations ->
-            val currentItemCount = locationList.childCount
+            Log.d(TAG, "${locations.size} in Acc fragment")
+            Log.d(TAG, "${viewModel.locationIndex}")
+            val currentItemCount = locationList?.childCount
             val max = locations.size
             if (max == 0 && currentItemCount == 0) {
                 val item = createDefaultTv()
-                locationList.addView(item)
+                locationList?.addView(item)
             } else {
-                for (i in currentItemCount until max) {
-                    val item = createItemView(i, locations)
-                    locationList.addView(item)
+                if (currentItemCount != null) {
+                    for (i in currentItemCount until max) {
+                        val item = createItemView(i, locations)
+                        locationList?.addView(item)
+                    }
                 }
             }
         }
@@ -145,19 +149,15 @@ class AccountFragment : Fragment() {
 
         alertDialogBuilder.setView(customView)
         alertDialog = alertDialogBuilder.create()
-
-        // Set background color of the dialog window to be transparent
         alertDialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-
-        // Show the dialog
         alertDialog?.show()
     }
 
 
 
     private fun removeFixedItem(index: Int, location: LocationDto) {
-        if (index >= 0 && index < locationList.childCount) {
-            locationList.removeViewAt(index)
+        if (index >= 0 && index < locationList!!.childCount) {
+            locationList?.removeViewAt(index)
             viewModel.deleteLocation(location)
 
         }
@@ -169,14 +169,13 @@ class AccountFragment : Fragment() {
         item.setTextColor(Color.WHITE)
         item.textSize = 18.0f
         item.gravity = 1
-
-
         return item
     }
 
 
     override fun onDestroyView() {
         super.onDestroyView()
+        locationList = null
         _binding = null
         viewModel.locations.removeObservers(viewLifecycleOwner)
     }
