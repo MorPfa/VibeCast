@@ -17,6 +17,7 @@ import androidx.navigation.fragment.findNavController
 import app.vibecast.R
 import app.vibecast.databinding.FragmentMainScreenBinding
 import app.vibecast.presentation.mainscreen.MainScreenViewModel
+import app.vibecast.presentation.navigation.ImageViewModel
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -31,7 +32,8 @@ class MainScreenFragment : Fragment() {
     private var _binding: FragmentMainScreenBinding? = null
     private val binding get() = _binding!!
     private lateinit var actionBar: ActionBar
-    private val viewModel : MainScreenViewModel by activityViewModels()
+    private val mainScreenViewModel: MainScreenViewModel by activityViewModels()
+    private val imageViewModel: ImageViewModel by activityViewModels()
 
     private var param1: String? = null
     private var param2: String? = null
@@ -57,8 +59,8 @@ class MainScreenFragment : Fragment() {
         actionBar.show()
         val nextScreenButton = binding.nextScreenButton
         nextScreenButton.setOnClickListener {
-            if (viewModel.locations.value?.size != 0){
-                viewModel.getSavedLocationWeather()
+            if (mainScreenViewModel.locations.value?.size != 0){
+                mainScreenViewModel.getSavedLocationWeather()
                 val action = MainScreenFragmentDirections.actionNavHomeToSavedLocationFragment()
                 findNavController().navigate(action)
             }
@@ -83,12 +85,12 @@ class MainScreenFragment : Fragment() {
     private fun observeImageData(city: String, weather: String) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                viewModel.loadImage(city, weather)
+                imageViewModel.loadImage(city, weather)
                     .collect { imageDto ->
                         imageDto!!.urls.regular.let { imageUrl ->
                             withContext(Dispatchers.Main) {
-                                viewModel.setImageLiveData(imageDto)
-                                viewModel.loadImageIntoImageView(
+                                imageViewModel.setImageLiveData(imageDto)
+                                imageViewModel.loadImageIntoImageView(
                                     imageUrl, binding.backgroundImageView
                                 )
                             }
@@ -101,7 +103,7 @@ class MainScreenFragment : Fragment() {
                         getString(R.string.error_loading_image),
                         Snackbar.LENGTH_SHORT
                     )
-                    val image = viewModel.pickDefaultImage(weather)
+                    val image = imageViewModel.pickDefaultImage(weather)
                     binding.backgroundImageView.setImageDrawable(ContextCompat.getDrawable(requireContext(), image))
                     val snackbarView = snackbar.view
                     val snackbarText = snackbarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
@@ -116,7 +118,7 @@ class MainScreenFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         lifecycleScope.launch {
-            viewModel.currentWeather.observe(viewLifecycleOwner) { weatherData ->
+            mainScreenViewModel.currentWeather.observe(viewLifecycleOwner) { weatherData ->
                     weatherData.weather.currentWeather?.let { currentWeather ->
                         val city = weatherData.location.cityName
                         val weather =
@@ -173,7 +175,7 @@ class MainScreenFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        viewModel.currentWeather.removeObservers(viewLifecycleOwner)
+        mainScreenViewModel.currentWeather.removeObservers(viewLifecycleOwner)
         _binding = null
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }

@@ -14,6 +14,7 @@ import androidx.navigation.fragment.findNavController
 import app.vibecast.R
 import app.vibecast.databinding.FragmentSearchResultBinding
 import app.vibecast.presentation.mainscreen.MainScreenViewModel
+import app.vibecast.presentation.navigation.ImageViewModel
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -28,11 +29,12 @@ class SearchResultFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
     private lateinit var binding : FragmentSearchResultBinding
-    private val viewModel : MainScreenViewModel by activityViewModels()
+    private val mainScreenViewModel: MainScreenViewModel by activityViewModels()
+    private val imageViewModel: ImageViewModel by activityViewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requireActivity().onBackPressedDispatcher.addCallback(this) {
-            viewModel.loadCurrentLocationWeather()
+            mainScreenViewModel.loadCurrentLocationWeather()
             findNavController().navigate(R.id.nav_home)
         }
         arguments?.let {
@@ -52,12 +54,12 @@ class SearchResultFragment : Fragment() {
     private fun observeImageData(city: String, weather: String) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                viewModel.loadImage(city, weather)
+                imageViewModel.loadImage(city, weather)
                     .collect { imageDto ->
                         imageDto!!.urls.regular.let { imageUrl ->
                             withContext(Dispatchers.Main) {
-                                viewModel.setImageLiveData(imageDto)
-                                viewModel.loadImageIntoImageView(
+                                imageViewModel.setImageLiveData(imageDto)
+                                imageViewModel.loadImageIntoImageView(
                                     imageUrl, binding.backgroundImageView
                                 )
                             }
@@ -70,7 +72,7 @@ class SearchResultFragment : Fragment() {
                         getString(R.string.error_loading_image),
                         Snackbar.LENGTH_SHORT
                     )
-                    val image = viewModel.pickDefaultImage(weather)
+                    val image = imageViewModel.pickDefaultImage(weather)
                     binding.backgroundImageView.setImageDrawable(ContextCompat.getDrawable(requireContext(), image))
                     val snackbarView = snackbar.view
                     val snackbarText = snackbarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
@@ -86,7 +88,7 @@ class SearchResultFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         super.onViewCreated(view, savedInstanceState)
-        viewModel.currentWeather.observe(viewLifecycleOwner) { weatherData ->
+        mainScreenViewModel.currentWeather.observe(viewLifecycleOwner) { weatherData ->
             weatherData.weather.currentWeather?.let { currentWeather ->
                 val city = weatherData.location.cityName
                 val weather =

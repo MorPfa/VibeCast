@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import app.vibecast.databinding.FragmentPicturesBinding
 import app.vibecast.domain.entity.ImageDto
-import app.vibecast.presentation.mainscreen.MainScreenViewModel
 import app.vibecast.presentation.image.ImageAdapter
 import app.vibecast.presentation.image.ImageLoader
 import kotlin.math.pow
@@ -33,7 +32,7 @@ class GalleryFragment : Fragment() {
 
     private var _binding: FragmentPicturesBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: MainScreenViewModel by activityViewModels()
+    private val viewModel: ImageViewModel by activityViewModels()
     private var param1: String? = null
     private var param2: String? = null
 

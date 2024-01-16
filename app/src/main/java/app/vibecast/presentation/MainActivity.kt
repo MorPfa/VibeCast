@@ -9,14 +9,12 @@ import android.util.TypedValue
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.findNavController
@@ -31,6 +29,7 @@ import app.vibecast.databinding.ActivityMainBinding
 import app.vibecast.domain.entity.ImageDto
 import app.vibecast.domain.entity.LocationDto
 import app.vibecast.presentation.mainscreen.MainScreenViewModel
+import app.vibecast.presentation.navigation.ImageViewModel
 import app.vibecast.presentation.permissions.LocationPermissionState
 import app.vibecast.presentation.permissions.PermissionHelper
 import com.google.android.material.navigation.NavigationView
@@ -45,7 +44,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private lateinit var searchView: SearchView
-    private val viewModel : MainScreenViewModel by viewModels()
+    private val mainScreenViewModel : MainScreenViewModel by viewModels()
+    private val imageViewModel : ImageViewModel by viewModels()
     private lateinit var currentImage : ImageDto
     private lateinit var currentLocation : LocationDto
     private var showIcons : Boolean = true
@@ -103,11 +103,11 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-        viewModel.currentWeather.observe(this){
+        mainScreenViewModel.currentWeather.observe(this){
             currentLocation = LocationDto(it.location.cityName, it.location.country)
 
         }
-        viewModel.image.observe(this){
+        imageViewModel.image.observe(this){
             currentImage = it
         }
 
@@ -117,8 +117,8 @@ class MainActivity : AppCompatActivity() {
         // Check if location permission is granted
         if (permissionHelper.isPermissionGranted(Manifest.permission.ACCESS_COARSE_LOCATION)) {
             // Permission is granted, load weather data
-            viewModel.updatePermissionState(LocationPermissionState.Granted)
-            viewModel.loadCurrentLocationWeather()
+            mainScreenViewModel.updatePermissionState(LocationPermissionState.Granted)
+            mainScreenViewModel.loadCurrentLocationWeather()
         } else {
             // Permission not granted, request it
             permissionHelper.requestPermission(
@@ -138,12 +138,12 @@ class MainActivity : AppCompatActivity() {
             LOCATION_PERMISSION_REQUEST_CODE -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // Permission granted, update state and load weather data
-                    viewModel.updatePermissionState(LocationPermissionState.Granted)
-                    viewModel.loadCurrentLocationWeather()
+                    mainScreenViewModel.updatePermissionState(LocationPermissionState.Granted)
+                    mainScreenViewModel.loadCurrentLocationWeather()
                 } else {
                     // Permission denied, update state and handle accordingly
-                    viewModel.updatePermissionState(LocationPermissionState.Denied)
-                    viewModel.loadCurrentLocationWeather()
+                    mainScreenViewModel.updatePermissionState(LocationPermissionState.Denied)
+                    mainScreenViewModel.loadCurrentLocationWeather()
                     Toast.makeText(this,
                         getString(R.string.location_request_toast), Toast.LENGTH_SHORT).show()
                 }
@@ -159,7 +159,7 @@ class MainActivity : AppCompatActivity() {
             override fun onQueryTextSubmit(query: String): Boolean {
                 if (isInputValid(query)){
                     search.collapseActionView()
-                    viewModel.getSearchedLocationWeather(query)
+                    mainScreenViewModel.getSearchedLocationWeather(query)
                     val currentDestination = findNavController(R.id.nav_host_fragment_content_home).currentDestination
                     if (currentDestination?.id == R.id.nav_home) {
                         val action = MainScreenFragmentDirections.actionNavHomeToSearchResultFragment()
@@ -242,14 +242,14 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_save_image -> {
-                if (viewModel.image.value != null) {
+                if (imageViewModel.image.value != null) {
                     if (!item.isChecked) {
                         item.isChecked = true
-                        viewModel.addImage(currentImage)
+                        imageViewModel.addImage(currentImage)
                         item.icon = ContextCompat.getDrawable(this, R.drawable.favorite_selected)
                     } else {
                         item.isChecked = false
-                        viewModel.deleteImage(currentImage)
+                        imageViewModel.deleteImage(currentImage)
                         item.icon = ContextCompat.getDrawable(this, R.drawable.favorite_unselected)
                     }
                 }
@@ -259,11 +259,11 @@ class MainActivity : AppCompatActivity() {
                 if (item.isCheckable) {
                     if (!item.isChecked) {
                         item.isChecked = true
-                        viewModel.addLocation(viewModel.currentWeather.value!!.location)
+                        mainScreenViewModel.addLocation(mainScreenViewModel.currentWeather.value!!.location)
                         item.icon = ContextCompat.getDrawable(this, R.drawable.delete_location_icon)
                     } else {
                         item.isChecked = false
-                        viewModel.deleteLocation(currentLocation)
+                        mainScreenViewModel.deleteLocation(currentLocation)
                         item.icon = ContextCompat.getDrawable(this, R.drawable.save_location_icon)
                     }
                 }
@@ -277,7 +277,7 @@ class MainActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_content_home)
         if (navController.currentDestination?.id == R.id.nav_search) {
-            viewModel.loadCurrentLocationWeather()
+            mainScreenViewModel.loadCurrentLocationWeather()
         }
 
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()

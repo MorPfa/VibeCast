@@ -38,14 +38,15 @@ class AccountFragment : Fragment() {
     private val binding get() = _binding!!
 
     private var locationList : LinearLayout? = null
-    private val viewModel: MainScreenViewModel by activityViewModels()
+    private val mainScreenViewModel: MainScreenViewModel by activityViewModels()
+    private val imageViewModel: ImageViewModel by activityViewModels()
 
 
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.setImageCountLiveData()
+        imageViewModel.setImageCountLiveData()
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
@@ -60,7 +61,7 @@ class AccountFragment : Fragment() {
         locationList = binding.savedLocations
 
         lifecycleScope.launch {
-            viewModel.imageCount.observe(viewLifecycleOwner){
+            imageViewModel.imageCount.observe(viewLifecycleOwner){
                 binding.savedImageCount.text = getString(R.string.saved_image_count, it)
             }
         }
@@ -72,9 +73,9 @@ class AccountFragment : Fragment() {
 
 
     private fun loadLocations() {
-        viewModel.locations.observe(viewLifecycleOwner) { locations ->
+        mainScreenViewModel.locations.observe(viewLifecycleOwner) { locations ->
             Log.d(TAG, "${locations.size} in Acc fragment")
-            Log.d(TAG, "${viewModel.locationIndex}")
+            Log.d(TAG, "${mainScreenViewModel.locationIndex}")
             val currentItemCount = locationList?.childCount
             val max = locations.size
             if (max == 0 && currentItemCount == 0) {
@@ -158,7 +159,7 @@ class AccountFragment : Fragment() {
     private fun removeFixedItem(index: Int, location: LocationDto) {
         if (index >= 0 && index < locationList!!.childCount) {
             locationList?.removeViewAt(index)
-            viewModel.deleteLocation(location)
+            mainScreenViewModel.deleteLocation(location)
 
         }
     }
@@ -177,7 +178,7 @@ class AccountFragment : Fragment() {
         super.onDestroyView()
         locationList = null
         _binding = null
-        viewModel.locations.removeObservers(viewLifecycleOwner)
+        mainScreenViewModel.locations.removeObservers(viewLifecycleOwner)
     }
     companion object {
         @JvmStatic

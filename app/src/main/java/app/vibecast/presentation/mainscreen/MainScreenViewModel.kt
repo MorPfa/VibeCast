@@ -4,44 +4,32 @@ import android.annotation.SuppressLint
 import android.icu.text.SimpleDateFormat
 import android.icu.util.TimeZone
 import android.util.Log
-import android.widget.ImageView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import app.vibecast.data.TAGS.IMAGE_ERROR
 import app.vibecast.data.TAGS.WEATHER_ERROR
 import app.vibecast.data.data_repository.repository.Unit
 import app.vibecast.data.remote.LocationGetter
 import app.vibecast.domain.entity.CurrentWeather
 import app.vibecast.domain.entity.HourlyWeather
-import app.vibecast.domain.entity.ImageDto
 import app.vibecast.domain.entity.LocationDto
 import app.vibecast.domain.entity.LocationWithWeatherDataDto
 import app.vibecast.domain.entity.WeatherCondition
 import app.vibecast.domain.entity.WeatherDto
 import app.vibecast.domain.repository.DataStoreRepository
-import app.vibecast.domain.repository.ImageRepository
 import app.vibecast.domain.repository.LocationRepository
 import app.vibecast.domain.repository.WeatherRepository
 import app.vibecast.presentation.TAG
-import app.vibecast.presentation.image.ImageLoader
-import app.vibecast.presentation.image.ImagePicker
 import app.vibecast.presentation.permissions.LocationPermissionState
 import app.vibecast.presentation.weather.LocationModel
 import app.vibecast.presentation.weather.LocationWeatherModel
 import app.vibecast.presentation.weather.WeatherModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Date
@@ -56,9 +44,6 @@ class MainScreenViewModel @Inject constructor(
     private val locationGetter: LocationGetter,
     private val weatherRepository: WeatherRepository,
     private val locationRepository: LocationRepository,
-    private val imageRepository: ImageRepository,
-    private val imageLoader: ImageLoader,
-    private val imagePicker: ImagePicker,
     private val dataStoreRepository: DataStoreRepository
 ): ViewModel() {
 
@@ -70,74 +55,6 @@ class MainScreenViewModel @Inject constructor(
             }
         }
     }
-
-
-    private val _image = MutableLiveData<ImageDto>()
-    val image: LiveData<ImageDto> get() = _image
-
-    private val _imageCount = MutableLiveData(0)
-
-    val imageCount = _imageCount
-
-    fun setImageCountLiveData(){
-        viewModelScope.launch {
-            imageRepository.getLocalImages().collect{
-                withContext(Dispatchers.Main){
-                    _imageCount.value = it.size
-                }
-            }
-        }
-
-    }
-
-    fun pickDefaultImage(weatherCondition: String) : Int = imagePicker.pickDefaultImage(weatherCondition)
-
-    fun loadImageIntoImageView(url: String, imageView: ImageView) {
-        imageLoader.loadUrlIntoImageView(url, imageView)
-    }
-
-    fun loadImage(query: String, weatherCondition: String): Flow<ImageDto?> = flow {
-        emitAll(imagePicker.pickImage(query, weatherCondition).flowOn(Dispatchers.IO))
-    }.catch { e ->
-        Log.e(IMAGE_ERROR, "Error loading image: $e in ViewModel")
-        throw e
-    }
-
-    fun setImageLiveData(image: ImageDto) {
-        _image.value = image
-    }
-
-    fun addImage(imageDto: ImageDto) {
-        viewModelScope.launch {
-            try {
-                imageRepository.addImage(imageDto)
-            } catch (e: Exception) {
-                Log.e(IMAGE_ERROR,e.toString())
-                throw e
-            }
-        }
-    }
-
-    fun deleteImage(imageDto: ImageDto) {
-        viewModelScope.launch {
-            try {
-                imageRepository.deleteImage(imageDto)
-            } catch (e: Exception) {
-                Log.e(IMAGE_ERROR,e.toString())
-                throw e
-            }
-        }
-    }
-
-    fun getImageForDownload(query: String) : Flow<String> = flow {
-        imageRepository.getImageForDownload(query).collect{
-            emit(it)
-        }
-
-    }
-
-
-    val galleryImages: LiveData<List<ImageDto>> = imageRepository.getLocalImages().asLiveData()
 
     private val _currentWeather = MutableLiveData<LocationWeatherModel>()
     val currentWeather: LiveData<LocationWeatherModel> get() = _currentWeather

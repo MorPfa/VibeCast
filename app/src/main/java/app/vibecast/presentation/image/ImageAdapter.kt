@@ -8,6 +8,7 @@ import android.text.SpannableStringBuilder
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,13 +19,14 @@ import androidx.recyclerview.widget.RecyclerView
 import app.vibecast.R
 import app.vibecast.databinding.ItemCardviewBinding
 import app.vibecast.domain.entity.ImageDto
-import app.vibecast.presentation.mainscreen.MainScreenViewModel
+import app.vibecast.presentation.TAG
+import app.vibecast.presentation.navigation.ImageViewModel
 import java.lang.ref.WeakReference
 
 class ImageAdapter(
     private val imageLoader: ImageLoader,
     context: Context,
-    private val viewModel: MainScreenViewModel
+    private val viewModel: ImageViewModel
 ) : ListAdapter<ImageDto, ImageAdapter.PictureViewHolder>(ImageDiffCallback()) {
 
 
@@ -57,8 +59,9 @@ class ImageAdapter(
         imageLoader.loadUrlIntoImageView(image.urls.regular, holder.savedImage)
 
         val userName = image.user.name
-        val unsplashText = "Unsplash"
         val userUrl = image.user.attributionUrl
+
+        val unsplashText = "Unsplash"
         val unsplashUrl = "https://unsplash.com/?vibecast&utm_medium=referral"
         val userLink = SpannableString(userName)
         val unsplashLink = SpannableString(unsplashText)
@@ -82,13 +85,9 @@ class ImageAdapter(
             }
             userLink.setSpan(clickableSpanUser, 0, userName.length, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
             userLink.setSpan(linkColorSpanUser, 0, userName.length, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
-
             unsplashLink.setSpan(clickableSpanUnsplash, 0, unsplashText.length, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
             unsplashLink.setSpan(linkColorSpanUnsplash, 0, unsplashText.length, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
-
         }
-
-
         val spannableStringBuilder = SpannableStringBuilder()
             .append("Photo by ")
             .append(userLink)
@@ -104,6 +103,7 @@ class ImageAdapter(
 
     private fun openUrlInBrowser(context: Context, url: String) {
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        Log.d(TAG, url)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         context.startActivity(intent, null)
     }

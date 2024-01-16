@@ -15,6 +15,7 @@ import app.vibecast.R
 import app.vibecast.databinding.FragmentSavedLocationBinding
 import app.vibecast.domain.entity.LocationDto
 import app.vibecast.presentation.mainscreen.MainScreenViewModel
+import app.vibecast.presentation.navigation.ImageViewModel
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,7 +31,8 @@ class SavedLocationFragment : Fragment() {
     private var param2: String? = null
     private var _binding: FragmentSavedLocationBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: MainScreenViewModel by activityViewModels()
+    private val mainScreenViewModel: MainScreenViewModel by activityViewModels()
+    private val imageViewModel: ImageViewModel by activityViewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -49,12 +51,12 @@ class SavedLocationFragment : Fragment() {
     private fun observeImageData(city: String, weather: String) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                viewModel.loadImage(city, weather)
+                imageViewModel.loadImage(city, weather)
                     .collect { imageDto ->
                         imageDto!!.urls.regular.let { imageUrl ->
                             withContext(Dispatchers.Main) {
-                                viewModel.setImageLiveData(imageDto)
-                                viewModel.loadImageIntoImageView(
+                                imageViewModel.setImageLiveData(imageDto)
+                                imageViewModel.loadImageIntoImageView(
                                     imageUrl, binding.backgroundImageView
                                 )
                             }
@@ -67,7 +69,7 @@ class SavedLocationFragment : Fragment() {
                         getString(R.string.error_loading_image),
                         Snackbar.LENGTH_SHORT
                     )
-                    val image = viewModel.pickDefaultImage(weather)
+                    val image = imageViewModel.pickDefaultImage(weather)
                     binding.backgroundImageView.setImageDrawable(ContextCompat.getDrawable(requireContext(), image))
                     val snackbarView = snackbar.view
                     val snackbarText = snackbarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
@@ -83,15 +85,15 @@ class SavedLocationFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         lifecycleScope.launch {
             val mediatorLiveData = MediatorLiveData<Pair<List<LocationDto>, Int>>()
-            mediatorLiveData.addSource(viewModel.locations) { locations ->
-                val locationIndex = viewModel.locationIndex.value
+            mediatorLiveData.addSource(mainScreenViewModel.locations) { locations ->
+                val locationIndex = mainScreenViewModel.locationIndex.value
                 if (locationIndex != null) {
                     mediatorLiveData.value = Pair(locations, locationIndex)
                 }
             }
 
-            mediatorLiveData.addSource(viewModel.locationIndex) { locationIndex ->
-                val locations = viewModel.locations.value
+            mediatorLiveData.addSource(mainScreenViewModel.locationIndex) { locationIndex ->
+                val locations = mainScreenViewModel.locations.value
                 if (locations != null) {
                     mediatorLiveData.value = Pair(locations, locationIndex)
                 }
@@ -113,8 +115,8 @@ class SavedLocationFragment : Fragment() {
                     binding.nextScreenButton.visibility = View.VISIBLE
                     binding.nextScreenButton.setOnClickListener {
                        requireActivity().invalidateOptionsMenu()
-                        viewModel.getSavedLocationWeather()
-                        viewModel.incrementIndex()
+                        mainScreenViewModel.getSavedLocationWeather()
+                        mainScreenViewModel.incrementIndex()
                     }
                 }
 
@@ -125,8 +127,8 @@ class SavedLocationFragment : Fragment() {
                     binding.prevScreenButton.visibility =  View.VISIBLE
                     binding.prevScreenButton.setOnClickListener {
                         requireActivity().invalidateOptionsMenu()
-                        viewModel.getSavedLocationWeather()
-                        viewModel.decrementIndex()
+                        mainScreenViewModel.getSavedLocationWeather()
+                        mainScreenViewModel.decrementIndex()
                     }
                 }
 
@@ -135,7 +137,7 @@ class SavedLocationFragment : Fragment() {
         }
 
         lifecycleScope.launch {
-            viewModel.savedWeather.observe(viewLifecycleOwner) { weatherData ->
+            mainScreenViewModel.savedWeather.observe(viewLifecycleOwner) { weatherData ->
                 weatherData.weather.currentWeather?.let { currentWeather ->
                     val city = weatherData.location.cityName
                     val weather =
@@ -193,7 +195,7 @@ class SavedLocationFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-        viewModel.resetIndex()
+        mainScreenViewModel.resetIndex()
 
     }
 

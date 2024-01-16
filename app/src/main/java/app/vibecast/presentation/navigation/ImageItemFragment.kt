@@ -25,14 +25,13 @@ import app.vibecast.domain.entity.ImageDto
 import app.vibecast.presentation.TAG
 import app.vibecast.presentation.image.ImageLoader
 import app.vibecast.presentation.image.ImageSaver
-import app.vibecast.presentation.mainscreen.MainScreenViewModel
 import kotlinx.coroutines.launch
 import java.util.Date
 import java.util.Locale
 
 private const val IMAGE = "image"
 class ImageItemFragment : DialogFragment() {
-    private val viewModel: MainScreenViewModel by activityViewModels()
+    private val viewModel: ImageViewModel by activityViewModels()
     private var image: ImageDto? = null
 
 
@@ -121,6 +120,7 @@ class ImageItemFragment : DialogFragment() {
 
     private fun openUrlInBrowser(url: String) {
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        Log.d(TAG, url)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         context?.startActivity(intent, null)
     }

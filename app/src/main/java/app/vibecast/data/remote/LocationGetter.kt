@@ -14,9 +14,6 @@ class LocationGetter@Inject constructor(
      val client = LocationServices.getFusedLocationProviderClient(context)
 
     fun isPermissionGranted() : Boolean {
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            return true
-        }
-        return false
+        return ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
     }
 }
