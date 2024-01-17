@@ -59,6 +59,7 @@ class LocationRepositoryImpl @Inject constructor(
                     longitude = 0.0,
                     dataTimestamp = System.currentTimeMillis(),
                     timezone = "",
+                    unit = null,
                     currentWeather = null,
                     hourlyWeather = null
                 )

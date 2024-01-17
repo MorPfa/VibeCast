@@ -7,10 +7,10 @@ import android.util.Log
 import app.vibecast.data.TAGS.WEATHER_ERROR
 import app.vibecast.data.data_repository.data_source.local.LocalWeatherDataSource
 import app.vibecast.data.data_repository.data_source.remote.RemoteWeatherDataSource
-import app.vibecast.data.remote.network.weather.CoordinateApiModel
 import app.vibecast.domain.entity.LocationDto
 import app.vibecast.domain.entity.LocationWithWeatherDataDto
 import app.vibecast.domain.entity.WeatherDto
+import app.vibecast.domain.repository.DataStoreRepository
 import app.vibecast.domain.repository.WeatherRepository
 import app.vibecast.presentation.TAG
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -27,6 +27,7 @@ import kotlin.coroutines.cancellation.CancellationException
 class WeatherRepositoryImpl @Inject constructor(
     private val remoteWeatherDataSource: RemoteWeatherDataSource,
     private val localWeatherDataSource: LocalWeatherDataSource,
+    private val dataStoreRepository: DataStoreRepository,
     @ApplicationContext private val appContext: Context
 ) : WeatherRepository{
 
@@ -49,7 +50,12 @@ class WeatherRepositoryImpl @Inject constructor(
             val localWeatherFlow = localWeatherDataSource.getWeather(cityName)
             localWeatherFlow.collect { weatherData ->
                 val timestamp = weatherData.dataTimestamp
-                if (isDataOutdated(timestamp) && isInternetAvailable(appContext)){
+                if (
+                    (isDataOutdated(timestamp) && isInternetAvailable(appContext))
+                    ||
+                    (isWrongUnit(weatherData.unit) && isInternetAvailable(appContext))
+                )
+                {
                     throw DataOutdatedException("Timestamp: $timestamp current time: ${System.currentTimeMillis()}")
                 }
                 else {
@@ -90,7 +96,12 @@ class WeatherRepositoryImpl @Inject constructor(
                         val localWeatherFlow = localWeatherDataSource.getWeather(cityName)
                         localWeatherFlow.collect { weatherData ->
                             val timestamp = weatherData.dataTimestamp
-                            if (isDataOutdated(timestamp) && isInternetAvailable(appContext)){
+                            if (
+                                (isDataOutdated(timestamp) && isInternetAvailable(appContext))
+                                ||
+                                (isWrongUnit(weatherData.unit) && isInternetAvailable(appContext))
+                                )
+                            {
                                 throw DataOutdatedException("Timestamp: $timestamp current time: ${System.currentTimeMillis()}")
                             }
                             else {
@@ -178,7 +189,10 @@ class WeatherRepositoryImpl @Inject constructor(
         return difference > outdatedThreshold
     }
 
-
+    private suspend fun isWrongUnit(unit : Unit?) : Boolean{
+        val previousUnit = dataStoreRepository.getUnit()
+        return unit?.name != previousUnit?.name
+    }
 
 
 

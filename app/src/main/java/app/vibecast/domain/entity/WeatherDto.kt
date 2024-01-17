@@ -1,5 +1,6 @@
 package app.vibecast.domain.entity
 
+import app.vibecast.data.data_repository.repository.Unit
 
 
 data class WeatherDto(
@@ -9,6 +10,7 @@ data class WeatherDto(
     val longitude: Double,
     val dataTimestamp : Long,
     val timezone : String,
+    val unit : Unit?,
     val currentWeather: CurrentWeather?,
     val hourlyWeather: List<HourlyWeather>?
 )

@@ -34,6 +34,7 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
 ) : RemoteWeatherDataSource {
 
 
+    private var preferredUnit : Unit? = null
     override fun getCity(lat: Double, lon: Double): Flow<CityApiModel> = flow {
         try {
             val locationInfo = weatherService.getCiyName(lat, lon, 1, BuildConfig.OWM_KEY)
@@ -70,9 +71,8 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
         getCoordinates(cityName)
             .collect {
                 try {
-                    val weatherData: WeatherApiModel
-                    val preferredUnit = dataStoreRepository.getUnit()
-                    weatherData = when (preferredUnit) {
+                    preferredUnit = dataStoreRepository.getUnit()
+                    val weatherData: WeatherApiModel = when (preferredUnit) {
                         Unit.IMPERIAL -> weatherService.getWeather(
                             it.latitude,
                             it.longitude,
@@ -101,7 +101,7 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
                     }
                     val combinedData = LocationWithWeatherDataDto(
                         LocationDto(it.name, it.country),
-                        weatherData.toWeatherDto()
+                        weatherData.toWeatherDto(preferredUnit)
                     )
                     emit(combinedData)
                 } catch (e: HttpException) {
@@ -116,9 +116,8 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
 
     override fun getWeather(lat: Double, lon: Double): Flow<LocationWithWeatherDataDto> = flow {
         try {
-            val weatherData: WeatherApiModel
-            val preferredUnit = dataStoreRepository.getUnit()
-            weatherData = when (preferredUnit) {
+            preferredUnit = dataStoreRepository.getUnit()
+            val weatherData: WeatherApiModel = when (preferredUnit) {
                 Unit.IMPERIAL -> weatherService.getWeather(
                     lat,
                     lon,
@@ -145,7 +144,7 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
             }
             emit(LocationWithWeatherDataDto(LocationDto(
                 weatherData.cityName, ""),
-                weatherData.toWeatherDto()))
+                weatherData.toWeatherDto(preferredUnit)))
         } catch (e: HttpException) {
             Log.e(WEATHER_ERROR, "$e in DataSource")
             throw WeatherFetchException("HTTP error fetching weather data", e)
@@ -162,7 +161,7 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
 
     companion object {
     //Converting Api response data to domain layer entity
-    fun WeatherApiModel.toWeatherDto(): WeatherDto {
+    fun WeatherApiModel.toWeatherDto(preferredUnit: Unit?): WeatherDto {
         return WeatherDto(
             cityName =cityName,
             country = "",
@@ -170,6 +169,7 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
             longitude = longitude,
             dataTimestamp = System.currentTimeMillis(),
             timezone = timezone,
+            unit = preferredUnit,
             currentWeather = currentWeatherRemote.toCurrentWeather(),
             hourlyWeather = hourlyWeather.map { it.toHourlyWeather() }
         )

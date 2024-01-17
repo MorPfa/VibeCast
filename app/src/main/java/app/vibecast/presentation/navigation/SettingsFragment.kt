@@ -16,6 +16,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import app.vibecast.data.data_repository.repository.Unit
+import app.vibecast.presentation.mainscreen.MainScreenViewModel
 
 
 private const val ARG_PARAM1 = "param1"
@@ -32,6 +33,7 @@ class SettingsFragment : Fragment() {
     private var _binding: FragmentSettingsBinding? = null
     private lateinit var permissionHelper: PermissionHelper
     private val viewModel : DataStoreViewModel by activityViewModels()
+    private val mainScreenViewModel: MainScreenViewModel by activityViewModels()
 
     private val binding get() = _binding!!
     private var param1: String? = null
@@ -93,6 +95,8 @@ class SettingsFragment : Fragment() {
                 else -> Unit.IMPERIAL // Default to imperial if none is selected
             }
             viewModel.storeUnit(selectedUnit)
+            mainScreenViewModel.loadCurrentLocationWeather()
+
         }
     }
 
