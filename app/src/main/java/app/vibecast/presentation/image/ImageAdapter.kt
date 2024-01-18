@@ -62,7 +62,7 @@ class ImageAdapter(
         val userUrl = image.user.attributionUrl
 
         val unsplashText = "Unsplash"
-        val unsplashUrl = "https://unsplash.com/?vibecast&utm_medium=referral"
+        val unsplashUrl = "https://unsplash.com/?utm_source=vibecast&utm_medium=referral"
         val userLink = SpannableString(userName)
         val unsplashLink = SpannableString(unsplashText)
 

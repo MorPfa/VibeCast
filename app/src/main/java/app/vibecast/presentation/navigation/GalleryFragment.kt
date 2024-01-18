@@ -4,19 +4,24 @@ package app.vibecast.presentation.navigation
 
 import android.app.Activity
 import android.content.Context
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowInsets
+import androidx.databinding.DataBindingUtil.setContentView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import app.vibecast.R
 import app.vibecast.databinding.FragmentPicturesBinding
 import app.vibecast.domain.entity.ImageDto
+import app.vibecast.presentation.TAG
 import app.vibecast.presentation.image.ImageAdapter
 import app.vibecast.presentation.image.ImageLoader
 import kotlin.math.pow
@@ -48,6 +53,7 @@ class GalleryFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        Log.d(TAG, resources.configuration.orientation.toString())
         _binding = FragmentPicturesBinding.inflate(inflater,container,false)
         val recyclerView: RecyclerView = binding.recyclerView
         val imageLoader = ImageLoader(requireContext())
@@ -95,6 +101,9 @@ class GalleryFragment : Fragment() {
         }
     }
 
+
+
+
     private fun dpToPixels(context: Context, dp: Int): Int {
         val density = context.resources.displayMetrics.density
         return (dp * density).toInt()
@@ -104,6 +113,7 @@ class GalleryFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+        Log.d(TAG, "ondestroy called")
     }
 
     companion object {

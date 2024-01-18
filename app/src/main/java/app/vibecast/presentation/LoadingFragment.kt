@@ -1,6 +1,8 @@
 package app.vibecast.presentation
 
 
+import android.annotation.SuppressLint
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -25,12 +27,15 @@ class LoadingFragment : Fragment() {
     private var _binding: FragmentLoadingBinding? = null
     private val binding get() = _binding!!
     private lateinit var actionBar: ActionBar
+
+    @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
+        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
     }
 
     override fun onCreateView(
@@ -49,17 +54,24 @@ class LoadingFragment : Fragment() {
 
 
         Handler(Looper.getMainLooper()).postDelayed({
-            navigateToNextScreen()
+            if (isAdded) {
+                navigateToNextScreen()
+            }
         }, 2200)
+
     }
     private fun navigateToNextScreen() {
-        findNavController().navigate(R.id.action_splashFragment_to_nav_home)
+        if (isAdded) {
+            findNavController().navigate(R.id.action_splashFragment_to_nav_home)
+        }
     }
+
 
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
     companion object {
         @JvmStatic

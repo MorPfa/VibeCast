@@ -1,24 +1,17 @@
 
 
 Today:
-fix landscape orientation for gallery fragment
-fix top of image card in gallery fragment
--> both of those can be fixed by fixing the way the fragment/ activity gets recreated on config changes
-
-
-
-
-
-
-
-
-Make it so that when the user changes units, the change gets shown once they leave settings screen
-Make another attempt at autocomplete but with autocomplete intent
-
-
-Allow user to choose themes
 fix bug where image gets updated twice
 optimize image accuracy (maybe go back to GET /search/photos endpoint and combine query with collections)
+fix placeholders in different resource qualifiers
+
+
+
+
+Make another attempt at autocomplete but with autocomplete intent
+
 (re)write unit tests
+implement spotify API
+implement firebase auth
 
 

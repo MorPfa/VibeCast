@@ -1,5 +1,7 @@
 package app.vibecast.presentation
 
+import android.annotation.SuppressLint
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -28,7 +30,8 @@ class SearchResultFragment : Fragment() {
 
     private var param1: String? = null
     private var param2: String? = null
-    private lateinit var binding : FragmentSearchResultBinding
+    private var _binding: FragmentSearchResultBinding? = null
+    private val binding get() = _binding!!
     private val mainScreenViewModel: MainScreenViewModel by activityViewModels()
     private val imageViewModel: ImageViewModel by activityViewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,11 +46,13 @@ class SearchResultFragment : Fragment() {
         }
     }
 
+    @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentSearchResultBinding.inflate(inflater, container, false)
+        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        _binding = FragmentSearchResultBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -86,7 +91,6 @@ class SearchResultFragment : Fragment() {
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-
         super.onViewCreated(view, savedInstanceState)
         mainScreenViewModel.currentWeather.observe(viewLifecycleOwner) { weatherData ->
             weatherData.weather.currentWeather?.let { currentWeather ->
@@ -142,6 +146,12 @@ class SearchResultFragment : Fragment() {
 
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+        mainScreenViewModel.resetIndex()
+        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+    }
     companion object {
         @JvmStatic
         fun newInstance(param1: String, param2: String) =

@@ -29,7 +29,6 @@
             android:name=".presentation.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.VibeCast"
-            android:configChanges="orientation|screenSize"
             >
 
             <intent-filter>

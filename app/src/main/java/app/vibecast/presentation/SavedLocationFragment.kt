@@ -1,5 +1,7 @@
 package app.vibecast.presentation
 
+import android.annotation.SuppressLint
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -40,11 +42,12 @@ class SavedLocationFragment : Fragment() {
             param2 = it.getString(ARG_PARAM2)
         }
     }
-
+    @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         _binding = FragmentSavedLocationBinding.inflate(inflater,container,false)
         return binding.root
     }
@@ -196,7 +199,7 @@ class SavedLocationFragment : Fragment() {
         super.onDestroyView()
         _binding = null
         mainScreenViewModel.resetIndex()
-
+        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
 
     companion object {

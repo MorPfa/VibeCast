@@ -10,7 +10,7 @@
     <ImageView
         android:id="@+id/saved_image"
         android:layout_width="match_parent"
-        android:layout_height="160dp"
+        android:layout_height="120dp"
         android:paddingTop="16dp"
         android:contentDescription="@string/saved_image"
         android:scaleType="centerCrop"

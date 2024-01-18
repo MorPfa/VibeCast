@@ -57,6 +57,7 @@ class AccountFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+
         _binding = FragmentAccountBinding.inflate(inflater,container,false)
         locationList = binding.savedLocations
 
@@ -138,13 +139,11 @@ class AccountFragment : Fragment() {
 
 
         removeButton.setOnClickListener {
-
             removeFixedItem(index, location)
             alertDialog?.dismiss()
         }
 
         cancelButton.setOnClickListener {
-
             alertDialog?.dismiss()
         }
 
@@ -173,6 +172,10 @@ class AccountFragment : Fragment() {
         return item
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()
