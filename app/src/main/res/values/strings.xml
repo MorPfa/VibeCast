@@ -108,6 +108,13 @@
     <string name="error_loading_image">Error loading Image for desired location</string>
     <string name="invalid_query_input">Could not find results for this input</string>
     <string name="downloadBtn">Download</string>
+    <string name="confirm_location_removal">Do you want to remove this saved location?</string>
+    <string name="remove">Remove</string>
+    <string name="cancel">Cancel</string>
+    <string name="rewind_current_song">Rewind current song</string>
+    <string name="cover_art_description">Cover art of current album</string>
+    <string name="skip_to_next_song">Skip to next song</string>
+    <string name="pause_or_resume_current_song">Pause or resume current song</string>
 
 
 </resources>

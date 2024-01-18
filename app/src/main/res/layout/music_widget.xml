@@ -19,6 +19,7 @@
 
         <ImageView
             android:layout_weight="1"
+            android:contentDescription="@string/cover_art_description"
             android:id="@+id/albumArtImageView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -44,7 +45,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAlignment="center"
-            android:text="Song Title"
+            android:text="@string/loading_placeholder"
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -57,7 +58,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/songTitleTextView"
             android:layout_marginTop="4dp"
-            android:text="Artist Name"
+            android:text="@string/loading_placeholder"
             android:textSize="14sp" />
 
         <ProgressBar
@@ -79,6 +80,7 @@
 
             <ImageButton
                 android:id="@+id/rewindButton"
+                android:contentDescription="@string/rewind_current_song"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:background="@drawable/previous_track_btn"
@@ -86,6 +88,7 @@
 
             <ImageButton
                 android:id="@+id/playPauseButton"
+                android:contentDescription="@string/pause_or_resume_current_song"
                 android:layout_width="42dp"
                 android:layout_height="40dp"
                 android:background="@drawable/play_button"
@@ -93,6 +96,7 @@
 
             <ImageButton
                 android:id="@+id/forwardButton"
+                android:contentDescription="@string/skip_to_next_song"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:background="@drawable/next_track_btn"

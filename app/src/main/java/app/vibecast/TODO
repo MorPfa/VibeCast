@@ -3,7 +3,7 @@
 Today:
 fix bug where image gets updated twice
 optimize image accuracy (maybe go back to GET /search/photos endpoint and combine query with collections)
-fix placeholders in different resource qualifiers
+
 
 
 

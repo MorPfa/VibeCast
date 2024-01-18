@@ -44,7 +44,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
-                android:text="@string/feels_like"
+                android:text="@string/loading_placeholder"
                 android:textAlignment="textStart"
                 android:textColor="#FFFFFF"
                 android:textSize="20sp" />
@@ -54,7 +54,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
-                android:text="@string/wind_speed"
+                android:text="@string/loading_placeholder"
                 android:textAlignment="textStart"
                 android:textColor="#FFFFFF"
                 android:textSize="20sp" />
@@ -64,7 +64,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
-                android:text="@string/visibility"
+                android:text="@string/loading_placeholder"
                 android:textAlignment="textStart"
                 android:textColor="#FFFFFF"
                 android:textSize="20sp" />
@@ -74,7 +74,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
-                android:text="@string/chance_of_rain"
+                android:text="@string/loading_placeholder"
                 android:textAlignment="textStart"
                 android:textColor="#FFFFFF"
                 android:textSize="20sp" />
@@ -84,7 +84,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
-                android:text="@string/uv_index_value"
+                android:text="@string/loading_placeholder"
                 android:textAlignment="textStart"
                 android:textColor="#FFFFFF"
                 android:textSize="20sp" />
@@ -94,7 +94,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
-                android:text="@string/humidity"
+                android:text="@string/loading_placeholder"
                 android:textAlignment="textStart"
                 android:textColor="#FFFFFF"
                 android:textSize="20sp" />
