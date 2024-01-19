@@ -103,7 +103,6 @@ class ImageAdapter(
 
     private fun openUrlInBrowser(context: Context, url: String) {
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-        Log.d(TAG, url)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         context.startActivity(intent, null)
     }

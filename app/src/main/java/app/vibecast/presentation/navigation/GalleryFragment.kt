@@ -53,7 +53,6 @@ class GalleryFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        Log.d(TAG, resources.configuration.orientation.toString())
         _binding = FragmentPicturesBinding.inflate(inflater,container,false)
         val recyclerView: RecyclerView = binding.recyclerView
         val imageLoader = ImageLoader(requireContext())
@@ -113,7 +112,6 @@ class GalleryFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-        Log.d(TAG, "ondestroy called")
     }
 
     companion object {

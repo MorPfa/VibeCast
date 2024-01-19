@@ -11,6 +11,7 @@ import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import app.vibecast.R
@@ -92,7 +93,7 @@ class SearchResultFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mainScreenViewModel.currentWeather.observe(viewLifecycleOwner) { weatherData ->
+        mainScreenViewModel.searchedWeather.distinctUntilChanged().observe(viewLifecycleOwner) { weatherData ->
             weatherData.weather.currentWeather?.let { currentWeather ->
                 val city = weatherData.location.cityName
                 val weather =
@@ -150,6 +151,7 @@ class SearchResultFragment : Fragment() {
         super.onDestroyView()
         _binding = null
         mainScreenViewModel.resetIndex()
+        mainScreenViewModel.searchedWeather.removeObservers(this)
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
     companion object {

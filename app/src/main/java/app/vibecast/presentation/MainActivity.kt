@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.MediatorLiveData
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -47,7 +48,6 @@ class MainActivity : AppCompatActivity() {
     private val mainScreenViewModel : MainScreenViewModel by viewModels()
     private val imageViewModel : ImageViewModel by viewModels()
     private lateinit var currentImage : ImageDto
-    private lateinit var currentLocation : LocationDto
     private var showIcons : Boolean = true
     private lateinit var permissionHelper: PermissionHelper
 
@@ -100,15 +100,6 @@ class MainActivity : AppCompatActivity() {
                                         invalidateOptionsMenu()
                 }
             }
-        }
-
-
-        mainScreenViewModel.currentWeather.observe(this){
-            currentLocation = LocationDto(it.location.cityName, it.location.country)
-
-        }
-        imageViewModel.image.observe(this){
-            currentImage = it
         }
 
     }
@@ -195,6 +186,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     snackbar.show()
                 }
+                invalidateOptionsMenu()
                 return true
             }
             override fun onQueryTextChange(newText: String): Boolean {
@@ -205,9 +197,10 @@ class MainActivity : AppCompatActivity() {
         return true
     }
     fun isInputValid(input: String): Boolean {
-        val validCharacters = Regex("[a-zA-Z]+")
-        return input.matches(validCharacters)
+        val validCharactersWithSpaces = Regex("[a-zA-Z ]+")
+        return input.matches(validCharactersWithSpaces)
     }
+
 
     fun getActionBarHeight(): Int {
         val typedValue = TypedValue()
@@ -259,11 +252,12 @@ class MainActivity : AppCompatActivity() {
                 if (item.isCheckable) {
                     if (!item.isChecked) {
                         item.isChecked = true
-                        mainScreenViewModel.addLocation(mainScreenViewModel.currentWeather.value!!.location)
+
+                        mainScreenViewModel.addLocation(mainScreenViewModel.currentLocation.value!!)
                         item.icon = ContextCompat.getDrawable(this, R.drawable.delete_location_icon)
                     } else {
                         item.isChecked = false
-                        mainScreenViewModel.deleteLocation(currentLocation)
+                        mainScreenViewModel.deleteLocation(mainScreenViewModel.currentLocation.value!!)
                         item.icon = ContextCompat.getDrawable(this, R.drawable.save_location_icon)
                     }
                 }

@@ -27,7 +27,7 @@ class AccountViewModel @Inject constructor(
         locationRepository.deleteLocation(LocationDto(location.cityName, location.country))
     }
 
-    var savedLocations : LiveData<List<LocationDto>> = locationRepository.getLocations().asLiveData()
+    var savedLocations : LiveData<List<LocationModel>> = locationRepository.getLocations().asLiveData()
 
 
     private fun WeatherModel.WeatherCondition.toWeatherConditionDto(): WeatherCondition {

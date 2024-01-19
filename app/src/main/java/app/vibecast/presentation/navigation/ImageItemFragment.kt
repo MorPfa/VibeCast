@@ -120,7 +120,6 @@ class ImageItemFragment : DialogFragment() {
 
     private fun openUrlInBrowser(url: String) {
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-        Log.d(TAG, url)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         context?.startActivity(intent, null)
     }

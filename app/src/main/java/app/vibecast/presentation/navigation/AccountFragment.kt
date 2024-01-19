@@ -20,6 +20,7 @@ import app.vibecast.databinding.FragmentAccountBinding
 import app.vibecast.domain.entity.LocationDto
 import app.vibecast.presentation.TAG
 import app.vibecast.presentation.mainscreen.MainScreenViewModel
+import app.vibecast.presentation.weather.LocationModel
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.circularreveal.cardview.CircularRevealCardView
 import dagger.hilt.android.AndroidEntryPoint
@@ -75,8 +76,6 @@ class AccountFragment : Fragment() {
 
     private fun loadLocations() {
         mainScreenViewModel.locations.observe(viewLifecycleOwner) { locations ->
-            Log.d(TAG, "${locations.size} in Acc fragment")
-            Log.d(TAG, "${mainScreenViewModel.locationIndex}")
             val currentItemCount = locationList?.childCount
             val max = locations.size
             if (max == 0 && currentItemCount == 0) {
@@ -92,7 +91,7 @@ class AccountFragment : Fragment() {
             }
         }
     }
-    private fun createItemView(index: Int, locations: List<LocationDto>): View {
+    private fun createItemView(index: Int, locations: List<LocationModel>): View {
         val item = TextView(requireContext())
         val formattedLocation = locations.getOrNull(index)?.cityName
                                 .plus(" - ")
@@ -126,7 +125,7 @@ class AccountFragment : Fragment() {
     }
     private var alertDialog: AlertDialog? = null
 
-    private fun showDeleteConfirmationDialog(index: Int, location: LocationDto) {
+    private fun showDeleteConfirmationDialog(index: Int, location: LocationModel) {
         val alertDialogBuilder = AlertDialog.Builder(requireContext())
         val customView = LayoutInflater.from(requireContext()).inflate(R.layout.confirm_delete_dialog, null)
         val cardView = customView.findViewById<CircularRevealCardView>(R.id.dialog_card)
@@ -140,6 +139,9 @@ class AccountFragment : Fragment() {
 
         removeButton.setOnClickListener {
             removeFixedItem(index, location)
+            Log.d(TAG, "clicked")
+            Log.d(TAG, location.cityName)
+
             alertDialog?.dismiss()
         }
 
@@ -155,7 +157,7 @@ class AccountFragment : Fragment() {
 
 
 
-    private fun removeFixedItem(index: Int, location: LocationDto) {
+    private fun removeFixedItem(index: Int, location: LocationModel) {
         if (index >= 0 && index < locationList!!.childCount) {
             locationList?.removeViewAt(index)
             mainScreenViewModel.deleteLocation(location)

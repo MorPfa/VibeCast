@@ -6,10 +6,13 @@ import app.vibecast.domain.entity.LocationDto
 import app.vibecast.domain.entity.LocationWithWeatherDataDto
 import app.vibecast.domain.entity.WeatherDto
 import app.vibecast.domain.repository.LocationRepository
+import app.vibecast.presentation.weather.LocationModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.launch
@@ -68,11 +71,26 @@ class LocationRepositoryImpl @Inject constructor(
     }
 
 
-    override fun getLocations(): Flow<List<LocationDto>> =  localLocationDataSource.getLocations()
+    override fun getLocations(): Flow<List<LocationModel>> = flow {
+        localLocationDataSource.getLocations().collect{
+            emit(it.toLocationModels())
+        }
+    }
+
+
+    private fun List<LocationDto>.toLocationModels(): List<LocationModel> {
+        return map { locationDto ->
+            LocationModel(
+                cityName = locationDto.cityName,
+                country = locationDto.country
+            )
+        }
+    }
 
     override fun getLocation(cityName: String): Flow<LocationDto> = localLocationDataSource.getLocation(cityName)
 
-    override fun addLocation(location: LocationDto) =  CoroutineScope(Dispatchers.Main).launch {
+    override fun addLocation(location: LocationDto) =
+        CoroutineScope(Dispatchers.Main).launch {
         localLocationDataSource.addLocation(location)
     }
 

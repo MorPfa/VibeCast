@@ -18,6 +18,7 @@ import app.vibecast.databinding.FragmentSavedLocationBinding
 import app.vibecast.domain.entity.LocationDto
 import app.vibecast.presentation.mainscreen.MainScreenViewModel
 import app.vibecast.presentation.navigation.ImageViewModel
+import app.vibecast.presentation.weather.LocationModel
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -87,7 +88,7 @@ class SavedLocationFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         lifecycleScope.launch {
-            val mediatorLiveData = MediatorLiveData<Pair<List<LocationDto>, Int>>()
+            val mediatorLiveData = MediatorLiveData<Pair<List<LocationModel>, Int>>()
             mediatorLiveData.addSource(mainScreenViewModel.locations) { locations ->
                 val locationIndex = mainScreenViewModel.locationIndex.value
                 if (locationIndex != null) {
@@ -139,7 +140,6 @@ class SavedLocationFragment : Fragment() {
             }
         }
 
-        lifecycleScope.launch {
             mainScreenViewModel.savedWeather.observe(viewLifecycleOwner) { weatherData ->
                 weatherData.weather.currentWeather?.let { currentWeather ->
                     val city = weatherData.location.cityName
@@ -190,7 +190,6 @@ class SavedLocationFragment : Fragment() {
                         )
 
                 }
-            }
         }
     }
 

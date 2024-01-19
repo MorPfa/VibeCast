@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import app.vibecast.R
@@ -119,7 +120,7 @@ class MainScreenFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         lifecycleScope.launch {
-            mainScreenViewModel.currentWeather.observe(viewLifecycleOwner) { weatherData ->
+            mainScreenViewModel.currentWeather.distinctUntilChanged().observe(viewLifecycleOwner) { weatherData ->
                     weatherData.weather.currentWeather?.let { currentWeather ->
                         val city = weatherData.location.cityName
                         val weather =

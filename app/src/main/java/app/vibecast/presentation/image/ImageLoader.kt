@@ -1,8 +1,10 @@
 package app.vibecast.presentation.image
 
 import android.content.Context
+import android.util.Log
 import android.widget.ImageView
 import app.vibecast.R
+import app.vibecast.presentation.TAG
 import com.bumptech.glide.Glide
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject

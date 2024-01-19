@@ -7,6 +7,8 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.distinctUntilChanged
+import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import app.vibecast.data.TAGS.WEATHER_ERROR
 import app.vibecast.data.data_repository.repository.Unit
@@ -46,7 +48,6 @@ class MainScreenViewModel @Inject constructor(
     private val locationRepository: LocationRepository,
     private val dataStoreRepository: DataStoreRepository
 ): ViewModel() {
-
     init {
         viewModelScope.launch {
             locationRepository.getLocations().collect { locations ->
@@ -57,96 +58,16 @@ class MainScreenViewModel @Inject constructor(
     }
 
     private val _currentWeather = MutableLiveData<LocationWeatherModel>()
-    val currentWeather: LiveData<LocationWeatherModel> get() = _currentWeather
+    val currentWeather: LiveData<LocationWeatherModel> get() = _currentWeather.distinctUntilChanged()
 
-    private val _savedWeather = MutableLiveData<LocationWeatherModel>()
-    val savedWeather: LiveData<LocationWeatherModel> get() = _savedWeather
-
-
-    fun getSearchedLocationWeather(query: String) {
-        viewModelScope.launch(Dispatchers.Main) {
-            try {
-                weatherRepository.getSearchedWeather(query).collect { data ->
-                    try {
-                        val weatherData = convertWeatherDtoToWeatherModel(data.weather)
-                        _currentWeather.value = LocationWeatherModel(
-                            location = LocationModel(data.location.cityName, data.location.country),
-                            weather = weatherData
-                        )
-                    } catch (e: Exception) {
-                        Log.d(WEATHER_ERROR, "$query viewmodel")
-                        throw e
-                    }
-                }
-            } catch (e: Exception) {
-                Log.d(WEATHER_ERROR, "$query viewmodel")
-                throw e
+    fun loadCurrentLocationWeather() {
+        viewModelScope.launch(Dispatchers.IO)  {
+            when (locationPermissionState.value) {
+                LocationPermissionState.Granted -> handleLocationGranted()
+                else -> handleLocationDenied()
             }
         }
     }
-
-
-
-    private var _locations = MutableLiveData<List<LocationDto>>()
-    val locations: LiveData<List<LocationDto>> get() = _locations
-
-
-    fun addLocation(location: LocationModel) {
-        locationRepository.addLocation(LocationDto(location.cityName, location.country))
-    }
-
-    fun deleteLocation(location: LocationDto) {
-        locationRepository.deleteLocation(LocationDto(location.cityName, location.country))
-    }
-
-    private var _locationIndex = MutableLiveData(0)
-
-    val locationIndex: LiveData<Int> get() = _locationIndex
-
-    fun incrementIndex() {
-        _locationIndex.value = _locationIndex.value?.plus(1)
-    }
-
-    fun decrementIndex() {
-        _locationIndex.value = _locationIndex.value?.minus(1)
-    }
-
-    fun resetIndex(){
-        _locationIndex.value = 0
-    }
-
-    fun getSavedLocationWeather() {
-        viewModelScope.launch {
-            try {
-                locationRepository.getLocations().distinctUntilChanged().collect { locations ->
-                    if (locationIndex.value != null && locations.isNotEmpty()) {
-                        try {
-                            weatherRepository.getWeather(locations[locationIndex.value!!].cityName).distinctUntilChanged()
-                                .collect { data ->
-                                    try {
-                                        val weatherData = convertWeatherDtoToWeatherModel(data.weather)
-                                        _savedWeather.value = LocationWeatherModel(
-                                            location = LocationModel(
-                                                data.location.cityName,
-                                                data.location.country
-                                            ),
-                                            weather = weatherData
-                                        )
-                                    } catch (e: Exception) {
-                                        handleError(e)
-                                    }
-                                }
-                        } catch (e: Exception) {
-                            handleError(e)
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                handleError(e)
-            }
-        }
-    }
-
 
     private val _locationPermissionState =
         MutableStateFlow<LocationPermissionState>(LocationPermissionState.Granted)
@@ -158,15 +79,6 @@ class MainScreenViewModel @Inject constructor(
     }
 
 
-    fun loadCurrentLocationWeather() {
-        viewModelScope.launch(Dispatchers.IO)  {
-            when (locationPermissionState.value) {
-                LocationPermissionState.Granted -> handleLocationGranted()
-                else -> handleLocationDenied()
-            }
-        }
-    }
-
     @SuppressLint("MissingPermission")
     private suspend fun handleLocationGranted() {
         locationGetter.client.lastLocation
@@ -174,7 +86,7 @@ class MainScreenViewModel @Inject constructor(
                 if (location != null) {
                     viewModelScope.launch(Dispatchers.IO) {
                         try {
-                            fetchWeatherData(location.latitude, location.longitude)
+                            fetchWeatherData(location.latitude, location.longitude, _currentWeather)
                         } catch (e: Exception) {
                             // Handle specific error for fetching weather data
                             handleError(e)
@@ -201,28 +113,40 @@ class MainScreenViewModel @Inject constructor(
         }
     }
 
-    private suspend fun fetchWeatherData(lat: Double, lon: Double) {
+
+    private suspend fun fetchWeatherData(
+        lat: Double,
+        lon: Double,
+        weatherLiveDataObj: MutableLiveData<LocationWeatherModel>
+    ) {
         try {
             weatherRepository.getWeather(lat, lon).collect { weatherData ->
-                updateWeatherData(weatherData)
+                updateWeatherData(weatherData, weatherLiveDataObj)
             }
         } catch (e: Exception) {
             handleError(e)
         }
     }
 
-    private suspend fun fetchDefaultWeatherData() {
-        val defaultLocation = getDefaultLocation()
+
+    private suspend fun fetchWeatherData(
+        cityName : String,
+        weatherLiveDataObj: MutableLiveData<LocationWeatherModel>
+    ) {
         try {
-            weatherRepository.getWeather(defaultLocation).collect { weatherData ->
-                updateWeatherData(weatherData)
+            weatherRepository.getWeather(cityName).collect { weatherData ->
+                updateWeatherData(weatherData, weatherLiveDataObj)
             }
         } catch (e: Exception) {
             handleError(e)
         }
     }
 
-    private suspend fun updateWeatherData(locationWithWeatherDataDto: LocationWithWeatherDataDto) {
+
+    private suspend fun updateWeatherData(
+        locationWithWeatherDataDto: LocationWithWeatherDataDto,
+        weatherLiveDataObj: MutableLiveData<LocationWeatherModel>
+    ) {
         try {
             val weatherData = convertWeatherDtoToWeatherModel(locationWithWeatherDataDto.weather)
             val locationData = LocationModel(
@@ -230,7 +154,8 @@ class MainScreenViewModel @Inject constructor(
                 locationWithWeatherDataDto.location.country
             )
             withContext(Dispatchers.Main){
-                _currentWeather.value = LocationWeatherModel(location = locationData, weather = weatherData)
+                weatherLiveDataObj.value = LocationWeatherModel(location = locationData, weather = weatherData)
+                setCurrLocation(locationData)
             }
         } catch (e: Exception) {
             handleError(e)
@@ -240,6 +165,133 @@ class MainScreenViewModel @Inject constructor(
     private fun getDefaultLocation(): String {
         return "Chicago"
     }
+
+
+
+    private val _searchedWeather = MutableLiveData<LocationWeatherModel>()
+    val searchedWeather: LiveData<LocationWeatherModel> get() = _searchedWeather.distinctUntilChanged()
+
+
+    fun getSearchedLocationWeather(query: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                weatherRepository.getSearchedWeather(query).collect { data ->
+                    try {
+//                        val weatherData = convertWeatherDtoToWeatherModel(data.weather)
+                        withContext(Dispatchers.Main){
+//                            val location = LocationModel(data.location.cityName, data.location.country)
+//                            _searchedWeather.value = LocationWeatherModel(
+//                            location = location,
+//                            weather = weatherData
+//                        )
+                            updateWeatherData(data, _searchedWeather)
+                        setCurrLocation(LocationModel(data.location.cityName, data.location.country))
+                        }
+                    } catch (e: Exception) {
+                        Log.d(WEATHER_ERROR, "$query viewmodel")
+                        throw e
+                    }
+                }
+            } catch (e: Exception) {
+                Log.d(WEATHER_ERROR, "$query viewmodel")
+                throw e
+            }
+        }
+    }
+
+
+    private val _savedWeather = MutableLiveData<LocationWeatherModel>()
+    val savedWeather: LiveData<LocationWeatherModel> get() = _savedWeather.distinctUntilChanged()
+
+
+    fun getSavedLocationWeather() {
+        viewModelScope.launch {
+            try {
+                locationRepository.getLocations().collect { locations ->
+                    if (locationIndex.value != null && locations.isNotEmpty()) {
+                        try {
+                            weatherRepository.getWeather(locations[locationIndex.value!!].cityName).distinctUntilChanged()
+                                .collect { data ->
+                                    try {
+//                                        val weatherData = convertWeatherDtoToWeatherModel(data.weather)
+//                                        val location = LocationModel(
+//                                            data.location.cityName,
+//                                            data.location.country
+//                                        )
+//                                        _savedWeather.value = LocationWeatherModel(
+//                                            location = location,
+//                                            weather = weatherData
+//                                        )
+                                        updateWeatherData(data, _savedWeather)
+                                        setCurrLocation(LocationModel(data.location.cityName, data.location.country))
+                                    } catch (e: Exception) {
+                                        handleError(e)
+                                    }
+                                }
+                        } catch (e: Exception) {
+                            handleError(e)
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                handleError(e)
+            }
+        }
+    }
+
+
+
+    private var _locations = MutableLiveData<List<LocationModel>>()
+    val locations: LiveData<List<LocationModel>> get() = _locations
+
+    private var _currentLocation = MutableLiveData<LocationModel>()
+    val currentLocation: LiveData<LocationModel> get() = _currentLocation.distinctUntilChanged()
+
+    private fun setCurrLocation(location : LocationModel){
+        _currentLocation.value = location
+    }
+
+
+
+
+    fun addLocation(location: LocationModel) {
+        locationRepository.addLocation(LocationDto(location.cityName, location.country))
+    }
+
+    fun deleteLocation(location: LocationModel) {
+        locationRepository.deleteLocation(LocationDto(location.cityName, location.country))
+    }
+
+    private var _locationIndex = MutableLiveData(0)
+
+    val locationIndex: LiveData<Int> get() = _locationIndex
+
+    fun incrementIndex() {
+        _locationIndex.value = _locationIndex.value?.plus(1)
+    }
+
+    fun decrementIndex() {
+        _locationIndex.value = _locationIndex.value?.minus(1)
+    }
+
+    fun resetIndex(){
+        _locationIndex.value = 0
+    }
+
+
+    private suspend fun fetchDefaultWeatherData() {
+        val defaultLocation = getDefaultLocation()
+        try {
+            weatherRepository.getWeather(defaultLocation).collect { weatherData ->
+                updateWeatherData(weatherData, _currentWeather)
+            }
+        } catch (e: Exception) {
+            handleError(e)
+        }
+    }
+
+
+
 
     private fun handleError(e: Exception) {
         Log.e(TAG, "Error: $e")
