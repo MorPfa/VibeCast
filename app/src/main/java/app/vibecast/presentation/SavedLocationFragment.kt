@@ -15,7 +15,6 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.lifecycleScope
 import app.vibecast.R
 import app.vibecast.databinding.FragmentSavedLocationBinding
-import app.vibecast.domain.entity.LocationDto
 import app.vibecast.presentation.mainscreen.MainScreenViewModel
 import app.vibecast.presentation.navigation.ImageViewModel
 import app.vibecast.presentation.weather.LocationModel
@@ -197,7 +196,7 @@ class SavedLocationFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-        mainScreenViewModel.resetIndex()
+
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
 

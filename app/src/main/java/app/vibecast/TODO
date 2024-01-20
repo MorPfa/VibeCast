@@ -1,8 +1,6 @@
 
 
 Today:
-fix account fragment not removing all locations
-(maybe reset index upon deletion for saved screen?)
 (re)write unit tests
 
 

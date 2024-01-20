@@ -94,6 +94,7 @@ class AccountFragment : Fragment() {
 
         removeButton.setOnClickListener {
             mainScreenViewModel.deleteLocation(location)
+            mainScreenViewModel.resetIndex()
             alertDialog?.dismiss()
         }
 
