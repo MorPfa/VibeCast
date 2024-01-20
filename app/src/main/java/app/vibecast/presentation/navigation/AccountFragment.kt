@@ -4,21 +4,17 @@ import android.app.AlertDialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.util.Log
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import app.vibecast.R
 import app.vibecast.databinding.FragmentAccountBinding
-import app.vibecast.domain.entity.LocationDto
-import app.vibecast.presentation.TAG
 import app.vibecast.presentation.mainscreen.MainScreenViewModel
 import app.vibecast.presentation.weather.LocationModel
 import com.google.android.material.button.MaterialButton
@@ -37,8 +33,6 @@ class AccountFragment : Fragment() {
     private var param2: String? = null
     private var _binding: FragmentAccountBinding? = null
     private val binding get() = _binding!!
-
-    private var locationList : LinearLayout? = null
     private val mainScreenViewModel: MainScreenViewModel by activityViewModels()
     private val imageViewModel: ImageViewModel by activityViewModels()
 
@@ -60,72 +54,33 @@ class AccountFragment : Fragment() {
     ): View {
 
         _binding = FragmentAccountBinding.inflate(inflater,container,false)
-        locationList = binding.savedLocations
+        val savedLocationsRv : RecyclerView = binding.savedLocations
+        val adapter = LocationAdapter(requireContext())
+        savedLocationsRv.adapter = adapter
+        savedLocationsRv.setHasFixedSize(true)
+        val layoutManager = LinearLayoutManager(requireContext())
+        savedLocationsRv.layoutManager = layoutManager
 
+        adapter.setOnItemClickListener { position ->
+            val clickedItem = adapter.currentList[position]
+            showDeleteConfirmationDialog(clickedItem)
+        }
         lifecycleScope.launch {
             imageViewModel.imageCount.observe(viewLifecycleOwner){
                 binding.savedImageCount.text = getString(R.string.saved_image_count, it)
             }
         }
-
-        loadLocations()
+        mainScreenViewModel.locations.observe(viewLifecycleOwner) { locations ->
+            adapter.submitList(locations)
+        }
 
         return binding.root
     }
 
 
-    private fun loadLocations() {
-        mainScreenViewModel.locations.observe(viewLifecycleOwner) { locations ->
-            val currentItemCount = locationList?.childCount
-            val max = locations.size
-            if (max == 0 && currentItemCount == 0) {
-                val item = createDefaultTv()
-                locationList?.addView(item)
-            } else {
-                if (currentItemCount != null) {
-                    for (i in currentItemCount until max) {
-                        val item = createItemView(i, locations)
-                        locationList?.addView(item)
-                    }
-                }
-            }
-        }
-    }
-    private fun createItemView(index: Int, locations: List<LocationModel>): View {
-        val item = TextView(requireContext())
-        val formattedLocation = locations.getOrNull(index)?.cityName
-                                .plus(" - ")
-                                .plus(locations.getOrNull(index)?.country)
-        item.text = formattedLocation
-        item.setTextColor(Color.WHITE)
-        item.setBackgroundResource(R.drawable.rounded_black_background)
-        item.gravity = Gravity.START
-        item.textSize = 20f
-        val paddingInDpVertical = 8
-        val paddingInPxVertical = (paddingInDpVertical * resources.displayMetrics.density).toInt()
-        val paddingInDpLeft = 12
-        val paddingInPxLeft = (paddingInDpLeft * resources.displayMetrics.density).toInt()
-        val paddingInDpRight = 12
-        val paddingInPxRight = (paddingInDpRight * resources.displayMetrics.density).toInt()
-        item.setPadding(paddingInPxLeft, paddingInPxVertical, paddingInPxRight, paddingInPxVertical)
-        val marginInDp = 2
-        val marginInPx = (marginInDp * resources.displayMetrics.density).toInt()
-        val layoutParams = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        )
-        layoutParams.setMargins(marginInPx, marginInPx, marginInPx, marginInPx)
-        item.layoutParams = layoutParams
-        item.setOnLongClickListener {
-            showDeleteConfirmationDialog(index, locations[index])
-            true
-        }
-
-        return item
-    }
     private var alertDialog: AlertDialog? = null
 
-    private fun showDeleteConfirmationDialog(index: Int, location: LocationModel) {
+    private fun showDeleteConfirmationDialog(location: LocationModel) {
         val alertDialogBuilder = AlertDialog.Builder(requireContext())
         val customView = LayoutInflater.from(requireContext()).inflate(R.layout.confirm_delete_dialog, null)
         val cardView = customView.findViewById<CircularRevealCardView>(R.id.dialog_card)
@@ -138,10 +93,7 @@ class AccountFragment : Fragment() {
 
 
         removeButton.setOnClickListener {
-            removeFixedItem(index, location)
-            Log.d(TAG, "clicked")
-            Log.d(TAG, location.cityName)
-
+            mainScreenViewModel.deleteLocation(location)
             alertDialog?.dismiss()
         }
 
@@ -157,31 +109,8 @@ class AccountFragment : Fragment() {
 
 
 
-    private fun removeFixedItem(index: Int, location: LocationModel) {
-        if (index >= 0 && index < locationList!!.childCount) {
-            locationList?.removeViewAt(index)
-            mainScreenViewModel.deleteLocation(location)
-
-        }
-    }
-
-    private fun createDefaultTv(): View {
-        val item = TextView(requireContext())
-        item.text = getString(R.string.none_saved)
-        item.setTextColor(Color.WHITE)
-        item.textSize = 18.0f
-        item.gravity = 1
-        return item
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
-        locationList = null
         _binding = null
         mainScreenViewModel.locations.removeObservers(viewLifecycleOwner)
     }

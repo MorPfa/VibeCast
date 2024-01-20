@@ -75,7 +75,7 @@
     <string name="lorem_ipusm">Lorem ipsum dolor sit amet, consectetur adipiscing elit. </string>
     <string name="remove_btn">Remove</string>
     <string name="display_temperature_in_fahrenheit">Use Metric System</string>
-    <string name="saved_locations">Saved Locations</string>
+    <string name="saved_locations">My saved Locations</string>
     <string name="profile_picture_content_desc">Users profile picture</string>
     <string name="name">%1$s</string>
     <string name="save_location">Save location</string>
@@ -115,6 +115,8 @@
     <string name="cover_art_description">Cover art of current album</string>
     <string name="skip_to_next_song">Skip to next song</string>
     <string name="pause_or_resume_current_song">Pause or resume current song</string>
+    <string name="saved_location">%1$s - %2$s</string>
+
 
 
 </resources>
