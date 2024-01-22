@@ -2,6 +2,7 @@ package app.vibecast.data
 
 
 import app.vibecast.BuildConfig
+import app.vibecast.data.data_repository.repository.Unit
 import app.vibecast.data.remote.network.weather.CoordinateApiModel
 import app.vibecast.data.remote.network.weather.CurrentWeatherRemote
 import app.vibecast.data.remote.network.weather.HourlyWeatherRemote
@@ -12,12 +13,12 @@ import app.vibecast.data.remote.source.RemoteWeatherDataSourceImpl
 import app.vibecast.domain.entity.CurrentWeather
 import app.vibecast.domain.entity.HourlyWeather
 import app.vibecast.domain.entity.UseCaseException
-import app.vibecast.domain.entity.WeatherDto
 import app.vibecast.domain.entity.WeatherCondition
+import app.vibecast.domain.entity.WeatherDto
+import app.vibecast.domain.repository.DataStoreRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -31,18 +32,20 @@ import org.mockito.kotlin.whenever
 class RemoteWeatherDataSourceImplTest {
 
     private val weatherService = mock<WeatherService>()
-    private val weatherDataSource = RemoteWeatherDataSourceImpl(weatherService)
+    private val dataStore = mock<DataStoreRepository>()
+    private val weatherDataSource = RemoteWeatherDataSourceImpl(weatherService, dataStore)
     private lateinit var remoteWeather: WeatherApiModel
     private lateinit var  expectedWeather : WeatherDto
-    private val cityName = "Seattle - US"
+    private val cityName = "Seattle"
 
 
     @Before
     fun setUp() {
          remoteWeather = WeatherApiModel(
-             cityName = "Seattle - US",
+             cityName = "Seattle",
              latitude = 51.5074,
-             longitude = -0.1278,,
+             longitude = -0.1278,
+             timezone = "US",
              currentWeatherRemote = CurrentWeatherRemote(
                  timestamp = 1637094000,
                  temperature = 15.0,
@@ -54,9 +57,7 @@ class RemoteWeatherDataSourceImplTest {
                  windSpeed = 12.0,
                  weatherConditionRemotes = listOf(
                      WeatherConditionRemote(
-                         conditionId = 800,
                          mainDescription = "Clear",
-                         detailedDescription = "Clear sky",
                          icon = "01d"
                      )
                  )
@@ -68,13 +69,10 @@ class RemoteWeatherDataSourceImplTest {
                      feelsLike = 13.0,
                      humidity = 65,
                      uvi = 5.5,
-                     cloudCover = 45,
                      windSpeed = 11.0,
                      weatherConditionRemotes = listOf(
                          WeatherConditionRemote(
-                             conditionId = 800,
                              mainDescription = "Clear",
-                             detailedDescription = "Clear sky",
                              icon = "01d"
                          )
                      ),
@@ -85,8 +83,12 @@ class RemoteWeatherDataSourceImplTest {
 
         expectedWeather =  WeatherDto(
             cityName = cityName,
+            country = "US",
             latitude = 51.5074,
-            longitude = -0.1278,,
+            longitude = -0.1278,
+            dataTimestamp = 10000,
+            timezone = "US",
+            unit = Unit.IMPERIAL,
             currentWeather = CurrentWeather(
                 timestamp = 1637094000,
                 temperature = 15.0,
@@ -98,9 +100,7 @@ class RemoteWeatherDataSourceImplTest {
                 windSpeed = 12.0,
                 weatherConditions = listOf(
                     WeatherCondition(
-                        conditionId = 800,
                         mainDescription = "Clear",
-                        detailedDescription = "Clear sky",
                         icon = "01d"
                     )
                 )
@@ -112,13 +112,10 @@ class RemoteWeatherDataSourceImplTest {
                     feelsLike = 13.0,
                     humidity = 65,
                     uvi = 5.5,
-                    cloudCover = 45,
                     windSpeed = 11.0,
                     weatherConditions = listOf(
                         WeatherCondition(
-                            conditionId = 800,
                             mainDescription = "Clear",
-                            detailedDescription = "Clear sky",
                             icon = "01d"
                         )
                     ),
@@ -145,29 +142,44 @@ class RemoteWeatherDataSourceImplTest {
     @Test
     fun testGetWeather() = runTest {
         val remoteCoordinates = listOf(CoordinateApiModel("Seattle",51.5073219,-0.1276474, "US" ))
+        whenever(weatherService.getCiyCoordinates(
+            cityName,
+            1,
+            BuildConfig.OWM_KEY
+        )).thenReturn(remoteCoordinates)
 
-        whenever(weatherService.getCiyCoordinates(cityName, 1, BuildConfig.OWM_KEY )).thenReturn(remoteCoordinates)
+        whenever(weatherService.getWeather(
+            remoteCoordinates[0].latitude,
+            remoteCoordinates[0].longitude,
+            "minutely,daily",
+            "Imperial",
+            BuildConfig.OWM_KEY
+        )).thenReturn(remoteWeather)
 
-        whenever(weatherService.getWeather(remoteCoordinates[0].latitude, remoteCoordinates[0].longitude,"minutely,daily", BuildConfig.OWM_KEY)).thenReturn(remoteWeather)
-
-        val result = weatherDataSource.getWeather(cityName).first()
+        val result = weatherDataSource.getWeather(cityName).single()
 
 
-        assertEquals(expectedWeather.cityName, result.cityName)
-        assertEquals(expectedWeather.longitude, result.longitude,1.0)
-        assertEquals(expectedWeather.latitude, result.latitude,1.0)
-        assertEquals(expectedWeather.currentWeather?.timestamp, result.currentWeather?.timestamp)
+        assertEquals(expectedWeather.cityName, result.weather.cityName)
+        assertEquals(expectedWeather.longitude, result.weather.longitude,1.0)
+        assertEquals(expectedWeather.latitude, result.weather.latitude,1.0)
+        assertEquals(expectedWeather.currentWeather?.timestamp, result.weather.currentWeather?.timestamp)
     }
 
 
     @ExperimentalCoroutinesApi
     @Test
     fun testGetWeatherWithCoordinates() = runTest {
-        whenever(weatherService.getWeather(expectedWeather.latitude, expectedWeather.longitude,"minutely,daily",  BuildConfig.OWM_KEY)).thenReturn(remoteWeather)
-        val result = weatherDataSource.getWeather(expectedWeather.latitude, expectedWeather.longitude).first()
-        assertEquals(expectedWeather.longitude, result.longitude,1.0)
-        assertEquals(expectedWeather.latitude, result.latitude,1.0)
-        assertEquals(expectedWeather.currentWeather?.timestamp, result.currentWeather?.timestamp)
+        whenever(weatherService.getWeather(
+            expectedWeather.latitude,
+            expectedWeather.longitude,
+            "minutely,daily",
+            "Imperial",
+            BuildConfig.OWM_KEY
+        )).thenReturn(remoteWeather)
+        val result = weatherDataSource.getWeather(expectedWeather.latitude, expectedWeather.longitude).single()
+        assertEquals(expectedWeather.longitude, result.weather.longitude,1.0)
+        assertEquals(expectedWeather.latitude, result.weather.latitude,1.0)
+        assertEquals(expectedWeather.currentWeather?.timestamp, result.weather.currentWeather?.timestamp)
     }
 
 
@@ -176,7 +188,13 @@ class RemoteWeatherDataSourceImplTest {
     fun testGetWeatherThrowsError() = runTest {
         val cityName = "London"
         val remoteCoordinates = CoordinateApiModel("Seattle",51.5073219,-0.1276474, "US" )
-        whenever(weatherService.getWeather(remoteCoordinates.latitude, remoteCoordinates.longitude,"minutely,daily", BuildConfig.OWM_KEY)).thenThrow(RuntimeException())
+        whenever(weatherService.getWeather(
+            remoteCoordinates.latitude,
+            remoteCoordinates.longitude,
+            "minutely,daily",
+            "Imperial",
+            BuildConfig.OWM_KEY
+        )).thenThrow(RuntimeException())
         weatherDataSource.getWeather(cityName).catch {
             assertTrue(it is UseCaseException.WeatherException)
         }.collect()
@@ -185,9 +203,13 @@ class RemoteWeatherDataSourceImplTest {
 
     private fun WeatherApiModel.toWeather(): WeatherDto {
         return WeatherDto(
-            cityName =cityName,
+            cityName = cityName,
+            country = "",
             latitude = latitude,
-            longitude = longitude,,
+            longitude = longitude,
+            dataTimestamp = 1000,
+            timezone = timezone,
+            unit = Unit.IMPERIAL,
             currentWeather = currentWeatherRemote.toCurrentWeather(),
             hourlyWeather = hourlyWeather.map { it.toHourlyWeather() }
         )
@@ -214,7 +236,6 @@ class RemoteWeatherDataSourceImplTest {
             feelsLike = feelsLike,
             humidity = humidity,
             uvi = uvi,
-            cloudCover = cloudCover,
             windSpeed = windSpeed,
             weatherConditions = weatherConditionRemotes.map { it.toWeatherCondition() },
             chanceOfRain = chanceOfRain
@@ -223,9 +244,7 @@ class RemoteWeatherDataSourceImplTest {
 
     private fun WeatherConditionRemote.toWeatherCondition(): WeatherCondition {
         return WeatherCondition(
-            conditionId = conditionId,
             mainDescription = mainDescription,
-            detailedDescription = detailedDescription,
             icon = icon
         )
     }

@@ -12,8 +12,10 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.mock
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import kotlin.math.abs
 
 class LocalImageDataSourceImplTest {
 
@@ -35,7 +37,8 @@ class LocalImageDataSourceImplTest {
             userName = "john_doe",
             portfolioUrl = "https://example.com/john_doe",
             userLink = "test",
-            downloadLink = "https://dummyurl.com/raw"
+            downloadLink = "https://dummyurl.com/raw",
+            timestamp = System.currentTimeMillis()
         )
 
         imageDto = ImageDto(
@@ -58,6 +61,7 @@ class LocalImageDataSourceImplTest {
                 user = "test",
                 downloadLink = "https://dummyurl.com/raw"
             ),
+            timestamp = System.currentTimeMillis()
         )
     }
 
@@ -80,7 +84,9 @@ class LocalImageDataSourceImplTest {
     fun testAddImage() {
         runTest {
             imageDataSource.addImage(imageDto)
-            val imageEntity =  ImageEntity(
+
+            val expectedTimestamp = System.currentTimeMillis()
+            ImageEntity(
                 imageDto.id,
                 imageDto.description,
                 imageDto.altDescription,
@@ -90,10 +96,13 @@ class LocalImageDataSourceImplTest {
                 imageDto.user.userName,
                 imageDto.user.portfolioUrl,
                 imageDto.links.user,
-                imageDto.links.downloadLink
+                imageDto.links.downloadLink,
+                expectedTimestamp
             )
-            verify(imageDao).addImage(imageEntity)
-
+            verify(imageDao).addImage( argThat {
+                // Check if the timestamp falls within an acceptable range
+                abs(expectedTimestamp - timestamp) <= 1000
+            })
         }
     }
 
@@ -112,7 +121,8 @@ class LocalImageDataSourceImplTest {
                 imageDto.user.userName,
                 imageDto.user.portfolioUrl,
                 imageDto.links.user,
-                imageDto.links.downloadLink
+                imageDto.links.downloadLink,
+                0
             )
             verify(imageDao).deleteImage(imageEntity)
 
@@ -140,6 +150,7 @@ class LocalImageDataSourceImplTest {
                 user = this.userLink,
                 downloadLink = this.downloadLink
             ),
+            timestamp = this.timestamp
         )
     }
 

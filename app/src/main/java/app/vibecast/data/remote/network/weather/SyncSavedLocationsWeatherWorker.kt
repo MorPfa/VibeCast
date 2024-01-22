@@ -32,7 +32,7 @@ class SyncSavedLocationsWeatherWorker @Inject constructor(
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-        val periodicWorkRequest = PeriodicWorkRequestBuilder<SyncCurrentLocationWeatherWorker>(
+        val periodicWorkRequest = PeriodicWorkRequestBuilder<SyncSavedLocationsWeatherWorker>(
             repeatInterval = 10,
             repeatIntervalTimeUnit = TimeUnit.MINUTES
         )

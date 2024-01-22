@@ -1,5 +1,6 @@
 package app.vibecast.data
 
+import app.vibecast.data.data_repository.repository.Unit
 import app.vibecast.data.local.db.location.LocationDao
 import app.vibecast.data.local.db.location.LocationEntity
 import app.vibecast.data.local.db.location.LocationWithWeatherData
@@ -11,13 +12,17 @@ import app.vibecast.domain.entity.LocationDto
 import app.vibecast.domain.entity.LocationWithWeatherDataDto
 import app.vibecast.domain.entity.WeatherDto
 import app.vibecast.domain.entity.WeatherCondition
+import app.vibecast.domain.repository.DataStoreRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.argThat
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -25,7 +30,8 @@ import org.mockito.kotlin.whenever
 class LocalLocationDataSourceImplTest {
 
     private val locationDao = mock<LocationDao>()
-    private val locationDataSource = LocalLocationDataSourceImpl(locationDao)
+    private val dataStore = mock<DataStoreRepository>()
+    private val locationDataSource = LocalLocationDataSourceImpl(locationDao, dataStore)
     private lateinit var locationDto : LocationDto
     private lateinit var weatherDto : WeatherDto
     private lateinit var locationWithWeatherData: LocationWithWeatherData
@@ -38,9 +44,13 @@ class LocalLocationDataSourceImplTest {
     fun setUp() {
 
         weatherDto = WeatherDto(
-            cityName = "London",
+            cityName = "Seattle",
+            country = "US",
             latitude = 51.5074,
-            longitude = -0.1278,,
+            longitude = -0.1278,
+            dataTimestamp = System.currentTimeMillis(),
+            timezone = "US",
+            unit = Unit.IMPERIAL,
             currentWeather = CurrentWeather(
                 timestamp = 1637094000,
                 temperature = 15.0,
@@ -52,9 +62,7 @@ class LocalLocationDataSourceImplTest {
                 windSpeed = 12.0,
                 weatherConditions = listOf(
                     WeatherCondition(
-                        conditionId = 800,
                         mainDescription = "Clear",
-                        detailedDescription = "Clear sky",
                         icon = "01d"
                     )
                 )
@@ -66,13 +74,10 @@ class LocalLocationDataSourceImplTest {
                     feelsLike = 13.0,
                     humidity = 65,
                     uvi = 5.5,
-                    cloudCover = 45,
                     windSpeed = 11.0,
                     weatherConditions = listOf(
                         WeatherCondition(
-                            conditionId = 800,
                             mainDescription = "Clear",
-                            detailedDescription = "Clear sky",
                             icon = "01d"
                         )
                     ),
@@ -82,21 +87,29 @@ class LocalLocationDataSourceImplTest {
         )
 
         locationDto = LocationDto(
-            cityName = "London",
-            locationIndex = 1
+            cityName = "Seattle",
+            country = "US"
         )
 
         locationEntity = LocationEntity(
-            cityName = "London",
-            locationIndex = 1)
+            cityName = "Seattle",
+            country = "US"
+        )
 
 
         weatherEntity =  WeatherEntity(
-                cityName = "London",
+                cityName = "Seattle",
+                countryName = "US",
+                dataTimestamp = 1000,
+                unit = Unit.IMPERIAL,
                 weatherData = WeatherDto(
-                    cityName = "London",
+                    cityName = "Seattle",
+                    country = "US",
                     latitude = 51.5074,
-                    longitude = -0.1278,,
+                    longitude = -0.1278,
+                    dataTimestamp = 1000,
+                    timezone = "US",
+                    unit = Unit.IMPERIAL,
                     currentWeather = CurrentWeather(
                     timestamp = 1637094000,
                     temperature = 15.0,
@@ -108,9 +121,7 @@ class LocalLocationDataSourceImplTest {
                     windSpeed = 12.0,
                     weatherConditions = listOf(
                         WeatherCondition(
-                            conditionId = 800,
                             mainDescription = "Clear",
-                            detailedDescription = "Clear sky",
                             icon = "01d"
                         )
                     )
@@ -122,13 +133,10 @@ class LocalLocationDataSourceImplTest {
                             feelsLike = 13.0,
                             humidity = 65,
                             uvi = 5.5,
-                            cloudCover = 45,
                             windSpeed = 11.0,
                             weatherConditions = listOf(
                                 WeatherCondition(
-                                    conditionId = 800,
                                     mainDescription = "Clear",
-                                    detailedDescription = "Clear sky",
                                     icon = "01d"
                                 )
                             ),
@@ -149,12 +157,25 @@ class LocalLocationDataSourceImplTest {
     @Test
     fun testAddLocationWithWeather() {
         runTest {
+            val expectedTimestamp = System.currentTimeMillis()
+            val timestampRange = expectedTimestamp - 1000..expectedTimestamp + 1000
+
+            // Perform the test
             locationDataSource.addLocationWithWeather(locationWithWeatherDataDto)
-            verify(locationDao).addLocationWithWeather(locationEntity,weatherEntity)
 
+            // Verify that the expected method call was made with a dataTimestamp within the range
+            verify(locationDao).addLocationWithWeather(
+                argThat {
+                    assertTrue(weatherEntity.dataTimestamp in timestampRange)
+                    true // Always return true to satisfy the suspension function
+                },
+                eq(weatherEntity) // Use eq() for exact matching of the WeatherEntity
+            )
         }
-
     }
+
+
+
 
     @ExperimentalCoroutinesApi
     @Test

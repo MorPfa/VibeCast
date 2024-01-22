@@ -2,6 +2,8 @@ package app.vibecast.data
 
 
 
+import app.vibecast.data.data_repository.repository.Unit
+import app.vibecast.data.local.db.location.LocationDao
 import app.vibecast.data.local.db.weather.WeatherDao
 import app.vibecast.data.local.db.weather.WeatherEntity
 import app.vibecast.data.local.source.LocalWeatherDataSourceImpl
@@ -23,30 +25,37 @@ import org.mockito.kotlin.whenever
 class LocalWeatherDataSourceImplTest {
 
     private val weatherDao = mock<WeatherDao>()
-    private val weatherDataSource = LocalWeatherDataSourceImpl(weatherDao)
+    private val locationDao = mock<LocationDao>()
+    private val weatherDataSource = LocalWeatherDataSourceImpl(weatherDao, locationDao)
     private lateinit var localWeather: WeatherEntity
     private lateinit var  expectedWeather : WeatherDto
-    private val cityName = "London"
+    private val cityName = "Seattle"
 
-
-    private fun WeatherEntity.toWeather(): WeatherDto {
-        return WeatherDto(
+    private fun WeatherDto.toWeatherEntity(cityName: String): WeatherEntity {
+        return WeatherEntity(
             cityName = cityName,
-            latitude = weatherData.latitude,
-            longitude = weatherData.longitude,,
-            currentWeather = weatherData.currentWeather,
-            hourlyWeather = weatherData.hourlyWeather
+            countryName = this.country,
+            weatherData = this,
+            dataTimestamp = this.dataTimestamp,
+            unit = this.unit
         )
     }
 
     @Before
     fun setUp() {
          localWeather = WeatherEntity(
-            cityName = cityName,
-            weatherData = WeatherDto(
+             cityName = cityName,
+             countryName = "US",
+             dataTimestamp = 1000,
+             unit = Unit.IMPERIAL,
+             weatherData = WeatherDto(
                 cityName = cityName,
+                 country = "US",
                 latitude = 51.5074,
-                longitude = -0.1278,,
+                longitude = -0.1278,
+                 dataTimestamp = 10000,
+                 timezone = "US",
+                 unit = Unit.IMPERIAL,
                 currentWeather = CurrentWeather(
                     timestamp = 1637094000,
                     temperature = 15.0,
@@ -58,9 +67,7 @@ class LocalWeatherDataSourceImplTest {
                     windSpeed = 12.0,
                     weatherConditions = listOf(
                         WeatherCondition(
-                            conditionId = 800,
                             mainDescription = "Clear",
-                            detailedDescription = "Clear sky",
                             icon = "01d"
                         )
                     )
@@ -72,13 +79,10 @@ class LocalWeatherDataSourceImplTest {
                         feelsLike = 13.0,
                         humidity = 65,
                         uvi = 5.5,
-                        cloudCover = 45,
                         windSpeed = 11.0,
                         weatherConditions = listOf(
                             WeatherCondition(
-                                conditionId = 800,
                                 mainDescription = "Clear",
-                                detailedDescription = "Clear sky",
                                 icon = "01d"
                             )
                         ),
@@ -89,8 +93,12 @@ class LocalWeatherDataSourceImplTest {
         )
         expectedWeather =  WeatherDto(
             cityName = cityName,
+            country = "US",
             latitude = 51.5074,
-            longitude = -0.1278,,
+            longitude = -0.1278,
+            dataTimestamp = 10000,
+            timezone = "US",
+            unit = Unit.IMPERIAL,
             currentWeather = CurrentWeather(
                 timestamp = 1637094000,
                 temperature = 15.0,
@@ -102,9 +110,7 @@ class LocalWeatherDataSourceImplTest {
                 windSpeed = 12.0,
                 weatherConditions = listOf(
                     WeatherCondition(
-                        conditionId = 800,
                         mainDescription = "Clear",
-                        detailedDescription = "Clear sky",
                         icon = "01d"
                     )
                 )
@@ -116,13 +122,10 @@ class LocalWeatherDataSourceImplTest {
                     feelsLike = 13.0,
                     humidity = 65,
                     uvi = 5.5,
-                    cloudCover = 45,
                     windSpeed = 11.0,
                     weatherConditions = listOf(
                         WeatherCondition(
-                            conditionId = 800,
                             mainDescription = "Clear",
-                            detailedDescription = "Clear sky",
                             icon = "01d"
                         )
                     ),
@@ -152,12 +155,9 @@ class LocalWeatherDataSourceImplTest {
     @ExperimentalCoroutinesApi
     @Test
     fun testAddWeather() = runTest {
-        val cityName = "London"
-        val weather = localWeather.toWeather()
-        val weatherEntity = WeatherEntity(cityName, weather) // Convert weather to WeatherEntity
-
-        weatherDataSource.addWeather(weather)
-        verify(weatherDao).addWeather(weatherEntity) // Verify with the correct argument
+        val weatherToSave = expectedWeather.toWeatherEntity(cityName)
+        weatherDataSource.addWeather(expectedWeather)
+        verify(weatherDao).addWeather(weatherToSave) // Verify with the correct argument
     }
 
 

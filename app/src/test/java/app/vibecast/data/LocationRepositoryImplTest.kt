@@ -3,6 +3,7 @@ package app.vibecast.data
 import app.vibecast.data.data_repository.data_source.local.LocalLocationDataSource
 import app.vibecast.data.data_repository.data_source.remote.RemoteWeatherDataSource
 import app.vibecast.data.data_repository.repository.LocationRepositoryImpl
+import app.vibecast.data.data_repository.repository.Unit
 import app.vibecast.data.local.db.location.LocationEntity
 import app.vibecast.data.local.db.weather.WeatherEntity
 import app.vibecast.domain.entity.CurrentWeather
@@ -15,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -44,21 +46,29 @@ class LocationRepositoryImplTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         locationDto = LocationDto(
-            cityName = "London",
-            locationIndex = 1
+            cityName = "Seattle",
+            country = "US"
         )
 
         locationEntity = LocationEntity(
-            cityName = "London",
-            locationIndex = 1)
+            cityName = "Seattle",
+            country = "US"
+        )
 
 
         weatherEntity =  WeatherEntity(
-            cityName = "London",
+            cityName = "Seattle",
+            countryName = "US",
+            dataTimestamp = 1000,
+            unit = Unit.IMPERIAL,
             weatherData = WeatherDto(
-                cityName = "London",
+                cityName = "Seattle",
+                country = "US",
                 latitude = 51.5074,
-                longitude = -0.1278,,
+                longitude = -0.1278,
+                dataTimestamp = 1000,
+                timezone = "US",
+                unit = Unit.IMPERIAL,
                 currentWeather = CurrentWeather(
                     timestamp = 1637094000,
                     temperature = 15.0,
@@ -70,27 +80,22 @@ class LocationRepositoryImplTest {
                     windSpeed = 12.0,
                     weatherConditions = listOf(
                         WeatherCondition(
-                            conditionId = 800,
                             mainDescription = "Clear",
-                            detailedDescription = "Clear sky",
                             icon = "01d"
                         )
                     )
                 ),
                 hourlyWeather = List(24) {
                     HourlyWeather(
-                        timestamp = (1637094000 + it * 3600).toLong(), // Incrementing timestamp for hourly forecast
+                        timestamp = (1637094000 + it * 3600).toLong(),
                         temperature = 14.0,
                         feelsLike = 13.0,
                         humidity = 65,
                         uvi = 5.5,
-                        cloudCover = 45,
                         windSpeed = 11.0,
                         weatherConditions = listOf(
                             WeatherCondition(
-                                conditionId = 800,
                                 mainDescription = "Clear",
-                                detailedDescription = "Clear sky",
                                 icon = "01d"
                             )
                         ),
@@ -100,9 +105,13 @@ class LocationRepositoryImplTest {
             )
         )
         weatherDto = WeatherDto(
-            cityName = "London",
+            cityName = "Seattle",
+            country = "US",
             latitude = 51.5074,
-            longitude = -0.1278,,
+            longitude = -0.1278,
+            dataTimestamp = 1000,
+            timezone = "US",
+            unit = Unit.IMPERIAL,
             currentWeather = CurrentWeather(
                 timestamp = 1637094000,
                 temperature = 15.0,
@@ -114,9 +123,7 @@ class LocationRepositoryImplTest {
                 windSpeed = 12.0,
                 weatherConditions = listOf(
                     WeatherCondition(
-                        conditionId = 800,
                         mainDescription = "Clear",
-                        detailedDescription = "Clear sky",
                         icon = "01d"
                     )
                 )
@@ -128,13 +135,11 @@ class LocationRepositoryImplTest {
                     feelsLike = 13.0,
                     humidity = 65,
                     uvi = 5.5,
-                    cloudCover = 45,
+
                     windSpeed = 11.0,
                     weatherConditions = listOf(
                         WeatherCondition(
-                            conditionId = 800,
                             mainDescription = "Clear",
-                            detailedDescription = "Clear sky",
                             icon = "01d"
                         )
                     ),
@@ -160,10 +165,10 @@ class LocationRepositoryImplTest {
     @Test
     fun testRefreshLocationWithWeather() {
         runTest {
-            val cityName = "London"
+            val cityName = "Seattle"
             val expectedList = listOf(locationWithWeatherDataDto)
             whenever(localLocationDataSource.getLocationWithWeather()).thenReturn(flowOf(expectedList))
-            whenever(remoteWeatherDataSource.getWeather(cityName)).thenReturn(flowOf(weatherDto))
+            whenever(remoteWeatherDataSource.getWeather(cityName)).thenReturn(flowOf(locationWithWeatherDataDto))
             locationRepository.refreshLocationWeather()
             verify(remoteWeatherDataSource).getWeather(cityName)
             verify(localLocationDataSource).addLocationWithWeather(locationWithWeatherDataDto)
@@ -199,8 +204,9 @@ class LocationRepositoryImplTest {
         runTest {
             val expectedList = listOf(locationDto)
             whenever(localLocationDataSource.getLocations()).thenReturn(flowOf(expectedList))
-            val result = locationRepository.getLocations().first()
-            assertEquals(expectedList, result)
+            val result = locationRepository.getLocations().single()
+            val resultModel = listOf(LocationDto(result[0].cityName, result[0].country))
+            assertEquals(expectedList, resultModel)
         }
     }
 

@@ -1,11 +1,12 @@
 package app.vibecast.data
 
+import app.vibecast.data.remote.network.image.DownloadUrl
 import app.vibecast.data.remote.network.image.ImageApiModel
 import app.vibecast.data.remote.network.image.ImageService
 import app.vibecast.data.remote.source.RemoteImageDataSourceImpl
 import app.vibecast.domain.entity.ImageDto
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -13,17 +14,17 @@ import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.whenever
 
-class RemoteImageDataSourceImplTest {
+class  RemoteImageDataSourceImplTest {
 
     private val imageService = mock<ImageService>()
     private val remoteImageDataSource = RemoteImageDataSourceImpl(imageService)
     private lateinit var imageApiModel: ImageApiModel
     private lateinit var imageDto: ImageDto
+    private lateinit var downLoadUrl : DownloadUrl
 
 
     @Before
     fun setUp() {
-
         imageApiModel = ImageApiModel(
             id = "test",
             description = "test",
@@ -63,7 +64,10 @@ class RemoteImageDataSourceImplTest {
                 user = "test",
                 downloadLink = "https://dummyurl.com/raw"
             ),
+            timestamp = 1000
         )
+
+        downLoadUrl = DownloadUrl("https://dummyurl.com/download")
     }
 
     @ExperimentalCoroutinesApi
@@ -72,11 +76,25 @@ class RemoteImageDataSourceImplTest {
         runTest {
             val query = "Seattle rainy"
             val orientation = "portrait"
+            val count = 1
+            val contentFilter = "high"
             val remoteImages = listOf(imageApiModel)
             val expectedImages = listOf(imageApiModel.toImageDto())
-            whenever(imageService.getImages(query, orientation, 1)).thenReturn(remoteImages)
-            val result = remoteImageDataSource.getImages(query).first()
+            whenever(imageService.getImages(query, orientation, count, contentFilter)).thenReturn(remoteImages)
+            val result = remoteImageDataSource.getImages(query).single()
             assertEquals(expectedImages[0], result)
+        }
+    }
+
+    @ExperimentalCoroutinesApi
+    @Test
+    fun testgetImageForDownload(){
+        runTest {
+            val query = "Seattle rainy"
+            val expectedUrl = "https://dummyurl.com/download"
+            whenever(imageService.getImageForDownload(query)).thenReturn(downLoadUrl)
+            val result = remoteImageDataSource.getImageForDownload(query).single()
+            assertEquals(expectedUrl, result)
         }
     }
 
@@ -102,6 +120,7 @@ class RemoteImageDataSourceImplTest {
                 user = this.links.user,
                 downloadLink = this.links.downloadLink
             ),
+            timestamp = null
         )
     }
 }

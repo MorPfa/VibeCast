@@ -5,14 +5,19 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import app.vibecast.data.data_repository.data_source.local.LocalWeatherDataSource
 import app.vibecast.data.data_repository.data_source.remote.RemoteWeatherDataSource
+import app.vibecast.data.data_repository.repository.Unit
 import app.vibecast.data.data_repository.repository.WeatherRepositoryImpl
 import app.vibecast.domain.entity.CurrentWeather
 import app.vibecast.domain.entity.HourlyWeather
+import app.vibecast.domain.entity.LocationDto
+import app.vibecast.domain.entity.LocationWithWeatherDataDto
 import app.vibecast.domain.entity.WeatherDto
 import app.vibecast.domain.entity.WeatherCondition
+import app.vibecast.domain.repository.DataStoreRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -26,20 +31,27 @@ class WeatherRepositoryImplTest {
 
     private val remoteWeatherDataSource = mock<RemoteWeatherDataSource>()
     private val localWeatherDataSource = mock<LocalWeatherDataSource>()
+    private val dataStore = mock<DataStoreRepository>()
     private val context = mock<Context>()
     private val connectivityManager = mock<ConnectivityManager>()
     private val networkCapabilities = mock<NetworkCapabilities>()
-    private val repositoryImpl = WeatherRepositoryImpl(remoteWeatherDataSource,localWeatherDataSource, context)
+    private val repositoryImpl = WeatherRepositoryImpl(remoteWeatherDataSource,localWeatherDataSource, dataStore, context)
     private lateinit var  expectedWeather : WeatherDto
-    private val cityName = "London"
+    private lateinit var  expectedLocation : LocationDto
+    private lateinit var  expectedLocationWithWeather : LocationWithWeatherDataDto
+    private val cityName = "Seattle"
 
     @Before
     fun setUp() {
 
         expectedWeather =  WeatherDto(
             cityName = cityName,
+            country = "US",
             latitude = 51.5074,
-            longitude = -0.1278,,
+            longitude = -0.1278,
+            dataTimestamp = 1000,
+            timezone = "US",
+            unit = Unit.IMPERIAL,
             currentWeather = CurrentWeather(
                 timestamp = 1637094000,
                 temperature = 15.0,
@@ -51,9 +63,7 @@ class WeatherRepositoryImplTest {
                 windSpeed = 12.0,
                 weatherConditions = listOf(
                     WeatherCondition(
-                        conditionId = 800,
                         mainDescription = "Clear",
-                        detailedDescription = "Clear sky",
                         icon = "01d"
                     )
                 )
@@ -65,13 +75,10 @@ class WeatherRepositoryImplTest {
                     feelsLike = 13.0,
                     humidity = 65,
                     uvi = 5.5,
-                    cloudCover = 45,
                     windSpeed = 11.0,
                     weatherConditions = listOf(
                         WeatherCondition(
-                            conditionId = 800,
                             mainDescription = "Clear",
-                            detailedDescription = "Clear sky",
                             icon = "01d"
                         )
                     ),
@@ -79,6 +86,8 @@ class WeatherRepositoryImplTest {
                 )
             }
         )
+        expectedLocation = LocationDto(cityName, "US")
+        expectedLocationWithWeather = LocationWithWeatherDataDto(expectedLocation, expectedWeather)
 
     }
 
@@ -86,7 +95,7 @@ class WeatherRepositoryImplTest {
     @ExperimentalCoroutinesApi
     @Test
     fun testRefreshWeatherWithCity() = runTest {
-        whenever(remoteWeatherDataSource.getWeather(expectedWeather.cityName)).thenReturn(flowOf(expectedWeather))
+        whenever(remoteWeatherDataSource.getWeather(expectedWeather.cityName)).thenReturn(flowOf(expectedLocationWithWeather))
         val result = repositoryImpl.refreshWeather(expectedWeather.cityName).first()
         assertEquals(expectedWeather, result)
         verify(localWeatherDataSource).addWeather(expectedWeather)
@@ -95,8 +104,8 @@ class WeatherRepositoryImplTest {
     @ExperimentalCoroutinesApi
     @Test
     fun testRefreshWeatherWithCoordinates() = runTest {
-        whenever(remoteWeatherDataSource.getWeather(expectedWeather.latitude, expectedWeather.longitude)).thenReturn(flowOf(expectedWeather))
-        val result = repositoryImpl.refreshWeather(expectedWeather.latitude, expectedWeather.longitude).first()
+        whenever(remoteWeatherDataSource.getWeather(expectedWeather.latitude, expectedWeather.longitude)).thenReturn(flowOf(expectedLocationWithWeather))
+        val result = repositoryImpl.refreshWeather(expectedWeather.latitude, expectedWeather.longitude).single()
         assertEquals(expectedWeather, result)
         verify(localWeatherDataSource).addWeather(expectedWeather)
     }
@@ -108,11 +117,31 @@ class WeatherRepositoryImplTest {
         whenever(connectivityManager.activeNetwork).thenReturn(mock())
         whenever(connectivityManager.getNetworkCapabilities(any())).thenReturn(networkCapabilities)
         whenever(networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)).thenReturn(true)
-        whenever(remoteWeatherDataSource.getWeather(expectedWeather.cityName)).thenReturn(flowOf(expectedWeather))
-        val result = repositoryImpl.getWeather(expectedWeather.cityName).first()
-        assertEquals(expectedWeather, result)
-
+        whenever(remoteWeatherDataSource.getWeather(expectedWeather.cityName)).thenReturn(flowOf(expectedLocationWithWeather))
+        val result = repositoryImpl.getWeather(expectedWeather.cityName).single()
+        assertEquals(expectedWeather, result.weather)
     }
 
+    @ExperimentalCoroutinesApi
+    @Test
+    fun testGetWeatherWithCoordinates() = runTest {
+        whenever(context.getSystemService(Context.CONNECTIVITY_SERVICE)).thenReturn(connectivityManager)
+        whenever(connectivityManager.activeNetwork).thenReturn(mock())
+        whenever(connectivityManager.getNetworkCapabilities(any())).thenReturn(networkCapabilities)
+        whenever(networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)).thenReturn(true)
+        whenever(remoteWeatherDataSource.getWeather(expectedWeather.latitude, expectedWeather.longitude)).thenReturn(flowOf(expectedLocationWithWeather))
+        val result = repositoryImpl.getWeather(expectedWeather.latitude, expectedWeather.longitude).single()
+        assertEquals(expectedWeather, result.weather)
+    }
+
+
+    @ExperimentalCoroutinesApi
+    @Test
+    fun testGetSearchedWeather() = runTest {
+        whenever(remoteWeatherDataSource.getWeather(expectedWeather.cityName)).thenReturn(flowOf(expectedLocationWithWeather))
+        val result = repositoryImpl.getSearchedWeather(expectedWeather.cityName).single()
+        assertEquals(expectedWeather, result.weather)
+
+    }
 
     }

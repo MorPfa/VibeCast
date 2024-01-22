@@ -46,6 +46,7 @@ class ImageRepositoryImplTest {
                 user = "test",
                 downloadLink = "https://dummyurl.com/raw"
             ),
+            timestamp = 1000
         )
     }
 
