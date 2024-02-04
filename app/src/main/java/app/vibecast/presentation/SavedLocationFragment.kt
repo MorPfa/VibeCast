@@ -51,6 +51,10 @@ class SavedLocationFragment : Fragment() {
         _binding = FragmentSavedLocationBinding.inflate(inflater,container,false)
         return binding.root
     }
+
+    /**
+     * Loads and sets new image as background image when location or weather conditions change
+     */
     private fun observeImageData(city: String, weather: String) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {

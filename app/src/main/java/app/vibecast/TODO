@@ -1,7 +1,7 @@
 
 
 Today:
-(re)write unit tests
+implement spotify API
 
 
 
@@ -10,7 +10,7 @@ Today:
 Make another attempt at autocomplete but with autocomplete intent
 optimize image accuracy (maybe go back to GET /search/photos endpoint and combine query with collections)
 
-implement spotify API
+
 implement firebase auth
 
 

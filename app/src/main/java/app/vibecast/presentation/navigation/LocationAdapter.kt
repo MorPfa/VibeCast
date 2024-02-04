@@ -14,7 +14,9 @@ class LocationAdapter(
     private val context: Context,
 ) : ListAdapter<LocationModel, LocationAdapter.LocationViewHolder>(LocationDiffCallback()) {
 
-
+    /**
+     * Captures click on current item and allows for custom logic upon click
+     */
     private var onItemClickListener: ((Int) -> Unit)? = null
 
     fun setOnItemClickListener(listener: (Int) -> Unit) {

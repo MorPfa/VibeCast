@@ -80,6 +80,9 @@ class AccountFragment : Fragment() {
 
     private var alertDialog: AlertDialog? = null
 
+    /**
+     * Shows pop up window to confirm deletion or cancel
+     */
     private fun showDeleteConfirmationDialog(location: LocationModel) {
         val alertDialogBuilder = AlertDialog.Builder(requireContext())
         val customView = LayoutInflater.from(requireContext()).inflate(R.layout.confirm_delete_dialog, null)

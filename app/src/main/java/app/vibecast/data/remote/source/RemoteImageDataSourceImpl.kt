@@ -12,8 +12,12 @@ import retrofit2.HttpException
 import javax.inject.Inject
 
 class RemoteImageDataSourceImpl @Inject constructor(
-    private val imageService: ImageService) : RemoteImageDataSource {
+    private val imageService: ImageService,
+) : RemoteImageDataSource {
 
+    /**
+     *  Fetches list of random images that match query string in some way
+     */
     override fun getImages(query: String): Flow<ImageDto> = flow {
         try {
             val images = imageService.getImages(query, "portrait", 1, "high")
@@ -29,7 +33,10 @@ class RemoteImageDataSourceImpl @Inject constructor(
         }
     }.flowOn(Dispatchers.IO)
 
-
+    /**
+     *  Fetches the specific download URL for specified image which is necessary
+     *  due to the Unsplash API Guidelines
+     */
     override fun getImageForDownload(query: String): Flow<String> = flow {
         val image = imageService.getImageForDownload(query).url
         emit(image)
@@ -38,6 +45,10 @@ class RemoteImageDataSourceImpl @Inject constructor(
     class EmptyApiResponseException(message: String) : Exception(message)
     class ImageFetchException(message: String, cause: Throwable? = null) : Exception(message, cause)
 
+
+    /**
+     *  Converts API response model to Data Transfer Object
+     */
     private fun ImageApiModel.toImagesDto(): ImageDto {
         return ImageDto(
             id = this.id,
@@ -57,12 +68,12 @@ class RemoteImageDataSourceImpl @Inject constructor(
             ),
             links = ImageDto.PhotoLinks(
                 user = this.links.user,
-                downloadLink =  this.links.downloadLink
+                downloadLink = this.links.downloadLink
             ),
             timestamp = null
         )
-        }
     }
+}
 
 
 

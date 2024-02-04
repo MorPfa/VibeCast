@@ -38,7 +38,7 @@ class SearchResultFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requireActivity().onBackPressedDispatcher.addCallback(this) {
-            mainScreenViewModel.loadCurrentLocationWeather()
+            mainScreenViewModel.checkPermissionState()
             findNavController().navigate(R.id.nav_home)
         }
         arguments?.let {
@@ -57,6 +57,9 @@ class SearchResultFragment : Fragment() {
         return binding.root
     }
 
+    /**
+     * Loads and sets new image as background image when location or weather conditions change
+     */
     private fun observeImageData(city: String, weather: String) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {

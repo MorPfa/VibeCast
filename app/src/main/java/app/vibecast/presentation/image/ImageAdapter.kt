@@ -8,7 +8,6 @@ import android.text.SpannableStringBuilder
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,17 +18,18 @@ import androidx.recyclerview.widget.RecyclerView
 import app.vibecast.R
 import app.vibecast.databinding.ItemCardviewBinding
 import app.vibecast.domain.entity.ImageDto
-import app.vibecast.presentation.TAG
 import app.vibecast.presentation.navigation.ImageViewModel
 import java.lang.ref.WeakReference
 
 class ImageAdapter(
     private val imageLoader: ImageLoader,
     context: Context,
-    private val viewModel: ImageViewModel
+    private val viewModel: ImageViewModel,
 ) : ListAdapter<ImageDto, ImageAdapter.PictureViewHolder>(ImageDiffCallback()) {
 
-
+    /**
+     * Captures click on current item and allows for custom logic upon click
+     */
     private var onItemClickListener: ((Int) -> Unit)? = null
 
     fun setOnItemClickListener(listener: (Int) -> Unit) {
@@ -37,12 +37,15 @@ class ImageAdapter(
     }
 
     private val contextReference: WeakReference<Context> = WeakReference(context)
-    inner class PictureViewHolder(binding: ItemCardviewBinding) : RecyclerView.ViewHolder(binding.root) {
+
+    inner class PictureViewHolder(binding: ItemCardviewBinding) :
+        RecyclerView.ViewHolder(binding.root) {
         val savedImage = binding.savedImage
         val attributionText = binding.attributionText
         val removeButton = binding.removeBtn
+
         init {
-            itemView.setOnClickListener{
+            itemView.setOnClickListener {
                 onItemClickListener?.invoke(bindingAdapterPosition)
             }
         }
@@ -57,7 +60,18 @@ class ImageAdapter(
     override fun onBindViewHolder(holder: PictureViewHolder, position: Int) {
         val image = getItem(position)
         imageLoader.loadUrlIntoImageView(image.urls.regular, holder.savedImage)
+        createHotLink(image, holder)
 
+        holder.removeButton.setOnClickListener {
+            viewModel.deleteImage(image)
+        }
+    }
+
+
+    /**
+     * Formats text to be highlighted and gives it hotlink capability
+     */
+    private fun createHotLink(image: ImageDto, holder: PictureViewHolder) {
         val userName = image.user.name
         val userUrl = image.user.attributionUrl
 
@@ -83,10 +97,30 @@ class ImageAdapter(
                     openUrlInBrowser(context, unsplashUrl)
                 }
             }
-            userLink.setSpan(clickableSpanUser, 0, userName.length, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
-            userLink.setSpan(linkColorSpanUser, 0, userName.length, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
-            unsplashLink.setSpan(clickableSpanUnsplash, 0, unsplashText.length, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
-            unsplashLink.setSpan(linkColorSpanUnsplash, 0, unsplashText.length, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
+            userLink.setSpan(
+                clickableSpanUser,
+                0,
+                userName.length,
+                SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+            userLink.setSpan(
+                linkColorSpanUser,
+                0,
+                userName.length,
+                SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+            unsplashLink.setSpan(
+                clickableSpanUnsplash,
+                0,
+                unsplashText.length,
+                SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+            unsplashLink.setSpan(
+                linkColorSpanUnsplash,
+                0,
+                unsplashText.length,
+                SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
         }
         val spannableStringBuilder = SpannableStringBuilder()
             .append("Photo by ")
@@ -95,10 +129,6 @@ class ImageAdapter(
             .append(unsplashLink)
         holder.attributionText.text = spannableStringBuilder
         holder.attributionText.movementMethod = LinkMovementMethod.getInstance()
-
-        holder.removeButton.setOnClickListener {
-            viewModel.deleteImage(image)
-        }
     }
 
     private fun openUrlInBrowser(context: Context, url: String) {

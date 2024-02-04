@@ -19,7 +19,6 @@ class PermissionHelper(private val activity: Activity) {
         return ContextCompat.checkSelfPermission(activity, permission) == PackageManager.PERMISSION_GRANTED
     }
 
-
     fun requestPermission(permission: String, requestCode: Int) {
         ActivityCompat.requestPermissions(
                activity,
@@ -28,12 +27,9 @@ class PermissionHelper(private val activity: Activity) {
             )
         }
 
-
-
-
-
-
-
+    /**
+     * Redirects to settings app to change permissions manually
+     */
     fun openAppSettings() {
         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
         val uri: Uri = Uri.fromParts("package", activity.packageName, null)

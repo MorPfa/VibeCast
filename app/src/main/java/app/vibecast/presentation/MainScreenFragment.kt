@@ -83,7 +83,9 @@ class MainScreenFragment : Fragment() {
     }
 
 
-
+    /**
+     * Loads and sets new image as background image when location or weather conditions change
+     */
     private fun observeImageData(city: String, weather: String) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {

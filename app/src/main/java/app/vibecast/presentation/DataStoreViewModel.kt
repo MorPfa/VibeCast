@@ -16,15 +16,24 @@ class DataStoreViewModel
     private val dataStoreRepository: DataStoreRepository) : ViewModel() {
 
 
+    /**
+     * Updates preferred weather measurement unit
+     */
     fun storeUnit(unit: Unit) = viewModelScope.launch {
         dataStoreRepository.putUnit(unit)
     }
+
+    /**
+     * Gets preferred weather measurement unit
+     */
     fun getUnit(): Flow<Unit?> = flow {
         val unit = dataStoreRepository.getUnit()
         emit(unit)
     }
 
-
+    /**
+     * Resets preferred weather measurement unit
+     */
     fun clearUnit() {
         viewModelScope.launch {
             dataStoreRepository.clearUnit()

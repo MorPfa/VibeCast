@@ -18,6 +18,10 @@ class LocalLocationDataSourceImpl @Inject constructor(
     private val dataStoreRepository: DataStoreRepository
 ) : LocalLocationDataSource {
 
+
+    /**
+     *  Adds location data and associated weather data to database
+     */
     override suspend fun addLocationWithWeather(location: LocationWithWeatherDataDto)  {
         val preferredUnit = dataStoreRepository.getUnit()
         locationDao.addLocationWithWeather(
@@ -32,7 +36,9 @@ class LocalLocationDataSourceImpl @Inject constructor(
             )
     }
 
-
+    /**
+     *  Queries database for all saved locations and their associated weather data
+     */
     override fun getLocationWithWeather(): Flow<List<LocationWithWeatherDataDto>> =
         locationDao.getLocationsWithWeather().map { locationWithWeatherList ->
             locationWithWeatherList.map { locationWithWeatherData ->
@@ -63,7 +69,9 @@ class LocalLocationDataSourceImpl @Inject constructor(
         LocationEntity(location.cityName, location.country)
     )
 
-
+    /**
+     *  Converts DB Entity for weather data into Data Transfer Object
+     */
     private fun WeatherEntity.toWeatherDto(): WeatherDto {
         return WeatherDto(
             cityName = cityName,

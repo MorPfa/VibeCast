@@ -8,7 +8,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.distinctUntilChanged
-import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import app.vibecast.data.TAGS.WEATHER_ERROR
 import app.vibecast.data.data_repository.repository.Unit
@@ -46,12 +45,12 @@ class MainScreenViewModel @Inject constructor(
     private val locationGetter: LocationGetter,
     private val weatherRepository: WeatherRepository,
     private val locationRepository: LocationRepository,
-    private val dataStoreRepository: DataStoreRepository
-): ViewModel() {
+    private val dataStoreRepository: DataStoreRepository,
+) : ViewModel() {
     init {
         viewModelScope.launch {
             locationRepository.getLocations().collect { locations ->
-                withContext(Dispatchers.Main){   _locations.value = locations}
+                withContext(Dispatchers.Main) { _locations.value = locations }
 
             }
         }
@@ -60,8 +59,8 @@ class MainScreenViewModel @Inject constructor(
     private val _currentWeather = MutableLiveData<LocationWeatherModel>()
     val currentWeather: LiveData<LocationWeatherModel> get() = _currentWeather.distinctUntilChanged()
 
-    fun loadCurrentLocationWeather() {
-        viewModelScope.launch(Dispatchers.IO)  {
+    fun checkPermissionState() {
+        viewModelScope.launch(Dispatchers.IO) {
             when (locationPermissionState.value) {
                 LocationPermissionState.Granted -> handleLocationGranted()
                 else -> handleLocationDenied()
@@ -79,6 +78,10 @@ class MainScreenViewModel @Inject constructor(
     }
 
 
+    /**
+     * Queries repository to fetch weather data based on users last known coordinates
+     * fetches weather data for default location if location couldnt be determined
+     */
     @SuppressLint("MissingPermission")
     private suspend fun handleLocationGranted() {
         locationGetter.client.lastLocation
@@ -94,7 +97,7 @@ class MainScreenViewModel @Inject constructor(
                     }
                 } else {
                     // location is null, show default location
-                    viewModelScope.launch(Dispatchers.IO)  {
+                    viewModelScope.launch(Dispatchers.IO) {
                         try {
                             fetchDefaultWeatherData()
                         } catch (e: Exception) {
@@ -117,7 +120,7 @@ class MainScreenViewModel @Inject constructor(
     private suspend fun fetchWeatherData(
         lat: Double,
         lon: Double,
-        weatherLiveDataObj: MutableLiveData<LocationWeatherModel>
+        weatherLiveDataObj: MutableLiveData<LocationWeatherModel>,
     ) {
         try {
             weatherRepository.getWeather(lat, lon).collect { weatherData ->
@@ -130,8 +133,8 @@ class MainScreenViewModel @Inject constructor(
 
 
     private suspend fun fetchWeatherData(
-        cityName : String,
-        weatherLiveDataObj: MutableLiveData<LocationWeatherModel>
+        cityName: String,
+        weatherLiveDataObj: MutableLiveData<LocationWeatherModel>,
     ) {
         try {
             weatherRepository.getWeather(cityName).collect { weatherData ->
@@ -142,10 +145,12 @@ class MainScreenViewModel @Inject constructor(
         }
     }
 
-
+    /**
+     * Updates appropriate livedata object once new weather data has been fetched for it
+     */
     private suspend fun updateWeatherData(
         locationWithWeatherDataDto: LocationWithWeatherDataDto,
-        weatherLiveDataObj: MutableLiveData<LocationWeatherModel>
+        weatherLiveDataObj: MutableLiveData<LocationWeatherModel>,
     ) {
         try {
             val weatherData = convertWeatherDtoToWeatherModel(locationWithWeatherDataDto.weather)
@@ -153,8 +158,9 @@ class MainScreenViewModel @Inject constructor(
                 locationWithWeatherDataDto.location.cityName,
                 locationWithWeatherDataDto.location.country
             )
-            withContext(Dispatchers.Main){
-                weatherLiveDataObj.value = LocationWeatherModel(location = locationData, weather = weatherData)
+            withContext(Dispatchers.Main) {
+                weatherLiveDataObj.value =
+                    LocationWeatherModel(location = locationData, weather = weatherData)
                 setCurrLocation(locationData)
             }
         } catch (e: Exception) {
@@ -167,7 +173,6 @@ class MainScreenViewModel @Inject constructor(
     }
 
 
-
     private val _searchedWeather = MutableLiveData<LocationWeatherModel>()
     val searchedWeather: LiveData<LocationWeatherModel> get() = _searchedWeather.distinctUntilChanged()
 
@@ -178,14 +183,19 @@ class MainScreenViewModel @Inject constructor(
                 weatherRepository.getSearchedWeather(query).collect { data ->
                     try {
 //                        val weatherData = convertWeatherDtoToWeatherModel(data.weather)
-                        withContext(Dispatchers.Main){
+                        withContext(Dispatchers.Main) {
 //                            val location = LocationModel(data.location.cityName, data.location.country)
 //                            _searchedWeather.value = LocationWeatherModel(
 //                            location = location,
 //                            weather = weatherData
 //                        )
                             updateWeatherData(data, _searchedWeather)
-                        setCurrLocation(LocationModel(data.location.cityName, data.location.country))
+                            setCurrLocation(
+                                LocationModel(
+                                    data.location.cityName,
+                                    data.location.country
+                                )
+                            )
                         }
                     } catch (e: Exception) {
                         Log.d(WEATHER_ERROR, "$query viewmodel")
@@ -210,7 +220,8 @@ class MainScreenViewModel @Inject constructor(
                 locationRepository.getLocations().collect { locations ->
                     if (locationIndex.value != null && locations.isNotEmpty()) {
                         try {
-                            weatherRepository.getWeather(locations[locationIndex.value!!].cityName).distinctUntilChanged()
+                            weatherRepository.getWeather(locations[locationIndex.value!!].cityName)
+                                .distinctUntilChanged()
                                 .collect { data ->
                                     try {
 //                                        val weatherData = convertWeatherDtoToWeatherModel(data.weather)
@@ -223,7 +234,12 @@ class MainScreenViewModel @Inject constructor(
 //                                            weather = weatherData
 //                                        )
                                         updateWeatherData(data, _savedWeather)
-                                        setCurrLocation(LocationModel(data.location.cityName, data.location.country))
+                                        setCurrLocation(
+                                            LocationModel(
+                                                data.location.cityName,
+                                                data.location.country
+                                            )
+                                        )
                                     } catch (e: Exception) {
                                         handleError(e)
                                     }
@@ -240,18 +256,15 @@ class MainScreenViewModel @Inject constructor(
     }
 
 
-
     private var _locations = MutableLiveData<List<LocationModel>>()
     val locations: LiveData<List<LocationModel>> get() = _locations
 
     private var _currentLocation = MutableLiveData<LocationModel>()
     val currentLocation: LiveData<LocationModel> get() = _currentLocation.distinctUntilChanged()
 
-    private fun setCurrLocation(location : LocationModel){
+    private fun setCurrLocation(location: LocationModel) {
         _currentLocation.value = location
     }
-
-
 
 
     fun addLocation(location: LocationModel) {
@@ -274,7 +287,7 @@ class MainScreenViewModel @Inject constructor(
         _locationIndex.value = _locationIndex.value?.minus(1)
     }
 
-    fun resetIndex(){
+    fun resetIndex() {
         _locationIndex.value = 0
     }
 
@@ -291,16 +304,15 @@ class MainScreenViewModel @Inject constructor(
     }
 
 
-
-
     private fun handleError(e: Exception) {
         Log.e(TAG, "Error: $e")
         throw e
     }
 
 
-
-
+    /**
+     *  Converts Unix timestamp in seconds to AM PM format
+     */
     private fun convertUnixTimestamp(unixTimestamp: Long, timeZoneId: String): String {
         val date = Date(unixTimestamp * 1000L)
         val sdf = SimpleDateFormat("ha", Locale.getDefault())
@@ -308,71 +320,83 @@ class MainScreenViewModel @Inject constructor(
         return sdf.format(date)
     }
 
+    /**
+     * Formats chance of rain to percentage between 0 and 100
+     */
     private fun formatProp(prop: Double): Int = (prop * 100).toInt()
 
 
+    /**
+     * Formats UV index to number between 0 and 10
+     */
     private fun formatUvi(uvi: Double): Double = uvi * 10
 
 
-    private suspend fun formatVisibility(visibility: Int): String = suspendCoroutine { continuation ->
-        var formattedVisibility: String
+    /**
+     * Formats visibility based on preferred measurement (imperial/metric)
+     */
+    private suspend fun formatVisibility(visibility: Int): String =
+        suspendCoroutine { continuation ->
+            var formattedVisibility: String
 
-        viewModelScope.launch {
-            when (dataStoreRepository.getUnit()) {
-                Unit.IMPERIAL -> formattedVisibility = when {
-                    visibility >= 1000 -> {
-                        val miles = visibility / 1000.0
-                        String.format("%.1f miles", miles)
-                    }
-
-                    else -> {
-                        "$visibility feet"
-                    }
-                }
-
-                Unit.METRIC -> formattedVisibility = when {
-                    visibility >= 1000 -> {
-                        val km = visibility / 1000.0
-                        String.format("%.1f km", km)
-                    }
-
-                    else -> {
-                        "$visibility meters"
-                    }
-                }
-
-                else -> {
-                    formattedVisibility = when {
+            viewModelScope.launch {
+                when (dataStoreRepository.getUnit()) {
+                    Unit.IMPERIAL -> formattedVisibility = when {
                         visibility >= 1000 -> {
                             val miles = visibility / 1000.0
                             String.format("%.1f miles", miles)
                         }
 
                         else -> {
+                            "$visibility feet"
+                        }
+                    }
+
+                    Unit.METRIC -> formattedVisibility = when {
+                        visibility >= 1000 -> {
+                            val km = visibility / 1000.0
+                            String.format("%.1f km", km)
+                        }
+
+                        else -> {
                             "$visibility meters"
                         }
                     }
+
+                    else -> {
+                        formattedVisibility = when {
+                            visibility >= 1000 -> {
+                                val miles = visibility / 1000.0
+                                String.format("%.1f miles", miles)
+                            }
+
+                            else -> {
+                                "$visibility meters"
+                            }
+                        }
+                    }
                 }
+
+                continuation.resume(formattedVisibility)
             }
-
-            continuation.resume(formattedVisibility)
         }
-    }
 
-
-    private fun formatWindSpeed(ws : Double) : String {
+    /**
+     * Formats wind speed based on preferred measurement (imperial/metric)
+     */
+    private fun formatWindSpeed(ws: Double): String {
         var formattedWs = String.format("%.1f mph", ws)
         viewModelScope.launch {
             formattedWs = when (dataStoreRepository.getUnit()) {
                 Unit.IMPERIAL -> String.format("%.1f mph", ws)
                 Unit.METRIC -> String.format("%.1f kmh", ws)
-                        else -> {
-                            String.format("%.1f mph", ws)
-                        }
-                    }
+                else -> {
+                    String.format("%.1f mph", ws)
+                }
+            }
 
         }
-    return formattedWs
+        return formattedWs
     }
 
 
@@ -382,14 +406,27 @@ class MainScreenViewModel @Inject constructor(
             latitude = weatherDto.latitude,
             longitude = weatherDto.longitude,
             timezone = weatherDto.timezone,
-            currentWeather = weatherDto.currentWeather?.let { convertCurrentWeather(it, weatherDto.timezone) },
-            hourlyWeather = weatherDto.hourlyWeather?.map { convertHourlyWeather(it, weatherDto.timezone) }
+            currentWeather = weatherDto.currentWeather?.let {
+                convertCurrentWeather(
+                    it,
+                    weatherDto.timezone
+                )
+            },
+            hourlyWeather = weatherDto.hourlyWeather?.map {
+                convertHourlyWeather(
+                    it,
+                    weatherDto.timezone
+                )
+            }
         )
     }
 
-    private suspend fun convertCurrentWeather(dto: CurrentWeather, timeZoneId: String): WeatherModel.CurrentWeather {
+    private suspend fun convertCurrentWeather(
+        dto: CurrentWeather,
+        timeZoneId: String,
+    ): WeatherModel.CurrentWeather {
         return WeatherModel.CurrentWeather(
-            timestamp = convertUnixTimestamp(dto.timestamp,timeZoneId),
+            timestamp = convertUnixTimestamp(dto.timestamp, timeZoneId),
             temperature = dto.temperature.toInt(),
             feelsLike = dto.feelsLike.toInt(),
             humidity = dto.humidity,
@@ -401,7 +438,10 @@ class MainScreenViewModel @Inject constructor(
         )
     }
 
-    private fun convertHourlyWeather(dto: HourlyWeather, timeZoneId: String): WeatherModel.HourlyWeather {
+    private fun convertHourlyWeather(
+        dto: HourlyWeather,
+        timeZoneId: String,
+    ): WeatherModel.HourlyWeather {
         return WeatherModel.HourlyWeather(
             timestamp = convertUnixTimestamp(dto.timestamp, timeZoneId),
             temperature = dto.temperature.toInt(),
@@ -425,4 +465,4 @@ class MainScreenViewModel @Inject constructor(
         )
     }
 
-    }
+}

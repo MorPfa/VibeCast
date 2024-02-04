@@ -21,6 +21,9 @@ import kotlin.coroutines.cancellation.CancellationException
 class LocalImageDataSourceImpl @Inject constructor(
     private val imageDao: ImageDao) : LocalImageDataSource {
 
+    /**
+     *  Queries database for all saved images and returns them as Image Data Transfer Objects
+     */
     override fun getImages(): Flow<List<ImageDto>> = imageDao.getAllImages().map { imageList ->
         try {
             imageList.map { it.toImageDto() }
@@ -30,6 +33,9 @@ class LocalImageDataSourceImpl @Inject constructor(
         }
     }
 
+    /**
+     *  Adds image to database after converting it to DB Entity
+     */
     override suspend fun addImage(image: ImageDto) {
         withContext(Dispatchers.IO) {
             try {
@@ -61,6 +67,9 @@ class LocalImageDataSourceImpl @Inject constructor(
         }
     }
 
+    /**
+     *  Deletes image from database after converting specified image DTO to DB Entity
+     */
     override suspend fun deleteImage(image: ImageDto) {
         withContext(Dispatchers.IO) {
             try {
@@ -91,6 +100,9 @@ class LocalImageDataSourceImpl @Inject constructor(
     }
 
 
+    /**
+     * Converts Image Entity to Image Data Transfer Object
+     */
     private fun ImageEntity.toImageDto(): ImageDto {
         return ImageDto(
             id = this.id,

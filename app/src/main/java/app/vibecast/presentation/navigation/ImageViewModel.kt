@@ -44,6 +44,10 @@ class ImageViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Queries repository for download URL of an image
+     */
+
     fun getImageForDownload(query: String) : Flow<String> = flow {
         imageRepository.getImageForDownload(query).collect{
             emit(it)
@@ -69,6 +73,10 @@ class ImageViewModel @Inject constructor(
 
     val imageCount = _imageCount
 
+
+    /**
+     * Keeps track of the number of saved images
+     */
     fun setImageCountLiveData(){
         viewModelScope.launch {
             imageRepository.getLocalImages().collect{
@@ -80,7 +88,11 @@ class ImageViewModel @Inject constructor(
 
     }
 
+    /**
+     * Picks image saved on users phone by default in case none can be fetched from the remote datasource
+     */
     fun pickDefaultImage(weatherCondition: String) : Int = imagePicker.pickDefaultImage(weatherCondition)
+
 
     fun loadImageIntoImageView(url: String, imageView: ImageView) {
         imageLoader.loadUrlIntoImageView(url, imageView)

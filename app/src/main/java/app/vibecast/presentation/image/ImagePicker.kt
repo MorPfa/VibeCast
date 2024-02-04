@@ -10,6 +10,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
+/**
+ *  Picks correct query to send to repository based on weather condition or
+ *  picks correct default image in case of no internet or other error
+ */
 class ImagePicker @Inject constructor(
     private val imageRepository: ImageRepository) {
 

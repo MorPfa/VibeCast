@@ -124,7 +124,7 @@ class CurrentLocationViewModelTest{
             val city = "Seattle"
             val expectedWeather = convertWeatherDtoToWeatherModel(weatherDto)
             whenever(weatherRepository.getWeather(city)).thenReturn(flowOf(expectedLocationWithWeather))
-            val result = viewModel.loadCurrentLocationWeather()
+            val result = viewModel.checkPermissionState()
             assertEquals(expectedWeather, result)
         }
     }

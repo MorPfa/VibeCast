@@ -22,6 +22,10 @@ import kotlin.coroutines.cancellation.CancellationException
 class ImageRepositoryImpl @Inject constructor(
     private val remoteImageDataSource: RemoteImageDataSource,
     private val localImageDataSource: LocalImageDataSource) : ImageRepository {
+
+    /**
+     *  Gets an image from the remote datasource
+     */
     override fun getRemoteImages(query: String): Flow<ImageDto> = flow {
         try {
             emitAll(remoteImageDataSource.getImages(query))
@@ -31,7 +35,9 @@ class ImageRepositoryImpl @Inject constructor(
         }
     }.flowOn(Dispatchers.IO)
 
-
+    /**
+     *  Gets the download URL for an image from the remote datasource
+     */
     override fun getImageForDownload(query: String): Flow<String> = flow {
        remoteImageDataSource.getImageForDownload(query).collect{
             emit(it)
@@ -39,6 +45,9 @@ class ImageRepositoryImpl @Inject constructor(
 
     }
 
+    /**
+     *  Queries database for all saved images
+     */
     override fun getLocalImages(): Flow<List<ImageDto>> = flow {
         try {
             emitAll(localImageDataSource.getImages())
@@ -49,7 +58,9 @@ class ImageRepositoryImpl @Inject constructor(
         }
     }.flowOn(Dispatchers.IO)
 
-
+    /**
+     *  Adds image to database
+     */
     override fun addImage(imageDto: ImageDto) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -62,7 +73,9 @@ class ImageRepositoryImpl @Inject constructor(
         }
     }
 
-
+    /**
+     *  Deletes image from database
+     */
     override fun deleteImage(imageDto: ImageDto) {
         CoroutineScope(Dispatchers.IO).launch {
             try {

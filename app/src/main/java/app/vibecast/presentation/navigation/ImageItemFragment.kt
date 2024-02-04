@@ -11,7 +11,6 @@ import android.text.SpannableStringBuilder
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,7 +21,6 @@ import androidx.lifecycle.lifecycleScope
 import app.vibecast.R
 import app.vibecast.databinding.FragmentImageItemBinding
 import app.vibecast.domain.entity.ImageDto
-import app.vibecast.presentation.TAG
 import app.vibecast.presentation.image.ImageLoader
 import app.vibecast.presentation.image.ImageSaver
 import kotlinx.coroutines.launch
@@ -136,7 +134,19 @@ class ImageItemFragment : DialogFragment() {
 
     }
 
-
+    /**
+     * Retrieves a Parcelable object from the Bundle associated with the given key.
+     *
+     * This extension function is declared as `inline` to allow reified type parameters,
+     * providing a convenient and type-safe way to extract Parcelable objects from a Bundle.
+     *
+     * @param key The key associated with the Parcelable object in the Bundle.
+     * @return The Parcelable object of type [T], or `null` if not found.
+     *
+     * @see Parcelable
+     * @see Bundle.getParcelable
+     * @see Bundle.getParcelable(Class)
+     */
     private inline fun <reified T : Parcelable> Bundle.parcelable(key: String): T? = when {
         SDK_INT >= 33 -> getParcelable(key, T::class.java)
         else -> @Suppress("DEPRECATION") getParcelable(key) as? T

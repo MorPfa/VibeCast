@@ -17,7 +17,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.MediatorLiveData
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -27,8 +26,6 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import app.vibecast.R
 import app.vibecast.databinding.ActivityMainBinding
-import app.vibecast.domain.entity.ImageDto
-import app.vibecast.domain.entity.LocationDto
 import app.vibecast.presentation.mainscreen.MainScreenViewModel
 import app.vibecast.presentation.navigation.ImageViewModel
 import app.vibecast.presentation.permissions.LocationPermissionState
@@ -47,7 +44,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var searchView: SearchView
     private val mainScreenViewModel : MainScreenViewModel by viewModels()
     private val imageViewModel : ImageViewModel by viewModels()
-    private lateinit var currentImage : ImageDto
     private var showIcons : Boolean = true
     private lateinit var permissionHelper: PermissionHelper
 
@@ -109,7 +105,7 @@ class MainActivity : AppCompatActivity() {
         if (permissionHelper.isPermissionGranted(Manifest.permission.ACCESS_COARSE_LOCATION)) {
             // Permission is granted, load weather data
             mainScreenViewModel.updatePermissionState(LocationPermissionState.Granted)
-            mainScreenViewModel.loadCurrentLocationWeather()
+            mainScreenViewModel.checkPermissionState()
         } else {
             // Permission not granted, request it
             permissionHelper.requestPermission(
@@ -130,11 +126,11 @@ class MainActivity : AppCompatActivity() {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // Permission granted, update state and load weather data
                     mainScreenViewModel.updatePermissionState(LocationPermissionState.Granted)
-                    mainScreenViewModel.loadCurrentLocationWeather()
+                    mainScreenViewModel.checkPermissionState()
                 } else {
                     // Permission denied, update state and handle accordingly
                     mainScreenViewModel.updatePermissionState(LocationPermissionState.Denied)
-                    mainScreenViewModel.loadCurrentLocationWeather()
+                    mainScreenViewModel.checkPermissionState()
                     Toast.makeText(this,
                         getString(R.string.location_request_toast), Toast.LENGTH_SHORT).show()
                 }
@@ -142,6 +138,9 @@ class MainActivity : AppCompatActivity() {
 
         }
     }
+    /**
+     * Sets up App bar and captures search queries
+     */
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main, menu)
         val search = menu.findItem(R.id.action_search)
@@ -196,6 +195,10 @@ class MainActivity : AppCompatActivity() {
         )
         return true
     }
+    /**
+     * Checks if input is anything other than letters or whitespace
+     * Everything else is handled by the API
+     */
     fun isInputValid(input: String): Boolean {
         val validCharactersWithSpaces = Regex("[a-zA-Z ]+")
         return input.matches(validCharactersWithSpaces)
@@ -231,35 +234,34 @@ class MainActivity : AppCompatActivity() {
 
 
 
-
+    /**
+     * Captures clicks on either of the App bar buttons to save images or locations currently in view
+     */
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_save_image -> {
                 if (imageViewModel.image.value != null) {
                     if (!item.isChecked) {
                         item.isChecked = true
-                        imageViewModel.addImage(currentImage)
+                        imageViewModel.addImage(imageViewModel.image.value!!)
                         item.icon = ContextCompat.getDrawable(this, R.drawable.favorite_selected)
                     } else {
                         item.isChecked = false
-                        imageViewModel.deleteImage(currentImage)
+                        imageViewModel.deleteImage(imageViewModel.image.value!!)
                         item.icon = ContextCompat.getDrawable(this, R.drawable.favorite_unselected)
                     }
                 }
                 true
             }
             R.id.action_save_location -> {
-                if (item.isCheckable) {
                     if (!item.isChecked) {
                         item.isChecked = true
-
                         mainScreenViewModel.addLocation(mainScreenViewModel.currentLocation.value!!)
                         item.icon = ContextCompat.getDrawable(this, R.drawable.delete_location_icon)
                     } else {
                         item.isChecked = false
                         mainScreenViewModel.deleteLocation(mainScreenViewModel.currentLocation.value!!)
                         item.icon = ContextCompat.getDrawable(this, R.drawable.save_location_icon)
-                    }
                 }
                 true
             }
@@ -271,7 +273,7 @@ class MainActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_content_home)
         if (navController.currentDestination?.id == R.id.nav_search) {
-            mainScreenViewModel.loadCurrentLocationWeather()
+            mainScreenViewModel.checkPermissionState()
         }
 
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()

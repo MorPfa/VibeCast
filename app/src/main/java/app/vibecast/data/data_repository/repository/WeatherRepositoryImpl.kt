@@ -31,7 +31,9 @@ class WeatherRepositoryImpl @Inject constructor(
     @ApplicationContext private val appContext: Context
 ) : WeatherRepository{
 
-
+    /**
+     *  Gets weather data and location data from remote datasource based on search query
+     */
     override fun getSearchedWeather(cityName: String): Flow<LocationWithWeatherDataDto> = flow{
         try{
             remoteWeatherDataSource.getWeather(cityName).collect{
@@ -44,6 +46,13 @@ class WeatherRepositoryImpl @Inject constructor(
         }
 
     }.flowOn(Dispatchers.IO)
+
+    /**
+     *  Attempts to get weather data and location data for saved location from database.
+     *  If data is older than 20 minutes or the preference for weather units
+     *  has changed since data was last cached, DataOutdatedException is thrown
+     *  and data is fetched from server
+     */
 
     override fun getWeather(cityName: String): Flow<LocationWithWeatherDataDto> = flow {
         try {
@@ -81,7 +90,12 @@ class WeatherRepositoryImpl @Inject constructor(
     }.flowOn(Dispatchers.IO)
 
 
-
+    /**
+     *  Attempts to get weather data and location data for current location from database.
+     *  If data is older than 20 minutes or the preference for weather units
+     *  has changed since data was last cached, DataOutdatedException is thrown
+     *  and data is fetched from server
+     */
     override fun getWeather(lat: Double, lon: Double): Flow<LocationWithWeatherDataDto> = flow {
         remoteWeatherDataSource.getCity(lat, lon)
             .onCompletion { cause ->

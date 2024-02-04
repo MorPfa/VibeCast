@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 
-private val Context.dataStore : DataStore<Preferences> by preferencesDataStore(name = DATASTORE_NAME)
+private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = DATASTORE_NAME)
 
 class DataStoreRepositoryImpl @Inject constructor(
     private val context: Context
@@ -21,12 +21,17 @@ class DataStoreRepositoryImpl @Inject constructor(
 
     private val unitKey = stringPreferencesKey(UNIT)
 
+    /**
+     *  Updates preferred Unit for Weather
+     */
     override suspend fun putUnit(unit: Unit) {
         context.dataStore.edit { preferences ->
             preferences[unitKey] = unit.name
         }
     }
-
+    /**
+     *  Gets preferred Unit for Weather
+     */
     override suspend fun getUnit(): Unit? {
         return try {
             val preferences = context.dataStore.data.first()
@@ -37,7 +42,9 @@ class DataStoreRepositoryImpl @Inject constructor(
             null
         }
     }
-
+    /**
+     *  Resets preferred Unit for Weather
+     */
     override suspend fun clearUnit() {
         context.dataStore.edit { preferences ->
             if (preferences.contains(unitKey)) {
@@ -46,12 +53,12 @@ class DataStoreRepositoryImpl @Inject constructor(
         }
     }
 }
+
 object Constants {
     const val DATASTORE_NAME = "preferences"
     const val UNIT = "UNIT"
 }
 
 enum class Unit {
-    IMPERIAL,
-    METRIC
+    IMPERIAL, METRIC
 }

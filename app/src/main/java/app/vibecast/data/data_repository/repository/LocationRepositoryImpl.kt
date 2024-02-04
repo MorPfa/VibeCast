@@ -23,6 +23,10 @@ class LocationRepositoryImpl @Inject constructor(
     private val remoteWeatherDataSource: RemoteWeatherDataSource
 ) : LocationRepository {
     private val backgroundScope = CoroutineScope(Dispatchers.IO)
+
+    /**
+     *  Updates weather data for specified location
+     */
     override fun refreshLocationWeather() : Flow<List<LocationWithWeatherDataDto>> {
         backgroundScope.launch {
             localLocationDataSource.getLocationWithWeather().map { locationWithWeatherDataList ->
@@ -39,7 +43,6 @@ class LocationRepositoryImpl @Inject constructor(
 
                 }.single()
         }
-        //TODO figure out how to test this method / if return value is needed
         return localLocationDataSource.getLocationWithWeather()
     }
 
@@ -54,7 +57,6 @@ class LocationRepositoryImpl @Inject constructor(
                 val selectedLocationWithWeather = locationWithWeatherDataList[index]
                 selectedLocationWithWeather.weather
             } else {
-                //TODO Handle index out of bounds or other error cases here
                 WeatherDto(
                     cityName = "",
                     country = "",

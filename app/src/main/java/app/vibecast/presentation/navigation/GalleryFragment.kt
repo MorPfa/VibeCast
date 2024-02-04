@@ -4,24 +4,19 @@ package app.vibecast.presentation.navigation
 
 import android.app.Activity
 import android.content.Context
-import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.util.DisplayMetrics
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowInsets
-import androidx.databinding.DataBindingUtil.setContentView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import app.vibecast.R
 import app.vibecast.databinding.FragmentPicturesBinding
 import app.vibecast.domain.entity.ImageDto
-import app.vibecast.presentation.TAG
 import app.vibecast.presentation.image.ImageAdapter
 import app.vibecast.presentation.image.ImageLoader
 import kotlin.math.pow
@@ -81,6 +76,10 @@ class GalleryFragment : Fragment() {
 
 
     }
+
+    /**
+     * Determines screenSize to adapt number of columns in recyclerview
+     */
     @Suppress("DEPRECATION")
     private fun isTablet(activity: Activity): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {

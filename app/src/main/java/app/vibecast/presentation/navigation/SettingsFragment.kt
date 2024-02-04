@@ -95,7 +95,7 @@ class SettingsFragment : Fragment() {
                 else -> Unit.IMPERIAL // Default to imperial if none is selected
             }
             viewModel.storeUnit(selectedUnit)
-            mainScreenViewModel.loadCurrentLocationWeather()
+            mainScreenViewModel.checkPermissionState()
 
         }
     }
