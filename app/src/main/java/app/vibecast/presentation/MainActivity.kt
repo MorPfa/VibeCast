@@ -2,9 +2,11 @@ package app.vibecast.presentation
 
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.Menu
@@ -27,11 +29,21 @@ import androidx.navigation.ui.setupWithNavController
 import app.vibecast.R
 import app.vibecast.databinding.ActivityMainBinding
 import app.vibecast.presentation.mainscreen.MainScreenViewModel
+import app.vibecast.presentation.music.MusicViewModel
+import app.vibecast.presentation.music.MusicViewModelFactory
 import app.vibecast.presentation.navigation.ImageViewModel
 import app.vibecast.presentation.permissions.LocationPermissionState
 import app.vibecast.presentation.permissions.PermissionHelper
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
+import com.spotify.android.appremote.api.ConnectionParams
+import com.spotify.android.appremote.api.Connector
+import com.spotify.android.appremote.api.SpotifyAppRemote
+import com.spotify.protocol.types.Track
+import com.spotify.sdk.android.auth.AccountsQueryParameters.CLIENT_ID
+import com.spotify.sdk.android.auth.AuthorizationClient
+import com.spotify.sdk.android.auth.AuthorizationRequest
+import com.spotify.sdk.android.auth.AuthorizationResponse
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -43,9 +55,73 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var searchView: SearchView
     private val mainScreenViewModel : MainScreenViewModel by viewModels()
+    private val musicViewModel : MusicViewModel by viewModels{  MusicViewModelFactory(spotifyAppRemote) }
     private val imageViewModel : ImageViewModel by viewModels()
     private var showIcons : Boolean = true
     private lateinit var permissionHelper: PermissionHelper
+
+
+    private val clientId = "f4ab03e75c1e45b098bafcf905ad38c5"
+    private val redirectUri = "vibecast://callback"
+    private var spotifyAppRemote: SpotifyAppRemote? = null
+
+
+    private val REQUEST_CODE = 1337
+    private val REDIRECT_URI = "vibecast://callback"
+
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
+        super.onActivityResult(requestCode, resultCode, intent)
+
+        // Check if result comes from the correct activity
+        if (requestCode == REQUEST_CODE) {
+            val response = AuthorizationClient.getResponse(resultCode, intent)
+            when (response.type) {
+                AuthorizationResponse.Type.TOKEN -> {}
+                AuthorizationResponse.Type.ERROR -> {}
+                else -> {}
+            }
+        }
+    }
+
+
+    override fun onStart() {
+        super.onStart()
+        val connectionParams = ConnectionParams.Builder(clientId)
+            .setRedirectUri(redirectUri)
+            .showAuthView(true)
+            .build()
+
+        SpotifyAppRemote.disconnect(spotifyAppRemote)
+
+        val builder =
+            AuthorizationRequest.Builder(CLIENT_ID, AuthorizationResponse.Type.TOKEN, REDIRECT_URI)
+        builder.setScopes(arrayOf("streaming"))
+        val request = builder.build()
+
+        AuthorizationClient.openLoginActivity(this, REQUEST_CODE, request)
+
+        SpotifyAppRemote.connect(this, connectionParams, object : Connector.ConnectionListener {
+            override fun onConnected(appRemote: SpotifyAppRemote) {
+                spotifyAppRemote = appRemote
+                Log.d(TAG, "Connected! Yay!")
+                // Now you can start interacting with App Remote
+                musicViewModel.connected()
+            }
+
+            override fun onFailure(throwable: Throwable) {
+                Log.e(TAG, throwable.message, throwable)
+                // Something went wrong when attempting to connect! Handle errors here
+            }
+        })
+    }
+
+
+
+    override fun onStop() {
+        super.onStop()
+            SpotifyAppRemote.disconnect(spotifyAppRemote)
+    }
 
 
     companion object {
@@ -117,7 +193,7 @@ class MainActivity : AppCompatActivity() {
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
-        grantResults: IntArray
+        grantResults: IntArray,
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 

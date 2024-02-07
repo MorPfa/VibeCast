@@ -102,12 +102,17 @@ dependencies {
 
 //    Spotify
     implementation ("com.spotify.android:auth:1.2.3")
+    implementation("com.google.code.gson:gson:2.10")
+    implementation("androidx.browser:browser:1.7.0")
+
 
 //    Navigation
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.4")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.4")
     implementation("com.google.android.gms:play-services-location:21.0.1")
     implementation("androidx.test:core-ktx:1.5.0")
+    implementation(files("libs/spotify-app-remote-release-0.8.0.aar"))
+
     debugImplementation("androidx.fragment:fragment-testing:1.6.2")
     implementation("androidx.test.espresso:espresso-contrib:3.5.1")
     val room_version = "2.6.0"

@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
@@ -18,6 +20,7 @@ import androidx.navigation.fragment.findNavController
 import app.vibecast.R
 import app.vibecast.databinding.FragmentMainScreenBinding
 import app.vibecast.presentation.mainscreen.MainScreenViewModel
+import app.vibecast.presentation.music.MusicViewModel
 import app.vibecast.presentation.navigation.ImageViewModel
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -35,18 +38,15 @@ class MainScreenFragment : Fragment() {
     private lateinit var actionBar: ActionBar
     private val mainScreenViewModel: MainScreenViewModel by activityViewModels()
     private val imageViewModel: ImageViewModel by activityViewModels()
+    private val musicViewModel: MusicViewModel by activityViewModels()
+    private lateinit var playbackButton : ImageButton
 
-    private var param1: String? = null
-    private var param2: String? = null
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+    private fun updateButtonIcon(isPlaying : Boolean) {
+        if (isPlaying) {
+            playbackButton.setImageResource(R.drawable.pause_btn)
+        } else {
+            playbackButton.setImageResource(R.drawable.play_btn)
         }
-
     }
 
     @SuppressLint("SourceLockedOrientationActivity")
@@ -55,10 +55,17 @@ class MainScreenFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-
         _binding = FragmentMainScreenBinding.inflate(inflater,container,false)
+        playbackButton = binding.musicWidget.playPauseButton
         actionBar = (requireActivity() as AppCompatActivity).supportActionBar!!
         actionBar.show()
+        musicViewModel.isPlaying.observe(viewLifecycleOwner) { isPlaying ->
+            updateButtonIcon(isPlaying)
+        }
+        playbackButton.setOnClickListener{
+           musicViewModel.onPlayPauseButtonClicked()
+        }
+
         val nextScreenButton = binding.nextScreenButton
         nextScreenButton.setOnClickListener {
             if (mainScreenViewModel.locations.value?.size != 0){
@@ -199,10 +206,7 @@ class MainScreenFragment : Fragment() {
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
             MainScreenFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+
             }
     }
 }
