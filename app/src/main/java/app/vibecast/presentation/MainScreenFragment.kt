@@ -65,6 +65,12 @@ class MainScreenFragment : Fragment() {
         playbackButton.setOnClickListener{
            musicViewModel.onPlayPauseButtonClicked()
         }
+        binding.musicWidget.forwardButton.setOnClickListener{
+            musicViewModel.onSkipNextButtonClicked()
+        }
+        binding.musicWidget.rewindButton.setOnClickListener {
+            musicViewModel.onSkipPreviousButtonClicked()
+        }
 
         val nextScreenButton = binding.nextScreenButton
         nextScreenButton.setOnClickListener {
