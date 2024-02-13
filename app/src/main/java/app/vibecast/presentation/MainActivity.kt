@@ -30,19 +30,13 @@ import app.vibecast.R
 import app.vibecast.databinding.ActivityMainBinding
 import app.vibecast.presentation.mainscreen.MainScreenViewModel
 import app.vibecast.presentation.music.MusicViewModel
-import app.vibecast.presentation.music.MusicViewModelFactory
 import app.vibecast.presentation.navigation.ImageViewModel
 import app.vibecast.presentation.permissions.LocationPermissionState
 import app.vibecast.presentation.permissions.PermissionHelper
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
-import com.spotify.android.appremote.api.ConnectionParams
-import com.spotify.android.appremote.api.Connector
 import com.spotify.android.appremote.api.SpotifyAppRemote
-import com.spotify.protocol.types.Track
-import com.spotify.sdk.android.auth.AccountsQueryParameters.CLIENT_ID
 import com.spotify.sdk.android.auth.AuthorizationClient
-import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -54,20 +48,18 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private lateinit var searchView: SearchView
-    private val mainScreenViewModel : MainScreenViewModel by viewModels()
-    private val musicViewModel : MusicViewModel by viewModels{  MusicViewModelFactory(spotifyAppRemote) }
-    private val imageViewModel : ImageViewModel by viewModels()
-    private var showIcons : Boolean = true
+    private val mainScreenViewModel: MainScreenViewModel by viewModels()
+    private val imageViewModel: ImageViewModel by viewModels()
+    private val musicViewModel: MusicViewModel by viewModels()
+    private var showIcons: Boolean = true
     private lateinit var permissionHelper: PermissionHelper
 
 
-    private val clientId = "f4ab03e75c1e45b098bafcf905ad38c5"
-    private val redirectUri = "vibecast://callback"
-    private var spotifyAppRemote: SpotifyAppRemote? = null
+
+
 
 
     private val REQUEST_CODE = 1337
-    private val REDIRECT_URI = "vibecast://callback"
 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
@@ -85,48 +77,10 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    override fun onStart() {
-        super.onStart()
-        val connectionParams = ConnectionParams.Builder(clientId)
-            .setRedirectUri(redirectUri)
-            .showAuthView(true)
-            .build()
-
-        SpotifyAppRemote.disconnect(spotifyAppRemote)
-
-        val builder =
-            AuthorizationRequest.Builder(CLIENT_ID, AuthorizationResponse.Type.TOKEN, REDIRECT_URI)
-        builder.setScopes(arrayOf("streaming"))
-        val request = builder.build()
-
-        AuthorizationClient.openLoginActivity(this, REQUEST_CODE, request)
-
-        SpotifyAppRemote.connect(this, connectionParams, object : Connector.ConnectionListener {
-            override fun onConnected(appRemote: SpotifyAppRemote) {
-                spotifyAppRemote = appRemote
-                Log.d(TAG, "Connected! Yay!")
-                // Now you can start interacting with App Remote
-                musicViewModel.connected()
-            }
-
-            override fun onFailure(throwable: Throwable) {
-                Log.e(TAG, throwable.message, throwable)
-                // Something went wrong when attempting to connect! Handle errors here
-            }
-        })
-    }
-
-
-
-    override fun onStop() {
-        super.onStop()
-            SpotifyAppRemote.disconnect(spotifyAppRemote)
-    }
-
-
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -135,7 +89,8 @@ class MainActivity : AppCompatActivity() {
         handleLocationAndWeather()
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_home) as NavHostFragment
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_home) as NavHostFragment
         val navController = navHostFragment.navController
 
         appBarConfiguration = AppBarConfiguration(
@@ -152,24 +107,35 @@ class MainActivity : AppCompatActivity() {
         NavigationUI.setupWithNavController(binding.navView, navController)
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            when(destination.id){
-                R.id.nav_account -> {   showIcons = false
-                                        invalidateOptionsMenu()
+            when (destination.id) {
+                R.id.nav_account -> {
+                    showIcons = false
+                    invalidateOptionsMenu()
                 }
-                R.id.nav_pictures -> {  showIcons = false
-                                        invalidateOptionsMenu()
+
+                R.id.nav_pictures -> {
+                    showIcons = false
+                    invalidateOptionsMenu()
                 }
-                R.id.nav_settings -> {  showIcons = false
-                                        invalidateOptionsMenu()
+
+                R.id.nav_settings -> {
+                    showIcons = false
+                    invalidateOptionsMenu()
                 }
-                R.id.nav_home -> {      showIcons = true
-                                        invalidateOptionsMenu()
+
+                R.id.nav_home -> {
+                    showIcons = true
+                    invalidateOptionsMenu()
                 }
-                R.id.nav_search -> {  showIcons = true
-                                        invalidateOptionsMenu()
+
+                R.id.nav_search -> {
+                    showIcons = true
+                    invalidateOptionsMenu()
                 }
-                R.id.nav_saved -> {  showIcons = true
-                                        invalidateOptionsMenu()
+
+                R.id.nav_saved -> {
+                    showIcons = true
+                    invalidateOptionsMenu()
                 }
             }
         }
@@ -190,6 +156,7 @@ class MainActivity : AppCompatActivity() {
             )
         }
     }
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -207,13 +174,16 @@ class MainActivity : AppCompatActivity() {
                     // Permission denied, update state and handle accordingly
                     mainScreenViewModel.updatePermissionState(LocationPermissionState.Denied)
                     mainScreenViewModel.checkPermissionState()
-                    Toast.makeText(this,
-                        getString(R.string.location_request_toast), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this,
+                        getString(R.string.location_request_toast), Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
 
         }
     }
+
     /**
      * Sets up App bar and captures search queries
      */
@@ -223,23 +193,23 @@ class MainActivity : AppCompatActivity() {
         searchView = search.actionView as SearchView
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String): Boolean {
-                if (isInputValid(query)){
+                if (isInputValid(query)) {
                     search.collapseActionView()
                     mainScreenViewModel.getSearchedLocationWeather(query)
-                    val currentDestination = findNavController(R.id.nav_host_fragment_content_home).currentDestination
+                    val currentDestination =
+                        findNavController(R.id.nav_host_fragment_content_home).currentDestination
                     if (currentDestination?.id == R.id.nav_home) {
-                        val action = MainScreenFragmentDirections.actionNavHomeToSearchResultFragment()
+                        val action =
+                            MainScreenFragmentDirections.actionNavHomeToSearchResultFragment()
                         findNavController(R.id.nav_host_fragment_content_home).navigate(action)
-                    }
-                    else if (currentDestination?.id == R.id.nav_saved) {
+                    } else if (currentDestination?.id == R.id.nav_saved) {
                         val action =
                             SavedLocationFragmentDirections.actionNavSavedToNavSearch()
                         findNavController(R.id.nav_host_fragment_content_home).navigate(action)
                     }
                     searchView.clearFocus()
 
-                }
-                else {
+                } else {
                     val snackbar = Snackbar.make(
                         findViewById(android.R.id.content),
                         getString(R.string.invalid_query_input),
@@ -247,9 +217,16 @@ class MainActivity : AppCompatActivity() {
                     )
 
                     val snackbarView = snackbar.view
-                    val snackbarText = snackbarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
-                    snackbarText.setTextColor(ContextCompat.getColor(this@MainActivity, R.color.white))
-                    snackbarView.background = ContextCompat.getDrawable(this@MainActivity, R.drawable.snackbar_background)
+                    val snackbarText =
+                        snackbarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+                    snackbarText.setTextColor(
+                        ContextCompat.getColor(
+                            this@MainActivity,
+                            R.color.white
+                        )
+                    )
+                    snackbarView.background =
+                        ContextCompat.getDrawable(this@MainActivity, R.drawable.snackbar_background)
                     val params = snackbarView.layoutParams as FrameLayout.LayoutParams
                     params.gravity = Gravity.TOP
                     snackbarView.layoutParams = params
@@ -264,6 +241,7 @@ class MainActivity : AppCompatActivity() {
                 invalidateOptionsMenu()
                 return true
             }
+
             override fun onQueryTextChange(newText: String): Boolean {
                 return true
             }
@@ -271,6 +249,7 @@ class MainActivity : AppCompatActivity() {
         )
         return true
     }
+
     /**
      * Checks if input is anything other than letters or whitespace
      * Everything else is handled by the API
@@ -284,7 +263,10 @@ class MainActivity : AppCompatActivity() {
     fun getActionBarHeight(): Int {
         val typedValue = TypedValue()
         if (theme.resolveAttribute(android.R.attr.actionBarSize, typedValue, true)) {
-            return (TypedValue.complexToDimensionPixelSize(typedValue.data, resources.displayMetrics)) + 100
+            return (TypedValue.complexToDimensionPixelSize(
+                typedValue.data,
+                resources.displayMetrics
+            )) + 100
         }
         return 0
     }
@@ -309,7 +291,6 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-
     /**
      * Captures clicks on either of the App bar buttons to save images or locations currently in view
      */
@@ -329,18 +310,20 @@ class MainActivity : AppCompatActivity() {
                 }
                 true
             }
+
             R.id.action_save_location -> {
-                    if (!item.isChecked) {
-                        item.isChecked = true
-                        mainScreenViewModel.addLocation(mainScreenViewModel.currentLocation.value!!)
-                        item.icon = ContextCompat.getDrawable(this, R.drawable.delete_location_icon)
-                    } else {
-                        item.isChecked = false
-                        mainScreenViewModel.deleteLocation(mainScreenViewModel.currentLocation.value!!)
-                        item.icon = ContextCompat.getDrawable(this, R.drawable.save_location_icon)
+                if (!item.isChecked) {
+                    item.isChecked = true
+                    mainScreenViewModel.addLocation(mainScreenViewModel.currentLocation.value!!)
+                    item.icon = ContextCompat.getDrawable(this, R.drawable.delete_location_icon)
+                } else {
+                    item.isChecked = false
+                    mainScreenViewModel.deleteLocation(mainScreenViewModel.currentLocation.value!!)
+                    item.icon = ContextCompat.getDrawable(this, R.drawable.save_location_icon)
                 }
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -355,5 +338,18 @@ class MainActivity : AppCompatActivity() {
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
+    private fun logError(throwable: Throwable) {
+        Log.e(TAG, "${throwable.message}", throwable)
+    }
 
+
+    override fun onStart() {
+        super.onStart()
+        musicViewModel.connectToSpotify()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        musicViewModel.disconnectFromSpotify()
+    }
 }

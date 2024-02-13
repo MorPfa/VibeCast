@@ -3,10 +3,10 @@ package app.vibecast.presentation
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.ActionBar
@@ -23,16 +23,17 @@ import app.vibecast.presentation.mainscreen.MainScreenViewModel
 import app.vibecast.presentation.music.MusicViewModel
 import app.vibecast.presentation.navigation.ImageViewModel
 import com.google.android.material.snackbar.Snackbar
+import com.google.gson.GsonBuilder
+import com.spotify.protocol.client.Subscription
+import com.spotify.protocol.types.PlayerState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
 @AndroidEntryPoint
-class MainScreenFragment : Fragment() {
+class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
     private var _binding: FragmentMainScreenBinding? = null
     private val binding get() = _binding!!
     private lateinit var actionBar: ActionBar
@@ -41,12 +42,18 @@ class MainScreenFragment : Fragment() {
     private val musicViewModel: MusicViewModel by activityViewModels()
     private lateinit var playbackButton : ImageButton
 
-    private fun updateButtonIcon(isPlaying : Boolean) {
-        if (isPlaying) {
-            playbackButton.setImageResource(R.drawable.pause_btn)
-        } else {
+    private fun updateButtonIcon(playerState: PlayerState) {
+
+        if (playerState.isPaused) {
             playbackButton.setImageResource(R.drawable.play_btn)
+        } else {
+
+            playbackButton.setImageResource(R.drawable.pause_btn)
         }
+    }
+
+    override fun onPlayerStateUpdated(playerState: PlayerState) {
+        updateUI(playerState)
     }
 
     @SuppressLint("SourceLockedOrientationActivity")
@@ -56,12 +63,10 @@ class MainScreenFragment : Fragment() {
     ): View {
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         _binding = FragmentMainScreenBinding.inflate(inflater,container,false)
+        musicViewModel.setPlayerStateListener(this)
         playbackButton = binding.musicWidget.playPauseButton
         actionBar = (requireActivity() as AppCompatActivity).supportActionBar!!
         actionBar.show()
-        musicViewModel.isPlaying.observe(viewLifecycleOwner) { isPlaying ->
-            updateButtonIcon(isPlaying)
-        }
         playbackButton.setOnClickListener{
            musicViewModel.onPlayPauseButtonClicked()
         }
@@ -131,9 +136,13 @@ class MainScreenFragment : Fragment() {
             }
         }
     }
+    private fun updateUI(playerState: PlayerState) {
+        updateButtonIcon(playerState)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         lifecycleScope.launch {
             mainScreenViewModel.currentWeather.distinctUntilChanged().observe(viewLifecycleOwner) { weatherData ->
                     weatherData.weather.currentWeather?.let { currentWeather ->
@@ -205,12 +214,11 @@ class MainScreenFragment : Fragment() {
          * Use this factory method to create a new instance of
          * this fragment using the provided parameters.
          *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
+         *
          * @return A new instance of fragment CurrentLocationFragment.
          */
         @JvmStatic
-        fun newInstance(param1: String, param2: String) =
+        fun newInstance() =
             MainScreenFragment().apply {
 
             }

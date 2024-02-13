@@ -38,6 +38,10 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name="com.spotify.sdk.android.auth.LoginActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar">
+        </activity>
         <service
             android:name="androidx.work.impl.background.systemalarm.SystemAlarmService"
             android:exported="false" />

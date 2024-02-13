@@ -16,6 +16,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
+
         applicationId = "app.vibecast"
         minSdk = 24
         targetSdk = 33
@@ -48,6 +49,11 @@ android {
             name = "MAPS_KEY",
             value = mapsKey
         )
+
+        addManifestPlaceholders(mapOf(
+            "redirectSchemeName" to "spotify-sdk",
+            "redirectHostName" to "auth"
+        ))
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -101,7 +107,7 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:21.0.1")
 
 //    Spotify
-    implementation ("com.spotify.android:auth:1.2.3")
+    implementation ("com.spotify.android:auth:2.0.1")
     implementation("com.google.code.gson:gson:2.10")
     implementation("androidx.browser:browser:1.7.0")
 

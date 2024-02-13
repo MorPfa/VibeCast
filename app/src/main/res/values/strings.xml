@@ -116,7 +116,8 @@
     <string name="skip_to_next_song">Skip to next song</string>
     <string name="pause_or_resume_current_song">Pause or resume current song</string>
     <string name="saved_location">%1$s - %2$s</string>
-
+    <string name="shuffle_current_playlist">Shuffle current playlist</string>
+    <string name="play_playlist_in_loop">Play playlist in loop</string>
 
 
 </resources>
