@@ -1,6 +1,7 @@
 package app.vibecast.presentation.music
 
 import android.app.Application
+import android.graphics.Color
 import android.util.Log
 import android.view.View
 import androidx.lifecycle.AndroidViewModel
@@ -17,6 +18,7 @@ import com.spotify.android.appremote.api.error.SpotifyDisconnectedException
 import com.spotify.protocol.client.Subscription
 import com.spotify.protocol.types.PlayerContext
 import com.spotify.protocol.types.PlayerState
+import com.spotify.protocol.types.Repeat
 import com.spotify.protocol.types.Track
 import kotlinx.coroutines.launch
 
@@ -28,11 +30,44 @@ class MusicViewModel(application: Application) : AndroidViewModel(application) {
     private var playerStateSubscription: Subscription<PlayerState>? = null
     private var playerContextSubscription: Subscription<PlayerContext>? = null
     private var spotifyAppRemote: SpotifyAppRemote? = null
-
-
+    private val gson = GsonBuilder().setPrettyPrinting().create()
     private val clientId = BuildConfig.SPOTIFY_KEY
-
     private val redirectUri = "vibecast://callback"
+
+
+
+    fun getPlaylist(){
+        //TODO implement
+    }
+    fun setRepeatStatus() {
+        assertAppRemoteConnected()
+            .playerApi
+            .toggleRepeat()
+            .setResultCallback { logMessage("toggle repeat") }
+            .setErrorCallback(errorCallback)
+    }
+
+    fun setShuffleStatus(){
+        assertAppRemoteConnected().let {
+            it.playerApi
+                .playerState
+                .setResultCallback { playerState ->
+                    if (playerState.playbackOptions.isShuffling) {
+                        it.playerApi
+                            .setShuffle(false)
+                            .setResultCallback { logMessage("unshuffled") }
+                            .setErrorCallback(errorCallback)
+                    } else {
+                        it.playerApi
+                            .setShuffle(true)
+                            .setResultCallback {
+                                logMessage("shuffled")
+                            }
+                            .setErrorCallback(errorCallback)
+                    }
+                }
+        }
+    }
 
 
 
@@ -184,7 +219,7 @@ class MusicViewModel(application: Application) : AndroidViewModel(application) {
     }
 
 
-    private val gson = GsonBuilder().setPrettyPrinting().create()
+
 
 
 

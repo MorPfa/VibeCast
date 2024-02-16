@@ -2,6 +2,7 @@ package app.vibecast.data.remote.injection
 
 import android.app.Application
 import app.vibecast.data.remote.network.image.ImageService
+import app.vibecast.data.remote.network.music.MusicService
 import app.vibecast.data.remote.network.weather.WeatherService
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
@@ -60,31 +61,42 @@ class NetworkModule {
     fun provideWeatherService(@Named("weather") retrofit: Retrofit) : WeatherService =
         retrofit.create(WeatherService::class.java)
 
-
-    @Named("unsplash")
     @Provides
-    fun provideUnsplashRetrofit() : Retrofit {
-        val loggingInterceptor = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
-        }
+    fun provideMusicService(@Named("weather") retrofit: Retrofit) : MusicService =
+        retrofit.create(MusicService::class.java)
 
-        val client = OkHttpClient.Builder()
-            .addInterceptor(loggingInterceptor)
-            .build()
-       return  Retrofit.Builder()
-            .baseUrl("https://api.unsplash.com/")
-            .addConverterFactory(GsonConverterFactory.create())
-           .client(client)
-            .build()
+    @Named("spotify")
+    @Provides
+    fun provideSpotifyRetrofit() : Retrofit =  Retrofit.Builder()
+        .baseUrl("")
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
 
-    }
 
 //    @Named("unsplash")
 //    @Provides
-//    fun provideUnsplashRetrofit() : Retrofit =  Retrofit.Builder()
+//    fun provideUnsplashRetrofit() : Retrofit {
+//        val loggingInterceptor = HttpLoggingInterceptor().apply {
+//            level = HttpLoggingInterceptor.Level.BODY
+//        }
+//
+//        val client = OkHttpClient.Builder()
+//            .addInterceptor(loggingInterceptor)
+//            .build()
+//       return  Retrofit.Builder()
 //            .baseUrl("https://api.unsplash.com/")
 //            .addConverterFactory(GsonConverterFactory.create())
+//           .client(client)
 //            .build()
+//
+//    }
+
+    @Named("unsplash")
+    @Provides
+    fun provideUnsplashRetrofit() : Retrofit =  Retrofit.Builder()
+            .baseUrl("https://api.unsplash.com/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
 
 
 

@@ -5,7 +5,9 @@ implement spotify API
 ifx app crashing when rotating device
 
 
-
+fix naming of packages
+entity -> model
+fix domain structure
 
 
 Make another attempt at autocomplete but with autocomplete intent

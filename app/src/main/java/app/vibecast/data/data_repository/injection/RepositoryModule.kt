@@ -1,13 +1,15 @@
 package app.vibecast.data.data_repository.injection
 
-import app.vibecast.data.data_repository.repository.DataStoreRepositoryImpl
+
 import app.vibecast.data.data_repository.repository.LocationRepositoryImpl
 import app.vibecast.data.data_repository.repository.ImageRepositoryImpl
+import app.vibecast.data.data_repository.repository.MusicRepositoryImpl
 import app.vibecast.data.data_repository.repository.UserRepositoryImpl
 import app.vibecast.data.data_repository.repository.WeatherRepositoryImpl
-import app.vibecast.domain.repository.DataStoreRepository
+
 import app.vibecast.domain.repository.LocationRepository
 import app.vibecast.domain.repository.ImageRepository
+import app.vibecast.domain.repository.MusicRepository
 import app.vibecast.domain.repository.UserRepository
 import app.vibecast.domain.repository.WeatherRepository
 import dagger.Binds
@@ -31,6 +33,10 @@ abstract class RepositoryModule {
 
     @Binds
     abstract  fun bindImageRepository(imageRepositoryImpl: ImageRepositoryImpl) : ImageRepository
+
+    @Binds
+    abstract  fun bindMusicRepository(musicRepositoryImpl: MusicRepositoryImpl) : MusicRepository
+
 
 
 }

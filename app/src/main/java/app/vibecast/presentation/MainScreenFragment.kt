@@ -3,7 +3,6 @@ package app.vibecast.presentation
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,9 +22,8 @@ import app.vibecast.presentation.mainscreen.MainScreenViewModel
 import app.vibecast.presentation.music.MusicViewModel
 import app.vibecast.presentation.navigation.ImageViewModel
 import com.google.android.material.snackbar.Snackbar
-import com.google.gson.GsonBuilder
-import com.spotify.protocol.client.Subscription
 import com.spotify.protocol.types.PlayerState
+import com.spotify.protocol.types.Repeat
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -40,9 +38,12 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
     private val mainScreenViewModel: MainScreenViewModel by activityViewModels()
     private val imageViewModel: ImageViewModel by activityViewModels()
     private val musicViewModel: MusicViewModel by activityViewModels()
-    private lateinit var playbackButton : ImageButton
+    private lateinit var playbackButton: ImageButton
+    private lateinit var shuffleButton : ImageButton
+    private lateinit var repeatButton : ImageButton
 
-    private fun updateButtonIcon(playerState: PlayerState) {
+
+    private fun updatePlaybackBtn(playerState: PlayerState) {
 
         if (playerState.isPaused) {
             playbackButton.setImageResource(R.drawable.play_btn)
@@ -52,6 +53,37 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
         }
     }
 
+    private fun updateShuffleBtn(playerState: PlayerState) {
+        shuffleButton.apply {
+            if (playerState.playbackOptions.isShuffling) {
+                shuffleButton.setImageResource(R.drawable.shuffle_enabled)
+            } else {
+                shuffleButton.setImageResource(R.drawable.shuffle_disabled)
+            }
+        }
+
+    }
+
+    private fun updateRepeatBtn(playerState: PlayerState) {
+        repeatButton.apply {
+            when (playerState.playbackOptions.repeatMode) {
+                Repeat.ALL -> {
+                    setImageResource(R.drawable.repeat_all_enabled)
+
+                }
+                Repeat.ONE -> {
+                    setImageResource(R.drawable.repeat_one_enabled)
+
+                }
+                else -> {
+                    setImageResource(R.drawable.repeat_disabled2)
+
+                }
+            }
+        }
+
+    }
+
     override fun onPlayerStateUpdated(playerState: PlayerState) {
         updateUI(playerState)
     }
@@ -59,18 +91,26 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
     @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-        _binding = FragmentMainScreenBinding.inflate(inflater,container,false)
+        _binding = FragmentMainScreenBinding.inflate(inflater, container, false)
         musicViewModel.setPlayerStateListener(this)
         playbackButton = binding.musicWidget.playPauseButton
+        shuffleButton = binding.musicWidget.shuffleButton
+        repeatButton = binding.musicWidget.repeatButton
         actionBar = (requireActivity() as AppCompatActivity).supportActionBar!!
         actionBar.show()
-        playbackButton.setOnClickListener{
-           musicViewModel.onPlayPauseButtonClicked()
+        repeatButton.setOnClickListener {
+            musicViewModel.setRepeatStatus()
         }
-        binding.musicWidget.forwardButton.setOnClickListener{
+        playbackButton.setOnClickListener {
+            musicViewModel.onPlayPauseButtonClicked()
+        }
+        shuffleButton.setOnClickListener {
+            musicViewModel.setShuffleStatus()
+        }
+        binding.musicWidget.forwardButton.setOnClickListener {
             musicViewModel.onSkipNextButtonClicked()
         }
         binding.musicWidget.rewindButton.setOnClickListener {
@@ -79,21 +119,22 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
 
         val nextScreenButton = binding.nextScreenButton
         nextScreenButton.setOnClickListener {
-            if (mainScreenViewModel.locations.value?.size != 0){
+            if (mainScreenViewModel.locations.value?.size != 0) {
                 mainScreenViewModel.getSavedLocationWeather()
                 val action = MainScreenFragmentDirections.actionNavHomeToSavedLocationFragment()
                 findNavController().navigate(action)
-            }
-            else {
+            } else {
                 val snackbar = Snackbar.make(
                     requireView(),
                     getString(R.string.none_saved_warning),
                     Snackbar.LENGTH_SHORT
                 )
                 val snackbarView = snackbar.view
-                val snackbarText = snackbarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+                val snackbarText =
+                    snackbarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
                 snackbarText.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-                snackbarView.background = ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
+                snackbarView.background =
+                    ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
                 snackbar.show()
             }
         }
@@ -126,25 +167,41 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
                         Snackbar.LENGTH_SHORT
                     )
                     val image = imageViewModel.pickDefaultImage(weather)
-                    binding.backgroundImageView.setImageDrawable(ContextCompat.getDrawable(requireContext(), image))
+                    binding.backgroundImageView.setImageDrawable(
+                        ContextCompat.getDrawable(
+                            requireContext(),
+                            image
+                        )
+                    )
                     val snackbarView = snackbar.view
-                    val snackbarText = snackbarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
-                    snackbarText.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-                    snackbarView.background = ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
+                    val snackbarText =
+                        snackbarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+                    snackbarText.setTextColor(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.white
+                        )
+                    )
+                    snackbarView.background =
+                        ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
                     snackbar.show()
                 }
             }
         }
     }
+
     private fun updateUI(playerState: PlayerState) {
-        updateButtonIcon(playerState)
+        updatePlaybackBtn(playerState)
+        updateShuffleBtn(playerState)
+        updateRepeatBtn(playerState)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         lifecycleScope.launch {
-            mainScreenViewModel.currentWeather.distinctUntilChanged().observe(viewLifecycleOwner) { weatherData ->
+            mainScreenViewModel.currentWeather.distinctUntilChanged()
+                .observe(viewLifecycleOwner) { weatherData ->
                     weatherData.weather.currentWeather?.let { currentWeather ->
                         val city = weatherData.location.cityName
                         val weather =
@@ -173,7 +230,11 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
                         binding.centerTempRow.rightTime.text =
                             weatherData.weather.hourlyWeather?.get(2)?.timestamp.toString()
                         binding.locationDisplay.text =
-                            getString(R.string.center_location_text, weatherData.location.cityName, weatherData.location.country)
+                            getString(
+                                R.string.center_location_text,
+                                weatherData.location.cityName,
+                                weatherData.location.country
+                            )
                         binding.mainWeatherWidget.feelsLikeTv.text =
                             getString(R.string.feels_like, currentWeather.feelsLike)
                         binding.mainWeatherWidget.windSpeedTv.text =
@@ -196,8 +257,8 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
                     }
                 }
 
-            }
         }
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -205,8 +266,6 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
         _binding = null
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
-
-
 
 
     companion object {

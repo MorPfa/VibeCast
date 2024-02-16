@@ -5,4 +5,5 @@ object TAGS {
     const val COROUTINE_ERROR = "COROUTINEERROR "
     const val IMAGE_ERROR = "IMAGEERROR"
     const val WEATHER_ERROR = "WEATHERERROR"
+    const val MUSIC_ERROR = "MUSICERROR"
 }
