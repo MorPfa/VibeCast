@@ -35,7 +35,6 @@ import app.vibecast.presentation.permissions.LocationPermissionState
 import app.vibecast.presentation.permissions.PermissionHelper
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
-import com.spotify.android.appremote.api.SpotifyAppRemote
 import com.spotify.sdk.android.auth.AuthorizationClient
 import com.spotify.sdk.android.auth.AuthorizationResponse
 import dagger.hilt.android.AndroidEntryPoint
@@ -338,9 +337,6 @@ class MainActivity : AppCompatActivity() {
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
-    private fun logError(throwable: Throwable) {
-        Log.e(TAG, "${throwable.message}", throwable)
-    }
 
 
     override fun onStart() {

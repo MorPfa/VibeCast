@@ -20,6 +20,7 @@ import app.vibecast.R
 import app.vibecast.databinding.FragmentMainScreenBinding
 import app.vibecast.presentation.mainscreen.MainScreenViewModel
 import app.vibecast.presentation.music.MusicViewModel
+import app.vibecast.presentation.music.TrackProgressBar
 import app.vibecast.presentation.navigation.ImageViewModel
 import com.google.android.material.snackbar.Snackbar
 import com.spotify.protocol.types.PlayerState
@@ -41,6 +42,7 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
     private lateinit var playbackButton: ImageButton
     private lateinit var shuffleButton : ImageButton
     private lateinit var repeatButton : ImageButton
+    private lateinit var trackProgressBar: TrackProgressBar
 
 
     private fun updatePlaybackBtn(playerState: PlayerState) {
@@ -62,6 +64,22 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
             }
         }
 
+    }
+
+    private fun updateSeekbar(playerState: PlayerState) {
+        // Update progressbar
+        trackProgressBar.apply {
+            if (playerState.playbackSpeed > 0) {
+                unpause()
+            } else {
+                pause()
+            }
+            // Invalidate seekbar length and position
+            binding.musicWidget.progressBar.max = playerState.track.duration.toInt()
+            binding.musicWidget.progressBar.isEnabled = true
+            setDuration(playerState.track.duration)
+            update(playerState.playbackPosition)
+        }
     }
 
     private fun updateRepeatBtn(playerState: PlayerState) {
@@ -96,6 +114,7 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         _binding = FragmentMainScreenBinding.inflate(inflater, container, false)
         musicViewModel.setPlayerStateListener(this)
+        trackProgressBar = TrackProgressBar(binding.musicWidget.progressBar) { seekToPosition: Long -> musicViewModel.seekTo(seekToPosition) }
         playbackButton = binding.musicWidget.playPauseButton
         shuffleButton = binding.musicWidget.shuffleButton
         repeatButton = binding.musicWidget.repeatButton
@@ -194,7 +213,10 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
         updatePlaybackBtn(playerState)
         updateShuffleBtn(playerState)
         updateRepeatBtn(playerState)
+        updateSeekbar(playerState)
     }
+
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

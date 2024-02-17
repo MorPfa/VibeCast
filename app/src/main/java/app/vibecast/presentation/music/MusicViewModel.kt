@@ -69,7 +69,12 @@ class MusicViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-
+     fun seekTo(seekToPosition: Long) {
+        assertAppRemoteConnected()
+            .playerApi
+            .seekTo(seekToPosition)
+            .setErrorCallback(errorCallback)
+    }
 
     fun connectToSpotify(){
         val connectionParams = ConnectionParams.Builder(clientId)
