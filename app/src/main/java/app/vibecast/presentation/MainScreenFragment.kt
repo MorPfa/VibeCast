@@ -145,7 +145,22 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
             musicViewModel.setRepeatStatus()
         }
         playbackButton.setOnClickListener {
-            musicViewModel.onPlayPauseButtonClicked()
+            try{ musicViewModel.onPlayPauseButtonClicked() }
+            catch (e : Exception){
+                val snackbar = Snackbar.make(
+                    requireView(),
+                    "Log into spotify to enable music",
+                    Snackbar.LENGTH_SHORT
+                )
+                val snackbarView = snackbar.view
+                val snackbarText =
+                    snackbarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+                snackbarText.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+                snackbarView.background =
+                    ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
+                snackbar.show()
+            }
+
         }
         shuffleButton.setOnClickListener {
             musicViewModel.setShuffleStatus()

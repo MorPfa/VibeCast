@@ -118,6 +118,27 @@
     <string name="saved_location">%1$s - %2$s</string>
     <string name="shuffle_current_playlist">Shuffle current playlist</string>
     <string name="play_playlist_in_loop">Play playlist in loop</string>
+    <string name="preferred_measurements">Preferred measurements</string>
+    <string name="permissions">Permissions</string>
+    <string name="music_preferences">Music Preferences</string>
+    <string name="rainy_weather">Rainy weather</string>
+    <string name="sunny_weather">Sunny weather</string>
+    <string name="snowy_weather">Snowy weather</string>
+    <string name="foggy_weather">Foggy weather</string>
+    <string name="music_preference_dropdown_text">Select the music genre you would like to listen to in this weather</string>
+    <string-array name="items">
+        <item>Jazz</item>
+        <item>Rock</item>
+        <item>Pop</item>
+        <item>Hip-Hop</item>
+        <item>R&amp;B</item>
+        <item>Classical</item>
+        <item>Blues</item>
+        <item>Country</item>
+        <item>Metal</item>
+        <item>Reggae</item>
+
+    </string-array>
 
 
 </resources>

@@ -13,6 +13,7 @@
 
     </style>
 
+
     <style name="ActionBar" >
         <item name="background">@drawable/app_bar_background</item>
     </style>

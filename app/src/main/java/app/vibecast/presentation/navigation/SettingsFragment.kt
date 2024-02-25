@@ -5,6 +5,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -40,6 +43,8 @@ class SettingsFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
 
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -55,6 +60,19 @@ class SettingsFragment : Fragment() {
     ): View {
         _binding = FragmentSettingsBinding.inflate(inflater, container, false)
         permissionHelper = PermissionHelper(requireActivity())
+        val stringArray = resources.getStringArray(R.array.items)
+         val adapterItems = ArrayAdapter(requireContext(), R.layout.music_preference_item, stringArray)
+        binding.autoComplete.setAdapter(adapterItems)
+        binding.autoComplete2.setAdapter(adapterItems)
+        binding.autoComplete3.setAdapter(adapterItems)
+        binding.autoComplete4.setAdapter(adapterItems)
+        binding.autoComplete.setOnItemClickListener { parent, view, position, id ->
+            // Get the selected item from the adapter
+            val selectedItem = parent.getItemAtPosition(position).toString()
+
+            Toast.makeText(requireContext(), "Selected item: $selectedItem", Toast.LENGTH_SHORT)
+                .show()
+        }
 
         val isLocationPermissionGranted = permissionHelper.isPermissionGranted(Manifest.permission.ACCESS_COARSE_LOCATION)
         binding.allowLocationSwitch.isChecked = isLocationPermissionGranted

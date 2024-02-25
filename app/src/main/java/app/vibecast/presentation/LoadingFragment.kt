@@ -27,6 +27,7 @@ class LoadingFragment : Fragment() {
     private var _binding: FragmentLoadingBinding? = null
     private val binding get() = _binding!!
     private lateinit var actionBar: ActionBar
+    private var visited : Boolean = false
 
     @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,7 +49,7 @@ class LoadingFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        visited = true
         actionBar = (requireActivity() as AppCompatActivity).supportActionBar!!
         actionBar.hide()
 
@@ -67,6 +68,12 @@ class LoadingFragment : Fragment() {
     }
 
 
+    override fun onResume() {
+        super.onResume()
+        if (visited){
+            navigateToNextScreen()
+        }
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()

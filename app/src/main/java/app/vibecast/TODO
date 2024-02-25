@@ -2,15 +2,15 @@
 
 Today:
 implement spotify API
-ifx app crashing when rotating device
+fix app crashing when rotating device
 
 
 fix naming of packages
 entity -> model
-fix domain structure
+fix domain layer structure
 
 
-Make another attempt at autocomplete but with autocomplete intent
+
 optimize image accuracy (maybe go back to GET /search/photos endpoint and combine query with collections)
 
 
