@@ -28,6 +28,7 @@ class NetworkModule {
 
     @Provides
     fun provideMoshi(): Moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+
     @Provides
     fun provideGson(): Gson = GsonBuilder().create()
 
@@ -37,6 +38,40 @@ class NetworkModule {
         .baseUrl("https://api.openweathermap.org/")
         .addConverterFactory(MoshiConverterFactory.create(moshi))
         .build()
+
+//    @Named("music")
+//    @Provides
+//    fun provideSpotifyRetrofit(): Retrofit = Retrofit.Builder()
+//        .baseUrl("https://api.spotify.com/")
+//        .addConverterFactory(GsonConverterFactory.create())
+//        .build()
+
+    @Named("unsplash")
+    @Provides
+    fun provideUnsplashRetrofit(): Retrofit = Retrofit.Builder()
+        .baseUrl("https://api.unsplash.com/")
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+
+    @Named("music")
+    @Provides
+    fun provideSpotifyRetrofit(): Retrofit {
+        val loggingInterceptor = HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
+
+        val client = OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
+            .build()
+        return Retrofit.Builder()
+            .baseUrl("https://api.spotify.com/v1/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(client)
+            .build()
+
+
+    }
+
 
 //    @Named("weather")
 //    @Provides
@@ -57,23 +92,7 @@ class NetworkModule {
 //    }
 
 
-    @Provides
-    fun provideWeatherService(@Named("weather") retrofit: Retrofit) : WeatherService =
-        retrofit.create(WeatherService::class.java)
-
-    @Provides
-    fun provideMusicService(@Named("weather") retrofit: Retrofit) : MusicService =
-        retrofit.create(MusicService::class.java)
-
-    @Named("spotify")
-    @Provides
-    fun provideSpotifyRetrofit() : Retrofit =  Retrofit.Builder()
-        .baseUrl("")
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-
-
-//    @Named("unsplash")
+    //    @Named("unsplash")
 //    @Provides
 //    fun provideUnsplashRetrofit() : Retrofit {
 //        val loggingInterceptor = HttpLoggingInterceptor().apply {
@@ -91,19 +110,20 @@ class NetworkModule {
 //
 //    }
 
-    @Named("unsplash")
-    @Provides
-    fun provideUnsplashRetrofit() : Retrofit =  Retrofit.Builder()
-            .baseUrl("https://api.unsplash.com/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-
 
     @Provides
-    fun provideImageService(@Named("unsplash") retrofit: Retrofit) : ImageService =
+    fun provideWeatherService(@Named("weather") retrofit: Retrofit): WeatherService =
+        retrofit.create(WeatherService::class.java)
+
+    @Provides
+    fun provideMusicService(@Named("music") retrofit: Retrofit): MusicService =
+        retrofit.create(MusicService::class.java)
+
+
+    @Provides
+    fun provideImageService(@Named("unsplash") retrofit: Retrofit): ImageService =
         retrofit.create(ImageService::class.java)
 
     @Provides
-    fun provideGlideInstance(application: Application) : RequestManager = Glide.with(application)
+    fun provideGlideInstance(application: Application): RequestManager = Glide.with(application)
 }

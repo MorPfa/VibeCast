@@ -23,6 +23,7 @@ import app.vibecast.presentation.music.MusicViewModel
 import app.vibecast.presentation.music.TrackProgressBar
 import app.vibecast.presentation.navigation.ImageViewModel
 import com.google.android.material.snackbar.Snackbar
+import com.spotify.protocol.types.Image
 import com.spotify.protocol.types.PlayerState
 import com.spotify.protocol.types.Repeat
 import dagger.hilt.android.AndroidEntryPoint
@@ -52,6 +53,25 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
         } else {
 
             playbackButton.setImageResource(R.drawable.pause_btn)
+        }
+    }
+
+
+    private fun updateTrackCoverArt(playerState: PlayerState) {
+        // Get image from track
+        musicViewModel.assertAppRemoteConnected()
+            .imagesApi
+            .getImage(playerState.track.imageUri, Image.Dimension.X_SMALL)
+            .setResultCallback { bitmap ->
+                binding.musicWidget.albumArtImageView.setImageBitmap(bitmap)
+            }
+    }
+
+    private fun updateTrackInfo(playerState: PlayerState) {
+        binding.musicWidget.apply {
+            songTitleTextView.text =  playerState.track.name
+            artistNameTextView.text =  playerState.track.artist.name
+
         }
     }
 
@@ -114,6 +134,7 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         _binding = FragmentMainScreenBinding.inflate(inflater, container, false)
         musicViewModel.setPlayerStateListener(this)
+
         trackProgressBar = TrackProgressBar(binding.musicWidget.progressBar) { seekToPosition: Long -> musicViewModel.seekTo(seekToPosition) }
         playbackButton = binding.musicWidget.playPauseButton
         shuffleButton = binding.musicWidget.shuffleButton
@@ -214,13 +235,14 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
         updateShuffleBtn(playerState)
         updateRepeatBtn(playerState)
         updateSeekbar(playerState)
+        updateTrackCoverArt(playerState)
+        updateTrackInfo(playerState)
     }
 
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         lifecycleScope.launch {
             mainScreenViewModel.currentWeather.distinctUntilChanged()
                 .observe(viewLifecycleOwner) { weatherData ->

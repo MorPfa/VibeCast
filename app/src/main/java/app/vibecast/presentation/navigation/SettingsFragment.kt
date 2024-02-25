@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import app.vibecast.data.data_repository.repository.Unit
 import app.vibecast.presentation.mainscreen.MainScreenViewModel
+import app.vibecast.presentation.music.MusicViewModel
 
 
 private const val ARG_PARAM1 = "param1"
@@ -54,8 +55,6 @@ class SettingsFragment : Fragment() {
     ): View {
         _binding = FragmentSettingsBinding.inflate(inflater, container, false)
         permissionHelper = PermissionHelper(requireActivity())
-
-
 
         val isLocationPermissionGranted = permissionHelper.isPermissionGranted(Manifest.permission.ACCESS_COARSE_LOCATION)
         binding.allowLocationSwitch.isChecked = isLocationPermissionGranted

@@ -3,23 +3,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/generic_background"
     android:fitsSystemWindows="false"
-    tools:context=".presentation.navigation.SettingsFragment"
-    android:background="@drawable/generic_background">
+    tools:context=".presentation.navigation.SettingsFragment">
 
     <LinearLayout
-        android:layout_marginTop="68dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="68dp"
         android:orientation="vertical">
 
         <!-- Title for the settings -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:padding="16dp"
             android:text="@string/settings_header"
-            android:textSize="20sp"
-            android:padding="16dp" />
+            android:textSize="20sp" />
 
         <!-- Celsius/Fahrenheit switch -->
         <RadioGroup
@@ -32,8 +32,8 @@
                 android:id="@+id/radioImperial"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/imperial"
-                android:checked="true" />
+                android:checked="true"
+                android:text="@string/imperial" />
 
             <RadioButton
                 android:id="@+id/radioMetric"
@@ -43,17 +43,13 @@
         </RadioGroup>
 
 
-
-
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/allowLocationSwitch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/allow_vibecast_to_use_your_location"
             android:padding="16dp"
-            android:theme="@style/SwitchTheme"/>
-
-
+            android:text="@string/allow_vibecast_to_use_your_location"
+            android:theme="@style/SwitchTheme" />
 
 
     </LinearLayout>

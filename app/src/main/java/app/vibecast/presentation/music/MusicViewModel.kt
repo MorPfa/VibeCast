@@ -1,14 +1,16 @@
 package app.vibecast.presentation.music
 
 import android.app.Application
-import android.graphics.Color
 import android.util.Log
-import android.view.View
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import app.vibecast.BuildConfig
+import app.vibecast.data.TAGS.MUSIC_ERROR
+import app.vibecast.data.remote.network.music.PlaylistApiModel
+import app.vibecast.domain.repository.MusicRepository
 import app.vibecast.presentation.TAG
 import com.google.gson.GsonBuilder
 import com.spotify.android.appremote.api.ConnectionParams
@@ -18,14 +20,22 @@ import com.spotify.android.appremote.api.error.SpotifyDisconnectedException
 import com.spotify.protocol.client.Subscription
 import com.spotify.protocol.types.PlayerContext
 import com.spotify.protocol.types.PlayerState
-import com.spotify.protocol.types.Repeat
-import com.spotify.protocol.types.Track
+import com.spotify.sdk.android.auth.AuthorizationClient
+import com.spotify.sdk.android.auth.AuthorizationRequest
+import com.spotify.sdk.android.auth.AuthorizationResponse
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
+import timber.log.Timber
+import javax.inject.Inject
 
+@HiltViewModel
+class MusicViewModel @Inject constructor(
+    private val application: Application,
+    private val musicRepository: MusicRepository,
+) : ViewModel() {
 
-class MusicViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val context = getApplication<Application>()
 
     private var playerStateSubscription: Subscription<PlayerState>? = null
     private var playerContextSubscription: Subscription<PlayerContext>? = null
@@ -34,11 +44,23 @@ class MusicViewModel(application: Application) : AndroidViewModel(application) {
     private val clientId = BuildConfig.SPOTIFY_KEY
     private val redirectUri = "vibecast://callback"
 
+    private val _coverImage =MutableLiveData<String>()
+    var coverImage : LiveData<String> = _coverImage
 
 
-    fun getPlaylist(){
-        //TODO implement
+    fun getPlaylist(category: String, accessCode : String): Flow<PlaylistApiModel> = flow {
+        try {
+            Timber.tag("Spotify").d("getPlaylist called")
+            musicRepository.getPlaylist(category, accessCode).collect {
+                Timber.tag("Spotify").d(it.playlists.items[0].name)
+                emit(it)
+            }
+        } catch (e : Exception){
+            Timber.tag("Spotify").d(e.localizedMessage ?: "null")
+        }
     }
+
+
     fun setRepeatStatus() {
         assertAppRemoteConnected()
             .playerApi
@@ -47,7 +69,8 @@ class MusicViewModel(application: Application) : AndroidViewModel(application) {
             .setErrorCallback(errorCallback)
     }
 
-    fun setShuffleStatus(){
+
+    fun setShuffleStatus() {
         assertAppRemoteConnected().let {
             it.playerApi
                 .playerState
@@ -69,20 +92,19 @@ class MusicViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-     fun seekTo(seekToPosition: Long) {
+    fun seekTo(seekToPosition: Long) {
         assertAppRemoteConnected()
             .playerApi
             .seekTo(seekToPosition)
             .setErrorCallback(errorCallback)
     }
 
-    fun connectToSpotify(){
+    fun connectToSpotify() {
         val connectionParams = ConnectionParams.Builder(clientId)
             .setRedirectUri(redirectUri)
-            .showAuthView(true)
             .build()
         SpotifyAppRemote.connect(
-            context.applicationContext,
+            application.applicationContext,
             connectionParams,
             object : Connector.ConnectionListener {
                 override fun onConnected(appRemote: SpotifyAppRemote) {
@@ -97,18 +119,21 @@ class MusicViewModel(application: Application) : AndroidViewModel(application) {
                     // Something went wrong when attempting to connect! Handle errors here
                 }
             })
-
-
-
     }
 
-    fun disconnectFromSpotify(){
+
+    fun disconnectFromSpotify() {
         SpotifyAppRemote.disconnect(spotifyAppRemote)
     }
 
     private fun connected() {
+//        viewModelScope.launch {
+//           getPlaylist("dinner", "Bearer ${response.accessToken}").collect{
+//                Timber.tag("Spotify").d(it.playlists.items[0].name)
+//            }
+//        }
 //            subscribeToPlayerContext()
-            subscribeToPlayerState()
+        subscribeToPlayerState()
 
     }
 
@@ -198,7 +223,7 @@ class MusicViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun assertAppRemoteConnected(): SpotifyAppRemote {
+    fun assertAppRemoteConnected(): SpotifyAppRemote {
         spotifyAppRemote.let {
             if (it?.isConnected == true) {
                 return it
@@ -208,10 +233,10 @@ class MusicViewModel(application: Application) : AndroidViewModel(application) {
     }
 
 
-
     interface PlayerStateListener {
         fun onPlayerStateUpdated(playerState: PlayerState)
     }
+
     private var playerStateListener: PlayerStateListener? = null
 
     fun setPlayerStateListener(listener: PlayerStateListener) {
@@ -222,10 +247,6 @@ class MusicViewModel(application: Application) : AndroidViewModel(application) {
         playerStateListener?.onPlayerStateUpdated(playerState)
         Log.v(TAG, String.format("Player State: %s", gson.toJson(playerState)))
     }
-
-
-
-
 
 
     override fun onCleared() {

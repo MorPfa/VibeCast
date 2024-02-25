@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -26,6 +27,7 @@ import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import app.vibecast.BuildConfig
 import app.vibecast.R
 import app.vibecast.databinding.ActivityMainBinding
 import app.vibecast.presentation.mainscreen.MainScreenViewModel
@@ -36,8 +38,12 @@ import app.vibecast.presentation.permissions.PermissionHelper
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.spotify.sdk.android.auth.AuthorizationClient
+import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
 
 const val TAG = "TestTag"
@@ -52,28 +58,39 @@ class MainActivity : AppCompatActivity() {
     private val musicViewModel: MusicViewModel by viewModels()
     private var showIcons: Boolean = true
     private lateinit var permissionHelper: PermissionHelper
-
-
-
-
-
-
+    private val redirectUri = "vibecast://callback"
+    private val clientId = BuildConfig.SPOTIFY_KEY
     private val REQUEST_CODE = 1337
+    private fun authorizeClient(){
+        val request = AuthorizationRequest.Builder(clientId,AuthorizationResponse.Type.TOKEN ,redirectUri)
+            .setShowDialog(true)
+            .setScopes(arrayOf("user-read-email"))
+            .setCampaign("your-campaign-token")
+            .build()
+        AuthorizationClient.openLoginActivity(this, REQUEST_CODE, request)
+    }
 
 
+    @Deprecated("Deprecated but spotify requires this implementation")
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         super.onActivityResult(requestCode, resultCode, intent)
-
-        // Check if result comes from the correct activity
         if (requestCode == REQUEST_CODE) {
             val response = AuthorizationClient.getResponse(resultCode, intent)
             when (response.type) {
-                AuthorizationResponse.Type.TOKEN -> {}
-                AuthorizationResponse.Type.ERROR -> {}
-                else -> {}
+                AuthorizationResponse.Type.TOKEN -> {
+                    musicViewModel.connectToSpotify()
+                }
+                AuthorizationResponse.Type.ERROR -> {
+                    Timber.tag("Spotify").d("sum ting wong")
+                }
+                else -> {
+                    Timber.tag("Spotify").d("sum ting weally wong")
+                }
             }
         }
     }
+
+
 
 
     companion object {
@@ -341,7 +358,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        musicViewModel.connectToSpotify()
+        authorizeClient()
+
     }
 
     override fun onDestroy() {

@@ -170,7 +170,8 @@ dependencies {
 //    RecyclerView
     implementation ("androidx.recyclerview:recyclerview:1.3.1")
 
-
+//Timber
+    implementation("com.jakewharton.timber:timber:5.0.1")
 
 
     implementation("androidx.core:core-ktx:1.9.0")
