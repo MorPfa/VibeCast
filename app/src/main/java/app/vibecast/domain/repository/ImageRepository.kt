@@ -1,6 +1,6 @@
 package app.vibecast.domain.repository
 
-import app.vibecast.domain.entity.ImageDto
+import app.vibecast.domain.model.ImageDto
 import kotlinx.coroutines.flow.Flow
 
 

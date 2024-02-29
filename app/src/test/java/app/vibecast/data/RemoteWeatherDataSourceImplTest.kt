@@ -2,20 +2,20 @@ package app.vibecast.data
 
 
 import app.vibecast.BuildConfig
-import app.vibecast.data.data_repository.repository.Unit
-import app.vibecast.data.remote.network.weather.CoordinateApiModel
-import app.vibecast.data.remote.network.weather.CurrentWeatherRemote
-import app.vibecast.data.remote.network.weather.HourlyWeatherRemote
-import app.vibecast.data.remote.network.weather.WeatherApiModel
-import app.vibecast.data.remote.network.weather.WeatherConditionRemote
-import app.vibecast.data.remote.network.weather.WeatherService
-import app.vibecast.data.remote.source.RemoteWeatherDataSourceImpl
-import app.vibecast.domain.entity.CurrentWeather
-import app.vibecast.domain.entity.HourlyWeather
-import app.vibecast.domain.entity.UseCaseException
-import app.vibecast.domain.entity.WeatherCondition
-import app.vibecast.domain.entity.WeatherDto
-import app.vibecast.domain.repository.DataStoreRepository
+import app.vibecast.domain.repository.implementation.Unit
+import app.vibecast.data.remote_data.network.weather.model.CoordinateApiModel
+import app.vibecast.data.remote_data.network.weather.model.CurrentWeatherRemote
+import app.vibecast.data.remote_data.network.weather.model.HourlyWeatherRemote
+import app.vibecast.data.remote_data.network.weather.model.WeatherApiModel
+import app.vibecast.data.remote_data.network.weather.model.WeatherConditionRemote
+import app.vibecast.data.remote_data.network.weather.api.WeatherService
+import app.vibecast.data.remote_data.data_source.weather.RemoteWeatherDataSourceImpl
+import app.vibecast.domain.model.CurrentWeather
+import app.vibecast.domain.model.HourlyWeather
+import app.vibecast.domain.model.UseCaseException
+import app.vibecast.domain.model.WeatherCondition
+import app.vibecast.domain.model.WeatherDto
+import app.vibecast.domain.repository.UnitPreferenceRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
@@ -32,7 +32,7 @@ import org.mockito.kotlin.whenever
 class RemoteWeatherDataSourceImplTest {
 
     private val weatherService = mock<WeatherService>()
-    private val dataStore = mock<DataStoreRepository>()
+    private val dataStore = mock<UnitPreferenceRepository>()
     private val weatherDataSource = RemoteWeatherDataSourceImpl(weatherService, dataStore)
     private lateinit var remoteWeather: WeatherApiModel
     private lateinit var  expectedWeather : WeatherDto

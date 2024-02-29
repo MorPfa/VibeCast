@@ -11,7 +11,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/generic_background"
-    tools:context=".presentation.navigation.AccountFragment"
+    tools:context=".presentation.screens.account_screen.AccountFragment"
    >
 
 
@@ -83,6 +83,7 @@
                 >
 
                 <TextView
+                    android:id="@+id/saved_locations_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/white"

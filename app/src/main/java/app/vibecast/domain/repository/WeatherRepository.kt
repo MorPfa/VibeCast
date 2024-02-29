@@ -1,8 +1,7 @@
 package app.vibecast.domain.repository
 
-import app.vibecast.data.remote.network.weather.CoordinateApiModel
-import app.vibecast.domain.entity.LocationWithWeatherDataDto
-import app.vibecast.domain.entity.WeatherDto
+import app.vibecast.domain.model.LocationWithWeatherDataDto
+import app.vibecast.domain.model.WeatherDto
 import kotlinx.coroutines.flow.Flow
 
 interface WeatherRepository {

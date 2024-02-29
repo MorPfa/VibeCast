@@ -4,9 +4,9 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import app.vibecast.data.local.db.AppDatabase
-import app.vibecast.data.local.db.image.ImageDao
-import app.vibecast.data.local.db.image.ImageEntity
+import app.vibecast.data.local_data.db.AppDatabase
+import app.vibecast.data.local_data.db.image.dao.ImageDao
+import app.vibecast.data.local_data.db.image.model.ImageEntity
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import org.junit.After

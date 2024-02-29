@@ -1,19 +1,12 @@
 
 
 Today:
-implement spotify API
 fix app crashing when rotating device
-
-
-fix naming of packages
-entity -> model
-fix domain layer structure
-
 
 
 optimize image accuracy (maybe go back to GET /search/photos endpoint and combine query with collections)
 
 
-implement firebase auth
+implement firebase
 
 

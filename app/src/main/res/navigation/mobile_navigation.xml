@@ -8,7 +8,7 @@
 
     <fragment
         android:id="@+id/nav_loading"
-        android:name="app.vibecast.presentation.LoadingFragment"
+        android:name="app.vibecast.presentation.screens.splash_screen.LoadingFragment"
         android:label="fragment_loading"
         tools:layout="@layout/fragment_loading" >
         <action
@@ -21,7 +21,7 @@
 
     <fragment
         android:id="@+id/nav_home"
-        android:name="app.vibecast.presentation.MainScreenFragment"
+        android:name="app.vibecast.presentation.screens.main_screen.MainScreenFragment"
         tools:layout="@layout/fragment_main_screen" >
 
         <action
@@ -37,7 +37,7 @@
 
 <fragment
         android:id="@+id/nav_account"
-        android:name="app.vibecast.presentation.navigation.AccountFragment"
+        android:name="app.vibecast.presentation.screens.account_screen.AccountFragment"
         tools:layout="@layout/fragment_account">
 
 </fragment>
@@ -45,16 +45,16 @@
 
     <fragment
         android:id="@+id/nav_pictures"
-        android:name="app.vibecast.presentation.navigation.GalleryFragment"
+        android:name="app.vibecast.presentation.screens.gallery_screen.GalleryFragment"
         tools:layout="@layout/fragment_pictures" />
 
     <fragment
         android:id="@+id/nav_settings"
-        android:name="app.vibecast.presentation.navigation.SettingsFragment"
+        android:name="app.vibecast.presentation.screens.settings_screen.SettingsFragment"
         tools:layout="@layout/fragment_settings" />
     <fragment
         android:id="@+id/nav_saved"
-        android:name="app.vibecast.presentation.SavedLocationFragment"
+        android:name="app.vibecast.presentation.screens.saved_screen.SavedLocationFragment"
         android:label="fragment_saved_location"
         tools:layout="@layout/fragment_saved_location" >
         <action
@@ -66,7 +66,7 @@
     </fragment>
     <fragment
         android:id="@+id/nav_search"
-        android:name="app.vibecast.presentation.SearchResultFragment"
+        android:name="app.vibecast.presentation.screens.search_screen.SearchResultFragment"
         android:label="fragment_search_result"
         tools:layout="@layout/fragment_search_result" >
         <action

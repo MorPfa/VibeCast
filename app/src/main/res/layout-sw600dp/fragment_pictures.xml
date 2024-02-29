@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/generic_background"
     android:fitsSystemWindows="false"
-    tools:context=".presentation.navigation.GalleryFragment">
+    tools:context=".presentation.screens.gallery_screen.GalleryFragment">
 
     <TextView
         android:id="@+id/your_saved_images"

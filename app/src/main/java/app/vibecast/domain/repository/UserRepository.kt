@@ -1,6 +1,6 @@
 package app.vibecast.domain.repository
 
-import app.vibecast.domain.entity.User
+import app.vibecast.domain.model.User
 import kotlinx.coroutines.flow.Flow
 
 

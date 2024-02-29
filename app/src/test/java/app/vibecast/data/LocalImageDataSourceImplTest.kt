@@ -1,9 +1,9 @@
 package app.vibecast.data
 
-import app.vibecast.data.local.db.image.ImageDao
-import app.vibecast.data.local.db.image.ImageEntity
-import app.vibecast.data.local.source.LocalImageDataSourceImpl
-import app.vibecast.domain.entity.ImageDto
+import app.vibecast.data.local_data.db.image.dao.ImageDao
+import app.vibecast.data.local_data.db.image.model.ImageEntity
+import app.vibecast.data.local_data.data_source.image.LocalImageDataSourceImpl
+import app.vibecast.domain.model.ImageDto
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf

@@ -1,9 +1,9 @@
 package app.vibecast.domain.repository
 
-import app.vibecast.domain.entity.LocationDto
-import app.vibecast.domain.entity.LocationWithWeatherDataDto
-import app.vibecast.domain.entity.WeatherDto
-import app.vibecast.presentation.weather.LocationModel
+import app.vibecast.domain.model.LocationDto
+import app.vibecast.domain.model.LocationWithWeatherDataDto
+import app.vibecast.domain.model.WeatherDto
+import app.vibecast.presentation.screens.main_screen.weather.LocationModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 

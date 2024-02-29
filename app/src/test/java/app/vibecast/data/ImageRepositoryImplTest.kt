@@ -1,9 +1,9 @@
 package app.vibecast.data
 
-import app.vibecast.data.data_repository.repository.ImageRepositoryImpl
-import app.vibecast.data.local.source.LocalImageDataSourceImpl
-import app.vibecast.data.remote.source.RemoteImageDataSourceImpl
-import app.vibecast.domain.entity.ImageDto
+import app.vibecast.domain.repository.implementation.ImageRepositoryImpl
+import app.vibecast.data.local_data.data_source.image.LocalImageDataSourceImpl
+import app.vibecast.data.remote_data.data_source.image.RemoteImageDataSourceImpl
+import app.vibecast.domain.model.ImageDto
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf

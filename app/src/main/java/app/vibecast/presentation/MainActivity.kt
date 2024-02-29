@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.Menu
@@ -19,7 +18,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -30,19 +28,20 @@ import androidx.navigation.ui.setupWithNavController
 import app.vibecast.BuildConfig
 import app.vibecast.R
 import app.vibecast.databinding.ActivityMainBinding
-import app.vibecast.presentation.mainscreen.MainScreenViewModel
-import app.vibecast.presentation.music.MusicViewModel
-import app.vibecast.presentation.navigation.ImageViewModel
+import app.vibecast.presentation.screens.main_screen.MainScreenViewModel
+import app.vibecast.presentation.screens.main_screen.music.MusicViewModel
+import app.vibecast.presentation.screens.main_screen.image.ImageViewModel
 import app.vibecast.presentation.permissions.LocationPermissionState
 import app.vibecast.presentation.permissions.PermissionHelper
+import app.vibecast.presentation.screens.main_screen.MainScreenFragmentDirections
+import app.vibecast.presentation.screens.saved_screen.SavedLocationFragmentDirections
+
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.spotify.sdk.android.auth.AuthorizationClient
 import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 
@@ -78,7 +77,8 @@ class MainActivity : AppCompatActivity() {
             val response = AuthorizationClient.getResponse(resultCode, intent)
             when (response.type) {
                 AuthorizationResponse.Type.TOKEN -> {
-                    musicViewModel.connectToSpotify()
+                    musicViewModel.connectToSpotify(response.accessToken)
+
                 }
                 AuthorizationResponse.Type.ERROR -> {
                     Timber.tag("Spotify").d("sum ting wong")
@@ -354,13 +354,6 @@ class MainActivity : AppCompatActivity() {
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
-
-
-    override fun onStart() {
-        super.onStart()
-//        authorizeClient()
-
-    }
 
     override fun onDestroy() {
         super.onDestroy()

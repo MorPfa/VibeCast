@@ -104,6 +104,7 @@
     <string name="imperial">Imperial</string>
     <string name="metric">Metric</string>
     <string name="saved_image_count">%1$d</string>
+    <string name="saved_location_count">%1$d</string>
     <string name="loading_placeholder">-</string>
     <string name="error_loading_image">Error loading Image for desired location</string>
     <string name="invalid_query_input">Could not find results for this input</string>
@@ -126,7 +127,9 @@
     <string name="snowy_weather">Snowy weather</string>
     <string name="foggy_weather">Foggy weather</string>
     <string name="music_preference_dropdown_text">Select the music genre you would like to listen to in this weather</string>
-    <string-array name="items">
+    <string name="cloudy_weather">Cloudy weather</string>
+    <string name="reset_music_preferences">Reset music preferences</string>
+    <string-array name="music_genres">
         <item>Jazz</item>
         <item>Rock</item>
         <item>Pop</item>
@@ -139,6 +142,7 @@
         <item>Reggae</item>
 
     </string-array>
+
 
 
 </resources>

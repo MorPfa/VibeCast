@@ -1,18 +1,18 @@
 package app.vibecast.data
 
-import app.vibecast.data.data_repository.repository.Unit
-import app.vibecast.data.local.db.location.LocationDao
-import app.vibecast.data.local.db.location.LocationEntity
-import app.vibecast.data.local.db.location.LocationWithWeatherData
-import app.vibecast.data.local.db.weather.WeatherEntity
-import app.vibecast.data.local.source.LocalLocationDataSourceImpl
-import app.vibecast.domain.entity.CurrentWeather
-import app.vibecast.domain.entity.HourlyWeather
-import app.vibecast.domain.entity.LocationDto
-import app.vibecast.domain.entity.LocationWithWeatherDataDto
-import app.vibecast.domain.entity.WeatherDto
-import app.vibecast.domain.entity.WeatherCondition
-import app.vibecast.domain.repository.DataStoreRepository
+import app.vibecast.domain.repository.implementation.Unit
+import app.vibecast.data.local_data.db.location.dao.LocationDao
+import app.vibecast.data.local_data.db.location.model.LocationEntity
+import app.vibecast.data.local_data.db.location.model.LocationWithWeatherData
+import app.vibecast.data.local_data.db.weather.model.WeatherEntity
+import app.vibecast.data.local_data.data_source.weather.LocalLocationDataSourceImpl
+import app.vibecast.domain.model.CurrentWeather
+import app.vibecast.domain.model.HourlyWeather
+import app.vibecast.domain.model.LocationDto
+import app.vibecast.domain.model.LocationWithWeatherDataDto
+import app.vibecast.domain.model.WeatherDto
+import app.vibecast.domain.model.WeatherCondition
+import app.vibecast.domain.repository.UnitPreferenceRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -30,7 +30,7 @@ import org.mockito.kotlin.whenever
 class LocalLocationDataSourceImplTest {
 
     private val locationDao = mock<LocationDao>()
-    private val dataStore = mock<DataStoreRepository>()
+    private val dataStore = mock<UnitPreferenceRepository>()
     private val locationDataSource = LocalLocationDataSourceImpl(locationDao, dataStore)
     private lateinit var locationDto : LocationDto
     private lateinit var weatherDto : WeatherDto

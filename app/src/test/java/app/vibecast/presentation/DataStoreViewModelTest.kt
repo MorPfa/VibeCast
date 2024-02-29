@@ -1,7 +1,8 @@
 package app.vibecast.presentation
 
-import app.vibecast.data.data_repository.repository.Unit
-import app.vibecast.domain.repository.DataStoreRepository
+import app.vibecast.domain.repository.implementation.Unit
+import app.vibecast.domain.repository.UnitPreferenceRepository
+import app.vibecast.presentation.screens.settings_screen.PreferencesViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.single
@@ -17,8 +18,8 @@ import org.mockito.kotlin.whenever
 
 class DataStoreViewModelTest {
 
-    private val dataStoreRepository = mock<DataStoreRepository>()
-    private val viewModel = DataStoreViewModel(dataStoreRepository)
+    private val dataStoreRepository = mock<UnitPreferenceRepository>()
+    private val viewModel = PreferencesViewModel(dataStoreRepository)
     private lateinit var unit : Unit
 
     @ExperimentalCoroutinesApi
@@ -30,20 +31,20 @@ class DataStoreViewModelTest {
 
     @Test
     fun testStoreUnit() = runTest {
-        whenever(dataStoreRepository.getUnit()).thenReturn(unit)
+        whenever(dataStoreRepository.getPreference()).thenReturn(unit)
         viewModel.storeUnit(unit)
         val result = viewModel.getUnit().single()
         assertEquals(unit, result)
-        verify(dataStoreRepository).putUnit(unit)
+        verify(dataStoreRepository).savePreference(unit)
 
     }
 
     @Test
     fun testGetUnit(): kotlin.Unit = runTest {
-        whenever(dataStoreRepository.getUnit()).thenReturn(unit)
+        whenever(dataStoreRepository.getPreference()).thenReturn(unit)
         val result = viewModel.getUnit().single()
         assertEquals(unit, result)
-        verify(dataStoreRepository).getUnit()
+        verify(dataStoreRepository).getPreference()
     }
 
     @Test
@@ -51,7 +52,7 @@ class DataStoreViewModelTest {
         viewModel.clearUnit()
         val result = viewModel.getUnit().single()
         assertEquals(result, null )
-        verify(dataStoreRepository).clearUnit()
+        verify(dataStoreRepository).clearPreference()
 
     }
 }

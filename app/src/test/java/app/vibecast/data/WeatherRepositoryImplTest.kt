@@ -3,17 +3,17 @@ package app.vibecast.data
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import app.vibecast.data.data_repository.data_source.local.LocalWeatherDataSource
-import app.vibecast.data.data_repository.data_source.remote.RemoteWeatherDataSource
-import app.vibecast.data.data_repository.repository.Unit
-import app.vibecast.data.data_repository.repository.WeatherRepositoryImpl
-import app.vibecast.domain.entity.CurrentWeather
-import app.vibecast.domain.entity.HourlyWeather
-import app.vibecast.domain.entity.LocationDto
-import app.vibecast.domain.entity.LocationWithWeatherDataDto
-import app.vibecast.domain.entity.WeatherDto
-import app.vibecast.domain.entity.WeatherCondition
-import app.vibecast.domain.repository.DataStoreRepository
+import app.vibecast.data.local_data.data_source.weather.LocalWeatherDataSource
+import app.vibecast.data.remote_data.data_source.weather.RemoteWeatherDataSource
+import app.vibecast.domain.repository.implementation.Unit
+import app.vibecast.domain.repository.implementation.WeatherRepositoryImpl
+import app.vibecast.domain.model.CurrentWeather
+import app.vibecast.domain.model.HourlyWeather
+import app.vibecast.domain.model.LocationDto
+import app.vibecast.domain.model.LocationWithWeatherDataDto
+import app.vibecast.domain.model.WeatherDto
+import app.vibecast.domain.model.WeatherCondition
+import app.vibecast.domain.repository.UnitPreferenceRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -31,7 +31,7 @@ class WeatherRepositoryImplTest {
 
     private val remoteWeatherDataSource = mock<RemoteWeatherDataSource>()
     private val localWeatherDataSource = mock<LocalWeatherDataSource>()
-    private val dataStore = mock<DataStoreRepository>()
+    private val dataStore = mock<UnitPreferenceRepository>()
     private val context = mock<Context>()
     private val connectivityManager = mock<ConnectivityManager>()
     private val networkCapabilities = mock<NetworkCapabilities>()

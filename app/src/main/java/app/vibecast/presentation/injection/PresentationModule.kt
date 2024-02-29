@@ -1,7 +1,7 @@
 package app.vibecast.presentation.injection
 
 import android.content.Context
-import app.vibecast.presentation.image.ImageLoader
+import app.vibecast.presentation.screens.main_screen.image.ImageLoader
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

@@ -14,8 +14,8 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import app.vibecast.R
-import app.vibecast.data.local.db.AppDatabase
-import app.vibecast.data.local.db.image.ImageDao
+import app.vibecast.data.local_data.db.AppDatabase
+import app.vibecast.data.local_data.db.image.dao.ImageDao
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith

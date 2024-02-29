@@ -6,7 +6,7 @@ import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import app.vibecast.data.data_repository.repository.DataStoreRepositoryImpl
-import app.vibecast.data.data_repository.repository.Unit
+import app.vibecast.domain.repository.implementation.Unit
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -16,8 +16,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.TestCoroutineExceptionHandler
 import kotlinx.coroutines.test.TestCoroutineScope
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.createTestCoroutineScope
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.Assert.assertEquals
@@ -28,7 +30,8 @@ class DataStoreRepositoryImplTest {
 
     private val testDispatcher = TestCoroutineDispatcher()
     @ExperimentalCoroutinesApi
-    private val testScope = TestCoroutineScope(testDispatcher)
+    private val testScope =
+        createTestCoroutineScope(TestCoroutineDispatcher() + TestCoroutineExceptionHandler() + testDispatcher)
 
     private val context = mockk<Context>()
     private val dataStore = mockk<DataStore<Preferences>>()
@@ -53,7 +56,7 @@ class DataStoreRepositoryImplTest {
             mockPreferences
         }
 
-        dataStoreRepository.putUnit(unit)
+        dataStoreRepository.savePreferences(unit)
         testScope.advanceUntilIdle()
         coVerify { dataStore.edit(any()) }
 
@@ -71,7 +74,7 @@ class DataStoreRepositoryImplTest {
             }
         )
 
-        val result = dataStoreRepository.getUnit()
+        val result = dataStoreRepository.getPreferences()
 
         assertEquals(expectedUnit, result)
 
@@ -91,7 +94,7 @@ class DataStoreRepositoryImplTest {
             mockPreferences
         }
 
-        dataStoreRepository.clearUnit()
+        dataStoreRepository.clearPreferences()
         coVerify { dataStore.edit(any()) }
         testScope.advanceUntilIdle()
     }

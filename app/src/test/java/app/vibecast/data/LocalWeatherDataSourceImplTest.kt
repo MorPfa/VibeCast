@@ -2,15 +2,15 @@ package app.vibecast.data
 
 
 
-import app.vibecast.data.data_repository.repository.Unit
-import app.vibecast.data.local.db.location.LocationDao
-import app.vibecast.data.local.db.weather.WeatherDao
-import app.vibecast.data.local.db.weather.WeatherEntity
-import app.vibecast.data.local.source.LocalWeatherDataSourceImpl
-import app.vibecast.domain.entity.CurrentWeather
-import app.vibecast.domain.entity.HourlyWeather
-import app.vibecast.domain.entity.WeatherDto
-import app.vibecast.domain.entity.WeatherCondition
+import app.vibecast.domain.repository.implementation.Unit
+import app.vibecast.data.local_data.db.location.dao.LocationDao
+import app.vibecast.data.local_data.db.weather.dao.WeatherDao
+import app.vibecast.data.local_data.db.weather.model.WeatherEntity
+import app.vibecast.data.local_data.data_source.weather.LocalWeatherDataSourceImpl
+import app.vibecast.domain.model.CurrentWeather
+import app.vibecast.domain.model.HourlyWeather
+import app.vibecast.domain.model.WeatherDto
+import app.vibecast.domain.model.WeatherCondition
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf

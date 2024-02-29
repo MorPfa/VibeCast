@@ -1,10 +1,10 @@
 package app.vibecast.data
 
-import app.vibecast.data.remote.network.image.DownloadUrl
-import app.vibecast.data.remote.network.image.ImageApiModel
-import app.vibecast.data.remote.network.image.ImageService
-import app.vibecast.data.remote.source.RemoteImageDataSourceImpl
-import app.vibecast.domain.entity.ImageDto
+import app.vibecast.data.remote_data.network.image.model.DownloadUrl
+import app.vibecast.data.remote_data.network.image.model.ImageApiModel
+import app.vibecast.data.remote_data.network.image.api.ImageService
+import app.vibecast.data.remote_data.data_source.image.RemoteImageDataSourceImpl
+import app.vibecast.domain.model.ImageDto
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.test.runTest

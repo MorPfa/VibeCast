@@ -4,10 +4,9 @@ import androidx.fragment.app.testing.FragmentScenario
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.lifecycle.Lifecycle
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import app.vibecast.presentation.MainScreenFragment
+import app.vibecast.presentation.screens.main_screen.MainScreenFragment
 import org.junit.After
 import org.junit.Before
-import org.junit.Test
 
 import org.junit.runner.RunWith
 

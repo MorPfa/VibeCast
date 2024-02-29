@@ -1,11 +1,11 @@
 package app.vibecast.presentation
 
 
-import app.vibecast.domain.entity.ImageDto
+import app.vibecast.domain.model.ImageDto
 import app.vibecast.domain.repository.ImageRepository
-import app.vibecast.presentation.image.ImageLoader
-import app.vibecast.presentation.image.ImagePicker
-import app.vibecast.presentation.navigation.ImageViewModel
+import app.vibecast.presentation.screens.main_screen.image.ImageLoader
+import app.vibecast.presentation.screens.main_screen.image.ImagePicker
+import app.vibecast.presentation.screens.main_screen.image.ImageViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.single
