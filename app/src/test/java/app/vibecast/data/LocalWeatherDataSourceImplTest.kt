@@ -2,7 +2,7 @@ package app.vibecast.data
 
 
 
-import app.vibecast.domain.repository.implementation.Unit
+import app.vibecast.domain.repository.weather.Unit
 import app.vibecast.data.local_data.db.location.dao.LocationDao
 import app.vibecast.data.local_data.db.weather.dao.WeatherDao
 import app.vibecast.data.local_data.db.weather.model.WeatherEntity

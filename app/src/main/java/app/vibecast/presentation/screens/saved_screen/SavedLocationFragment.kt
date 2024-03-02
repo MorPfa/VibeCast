@@ -16,7 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import app.vibecast.R
 import app.vibecast.databinding.FragmentSavedLocationBinding
 import app.vibecast.presentation.TAG
-import app.vibecast.presentation.screens.main_screen.MainScreenViewModel
+import app.vibecast.presentation.screens.main_screen.MainViewModel
 import app.vibecast.presentation.screens.main_screen.image.ImageViewModel
 import app.vibecast.presentation.screens.main_screen.weather.LocationModel
 import com.google.android.material.snackbar.Snackbar
@@ -32,7 +32,7 @@ class SavedLocationFragment : Fragment() {
     private var param2: String? = null
     private var _binding: FragmentSavedLocationBinding? = null
     private val binding get() = _binding!!
-    private val mainScreenViewModel: MainScreenViewModel by activityViewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
     private val imageViewModel: ImageViewModel by activityViewModels()
 
     @SuppressLint("SourceLockedOrientationActivity")
@@ -85,15 +85,15 @@ class SavedLocationFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         lifecycleScope.launch {
             val mediatorLiveData = MediatorLiveData<Pair<List<LocationModel>, Int>>()
-            mediatorLiveData.addSource(mainScreenViewModel.locations) { locations ->
-                val locationIndex = mainScreenViewModel.locationIndex.value
+            mediatorLiveData.addSource(mainViewModel.locations) { locations ->
+                val locationIndex = mainViewModel.locationIndex.value
                 if (locationIndex != null) {
                     mediatorLiveData.value = Pair(locations, locationIndex)
                 }
             }
 
-            mediatorLiveData.addSource(mainScreenViewModel.locationIndex) { locationIndex ->
-                val locations = mainScreenViewModel.locations.value
+            mediatorLiveData.addSource(mainViewModel.locationIndex) { locationIndex ->
+                val locations = mainViewModel.locations.value
                 if (locations != null) {
                     mediatorLiveData.value = Pair(locations, locationIndex)
                 }
@@ -115,8 +115,8 @@ class SavedLocationFragment : Fragment() {
                     binding.nextScreenButton.visibility = View.VISIBLE
                     binding.nextScreenButton.setOnClickListener {
                        requireActivity().invalidateOptionsMenu()
-                        mainScreenViewModel.getSavedLocationWeather()
-                        mainScreenViewModel.incrementIndex()
+                        mainViewModel.getSavedLocationWeather()
+                        mainViewModel.incrementIndex()
                     }
                 }
 
@@ -127,8 +127,8 @@ class SavedLocationFragment : Fragment() {
                     binding.prevScreenButton.visibility =  View.VISIBLE
                     binding.prevScreenButton.setOnClickListener {
                         requireActivity().invalidateOptionsMenu()
-                        mainScreenViewModel.getSavedLocationWeather()
-                        mainScreenViewModel.decrementIndex()
+                        mainViewModel.getSavedLocationWeather()
+                        mainViewModel.decrementIndex()
                     }
                 }
 
@@ -136,7 +136,7 @@ class SavedLocationFragment : Fragment() {
             }
         }
 
-            mainScreenViewModel.savedWeather.observe(viewLifecycleOwner) { weatherData ->
+            mainViewModel.savedWeather.observe(viewLifecycleOwner) { weatherData ->
                 weatherData.weather.currentWeather?.let { currentWeather ->
                     val city = weatherData.location.cityName
                     val weather =

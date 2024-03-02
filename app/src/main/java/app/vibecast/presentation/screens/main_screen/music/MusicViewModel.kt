@@ -2,13 +2,13 @@ package app.vibecast.presentation.screens.main_screen.music
 
 import android.app.Application
 import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.vibecast.BuildConfig
-import app.vibecast.data.remote_data.network.music.model.PlaylistApiModel
-import app.vibecast.domain.repository.MusicRepository
+import app.vibecast.domain.repository.music.MusicPreferenceRepository
+import app.vibecast.domain.repository.music.MusicRepository
+import app.vibecast.domain.repository.music.WeatherCondition
 import app.vibecast.presentation.TAG
 import com.google.gson.GsonBuilder
 import com.spotify.android.appremote.api.ConnectionParams
@@ -19,9 +19,9 @@ import com.spotify.protocol.client.Subscription
 import com.spotify.protocol.types.PlayerContext
 import com.spotify.protocol.types.PlayerState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -29,6 +29,7 @@ import javax.inject.Inject
 class MusicViewModel @Inject constructor(
     private val application: Application,
     private val musicRepository: MusicRepository,
+    private val musicPreferenceRepository: MusicPreferenceRepository,
 ) : ViewModel() {
 
 
@@ -38,20 +39,45 @@ class MusicViewModel @Inject constructor(
     private val gson = GsonBuilder().setPrettyPrinting().create()
     private val clientId = BuildConfig.SPOTIFY_KEY
     private val redirectUri = "vibecast://callback"
-    private var started : Boolean = false
-
-    private val _coverImage =MutableLiveData<String>()
-    var coverImage : LiveData<String> = _coverImage
 
 
-    fun getPlaylist(category: String, accessCode : String): Flow<PlaylistApiModel> = flow {
+    private suspend fun getGenre(weather: String): String {
+        Timber.tag("Spotify").d("getGenre called")
+        val category = when (weather) {
+            "Thunderstorm" -> WeatherCondition.STORMY
+            "Drizzle" -> WeatherCondition.RAINY
+            "Rain" -> WeatherCondition.RAINY
+            "Snow" -> WeatherCondition.SNOWY
+            "Mist" -> WeatherCondition.CLOUDY
+            "Fog" -> WeatherCondition.FOGGY
+            "Tornado" -> WeatherCondition.STORMY
+            "Dust" -> WeatherCondition.FOGGY
+            "Clear" -> WeatherCondition.SUNNY
+            "Clouds" -> WeatherCondition.CLOUDY
+            else -> WeatherCondition.CLOUDY
+        }
+        return withContext(Dispatchers.IO) {
+            musicPreferenceRepository.getPreference(category)
+        }
+    }
+
+    private val _token = MutableLiveData<String>()
+    var token = _token
+
+
+    fun getPlaylist(category: String) {
         try {
-            Timber.tag("Spotify").d("getPlaylist called")
-            musicRepository.getPlaylist(category, accessCode).collect {
-                Timber.tag("Spotify").d(it.playlists.items[0].name)
-                emit(it)
+            viewModelScope.launch {
+                Timber.tag("Spotify").d("getPlaylist called")
+                val genre = getGenre(category)
+                musicRepository.getPlaylist(genre, token.value!!).collect {
+                    Timber.tag("Spotify").d(it.playlists.items[0].name)
+                    Timber.tag("Spotify").d(category)
+                    playPlaylist(it.playlists.items[0].uri)
+                }
             }
-        } catch (e : Exception){
+
+        } catch (e: Exception) {
             Timber.tag("Spotify").d(e.localizedMessage ?: "null")
         }
     }
@@ -95,7 +121,7 @@ class MusicViewModel @Inject constructor(
             .setErrorCallback(errorCallback)
     }
 
-    fun connectToSpotify(acessToken : String) {
+    fun connectToSpotify(token: String) {
         val connectionParams = ConnectionParams.Builder(clientId)
             .setRedirectUri(redirectUri)
             .build()
@@ -109,11 +135,7 @@ class MusicViewModel @Inject constructor(
                     // Now you can start interacting with App Remote
                     //            subscribeToPlayerContext()
                     subscribeToPlayerState()
-                    viewModelScope.launch {
-                        getPlaylist("jazz", acessToken).collect{
-                            playPlaylist(it.playlists.items[0].uri)
-                        }
-                    }
+                    _token.value = token
 
                 }
 
@@ -129,17 +151,23 @@ class MusicViewModel @Inject constructor(
         SpotifyAppRemote.disconnect(spotifyAppRemote)
     }
 
-    fun playPlaylist(uri : String){
+    private var playing : Boolean  = false
+    private fun playPlaylist(uri: String) {
         assertAppRemoteConnected().let {
-            if (!started){
-                it.playerApi.play(uri)
+            if(playing){
                 it.playerApi.pause()
+                Timber.tag("Spotify").d(playing.toString())
             }
             else {
-                it.playerApi.resume()
+                Timber.tag("Spotify").d(playing.toString())
+                it.playerApi.play(uri)
+                it.playerApi.pause()
+                playing = true
             }
 
+
         }
+
     }
 
     fun onPlayPauseButtonClicked() {
@@ -241,7 +269,9 @@ class MusicViewModel @Inject constructor(
         fun onPlayerStateUpdated(playerState: PlayerState)
     }
 
+
     private var playerStateListener: PlayerStateListener? = null
+
 
     fun setPlayerStateListener(listener: PlayerStateListener) {
         playerStateListener = listener

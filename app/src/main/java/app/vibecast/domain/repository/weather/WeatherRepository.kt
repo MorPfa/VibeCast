@@ -1,8 +1,9 @@
-package app.vibecast.domain.repository
+package app.vibecast.domain.repository.weather
 
 import app.vibecast.domain.model.LocationWithWeatherDataDto
 import app.vibecast.domain.model.WeatherDto
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 
 interface WeatherRepository {
 
@@ -15,4 +16,6 @@ interface WeatherRepository {
     fun refreshWeather(cityName : String) : Flow<WeatherDto>
 
     fun refreshWeather(lat : Double, lon : Double) : Flow<WeatherDto>
+
+    val currentWeather : MutableStateFlow<String?>
 }

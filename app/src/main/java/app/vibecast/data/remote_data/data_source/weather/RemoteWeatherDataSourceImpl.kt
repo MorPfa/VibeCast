@@ -3,7 +3,7 @@ package app.vibecast.data.remote_data.data_source.weather
 import android.util.Log
 import app.vibecast.BuildConfig
 import app.vibecast.domain.util.TAGS.WEATHER_ERROR
-import app.vibecast.domain.repository.implementation.Unit
+import app.vibecast.domain.repository.weather.Unit
 import app.vibecast.data.remote_data.network.weather.model.CityApiModel
 import app.vibecast.data.remote_data.network.weather.model.CoordinateApiModel
 import app.vibecast.data.remote_data.network.weather.model.CurrentWeatherRemote
@@ -17,7 +17,7 @@ import app.vibecast.domain.model.LocationDto
 import app.vibecast.domain.model.LocationWithWeatherDataDto
 import app.vibecast.domain.model.WeatherCondition
 import app.vibecast.domain.model.WeatherDto
-import app.vibecast.domain.repository.UnitPreferenceRepository
+import app.vibecast.domain.repository.weather.UnitPreferenceRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

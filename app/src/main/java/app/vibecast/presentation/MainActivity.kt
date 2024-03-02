@@ -28,7 +28,7 @@ import androidx.navigation.ui.setupWithNavController
 import app.vibecast.BuildConfig
 import app.vibecast.R
 import app.vibecast.databinding.ActivityMainBinding
-import app.vibecast.presentation.screens.main_screen.MainScreenViewModel
+import app.vibecast.presentation.screens.main_screen.MainViewModel
 import app.vibecast.presentation.screens.main_screen.music.MusicViewModel
 import app.vibecast.presentation.screens.main_screen.image.ImageViewModel
 import app.vibecast.presentation.permissions.LocationPermissionState
@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private lateinit var searchView: SearchView
-    private val mainScreenViewModel: MainScreenViewModel by viewModels()
+    private val mainViewModel: MainViewModel by viewModels()
     private val imageViewModel: ImageViewModel by viewModels()
     private val musicViewModel: MusicViewModel by viewModels()
     private var showIcons: Boolean = true
@@ -60,6 +60,9 @@ class MainActivity : AppCompatActivity() {
     private val redirectUri = "vibecast://callback"
     private val clientId = BuildConfig.SPOTIFY_KEY
     private val REQUEST_CODE = 1337
+
+
+
     private fun authorizeClient(){
         val request = AuthorizationRequest.Builder(clientId,AuthorizationResponse.Type.TOKEN ,redirectUri)
             .setShowDialog(true)
@@ -78,7 +81,7 @@ class MainActivity : AppCompatActivity() {
             when (response.type) {
                 AuthorizationResponse.Type.TOKEN -> {
                     musicViewModel.connectToSpotify(response.accessToken)
-
+                    Timber.tag("Spotify").d("authorized")
                 }
                 AuthorizationResponse.Type.ERROR -> {
                     Timber.tag("Spotify").d("sum ting wong")
@@ -162,8 +165,8 @@ class MainActivity : AppCompatActivity() {
         // Check if location permission is granted
         if (permissionHelper.isPermissionGranted(Manifest.permission.ACCESS_COARSE_LOCATION)) {
             // Permission is granted, load weather data
-            mainScreenViewModel.updatePermissionState(LocationPermissionState.Granted)
-            mainScreenViewModel.checkPermissionState()
+            mainViewModel.updatePermissionState(LocationPermissionState.Granted)
+            mainViewModel.checkPermissionState()
         } else {
             // Permission not granted, request it
             permissionHelper.requestPermission(
@@ -184,12 +187,12 @@ class MainActivity : AppCompatActivity() {
             LOCATION_PERMISSION_REQUEST_CODE -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // Permission granted, update state and load weather data
-                    mainScreenViewModel.updatePermissionState(LocationPermissionState.Granted)
-                    mainScreenViewModel.checkPermissionState()
+                    mainViewModel.updatePermissionState(LocationPermissionState.Granted)
+                    mainViewModel.checkPermissionState()
                 } else {
                     // Permission denied, update state and handle accordingly
-                    mainScreenViewModel.updatePermissionState(LocationPermissionState.Denied)
-                    mainScreenViewModel.checkPermissionState()
+                    mainViewModel.updatePermissionState(LocationPermissionState.Denied)
+                    mainViewModel.checkPermissionState()
                     Toast.makeText(
                         this,
                         getString(R.string.location_request_toast), Toast.LENGTH_SHORT
@@ -211,7 +214,7 @@ class MainActivity : AppCompatActivity() {
             override fun onQueryTextSubmit(query: String): Boolean {
                 if (isInputValid(query)) {
                     search.collapseActionView()
-                    mainScreenViewModel.getSearchedLocationWeather(query)
+                    mainViewModel.getSearchedLocationWeather(query)
                     val currentDestination =
                         findNavController(R.id.nav_host_fragment_content_home).currentDestination
                     if (currentDestination?.id == R.id.nav_home) {
@@ -330,11 +333,11 @@ class MainActivity : AppCompatActivity() {
             R.id.action_save_location -> {
                 if (!item.isChecked) {
                     item.isChecked = true
-                    mainScreenViewModel.addLocation(mainScreenViewModel.currentLocation.value!!)
+                    mainViewModel.addLocation(mainViewModel.currentLocation.value!!)
                     item.icon = ContextCompat.getDrawable(this, R.drawable.delete_location_icon)
                 } else {
                     item.isChecked = false
-                    mainScreenViewModel.deleteLocation(mainScreenViewModel.currentLocation.value!!)
+                    mainViewModel.deleteLocation(mainViewModel.currentLocation.value!!)
                     item.icon = ContextCompat.getDrawable(this, R.drawable.save_location_icon)
                 }
                 true
@@ -348,12 +351,17 @@ class MainActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_content_home)
         if (navController.currentDestination?.id == R.id.nav_search) {
-            mainScreenViewModel.checkPermissionState()
+            mainViewModel.checkPermissionState()
         }
 
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
+
+    override fun onStart() {
+        super.onStart()
+        authorizeClient()
+    }
 
     override fun onDestroy() {
         super.onDestroy()

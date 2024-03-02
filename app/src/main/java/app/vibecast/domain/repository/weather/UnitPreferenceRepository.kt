@@ -1,6 +1,4 @@
-package app.vibecast.domain.repository
-
-import app.vibecast.domain.repository.implementation.Unit
+package app.vibecast.domain.repository.weather
 
 
 interface UnitPreferenceRepository {

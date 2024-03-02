@@ -1,4 +1,4 @@
-package app.vibecast.domain.repository
+package app.vibecast.domain.repository.user
 
 import app.vibecast.domain.model.User
 import kotlinx.coroutines.flow.Flow

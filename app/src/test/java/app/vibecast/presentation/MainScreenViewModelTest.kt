@@ -1,7 +1,7 @@
 package app.vibecast.presentation
 
 import android.icu.text.SimpleDateFormat
-import app.vibecast.domain.repository.implementation.Unit
+import app.vibecast.domain.repository.weather.Unit
 import app.vibecast.domain.util.LocationGetter
 import app.vibecast.domain.model.CurrentWeather
 import app.vibecast.domain.model.HourlyWeather
@@ -10,10 +10,10 @@ import app.vibecast.domain.model.LocationDto
 import app.vibecast.domain.model.LocationWithWeatherDataDto
 import app.vibecast.domain.model.WeatherCondition
 import app.vibecast.domain.model.WeatherDto
-import app.vibecast.domain.repository.UnitPreferenceRepository
-import app.vibecast.domain.repository.LocationRepository
-import app.vibecast.domain.repository.WeatherRepository
-import app.vibecast.presentation.screens.main_screen.MainScreenViewModel
+import app.vibecast.domain.repository.weather.UnitPreferenceRepository
+import app.vibecast.domain.repository.weather.LocationRepository
+import app.vibecast.domain.repository.weather.WeatherRepository
+import app.vibecast.presentation.screens.main_screen.MainViewModel
 import app.vibecast.presentation.screens.main_screen.weather.WeatherModel
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -31,7 +31,7 @@ class CurrentLocationViewModelTest{
     private val locationRepository = mock<LocationRepository>()
     private val locationGetter = mock<LocationGetter>()
     private val dataStoreRepository = mock<UnitPreferenceRepository>()
-    private val viewModel = MainScreenViewModel(
+    private val viewModel = MainViewModel(
                             locationGetter,
                             weatherRepository,
                             locationRepository,

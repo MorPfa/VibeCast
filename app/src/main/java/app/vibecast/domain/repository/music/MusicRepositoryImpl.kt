@@ -1,8 +1,8 @@
-package app.vibecast.domain.repository.implementation
+package app.vibecast.domain.repository.music
 
 import app.vibecast.data.remote_data.data_source.music.RemoteMusicDataSource
 import app.vibecast.data.remote_data.network.music.model.PlaylistApiModel
-import app.vibecast.domain.repository.MusicRepository
+import app.vibecast.domain.repository.music.MusicRepository
 import kotlinx.coroutines.flow.Flow
 
 import kotlinx.coroutines.flow.flow

@@ -8,12 +8,13 @@
     tools:context=".presentation.screens.settings_screen.SettingsFragment"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_marginVertical="20dp"
+
     >
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingVertical="68dp"
         android:orientation="vertical">
 
         <!-- Title for the settings -->
@@ -77,7 +78,12 @@
             android:text="@string/music_preferences"
             android:textSize="20sp" />
 
-
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp"
+            android:text="@string/foggy_weather"
+            android:textSize="16sp" />
 
 
         <com.google.android.material.textfield.TextInputLayout
@@ -95,8 +101,15 @@
                 android:inputType="none"
                 />
 
-
         </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="4dp"
+            android:paddingHorizontal="16dp"
+            android:text="@string/rainy_weather"
+            android:textSize="16sp" />
 
 
         <com.google.android.material.textfield.TextInputLayout
@@ -114,6 +127,13 @@
                 />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp"
+            android:text="@string/sunny_weather"
+            android:textSize="16sp" />
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/sunny_dropdown_menu"
             android:layout_width="match_parent"
@@ -129,6 +149,12 @@
                 />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp"
+            android:text="@string/snowy_weather"
+            android:textSize="16sp" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/snowy_dropdown_menu"
@@ -144,6 +170,15 @@
                 android:inputType="none"
                 />
         </com.google.android.material.textfield.TextInputLayout>
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp"
+            android:text="@string/cloudy_weather"
+            android:textSize="16sp" />
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/cloudy_dropdown_menu"
             android:layout_width="match_parent"
@@ -153,6 +188,28 @@
             >
             <AutoCompleteTextView
                 android:id="@+id/cloudy_auto_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp"
+            android:text="@string/stormy_weather"
+            android:textSize="16sp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/stormy_dropdown_menu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            >
+            <AutoCompleteTextView
+                android:id="@+id/stormy_auto_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="none"

@@ -7,7 +7,7 @@ import app.vibecast.data.local_data.db.weather.model.WeatherEntity
 import app.vibecast.domain.model.LocationDto
 import app.vibecast.domain.model.LocationWithWeatherDataDto
 import app.vibecast.domain.model.WeatherDto
-import app.vibecast.domain.repository.UnitPreferenceRepository
+import app.vibecast.domain.repository.weather.UnitPreferenceRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject

@@ -1,17 +1,17 @@
 package app.vibecast.domain.injection
 
 
-import app.vibecast.domain.repository.implementation.LocationRepositoryImpl
-import app.vibecast.domain.repository.implementation.ImageRepositoryImpl
-import app.vibecast.domain.repository.implementation.MusicRepositoryImpl
-import app.vibecast.domain.repository.implementation.UserRepositoryImpl
-import app.vibecast.domain.repository.implementation.WeatherRepositoryImpl
+import app.vibecast.domain.repository.weather.LocationRepositoryImpl
+import app.vibecast.domain.repository.image.ImageRepositoryImpl
+import app.vibecast.domain.repository.music.MusicRepositoryImpl
+import app.vibecast.domain.repository.user.UserRepositoryImpl
+import app.vibecast.domain.repository.weather.WeatherRepositoryImpl
 
-import app.vibecast.domain.repository.LocationRepository
-import app.vibecast.domain.repository.ImageRepository
-import app.vibecast.domain.repository.MusicRepository
-import app.vibecast.domain.repository.UserRepository
-import app.vibecast.domain.repository.WeatherRepository
+import app.vibecast.domain.repository.weather.LocationRepository
+import app.vibecast.domain.repository.image.ImageRepository
+import app.vibecast.domain.repository.music.MusicRepository
+import app.vibecast.domain.repository.user.UserRepository
+import app.vibecast.domain.repository.weather.WeatherRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

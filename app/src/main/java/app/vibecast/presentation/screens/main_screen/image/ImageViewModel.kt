@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import app.vibecast.domain.model.ImageDto
-import app.vibecast.domain.repository.ImageRepository
+import app.vibecast.domain.repository.image.ImageRepository
 import app.vibecast.domain.util.TAGS
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers

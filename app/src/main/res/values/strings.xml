@@ -129,6 +129,7 @@
     <string name="music_preference_dropdown_text">Select the music genre you would like to listen to in this weather</string>
     <string name="cloudy_weather">Cloudy weather</string>
     <string name="reset_music_preferences">Reset music preferences</string>
+    <string name="stormy_weather">Stormy weather</string>
     <string-array name="music_genres">
         <item>Jazz</item>
         <item>Rock</item>

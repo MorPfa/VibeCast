@@ -3,7 +3,7 @@ package app.vibecast.data.local_data.db.weather.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import app.vibecast.domain.repository.implementation.Unit
+import app.vibecast.domain.repository.weather.Unit
 import app.vibecast.domain.model.WeatherDto
 
 @Entity(tableName = "weather")

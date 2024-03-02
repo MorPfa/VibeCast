@@ -6,8 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import app.vibecast.domain.model.LocationDto
 import app.vibecast.domain.model.WeatherCondition
-import app.vibecast.domain.repository.LocationRepository
-import app.vibecast.domain.repository.UserRepository
+import app.vibecast.domain.repository.weather.LocationRepository
+import app.vibecast.domain.repository.user.UserRepository
 import app.vibecast.presentation.screens.main_screen.weather.LocationModel
 import app.vibecast.presentation.screens.main_screen.weather.WeatherModel
 import dagger.hilt.android.lifecycle.HiltViewModel

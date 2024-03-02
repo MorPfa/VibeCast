@@ -11,10 +11,10 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import app.vibecast.R
 import app.vibecast.databinding.FragmentSettingsBinding
-import app.vibecast.domain.repository.implementation.Unit
-import app.vibecast.domain.repository.implementation.WeatherCondition
+import app.vibecast.domain.repository.weather.Unit
+import app.vibecast.domain.repository.music.WeatherCondition
 import app.vibecast.presentation.permissions.PermissionHelper
-import app.vibecast.presentation.screens.main_screen.MainScreenViewModel
+import app.vibecast.presentation.screens.main_screen.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -25,7 +25,7 @@ class SettingsFragment : Fragment() {
     private var _binding: FragmentSettingsBinding? = null
     private lateinit var permissionHelper: PermissionHelper
     private val prefViewModel : PreferencesViewModel by activityViewModels()
-    private val mainScreenViewModel: MainScreenViewModel by activityViewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
 
     private val binding get() = _binding!!
 
@@ -42,13 +42,15 @@ class SettingsFragment : Fragment() {
         binding.sunnyAutoTv.setAdapter(adapterItems)
         binding.cloudyAutoTv.setAdapter(adapterItems)
         binding.snowyAutoTv.setAdapter(adapterItems)
+        binding.stormyAutoTv.setAdapter(adapterItems)
 
         val weatherConditions = listOf(
             WeatherCondition.FOGGY,
             WeatherCondition.RAINY,
             WeatherCondition.SUNNY,
             WeatherCondition.SNOWY,
-            WeatherCondition.CLOUDY
+            WeatherCondition.CLOUDY,
+            WeatherCondition.STORMY
         )
 
         weatherConditions.forEach { condition ->
@@ -60,6 +62,7 @@ class SettingsFragment : Fragment() {
                         WeatherCondition.SUNNY -> binding.sunnyAutoTv
                         WeatherCondition.SNOWY -> binding.snowyAutoTv
                         WeatherCondition.CLOUDY -> binding.cloudyAutoTv
+                        WeatherCondition.STORMY -> binding.stormyAutoTv
                     }
 
                 autoCompleteTextView.setAdapter(adapterItems)
@@ -122,7 +125,7 @@ class SettingsFragment : Fragment() {
                 else -> Unit.IMPERIAL // Default to imperial if none is selected
             }
             prefViewModel.savePreferences(selectedUnit)
-            mainScreenViewModel.checkPermissionState()
+            mainViewModel.checkPermissionState()
 
         }
     }

@@ -4,7 +4,7 @@
 //import androidx.test.core.app.ApplicationProvider
 //import androidx.work.*
 //import app.vibecast.data.remote.network.weather.SyncSavedLocationsWeatherWorker
-//import app.vibecast.domain.repository.LocationRepository
+//import app.vibecast.domain.repository.weather.LocationRepository
 //import kotlinx.coroutines.runBlocking
 //import org.junit.Before
 //import org.junit.Test

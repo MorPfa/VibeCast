@@ -9,15 +9,15 @@ import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
 
-import app.vibecast.domain.repository.implementation.MusicPreferenceRepositoryImpl
-import app.vibecast.domain.repository.implementation.WeatherUnitRepositoryImpl
+import app.vibecast.domain.repository.music.MusicPreferenceRepositoryImpl
+import app.vibecast.domain.repository.weather.WeatherUnitRepositoryImpl
 import app.vibecast.data.local_data.db.AppDatabase
 import app.vibecast.data.local_data.db.location.dao.LocationDao
 import app.vibecast.data.local_data.db.image.dao.ImageDao
 import app.vibecast.data.local_data.db.user.UserDao
 import app.vibecast.data.local_data.db.weather.dao.WeatherDao
-import app.vibecast.domain.repository.MusicPreferenceRepository
-import app.vibecast.domain.repository.UnitPreferenceRepository
+import app.vibecast.domain.repository.music.MusicPreferenceRepository
+import app.vibecast.domain.repository.weather.UnitPreferenceRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

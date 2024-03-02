@@ -1,11 +1,10 @@
-package app.vibecast.domain.repository.implementation
+package app.vibecast.domain.repository.weather
 
 import app.vibecast.data.local_data.data_source.weather.LocalLocationDataSource
 import app.vibecast.data.remote_data.data_source.weather.RemoteWeatherDataSource
 import app.vibecast.domain.model.LocationDto
 import app.vibecast.domain.model.LocationWithWeatherDataDto
 import app.vibecast.domain.model.WeatherDto
-import app.vibecast.domain.repository.LocationRepository
 import app.vibecast.presentation.screens.main_screen.weather.LocationModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

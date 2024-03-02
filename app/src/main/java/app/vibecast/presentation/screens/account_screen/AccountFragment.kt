@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import app.vibecast.R
 import app.vibecast.databinding.FragmentAccountBinding
-import app.vibecast.presentation.screens.main_screen.MainScreenViewModel
+import app.vibecast.presentation.screens.main_screen.MainViewModel
 import app.vibecast.presentation.screens.main_screen.image.ImageViewModel
 import app.vibecast.presentation.screens.main_screen.weather.LocationModel
 import app.vibecast.presentation.util.LocationAdapter
@@ -29,7 +29,7 @@ import kotlinx.coroutines.launch
 class AccountFragment : Fragment() {
     private var _binding: FragmentAccountBinding? = null
     private val binding get() = _binding!!
-    private val mainScreenViewModel: MainScreenViewModel by activityViewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
     private val imageViewModel: ImageViewModel by activityViewModels()
 
 
@@ -62,11 +62,11 @@ class AccountFragment : Fragment() {
             imageViewModel.imageCount.observe(viewLifecycleOwner){
                 binding.savedImageCount.text = getString(R.string.saved_image_count, it)
             }
-            mainScreenViewModel.locations.observe(viewLifecycleOwner){
+            mainViewModel.locations.observe(viewLifecycleOwner){
                 binding.savedLocationsCount.text =  getString(R.string.saved_location_count, it.size)
             }
         }
-        mainScreenViewModel.locations.observe(viewLifecycleOwner) { locations ->
+        mainViewModel.locations.observe(viewLifecycleOwner) { locations ->
             adapter.submitList(locations)
         }
 
@@ -92,8 +92,8 @@ class AccountFragment : Fragment() {
 
 
         removeButton.setOnClickListener {
-            mainScreenViewModel.deleteLocation(location)
-            mainScreenViewModel.resetIndex()
+            mainViewModel.deleteLocation(location)
+            mainViewModel.resetIndex()
             alertDialog?.dismiss()
         }
 
@@ -112,7 +112,7 @@ class AccountFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-        mainScreenViewModel.locations.removeObservers(viewLifecycleOwner)
+        mainViewModel.locations.removeObservers(viewLifecycleOwner)
     }
 
 }

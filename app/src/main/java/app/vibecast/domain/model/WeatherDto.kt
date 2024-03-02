@@ -1,6 +1,6 @@
 package app.vibecast.domain.model
 
-import app.vibecast.domain.repository.implementation.Unit
+import app.vibecast.domain.repository.weather.Unit
 
 
 data class WeatherDto(

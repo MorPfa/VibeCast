@@ -1,7 +1,7 @@
 //package app.vibecast.presentation
 //
 //import app.vibecast.domain.entity.ImageDto
-//import app.vibecast.domain.repository.ImageRepository
+//import app.vibecast.domain.repository.image.ImageRepository
 //import app.vibecast.presentation.image.ImagePicker
 //import kotlinx.coroutines.flow.first
 //import kotlinx.coroutines.flow.flowOf

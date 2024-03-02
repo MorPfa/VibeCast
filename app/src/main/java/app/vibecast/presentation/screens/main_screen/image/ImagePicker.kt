@@ -3,7 +3,7 @@ package app.vibecast.presentation.screens.main_screen.image
 import android.util.Log
 import app.vibecast.R
 import app.vibecast.domain.model.ImageDto
-import app.vibecast.domain.repository.ImageRepository
+import app.vibecast.domain.repository.image.ImageRepository
 import app.vibecast.domain.util.TAGS.IMAGE_ERROR
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -15,7 +15,8 @@ import javax.inject.Inject
  *  picks correct default image in case of no internet or other error
  */
 class ImagePicker @Inject constructor(
-    private val imageRepository: ImageRepository) {
+    private val imageRepository: ImageRepository
+) {
 
     fun pickDefaultImage(weatherCondition: String) : Int{
         val randomIndex = (0..2).random()

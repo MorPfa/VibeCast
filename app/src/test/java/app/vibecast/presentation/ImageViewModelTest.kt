@@ -2,7 +2,7 @@ package app.vibecast.presentation
 
 
 import app.vibecast.domain.model.ImageDto
-import app.vibecast.domain.repository.ImageRepository
+import app.vibecast.domain.repository.image.ImageRepository
 import app.vibecast.presentation.screens.main_screen.image.ImageLoader
 import app.vibecast.presentation.screens.main_screen.image.ImagePicker
 import app.vibecast.presentation.screens.main_screen.image.ImageViewModel

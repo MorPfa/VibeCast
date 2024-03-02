@@ -29,6 +29,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 
 @AndroidEntryPoint
@@ -36,7 +37,7 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
     private var _binding: FragmentMainScreenBinding? = null
     private val binding get() = _binding!!
     private lateinit var actionBar: ActionBar
-    private val mainScreenViewModel: MainScreenViewModel by activityViewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
     private val imageViewModel: ImageViewModel by activityViewModels()
     private val musicViewModel: MusicViewModel by activityViewModels()
     private lateinit var playbackButton: ImageButton
@@ -133,13 +134,15 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         _binding = FragmentMainScreenBinding.inflate(inflater, container, false)
         musicViewModel.setPlayerStateListener(this)
-
         trackProgressBar = TrackProgressBar(binding.musicWidget.progressBar) { seekToPosition: Long -> musicViewModel.seekTo(seekToPosition) }
         playbackButton = binding.musicWidget.playPauseButton
         shuffleButton = binding.musicWidget.shuffleButton
         repeatButton = binding.musicWidget.repeatButton
         actionBar = (requireActivity() as AppCompatActivity).supportActionBar!!
         actionBar.show()
+
+
+
         repeatButton.setOnClickListener {
             musicViewModel.setRepeatStatus()
         }
@@ -173,8 +176,8 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
 
         val nextScreenButton = binding.nextScreenButton
         nextScreenButton.setOnClickListener {
-            if (mainScreenViewModel.locations.value?.size != 0) {
-                mainScreenViewModel.getSavedLocationWeather()
+            if (mainViewModel.locations.value?.size != 0) {
+                mainViewModel.getSavedLocationWeather()
                 val action =
                     MainScreenFragmentDirections.actionNavHomeToSavedLocationFragment()
                 findNavController().navigate(action)
@@ -259,13 +262,16 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         lifecycleScope.launch {
-            mainScreenViewModel.currentWeather.distinctUntilChanged()
+            mainViewModel.currentWeather.distinctUntilChanged()
                 .observe(viewLifecycleOwner) { weatherData ->
+
                     weatherData.weather.currentWeather?.let { currentWeather ->
                         val city = weatherData.location.cityName
                         val weather =
                             weatherData.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
-                        observeImageData(city, weather!!)
+                        musicViewModel.getPlaylist(weather!!)
+
+                        observeImageData(city, weather)
                         binding.mainTempDisplay.text =
                             getString(R.string.center_temp, currentWeather.temperature)
                         //            Current hour values
@@ -321,7 +327,7 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        mainScreenViewModel.currentWeather.removeObservers(viewLifecycleOwner)
+        mainViewModel.currentWeather.removeObservers(viewLifecycleOwner)
         _binding = null
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }

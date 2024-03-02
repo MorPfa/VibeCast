@@ -1,4 +1,4 @@
-package app.vibecast.domain.repository.implementation
+package app.vibecast.domain.repository.weather
 
 import android.content.Context
 import android.net.ConnectivityManager
@@ -10,12 +10,11 @@ import app.vibecast.data.remote_data.data_source.weather.RemoteWeatherDataSource
 import app.vibecast.domain.model.LocationDto
 import app.vibecast.domain.model.LocationWithWeatherDataDto
 import app.vibecast.domain.model.WeatherDto
-import app.vibecast.domain.repository.UnitPreferenceRepository
-import app.vibecast.domain.repository.WeatherRepository
 import app.vibecast.presentation.TAG
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -31,12 +30,18 @@ class WeatherRepositoryImpl @Inject constructor(
     @ApplicationContext private val appContext: Context
 ) : WeatherRepository {
 
+
+
+     override val currentWeather = MutableStateFlow<String?>(null)
+
     /**
      *  Gets weather data and location data from remote datasource based on search query
      */
     override fun getSearchedWeather(cityName: String): Flow<LocationWithWeatherDataDto> = flow{
         try{
             remoteWeatherDataSource.getWeather(cityName).collect{
+                val currentWeatherCondition = it.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
+                currentWeather.emit(currentWeatherCondition)
                 emit(it)
             }
         }
@@ -70,6 +75,8 @@ class WeatherRepositoryImpl @Inject constructor(
                 else {
                     Log.d(TAG, "local city")
                     val output = LocationWithWeatherDataDto(LocationDto(weatherData.cityName, weatherData.country), weatherData)
+                    val currentWeatherCondition = output.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
+                    currentWeather.emit(currentWeatherCondition)
                     emit(output)
                 }
 
@@ -84,6 +91,8 @@ class WeatherRepositoryImpl @Inject constructor(
                 data
             }.onEach {  localWeatherDataSource.addWeather(it.weather) }
                 .collect {
+                    val currentWeatherCondition = it.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
+                    currentWeather.emit(currentWeatherCondition)
                     emit(it)
                 }
         }
@@ -121,6 +130,8 @@ class WeatherRepositoryImpl @Inject constructor(
                             else {
                                 Log.d(TAG, "local coordinates")
                                 val output = LocationWithWeatherDataDto(LocationDto(weatherData.cityName, weatherData.country), weatherData)
+                                val currentWeatherCondition = output.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
+                                currentWeather.emit(currentWeatherCondition)
                                 emit(output)
                             }
                         }
@@ -137,6 +148,8 @@ class WeatherRepositoryImpl @Inject constructor(
                             .collect {
                                 it.location.cityName = data.cityName
                                 it.location.country = data.countryName
+                                val currentWeatherCondition = it.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
+                                currentWeather.emit(currentWeatherCondition)
                                 emit(it)
                             }
                     }

@@ -2,8 +2,8 @@ package app.vibecast.data
 
 import app.vibecast.data.local_data.data_source.weather.LocalLocationDataSource
 import app.vibecast.data.remote_data.data_source.weather.RemoteWeatherDataSource
-import app.vibecast.domain.repository.implementation.LocationRepositoryImpl
-import app.vibecast.domain.repository.implementation.Unit
+import app.vibecast.domain.repository.weather.LocationRepositoryImpl
+import app.vibecast.domain.repository.weather.Unit
 import app.vibecast.data.local_data.db.location.model.LocationEntity
 import app.vibecast.data.local_data.db.weather.model.WeatherEntity
 import app.vibecast.domain.model.CurrentWeather

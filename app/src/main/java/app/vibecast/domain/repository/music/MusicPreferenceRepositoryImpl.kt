@@ -1,11 +1,10 @@
-package app.vibecast.domain.repository.implementation
+package app.vibecast.domain.repository.music
 
 import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import app.vibecast.domain.repository.MusicPreferenceRepository
 import app.vibecast.presentation.TAG
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
@@ -25,7 +24,20 @@ class MusicPreferenceRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getPreference(): Map<WeatherCondition, String> {
+
+    override suspend fun getPreference(weather: WeatherCondition): String {
+        return try{
+            val preferences = dataStore.data.first()
+            val genre = preferences[stringPreferencesKey(weather.name)].let {
+                it ?: "Jazz"
+            }
+            genre
+        }catch (e : Exception){
+            "Jazz"
+        }
+    }
+
+    override suspend fun getPreferences(): Map<WeatherCondition, String> {
         return try {
             val preferencesMap = dataStore.data.first().asMap()
             val resultMap = mutableMapOf<WeatherCondition, String>()
@@ -59,5 +71,5 @@ class MusicPreferenceRepositoryImpl @Inject constructor(
 
 }
 enum class WeatherCondition {
-    SUNNY, RAINY, CLOUDY, SNOWY, FOGGY
+    SUNNY, RAINY, CLOUDY, SNOWY, FOGGY, STORMY
 }

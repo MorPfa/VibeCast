@@ -16,7 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import app.vibecast.R
 import app.vibecast.databinding.FragmentSearchResultBinding
-import app.vibecast.presentation.screens.main_screen.MainScreenViewModel
+import app.vibecast.presentation.screens.main_screen.MainViewModel
 import app.vibecast.presentation.screens.main_screen.image.ImageViewModel
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
@@ -30,12 +30,12 @@ class SearchResultFragment : Fragment() {
 
     private var _binding: FragmentSearchResultBinding? = null
     private val binding get() = _binding!!
-    private val mainScreenViewModel: MainScreenViewModel by activityViewModels()
+    private val mainViewModel: MainViewModel by activityViewModels()
     private val imageViewModel: ImageViewModel by activityViewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requireActivity().onBackPressedDispatcher.addCallback(this) {
-            mainScreenViewModel.checkPermissionState()
+            mainViewModel.checkPermissionState()
             findNavController().navigate(R.id.nav_home)
         }
 
@@ -90,7 +90,7 @@ class SearchResultFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mainScreenViewModel.searchedWeather.distinctUntilChanged().observe(viewLifecycleOwner) { weatherData ->
+        mainViewModel.searchedWeather.distinctUntilChanged().observe(viewLifecycleOwner) { weatherData ->
             weatherData.weather.currentWeather?.let { currentWeather ->
                 val city = weatherData.location.cityName
                 val weather =
@@ -147,8 +147,8 @@ class SearchResultFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-        mainScreenViewModel.resetIndex()
-        mainScreenViewModel.searchedWeather.removeObservers(this)
+        mainViewModel.resetIndex()
+        mainViewModel.searchedWeather.removeObservers(this)
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
 

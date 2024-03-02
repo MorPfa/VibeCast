@@ -2,10 +2,10 @@ package app.vibecast.presentation.screens.settings_screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import app.vibecast.domain.repository.MusicPreferenceRepository
-import app.vibecast.domain.repository.UnitPreferenceRepository
-import app.vibecast.domain.repository.implementation.Unit
-import app.vibecast.domain.repository.implementation.WeatherCondition
+import app.vibecast.domain.repository.music.MusicPreferenceRepository
+import app.vibecast.domain.repository.weather.UnitPreferenceRepository
+import app.vibecast.domain.repository.weather.Unit
+import app.vibecast.domain.repository.music.WeatherCondition
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -47,7 +47,7 @@ class PreferencesViewModel
     }
 
     fun getMusicPreferences(): Flow<Map<WeatherCondition, String>> = flow {
-        emit(musicPrefRepo.getPreference())
+        emit(musicPrefRepo.getPreferences())
     }
 
 

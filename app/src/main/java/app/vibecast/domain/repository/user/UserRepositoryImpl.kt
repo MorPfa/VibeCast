@@ -1,8 +1,8 @@
-package app.vibecast.domain.repository.implementation
+package app.vibecast.domain.repository.user
 
 import app.vibecast.data.local_data.data_source.user.LocalUserDataSource
 import app.vibecast.domain.model.User
-import app.vibecast.domain.repository.UserRepository
+import app.vibecast.domain.repository.user.UserRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

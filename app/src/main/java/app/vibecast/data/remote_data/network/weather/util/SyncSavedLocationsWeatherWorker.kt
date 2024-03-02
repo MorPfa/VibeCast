@@ -8,7 +8,7 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import app.vibecast.domain.repository.LocationRepository
+import app.vibecast.domain.repository.weather.LocationRepository
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 

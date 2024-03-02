@@ -1,4 +1,4 @@
-package app.vibecast.domain.repository
+package app.vibecast.domain.repository.weather
 
 import app.vibecast.domain.model.LocationDto
 import app.vibecast.domain.model.LocationWithWeatherDataDto

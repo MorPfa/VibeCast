@@ -1,7 +1,7 @@
 package app.vibecast.presentation
 
-import app.vibecast.domain.repository.implementation.Unit
-import app.vibecast.domain.repository.UnitPreferenceRepository
+import app.vibecast.domain.repository.weather.Unit
+import app.vibecast.domain.repository.weather.UnitPreferenceRepository
 import app.vibecast.presentation.screens.settings_screen.PreferencesViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

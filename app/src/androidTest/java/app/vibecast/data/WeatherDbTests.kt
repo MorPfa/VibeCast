@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import app.vibecast.domain.repository.implementation.Unit
+import app.vibecast.domain.repository.weather.Unit
 import app.vibecast.data.local_data.db.AppDatabase
 import app.vibecast.data.local_data.db.location.dao.LocationDao
 import app.vibecast.data.local_data.db.location.model.LocationEntity

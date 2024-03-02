@@ -2,7 +2,7 @@ package app.vibecast.data
 
 
 import app.vibecast.BuildConfig
-import app.vibecast.domain.repository.implementation.Unit
+import app.vibecast.domain.repository.weather.Unit
 import app.vibecast.data.remote_data.network.weather.model.CoordinateApiModel
 import app.vibecast.data.remote_data.network.weather.model.CurrentWeatherRemote
 import app.vibecast.data.remote_data.network.weather.model.HourlyWeatherRemote
@@ -15,7 +15,7 @@ import app.vibecast.domain.model.HourlyWeather
 import app.vibecast.domain.model.UseCaseException
 import app.vibecast.domain.model.WeatherCondition
 import app.vibecast.domain.model.WeatherDto
-import app.vibecast.domain.repository.UnitPreferenceRepository
+import app.vibecast.domain.repository.weather.UnitPreferenceRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect

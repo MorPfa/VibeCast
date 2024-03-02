@@ -1,4 +1,4 @@
-package app.vibecast.domain.repository.implementation
+package app.vibecast.domain.repository.image
 
 import android.util.Log
 import app.vibecast.domain.util.TAGS.COROUTINE_ERROR
@@ -7,7 +7,7 @@ import app.vibecast.data.local_data.data_source.image.LocalImageDataSource
 import app.vibecast.data.remote_data.data_source.image.RemoteImageDataSource
 import app.vibecast.data.remote_data.data_source.image.RemoteImageDataSourceImpl
 import app.vibecast.domain.model.ImageDto
-import app.vibecast.domain.repository.ImageRepository
+import app.vibecast.domain.repository.image.ImageRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

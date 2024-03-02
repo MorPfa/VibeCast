@@ -15,10 +15,10 @@ import app.vibecast.domain.model.LocationDto
 import app.vibecast.domain.model.LocationWithWeatherDataDto
 import app.vibecast.domain.model.WeatherCondition
 import app.vibecast.domain.model.WeatherDto
-import app.vibecast.domain.repository.LocationRepository
-import app.vibecast.domain.repository.UnitPreferenceRepository
-import app.vibecast.domain.repository.WeatherRepository
-import app.vibecast.domain.repository.implementation.Unit
+import app.vibecast.domain.repository.weather.LocationRepository
+import app.vibecast.domain.repository.weather.UnitPreferenceRepository
+import app.vibecast.domain.repository.weather.WeatherRepository
+import app.vibecast.domain.repository.weather.Unit
 import app.vibecast.domain.util.LocationGetter
 import app.vibecast.domain.util.TAGS.WEATHER_ERROR
 import app.vibecast.presentation.TAG
@@ -41,7 +41,7 @@ import kotlin.coroutines.suspendCoroutine
 
 
 @HiltViewModel
-class MainScreenViewModel @Inject constructor(
+class  MainViewModel @Inject constructor(
     private val locationGetter: LocationGetter,
     private val weatherRepository: WeatherRepository,
     private val locationRepository: LocationRepository,

@@ -1,6 +1,6 @@
 package app.vibecast.data
 
-import app.vibecast.domain.repository.implementation.Unit
+import app.vibecast.domain.repository.weather.Unit
 import app.vibecast.data.local_data.db.location.dao.LocationDao
 import app.vibecast.data.local_data.db.location.model.LocationEntity
 import app.vibecast.data.local_data.db.location.model.LocationWithWeatherData
@@ -12,7 +12,7 @@ import app.vibecast.domain.model.LocationDto
 import app.vibecast.domain.model.LocationWithWeatherDataDto
 import app.vibecast.domain.model.WeatherDto
 import app.vibecast.domain.model.WeatherCondition
-import app.vibecast.domain.repository.UnitPreferenceRepository
+import app.vibecast.domain.repository.weather.UnitPreferenceRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
