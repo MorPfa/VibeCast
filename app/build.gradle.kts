@@ -98,6 +98,19 @@ android {
 
 dependencies {
 
+
+    implementation("androidx.viewpager2:viewpager2:1.0.0")
+    implementation("com.makeramen:roundedimageview:2.3.0")
+
+
+
+//Firebase
+    implementation(platform("com.google.firebase:firebase-bom:32.7.3"))
+    implementation("com.google.firebase:firebase-database")
+    implementation("com.google.firebase:firebase-crashlytics")
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-auth")
+
     //Datastore
 //    implementation("androidx.datastore:datastore:1.0.0")
 //    implementation ("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5")
@@ -153,6 +166,8 @@ dependencies {
 //    Glide
     implementation ("com.github.bumptech.glide:glide:4.16.0")
     kapt("com.github.bumptech.glide:compiler:4.16.0")
+    implementation("jp.wasabeef:glide-transformations:4.3.0")
+
 
 //    Moshi
     implementation("com.squareup.moshi:moshi-kotlin:1.14.0")

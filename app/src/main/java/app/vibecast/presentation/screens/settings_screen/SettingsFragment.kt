@@ -8,16 +8,26 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.CompositePageTransformer
+import androidx.viewpager2.widget.MarginPageTransformer
+import androidx.viewpager2.widget.ViewPager2
 import app.vibecast.R
 import app.vibecast.databinding.FragmentSettingsBinding
-import app.vibecast.domain.repository.weather.Unit
+import app.vibecast.domain.model.ImageDto
 import app.vibecast.domain.repository.music.WeatherCondition
+import app.vibecast.domain.repository.weather.Unit
 import app.vibecast.presentation.permissions.PermissionHelper
 import app.vibecast.presentation.screens.main_screen.MainViewModel
+import app.vibecast.presentation.screens.main_screen.image.ImageLoader
+import app.vibecast.presentation.screens.main_screen.image.ImageViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import kotlin.math.abs
 
 
 @AndroidEntryPoint
@@ -26,15 +36,42 @@ class SettingsFragment : Fragment() {
     private lateinit var permissionHelper: PermissionHelper
     private val prefViewModel : PreferencesViewModel by activityViewModels()
     private val mainViewModel: MainViewModel by activityViewModels()
+    private val imageViewModel: ImageViewModel by activityViewModels()
+    private lateinit var imageSelector : ViewPager2
+
 
     private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
+
         _binding = FragmentSettingsBinding.inflate(inflater, container, false)
         permissionHelper = PermissionHelper(requireActivity())
+        imageSelector = binding.bgImageSelector
+        val imageLoader = ImageLoader(requireContext())
+
+
+        val adapter = ImageSelectorAdapter(imageLoader,this,  imageViewModel)
+        imageSelector.adapter = adapter
+        imageSelector.offscreenPageLimit = 3
+        imageSelector.clipToPadding = false
+        imageSelector.clipChildren = false
+        setUpTransformer()
+
+
+        imageViewModel.galleryImages.observe(viewLifecycleOwner){images ->
+            adapter.submitList(images)
+        }
+
+
+
+        imageSelector.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+
+
+        })
+
         val genres = resources.getStringArray(R.array.music_genres)
         val adapterItems = ArrayAdapter(requireContext(), R.layout.music_preference_item, genres)
         binding.foggyAutoTv.setAdapter(adapterItems)
@@ -52,6 +89,18 @@ class SettingsFragment : Fragment() {
             WeatherCondition.CLOUDY,
             WeatherCondition.STORMY
         )
+
+        lifecycleScope.launch {
+
+            imageViewModel.backgroundImage.observe(viewLifecycleOwner) { image ->
+                imageLoader.loadUrlIntoImageView(
+                    image,
+                    binding.backgroundImageView,
+                    true
+                )
+
+            }
+        }
 
         weatherConditions.forEach { condition ->
             prefViewModel.getMusicPreferences().onEach { musicPreferences ->
@@ -106,6 +155,17 @@ class SettingsFragment : Fragment() {
        return  binding.root
     }
 
+
+    private fun setUpTransformer(){
+        val transformer = CompositePageTransformer()
+        transformer.addTransformer(MarginPageTransformer(100))
+        transformer.addTransformer { page, position ->
+            val r = 1 - abs(position)
+            page.scaleY = 0.85f + r * 0.14f
+        }
+
+        imageSelector.setPageTransformer(transformer)
+    }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 

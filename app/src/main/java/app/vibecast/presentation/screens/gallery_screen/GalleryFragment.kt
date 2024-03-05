@@ -31,8 +31,7 @@ class GalleryFragment : Fragment() {
     private var _binding: FragmentPicturesBinding? = null
     private val binding get() = _binding!!
     private val viewModel: ImageViewModel by activityViewModels()
-    private var param1: String? = null
-    private var param2: String? = null
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,7 +40,7 @@ class GalleryFragment : Fragment() {
         _binding = FragmentPicturesBinding.inflate(inflater,container,false)
         val recyclerView: RecyclerView = binding.recyclerView
         val imageLoader = ImageLoader(requireContext())
-        val adapter = ImageAdapter(imageLoader, requireContext(), viewModel)
+        val adapter = ImageAdapter(imageLoader, viewModel)
         recyclerView.adapter = adapter
         recyclerView.setHasFixedSize(true)
         val spanCount = if (isTablet(requireActivity())) 4 else 3
@@ -55,6 +54,10 @@ class GalleryFragment : Fragment() {
 
         viewModel.galleryImages.observe(viewLifecycleOwner) { images ->
             adapter.submitList(images)
+
+        }
+        viewModel.backgroundImage.observe(viewLifecycleOwner){ image ->
+            imageLoader.loadUrlIntoImageView(image, binding.backgroundImageView, true)
         }
 
         return binding.root

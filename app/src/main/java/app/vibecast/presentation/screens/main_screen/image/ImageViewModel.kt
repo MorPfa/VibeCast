@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import app.vibecast.domain.model.ImageDto
+import app.vibecast.domain.repository.image.ImagePreferenceRepository
 import app.vibecast.domain.repository.image.ImageRepository
 import app.vibecast.domain.util.TAGS
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -25,11 +27,26 @@ import javax.inject.Inject
 @HiltViewModel
 class ImageViewModel @Inject constructor(
     private val imageRepository: ImageRepository,
+    private val imagePreferenceRepository: ImagePreferenceRepository,
     private val imageLoader: ImageLoader,
     private val imagePicker: ImagePicker,
     ): ViewModel() {
 
     val galleryImages: LiveData<List<ImageDto>> = imageRepository.getLocalImages().asLiveData()
+
+    val backgroundImage : MutableLiveData<String> = imagePreferenceRepository.getPreference().asLiveData() as MutableLiveData<String>
+
+    private fun updateBackgroundImage(url : String){
+        backgroundImage.value = url
+    }
+
+
+    fun saveBackgroundImage(url : String){
+        viewModelScope.launch {
+            imagePreferenceRepository.savePreference(url)
+            updateBackgroundImage(url)
+        }
+    }
 
     fun deleteImage(imageDto: ImageDto) {
         viewModelScope.launch {
@@ -93,7 +110,7 @@ class ImageViewModel @Inject constructor(
 
 
     fun loadImageIntoImageView(url: String, imageView: ImageView) {
-        imageLoader.loadUrlIntoImageView(url, imageView)
+        imageLoader.loadUrlIntoImageView(url, imageView, false)
     }
 
     fun loadImage(query: String, weatherCondition: String): Flow<ImageDto?> = flow {

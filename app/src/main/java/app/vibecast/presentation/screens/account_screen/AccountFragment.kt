@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import app.vibecast.R
 import app.vibecast.databinding.FragmentAccountBinding
 import app.vibecast.presentation.screens.main_screen.MainViewModel
+import app.vibecast.presentation.screens.main_screen.image.ImageLoader
 import app.vibecast.presentation.screens.main_screen.image.ImageViewModel
 import app.vibecast.presentation.screens.main_screen.weather.LocationModel
 import app.vibecast.presentation.util.LocationAdapter
@@ -53,7 +54,7 @@ class AccountFragment : Fragment() {
         savedLocationsRv.setHasFixedSize(true)
         val layoutManager = LinearLayoutManager(requireContext())
         savedLocationsRv.layoutManager = layoutManager
-
+        val imageLoader = ImageLoader(requireContext())
         adapter.setOnItemClickListener { position ->
             val clickedItem = adapter.currentList[position]
             showDeleteConfirmationDialog(clickedItem)
@@ -61,14 +62,17 @@ class AccountFragment : Fragment() {
         lifecycleScope.launch {
             imageViewModel.imageCount.observe(viewLifecycleOwner){
                 binding.savedImageCount.text = getString(R.string.saved_image_count, it)
+
             }
-            mainViewModel.locations.observe(viewLifecycleOwner){
-                binding.savedLocationsCount.text =  getString(R.string.saved_location_count, it.size)
+            imageViewModel.backgroundImage.observe(viewLifecycleOwner){ image ->
+                imageLoader.loadUrlIntoImageView(image, binding.backgroundImageView, true)
+            }
+            mainViewModel.locations.observe(viewLifecycleOwner){ locations->
+                binding.savedLocationsCount.text =  getString(R.string.saved_location_count, locations.size)
+                adapter.submitList(locations)
             }
         }
-        mainViewModel.locations.observe(viewLifecycleOwner) { locations ->
-            adapter.submitList(locations)
-        }
+
 
         return binding.root
     }

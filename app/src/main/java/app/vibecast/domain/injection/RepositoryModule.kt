@@ -1,6 +1,8 @@
 package app.vibecast.domain.injection
 
 
+import app.vibecast.domain.repository.image.ImagePreferenceRepository
+import app.vibecast.domain.repository.image.ImagePreferenceRepositoryImpl
 import app.vibecast.domain.repository.weather.LocationRepositoryImpl
 import app.vibecast.domain.repository.image.ImageRepositoryImpl
 import app.vibecast.domain.repository.music.MusicRepositoryImpl
@@ -36,6 +38,9 @@ abstract class RepositoryModule {
 
     @Binds
     abstract  fun bindMusicRepository(musicRepositoryImpl: MusicRepositoryImpl) : MusicRepository
+
+    @Binds
+    abstract  fun bindImagePreferenceRepository(imagePreferenceRepositoryImp: ImagePreferenceRepositoryImpl) : ImagePreferenceRepository
 
 
 

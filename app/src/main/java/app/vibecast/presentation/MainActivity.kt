@@ -358,11 +358,6 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    override fun onStart() {
-        super.onStart()
-        authorizeClient()
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         musicViewModel.disconnectFromSpotify()

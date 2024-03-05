@@ -269,9 +269,9 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
                         val city = weatherData.location.cityName
                         val weather =
                             weatherData.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
-                        musicViewModel.getPlaylist(weather!!)
+//                        musicViewModel.getPlaylist(weather!!)
 
-                        observeImageData(city, weather)
+                        observeImageData(city, weather!!)
                         binding.mainTempDisplay.text =
                             getString(R.string.center_temp, currentWeather.temperature)
                         //            Current hour values

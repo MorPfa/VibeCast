@@ -17,5 +17,6 @@ data class ImageEntity(
     @ColumnInfo(name = "portfolio_url") val portfolioUrl: String?,
     @ColumnInfo(name = "user_link") val userLink: String,
     @ColumnInfo(name = "download_location") val downloadLink: String,
-    @ColumnInfo(name = "timestamp") val timestamp : Long
+    @ColumnInfo(name = "timestamp") val timestamp : Long,
+
 )
