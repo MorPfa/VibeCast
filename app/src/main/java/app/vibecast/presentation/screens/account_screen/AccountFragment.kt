@@ -64,8 +64,18 @@ class AccountFragment : Fragment() {
                 binding.savedImageCount.text = getString(R.string.saved_image_count, it)
 
             }
-            imageViewModel.backgroundImage.observe(viewLifecycleOwner){ image ->
-                imageLoader.loadUrlIntoImageView(image, binding.backgroundImageView, true)
+            imageViewModel.backgroundImage?.observe(viewLifecycleOwner){ image ->
+                if(image != null){
+                    imageLoader.loadUrlIntoImageView(
+                        image,
+                        binding.backgroundImageView,
+                        true, 0
+                    )
+                } else {
+                    val bgImage = imageViewModel.pickDefaultBackground()
+                    binding.backgroundImageView.setImageResource(bgImage)
+                }
+
             }
             mainViewModel.locations.observe(viewLifecycleOwner){ locations->
                 binding.savedLocationsCount.text =  getString(R.string.saved_location_count, locations.size)

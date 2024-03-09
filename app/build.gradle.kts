@@ -100,7 +100,11 @@ dependencies {
 
 
     implementation("androidx.viewpager2:viewpager2:1.0.0")
-    implementation("com.makeramen:roundedimageview:2.3.0")
+
+
+    implementation ("jp.wasabeef:glide-transformations:4.3.0")
+
+
 
 
 
@@ -180,7 +184,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version")
 //    Coroutines
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
+
 
 //    RecyclerView
     implementation ("androidx.recyclerview:recyclerview:1.3.1")

@@ -37,6 +37,9 @@ class GalleryFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+
+
+
         _binding = FragmentPicturesBinding.inflate(inflater,container,false)
         val recyclerView: RecyclerView = binding.recyclerView
         val imageLoader = ImageLoader(requireContext())
@@ -56,8 +59,18 @@ class GalleryFragment : Fragment() {
             adapter.submitList(images)
 
         }
-        viewModel.backgroundImage.observe(viewLifecycleOwner){ image ->
-            imageLoader.loadUrlIntoImageView(image, binding.backgroundImageView, true)
+        viewModel.backgroundImage?.observe(viewLifecycleOwner){ image ->
+            if(image != null){
+                imageLoader.loadUrlIntoImageView(
+                    image,
+                    binding.backgroundImageView,
+                    true, 0
+                )
+            } else {
+                val bgImage = viewModel.pickDefaultBackground()
+                binding.backgroundImageView.setImageResource(bgImage)
+            }
+
         }
 
         return binding.root

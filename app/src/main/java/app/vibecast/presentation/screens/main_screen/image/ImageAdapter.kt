@@ -44,7 +44,7 @@ class ImageAdapter(
 
     override fun onBindViewHolder(holder: PictureViewHolder, position: Int) {
         val image = getItem(position)
-        imageLoader.loadUrlIntoImageView(image.urls.regular, holder.savedImage, false)
+        imageLoader.loadUrlIntoImageView(image.urls.regular, holder.savedImage, false, 0)
 
 
         holder.removeButton.setOnClickListener {

@@ -52,7 +52,7 @@ class ImageItemFragment : DialogFragment() {
         binding = FragmentImageItemBinding.inflate(inflater, container, false)
         dialog?.window?.setBackgroundDrawableResource(R.drawable.dialog_fragment_background)
         imageLoader = ImageLoader(requireContext())
-        image?.urls?.let { imageLoader.loadUrlIntoImageView(it.regular, binding.savedImage, false) }
+        image?.urls?.let { imageLoader.loadUrlIntoImageView(it.regular, binding.savedImage, false, 0) }
         val userName = image?.user?.name
         val unsplashText = "Unsplash"
         val userUrl = image?.user?.attributionUrl

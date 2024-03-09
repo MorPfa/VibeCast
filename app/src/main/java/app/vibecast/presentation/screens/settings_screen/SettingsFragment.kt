@@ -8,9 +8,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.CompositePageTransformer
 import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
@@ -42,6 +40,18 @@ class SettingsFragment : Fragment() {
 
     private val binding get() = _binding!!
 
+
+    private fun getImagePosition(items: List<ImageDto>, attribute: String?): Int {
+        if(attribute == null) return 0
+
+        for ((index, item) in items.withIndex()) {
+
+            if (item.urls.regular == attribute) {
+                return index
+            }
+        }
+        return -1
+    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
@@ -61,16 +71,15 @@ class SettingsFragment : Fragment() {
         setUpTransformer()
 
 
+
         imageViewModel.galleryImages.observe(viewLifecycleOwner){images ->
             adapter.submitList(images)
+            imageSelector.post {
+                imageSelector.setCurrentItem(getImagePosition( images,
+                    imageViewModel.backgroundImage?.value
+                ), false)
+            }
         }
-
-
-
-        imageSelector.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-
-
-        })
 
         val genres = resources.getStringArray(R.array.music_genres)
         val adapterItems = ArrayAdapter(requireContext(), R.layout.music_preference_item, genres)
@@ -92,14 +101,23 @@ class SettingsFragment : Fragment() {
 
         lifecycleScope.launch {
 
-            imageViewModel.backgroundImage.observe(viewLifecycleOwner) { image ->
-                imageLoader.loadUrlIntoImageView(
-                    image,
-                    binding.backgroundImageView,
-                    true
-                )
-
+            imageViewModel.backgroundImage?.observe(viewLifecycleOwner) { image ->
+                if(image != null){
+                    imageLoader.loadUrlIntoImageView(
+                        image,
+                        binding.backgroundImageView,
+                        true, 0
+                    )
+                } else {
+                    val bgImage = imageViewModel.pickDefaultBackground()
+                    binding.backgroundImageView.setImageResource(bgImage)
+                }
             }
+        }
+
+        binding.resetBgImageBtn.setOnClickListener {
+            imageViewModel.resetBackgroundImage()
+
         }
 
         weatherConditions.forEach { condition ->
@@ -158,7 +176,7 @@ class SettingsFragment : Fragment() {
 
     private fun setUpTransformer(){
         val transformer = CompositePageTransformer()
-        transformer.addTransformer(MarginPageTransformer(100))
+        transformer.addTransformer(MarginPageTransformer(40))
         transformer.addTransformer { page, position ->
             val r = 1 - abs(position)
             page.scaleY = 0.85f + r * 0.14f

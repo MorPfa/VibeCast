@@ -1,32 +1,40 @@
 package app.vibecast.presentation.screens.main_screen.image
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.widget.ImageView
-import androidx.core.content.ContextCompat
 import app.vibecast.R
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jp.wasabeef.glide.transformations.BlurTransformation
-import jp.wasabeef.glide.transformations.ColorFilterTransformation
 import javax.inject.Inject
 
 class ImageLoader @Inject constructor(@ApplicationContext private val context: Context) {
 
-    fun loadUrlIntoImageView(url: String, imageView: ImageView, applyFilter : Boolean) {
-        if(applyFilter) {
-            Glide.with(context)
-                .load(url)
-                .placeholder(R.drawable.gallery_image_placeholder)
-                .apply(RequestOptions.bitmapTransform(BlurTransformation(25, 3)))
-                .into(imageView)
-        }
-        else {
-            Glide.with(context)
-                .load(url)
-                .placeholder(R.drawable.gallery_image_placeholder)
-                .into(imageView)
+    @SuppressLint("CheckResult")
+    fun loadUrlIntoImageView(
+        url: String,
+        imageView: ImageView,
+        applyFilter: Boolean,
+        cornerRadius: Int,
+    ) {
+        val requestOptions = RequestOptions()
+            .placeholder(R.drawable.gallery_image_placeholder)
+
+        if (applyFilter) {
+            if (cornerRadius != 0) {
+                requestOptions.transform(RoundedCorners(cornerRadius))
+            } else {
+                // Apply blur transformation
+                requestOptions.transform(BlurTransformation(2, 3))
+            }
         }
 
+        Glide.with(context)
+            .load(url)
+            .apply(requestOptions)
+            .into(imageView)
     }
 }

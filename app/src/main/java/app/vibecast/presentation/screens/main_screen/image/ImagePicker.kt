@@ -18,6 +18,28 @@ class ImagePicker @Inject constructor(
     private val imageRepository: ImageRepository
 ) {
 
+
+    fun pickRandomImage() : Int{
+        val images = listOf(
+            R.drawable.snow_image_1,
+            R.drawable.snow_image_2,
+            R.drawable.snow_image_3,
+            R.drawable.rainy_image_1,
+            R.drawable.rainy_image_2,
+            R.drawable.rainy_image_3,
+            R.drawable.sunny_image_1,
+            R.drawable.sunny_image_2,
+            R.drawable.sunny_image_3,
+            R.drawable.storm_image_1,
+            R.drawable.storm_image_3,
+            R.drawable.storm_image_2,
+            R.drawable.fog_image_1,
+            R.drawable.fog_image_2,
+            R.drawable.fog_image_3
+        )
+        val randomIndex = images.indices.random()
+        return images[randomIndex]
+    }
     fun pickDefaultImage(weatherCondition: String) : Int{
         val randomIndex = (0..2).random()
         val snowList = listOf(

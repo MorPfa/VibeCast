@@ -4,7 +4,6 @@ package app.vibecast.presentation.screens.settings_screen
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import app.vibecast.R
@@ -13,7 +12,6 @@ import app.vibecast.domain.model.ImageDto
 import app.vibecast.presentation.screens.main_screen.image.ImageAdapter
 import app.vibecast.presentation.screens.main_screen.image.ImageLoader
 import app.vibecast.presentation.screens.main_screen.image.ImageViewModel
-import timber.log.Timber
 
 class ImageSelectorAdapter(
     private val imageLoader: ImageLoader,
@@ -26,8 +24,6 @@ class ImageSelectorAdapter(
         RecyclerView.ViewHolder(binding.root) {
         val savedImage = binding.savedImage
         val selectedIcon = binding.selectedIcon
-
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
@@ -37,10 +33,12 @@ class ImageSelectorAdapter(
     }
 
 
+
+
     override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
         val image = getItem(position)
-        imageLoader.loadUrlIntoImageView(image.urls.regular, holder.savedImage, false)
-        viewModel.backgroundImage.observe(owner) { backgroundImage ->
+        imageLoader.loadUrlIntoImageView(image.urls.regular, holder.savedImage, true, 32)
+        viewModel.backgroundImage?.observe(owner) { backgroundImage ->
             if (image.urls.regular == backgroundImage) {
                 holder.selectedIcon.setImageResource(R.drawable.item_selected_icon)
             } else {
@@ -63,16 +61,6 @@ class ImageSelectorAdapter(
     }
 
 
-}
-
-class ImageDiffCallback : DiffUtil.ItemCallback<ImageDto>() {
-    override fun areItemsTheSame(oldItem: ImageDto, newItem: ImageDto): Boolean {
-        return oldItem.id == newItem.id
-    }
-
-    override fun areContentsTheSame(oldItem: ImageDto, newItem: ImageDto): Boolean {
-        return oldItem == newItem
-    }
 }
 
 

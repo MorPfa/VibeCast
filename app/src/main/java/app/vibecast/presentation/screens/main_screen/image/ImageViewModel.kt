@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -27,14 +26,14 @@ import javax.inject.Inject
 @HiltViewModel
 class ImageViewModel @Inject constructor(
     private val imageRepository: ImageRepository,
-    private val imagePreferenceRepository: ImagePreferenceRepository,
+    private val imagePrefRepository: ImagePreferenceRepository,
     private val imageLoader: ImageLoader,
     private val imagePicker: ImagePicker,
     ): ViewModel() {
 
     val galleryImages: LiveData<List<ImageDto>> = imageRepository.getLocalImages().asLiveData()
 
-    val backgroundImage : MutableLiveData<String> = imagePreferenceRepository.getPreference().asLiveData() as MutableLiveData<String>
+    val backgroundImage : MutableLiveData<String?> = imagePrefRepository.getPreference().asLiveData() as MutableLiveData<String?>
 
     private fun updateBackgroundImage(url : String){
         backgroundImage.value = url
@@ -43,7 +42,7 @@ class ImageViewModel @Inject constructor(
 
     fun saveBackgroundImage(url : String){
         viewModelScope.launch {
-            imagePreferenceRepository.savePreference(url)
+            imagePrefRepository.savePreference(url)
             updateBackgroundImage(url)
         }
     }
@@ -108,9 +107,18 @@ class ImageViewModel @Inject constructor(
      */
     fun pickDefaultImage(weatherCondition: String) : Int = imagePicker.pickDefaultImage(weatherCondition)
 
+    fun pickDefaultBackground() : Int = imagePicker.pickRandomImage()
+
+    fun resetBackgroundImage() {
+        viewModelScope.launch {
+            imagePrefRepository.clearPreference()
+        }
+        backgroundImage.value = null
+    }
+
 
     fun loadImageIntoImageView(url: String, imageView: ImageView) {
-        imageLoader.loadUrlIntoImageView(url, imageView, false)
+        imageLoader.loadUrlIntoImageView(url, imageView, false, 0)
     }
 
     fun loadImage(query: String, weatherCondition: String): Flow<ImageDto?> = flow {
