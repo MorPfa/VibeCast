@@ -162,6 +162,7 @@
                     android:background="@drawable/textfield_background"
                     android:dropDownHeight="wrap_content"
                     android:inputType="none"
+                    android:textColor="@color/white"
                     android:textColorHint="@color/white" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -192,6 +193,7 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/textfield_background"
                     android:inputType="none"
+                    android:textColor="@color/white"
                     android:textColorHint="@color/white" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -219,6 +221,7 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/textfield_background"
                     android:inputType="none"
+                    android:textColor="@color/white"
                     android:textColorHint="@color/white" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -246,6 +249,7 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/textfield_background"
                     android:inputType="none"
+                    android:textColor="@color/white"
                     android:textColorHint="@color/white" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -274,6 +278,7 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/textfield_background"
                     android:inputType="none"
+                    android:textColor="@color/white"
                     android:textColorHint="@color/white" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -301,6 +306,7 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/textfield_background"
                     android:inputType="none"
+                    android:textColor="@color/white"
                     android:textColorHint="@color/white" />
             </com.google.android.material.textfield.TextInputLayout>
 

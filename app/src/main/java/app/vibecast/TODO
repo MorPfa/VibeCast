@@ -1,9 +1,7 @@
 
 
 Today:
-fix app crashing when rotating device
-
-
+fix screen rotation issues
 
 optimize image accuracy (maybe go back to GET /search/photos endpoint and combine query with collections)
 

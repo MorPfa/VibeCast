@@ -1,5 +1,6 @@
 package app.vibecast.presentation.screens.settings_screen
 
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.vibecast.domain.repository.music.MusicPreferenceRepository
@@ -7,9 +8,11 @@ import app.vibecast.domain.repository.weather.UnitPreferenceRepository
 import app.vibecast.domain.repository.weather.Unit
 import app.vibecast.domain.repository.music.WeatherCondition
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -46,9 +49,19 @@ class PreferencesViewModel
         emit(unitPrefRepo.getPreference())
     }
 
-    fun getMusicPreferences(): Flow<Map<WeatherCondition, String>> = flow {
-        emit(musicPrefRepo.getPreferences())
+    fun updateMusicPreferences() {
+        viewModelScope.launch(Dispatchers.IO) {
+           val preferences =  musicPrefRepo.getPreferences()
+            withContext(Dispatchers.Main){
+                musicPreferences.value = preferences
+            }
+
+        }
     }
+
+
+   val musicPreferences = MutableLiveData<Map<WeatherCondition, String>>()
+
 
 
     /**

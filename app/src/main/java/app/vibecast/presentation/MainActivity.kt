@@ -84,10 +84,10 @@ class MainActivity : AppCompatActivity() {
                     Timber.tag("Spotify").d("authorized")
                 }
                 AuthorizationResponse.Type.ERROR -> {
-                    Timber.tag("Spotify").d("sum ting wong")
+                    Timber.tag("Spotify").d("Error while authorizing")
                 }
                 else -> {
-                    Timber.tag("Spotify").d("sum ting weally wong")
+                    Timber.tag("Spotify").d("I have no idea what happened")
                 }
             }
         }
@@ -355,6 +355,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
+    }
+
+
+    override fun onStart() {
+        super.onStart()
+        authorizeClient()
     }
 
 

@@ -142,7 +142,14 @@
         <item>Blues</item>
         <item>Country</item>
         <item>Metal</item>
-        <item>Reggae</item>
+        <item>Lo-fi</item>
+        <item>Ambient</item>
+        <item>Electronic</item>
+        <item>Punk</item>
+        <item>Funk</item>
+        <item>House</item>
+        <item>Soul</item>
+
 
     </string-array>
 

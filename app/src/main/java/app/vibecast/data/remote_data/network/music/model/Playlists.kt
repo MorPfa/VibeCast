@@ -1,6 +1,6 @@
 package app.vibecast.data.remote_data.network.music.model
 
-import app.vibecast.data.remote_data.network.music.model.Item
+
 import com.google.gson.annotations.SerializedName
 
 data class Playlists(

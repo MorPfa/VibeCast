@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.activity.addCallback
 import androidx.core.content.ContextCompat
@@ -18,7 +19,12 @@ import app.vibecast.R
 import app.vibecast.databinding.FragmentSearchResultBinding
 import app.vibecast.presentation.screens.main_screen.MainViewModel
 import app.vibecast.presentation.screens.main_screen.image.ImageViewModel
+import app.vibecast.presentation.screens.main_screen.music.MusicViewModel
+import app.vibecast.presentation.screens.main_screen.music.TrackProgressBar
 import com.google.android.material.snackbar.Snackbar
+import com.spotify.protocol.types.Image
+import com.spotify.protocol.types.PlayerState
+import com.spotify.protocol.types.Repeat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -26,12 +32,108 @@ import kotlinx.coroutines.withContext
 
 
 
-class SearchResultFragment : Fragment() {
+class SearchResultFragment : Fragment(), MusicViewModel.PlayerStateListener{
 
     private var _binding: FragmentSearchResultBinding? = null
     private val binding get() = _binding!!
     private val mainViewModel: MainViewModel by activityViewModels()
     private val imageViewModel: ImageViewModel by activityViewModels()
+    private val musicViewModel : MusicViewModel by activityViewModels()
+    private lateinit var playbackButton: ImageButton
+    private lateinit var shuffleButton : ImageButton
+    private lateinit var repeatButton : ImageButton
+    private lateinit var trackProgressBar: TrackProgressBar
+
+
+    private fun updatePlaybackBtn(playerState: PlayerState) {
+
+        if (playerState.isPaused) {
+            playbackButton.setImageResource(R.drawable.play_btn)
+        } else {
+
+            playbackButton.setImageResource(R.drawable.pause_btn)
+        }
+    }
+
+
+    private fun updateTrackCoverArt(playerState: PlayerState) {
+        // Get image from track
+        musicViewModel.assertAppRemoteConnected()
+            .imagesApi
+            .getImage(playerState.track.imageUri, Image.Dimension.X_SMALL)
+            .setResultCallback { bitmap ->
+                binding.musicWidget.albumArtImageView.setImageBitmap(bitmap)
+            }
+    }
+
+    private fun updateTrackInfo(playerState: PlayerState) {
+        binding.musicWidget.apply {
+            songTitleTextView.text =  playerState.track.name
+            artistNameTextView.text =  playerState.track.artist.name
+
+        }
+    }
+
+    private fun updateShuffleBtn(playerState: PlayerState) {
+        shuffleButton.apply {
+            if (playerState.playbackOptions.isShuffling) {
+                shuffleButton.setImageResource(R.drawable.shuffle_enabled)
+            } else {
+                shuffleButton.setImageResource(R.drawable.shuffle_disabled)
+            }
+        }
+
+    }
+
+    private fun updateSeekbar(playerState: PlayerState) {
+        // Update progressbar
+        trackProgressBar.apply {
+            if (playerState.playbackSpeed > 0) {
+                unpause()
+            } else {
+                pause()
+            }
+            // Invalidate seekbar length and position
+            binding.musicWidget.progressBar.max = playerState.track.duration.toInt()
+            binding.musicWidget.progressBar.isEnabled = true
+            setDuration(playerState.track.duration)
+            update(playerState.playbackPosition)
+        }
+    }
+
+    private fun updateRepeatBtn(playerState: PlayerState) {
+        repeatButton.apply {
+            when (playerState.playbackOptions.repeatMode) {
+                Repeat.ALL -> {
+                    setImageResource(R.drawable.repeat_all_enabled)
+
+                }
+                Repeat.ONE -> {
+                    setImageResource(R.drawable.repeat_one_enabled)
+
+                }
+                else -> {
+                    setImageResource(R.drawable.repeat_disabled2)
+
+                }
+            }
+        }
+
+    }
+
+    override fun onPlayerStateUpdated(playerState: PlayerState) {
+        updateUI(playerState)
+    }
+
+    private fun updateUI(playerState: PlayerState) {
+        updatePlaybackBtn(playerState)
+        updateShuffleBtn(playerState)
+        updateRepeatBtn(playerState)
+        updateSeekbar(playerState)
+        updateTrackCoverArt(playerState)
+        updateTrackInfo(playerState)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requireActivity().onBackPressedDispatcher.addCallback(this) {
@@ -48,6 +150,41 @@ class SearchResultFragment : Fragment() {
     ): View {
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         _binding = FragmentSearchResultBinding.inflate(inflater, container, false)
+        musicViewModel.setPlayerStateListener(this)
+        trackProgressBar = TrackProgressBar(binding.musicWidget.progressBar) { seekToPosition: Long -> musicViewModel.seekTo(seekToPosition) }
+        playbackButton = binding.musicWidget.playPauseButton
+        shuffleButton = binding.musicWidget.shuffleButton
+        repeatButton = binding.musicWidget.repeatButton
+        repeatButton.setOnClickListener {
+            musicViewModel.setRepeatStatus()
+        }
+        playbackButton.setOnClickListener {
+            try{ musicViewModel.onPlayPauseButtonClicked() }
+            catch (e : Exception){
+                val snackbar = Snackbar.make(
+                    requireView(),
+                    "Log into spotify to enable music",
+                    Snackbar.LENGTH_SHORT
+                )
+                val snackbarView = snackbar.view
+                val snackbarText =
+                    snackbarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+                snackbarText.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+                snackbarView.background =
+                    ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
+                snackbar.show()
+            }
+
+        }
+        shuffleButton.setOnClickListener {
+            musicViewModel.setShuffleStatus()
+        }
+        binding.musicWidget.forwardButton.setOnClickListener {
+            musicViewModel.onSkipNextButtonClicked()
+        }
+        binding.musicWidget.rewindButton.setOnClickListener {
+            musicViewModel.onSkipPreviousButtonClicked()
+        }
         return binding.root
     }
 
@@ -96,6 +233,7 @@ class SearchResultFragment : Fragment() {
                 val weather =
                     weatherData.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
                 observeImageData(city, weather!!)
+                musicViewModel.getPlaylist(weather)
                 binding.mainTemp.text =
                     getString(R.string.center_temp, currentWeather.temperature)
                 //            Current hour values

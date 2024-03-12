@@ -29,11 +29,25 @@ class MusicPreferenceRepositoryImpl @Inject constructor(
         return try{
             val preferences = dataStore.data.first()
             val genre = preferences[stringPreferencesKey(weather.name)].let {
-                it ?: "Jazz"
+                it ?: when(weather){
+                    WeatherCondition.CLOUDY -> "Ambient"
+                    WeatherCondition.FOGGY -> "Jazz"
+                    WeatherCondition.RAINY -> "Lo-fi"
+                    WeatherCondition.STORMY -> "Heavy-Metal"
+                    WeatherCondition.SNOWY -> "Classical"
+                    WeatherCondition.SUNNY -> "Pop"
+                }
             }
             genre
         }catch (e : Exception){
-            "Jazz"
+            when(weather){
+                WeatherCondition.CLOUDY -> "Ambient"
+                WeatherCondition.FOGGY -> "Jazz"
+                WeatherCondition.RAINY -> "Lo-fi"
+                WeatherCondition.STORMY -> "Heavy-Metal"
+                WeatherCondition.SNOWY -> "Classical"
+                WeatherCondition.SUNNY -> "Pop"
+            }
         }
     }
 

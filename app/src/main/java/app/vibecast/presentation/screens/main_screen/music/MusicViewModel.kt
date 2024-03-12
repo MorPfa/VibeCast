@@ -1,7 +1,7 @@
 package app.vibecast.presentation.screens.main_screen.music
 
+
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,14 +9,13 @@ import app.vibecast.BuildConfig
 import app.vibecast.domain.repository.music.MusicPreferenceRepository
 import app.vibecast.domain.repository.music.MusicRepository
 import app.vibecast.domain.repository.music.WeatherCondition
-import app.vibecast.presentation.TAG
+import app.vibecast.presentation.util.GenreFormatter
 import com.google.gson.GsonBuilder
 import com.spotify.android.appremote.api.ConnectionParams
 import com.spotify.android.appremote.api.Connector
 import com.spotify.android.appremote.api.SpotifyAppRemote
 import com.spotify.android.appremote.api.error.SpotifyDisconnectedException
 import com.spotify.protocol.client.Subscription
-import com.spotify.protocol.types.PlayerContext
 import com.spotify.protocol.types.PlayerState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -34,15 +33,14 @@ class MusicViewModel @Inject constructor(
 
 
     private var playerStateSubscription: Subscription<PlayerState>? = null
-    private var playerContextSubscription: Subscription<PlayerContext>? = null
     private var spotifyAppRemote: SpotifyAppRemote? = null
     private val gson = GsonBuilder().setPrettyPrinting().create()
     private val clientId = BuildConfig.SPOTIFY_KEY
     private val redirectUri = "vibecast://callback"
+    private val genreFormatter = GenreFormatter()
 
 
     private suspend fun getGenre(weather: String): String {
-        Timber.tag("Spotify").d("getGenre called")
         val category = when (weather) {
             "Thunderstorm" -> WeatherCondition.STORMY
             "Drizzle" -> WeatherCondition.RAINY
@@ -57,23 +55,38 @@ class MusicViewModel @Inject constructor(
             else -> WeatherCondition.CLOUDY
         }
         return withContext(Dispatchers.IO) {
-            musicPreferenceRepository.getPreference(category)
+            val genre = musicPreferenceRepository.getPreference(category)
+            Timber.tag("Spotify").d("Unformatted genre: $genre")
+            genreFormatter.formatQuery(genre)
+
         }
     }
 
     private val _token = MutableLiveData<String>()
-    var token = _token
+    private var token = _token
 
 
-    fun getPlaylist(category: String) {
+    fun getPlaylist(weather: String) {
         try {
             viewModelScope.launch {
-                Timber.tag("Spotify").d("getPlaylist called")
-                val genre = getGenre(category)
-                musicRepository.getPlaylist(genre, token.value!!).collect {
-                    Timber.tag("Spotify").d(it.playlists.items[0].name)
-                    Timber.tag("Spotify").d(category)
-                    playPlaylist(it.playlists.items[0].uri)
+                val genre = getGenre(weather)
+                Timber.tag("Spotify").d("Formatted genre : $genre")
+                musicRepository.getPlaylist(genre, token.value!!).collect {result ->
+                    val playlists = result.playlists.items
+                    Timber.tag("Spotify").d("Weather: $weather")
+                    val index = playlists.indices.random()
+                    Timber.tag("Spotify").d("Playlist name : ${playlists[index].name}")
+                    val lofiPlaylist = playlists.find { it.name.contains("lofi", ignoreCase = true) }
+                    if (lofiPlaylist != null) {
+                        Timber.tag("Spotify").d("Lofi playlist found: ${lofiPlaylist.name}")
+                        playPlaylist(lofiPlaylist.uri)
+
+                    } else {
+                        Timber.tag("Spotify").d("No lofi playlist found")
+                        playPlaylist(playlists[index].uri)
+
+                    }
+
                 }
             }
 
@@ -131,7 +144,7 @@ class MusicViewModel @Inject constructor(
             object : Connector.ConnectionListener {
                 override fun onConnected(appRemote: SpotifyAppRemote) {
                     spotifyAppRemote = appRemote
-                    Log.d("MainActivity", "Connected! Yay!")
+                    Timber.tag("Spotify").d("Connected! Yay!")
                     // Now you can start interacting with App Remote
                     //            subscribeToPlayerContext()
                     subscribeToPlayerState()
@@ -140,7 +153,7 @@ class MusicViewModel @Inject constructor(
                 }
 
                 override fun onFailure(throwable: Throwable) {
-                    Log.e("MainActivity", throwable.message, throwable)
+                    Timber.tag("Spotify").e(throwable)
                     // Something went wrong when attempting to connect! Handle errors here
                 }
             })
@@ -151,24 +164,22 @@ class MusicViewModel @Inject constructor(
         SpotifyAppRemote.disconnect(spotifyAppRemote)
     }
 
-    private var playing : Boolean  = false
-    private fun playPlaylist(uri: String) {
-        assertAppRemoteConnected().let {
-            if(playing){
-                it.playerApi.pause()
-                Timber.tag("Spotify").d(playing.toString())
-            }
-            else {
-                Timber.tag("Spotify").d(playing.toString())
-                it.playerApi.play(uri)
-                it.playerApi.pause()
-                playing = true
-            }
 
+    private fun playPlaylist(uri: String) {
+        Timber.tag("Spotify").d(uri)
+        assertAppRemoteConnected().let {
+           it.playerApi.play(uri).setResultCallback { _ ->
+                    it.playerApi
+                        .pause()
+                        .setResultCallback {
+                            logMessage("pause")
+                        }
+                        .setErrorCallback(errorCallback)
+            }
 
         }
-
     }
+
 
     fun onPlayPauseButtonClicked() {
         assertAppRemoteConnected().let {
@@ -192,17 +203,7 @@ class MusicViewModel @Inject constructor(
         }
 
     }
-//
-//    private fun subscribeToPlayerContext() {
-//        playerContextSubscription = cancelAndResetSubscription(playerContextSubscription)
-//        playerContextSubscription = assertAppRemoteConnected()
-//            .playerApi
-//            .subscribeToPlayerContext()
-////            .setEventCallback(playerContextEventCallback)
-//            .setErrorCallback { throwable ->
-//                logError(throwable)
-//            } as Subscription<PlayerContext>
-//    }
+
 
     fun onSkipNextButtonClicked() {
         assertAppRemoteConnected()
@@ -240,12 +241,7 @@ class MusicViewModel @Inject constructor(
             } as Subscription<PlayerState>
     }
 
-    //    private val playerContextEventCallback = Subscription.EventCallback<PlayerContext> { playerContext ->
-//        binding.currentContextLabel.apply {
-//            text = String.format(Locale.US, "%s\n%s", playerContext.title, playerContext.subtitle)
-//            tag = playerContext
-//        }
-//    }
+
     private fun <T : Any?> cancelAndResetSubscription(subscription: Subscription<T>?): Subscription<T>? {
         return subscription?.let {
             if (!it.isCanceled) {
@@ -279,7 +275,7 @@ class MusicViewModel @Inject constructor(
 
     private val playerStateEventCallback = Subscription.EventCallback<PlayerState> { playerState ->
         playerStateListener?.onPlayerStateUpdated(playerState)
-        Log.v(TAG, String.format("Player State: %s", gson.toJson(playerState)))
+//        Timber.tag("Spotify").v("Player State: %s", gson.toJson(playerState))
     }
 
 
@@ -295,11 +291,11 @@ class MusicViewModel @Inject constructor(
 
     private val errorCallback = { throwable: Throwable -> logError(throwable) }
     private fun logError(throwable: Throwable) {
-        Log.e(TAG, "", throwable)
+        Timber.tag("Spotify").e(throwable)
     }
 
     private fun logMessage(msg: String) {
-        Log.e(TAG, msg)
+        Timber.tag("Spotify").e(msg)
     }
 }
 

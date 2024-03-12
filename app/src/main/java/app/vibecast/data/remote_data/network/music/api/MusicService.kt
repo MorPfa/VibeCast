@@ -14,7 +14,7 @@ interface MusicService {
     suspend fun getPlaylist(
         @Path("category_id") categoryId: String,
         @Header("Authorization") accessCode: String,
-        @Query("limit") limit: Int =1,
+        @Query("limit") limit: Int =10,
         @Query("offset") offset: Int =0
     ) : PlaylistApiModel
 }

@@ -25,6 +25,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import kotlin.math.abs
 
 
@@ -41,12 +42,12 @@ class SettingsFragment : Fragment() {
     private val binding get() = _binding!!
 
 
-    private fun getImagePosition(items: List<ImageDto>, attribute: String?): Int {
-        if(attribute == null) return 0
+    private fun getImagePosition(items: List<ImageDto>, bgValue: String?): Int {
+        if(bgValue == null) return 0
 
         for ((index, item) in items.withIndex()) {
 
-            if (item.urls.regular == attribute) {
+            if (item.urls.regular == bgValue) {
                 return index
             }
         }
@@ -56,7 +57,7 @@ class SettingsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-
+        prefViewModel.updateMusicPreferences()
         _binding = FragmentSettingsBinding.inflate(inflater, container, false)
         permissionHelper = PermissionHelper(requireActivity())
         imageSelector = binding.bgImageSelector
@@ -76,7 +77,7 @@ class SettingsFragment : Fragment() {
             adapter.submitList(images)
             imageSelector.post {
                 imageSelector.setCurrentItem(getImagePosition( images,
-                    imageViewModel.backgroundImage?.value
+                    imageViewModel.backgroundImage.value
                 ), false)
             }
         }
@@ -101,7 +102,7 @@ class SettingsFragment : Fragment() {
 
         lifecycleScope.launch {
 
-            imageViewModel.backgroundImage?.observe(viewLifecycleOwner) { image ->
+            imageViewModel.backgroundImage.observe(viewLifecycleOwner) { image ->
                 if(image != null){
                     imageLoader.loadUrlIntoImageView(
                         image,
@@ -121,19 +122,19 @@ class SettingsFragment : Fragment() {
         }
 
         weatherConditions.forEach { condition ->
-            prefViewModel.getMusicPreferences().onEach { musicPreferences ->
-                    val castedMusicPreferences = musicPreferences as? Map<WeatherCondition, String>
-                    val autoCompleteTextView = when (condition) {
-                        WeatherCondition.FOGGY -> binding.foggyAutoTv
-                        WeatherCondition.RAINY -> binding.rainyAutoTv
-                        WeatherCondition.SUNNY -> binding.sunnyAutoTv
-                        WeatherCondition.SNOWY -> binding.snowyAutoTv
-                        WeatherCondition.CLOUDY -> binding.cloudyAutoTv
-                        WeatherCondition.STORMY -> binding.stormyAutoTv
-                    }
+            prefViewModel.musicPreferences.observe(viewLifecycleOwner){musicPreferences ->
+                val autoCompleteTextView = when (condition) {
+                    WeatherCondition.FOGGY -> binding.foggyAutoTv
+                    WeatherCondition.RAINY -> binding.rainyAutoTv
+                    WeatherCondition.SUNNY -> binding.sunnyAutoTv
+                    WeatherCondition.SNOWY -> binding.snowyAutoTv
+                    WeatherCondition.CLOUDY -> binding.cloudyAutoTv
+                    WeatherCondition.STORMY -> binding.stormyAutoTv
+                }
 
                 autoCompleteTextView.setAdapter(adapterItems)
-                val savedPreference = castedMusicPreferences?.get(condition)
+                val savedPreference = musicPreferences?.get(condition)
+                Timber.tag("test").d(savedPreference.toString())
                 if (savedPreference != null) {
                     autoCompleteTextView.hint = savedPreference
                 } else {
@@ -142,14 +143,14 @@ class SettingsFragment : Fragment() {
 
 
                 autoCompleteTextView.setOnItemClickListener { _, _, position, _ ->
-                        val selectedItem = adapterItems.getItem(position)
-                        castedMusicPreferences?.let {
-                            val musicPreference = mapOf(condition to selectedItem!!)
-                            prefViewModel.savePreferences( musicPreference)
-                        }
+                    val selectedItem = adapterItems.getItem(position)
+                    musicPreferences?.let {
+                        val musicPreference = mapOf(condition to selectedItem!!)
+                        prefViewModel.savePreferences(musicPreference)
                     }
+                }
                 autoCompleteTextView.post { autoCompleteTextView.performCompletion() }
-            }.launchIn(viewLifecycleOwner.lifecycleScope)
+            }
         }
 
         val isLocationPermissionGranted = permissionHelper.isPermissionGranted(Manifest.permission.ACCESS_COARSE_LOCATION)
@@ -169,6 +170,7 @@ class SettingsFragment : Fragment() {
         }
         binding.resetMusicPrefBtn.setOnClickListener {
             prefViewModel.clearPreferences(UserPreferences.MUSIC)
+            prefViewModel.updateMusicPreferences()
         }
        return  binding.root
     }

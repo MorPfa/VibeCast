@@ -11,11 +11,9 @@ class RemoteMusicDataSourceImpl @Inject constructor(
     private val musicService: MusicService,
 ) : RemoteMusicDataSource {
 
-    val clientSecret = "bd4e7192d0884c73b088eb022a303716"
     override fun getPlaylist(category : String, accessCode : String) : Flow<PlaylistApiModel> = flow {
         try {
             val playlist = musicService.getPlaylist(category, "Bearer $accessCode")
-            Timber.tag("Spotify").d( playlist.playlists.items[0].name)
             emit(playlist)
         }
         catch (e : Exception){
