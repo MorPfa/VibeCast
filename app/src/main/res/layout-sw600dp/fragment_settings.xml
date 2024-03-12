@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -37,32 +36,34 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingVertical="68dp">
+            android:paddingVertical="72dp">
 
             <!-- Title for the settings -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
+                android:paddingVertical="16dp"
+                android:paddingHorizontal="48dp"
                 android:text="@string/settings_header"
                 android:textColor="#FFFFFF"
-                android:textSize="26sp"
+                android:textSize="28sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
+                android:paddingVertical="16dp"
+                android:paddingHorizontal="48dp"
                 android:text="@string/preferred_measurements"
                 android:textColor="#FFFFFF"
-                android:textSize="20sp" />
+                android:textSize="24sp" />
 
             <!-- Celsius/Fahrenheit switch -->
             <RadioGroup
                 android:id="@+id/weatherUnitRadioGroup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="20dp"
+                android:layout_marginHorizontal="48dp"
                 android:orientation="horizontal">
 
                 <RadioButton
@@ -70,6 +71,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:checked="true"
+                    android:textSize="22sp"
                     android:text="@string/imperial"
                     android:textColor="#FFFFFF" />
 
@@ -77,6 +79,7 @@
                     android:id="@+id/radioMetric"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textSize="22sp"
                     android:text="@string/metric"
                     android:textColor="#FFFFFF" />
             </RadioGroup>
@@ -84,18 +87,20 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
+                android:paddingVertical="16dp"
+                android:paddingHorizontal="48dp"
                 android:text="@string/permissions"
                 android:textColor="#FFFFFF"
-                android:textSize="20sp" />
+                android:textSize="24sp" />
 
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/allowLocationSwitch"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="20dp"
+                android:layout_marginHorizontal="48dp"
                 android:padding="16dp"
                 android:text="@string/allow_vibecast_to_use_your_location"
+                android:textSize="22sp"
                 android:textColor="#FFFFFF"
                 android:theme="@style/SwitchTheme" />
 
@@ -103,18 +108,19 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
+                android:paddingVertical="16dp"
+                android:paddingHorizontal="48dp"
                 android:text="@string/background_image"
                 android:textColor="#FFFFFF"
-                android:textSize="20sp" />
+                android:textSize="22sp" />
 
 
             <androidx.viewpager2.widget.ViewPager2
                 android:id="@+id/bg_image_selector"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="60dp"
-                android:layout_marginHorizontal="16dp"
+                android:paddingHorizontal="200dp"
+                android:layout_marginHorizontal="48dp"
                 android:background="@drawable/rounded_black_background" />
 
             <com.google.android.material.button.MaterialButton
@@ -122,27 +128,30 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="4dp"
-                android:layout_marginHorizontal="16dp"
+                android:layout_marginHorizontal="48dp"
                 android:background="@drawable/textfield_background"
+                android:textSize="20sp"
                 android:text="@string/reset_background_image"
+                app:backgroundTint="@color/black"
                 android:textColor="#FFFFFF" />
 
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
+                android:paddingHorizontal="48dp"
+                android:paddingVertical="16dp"
                 android:text="@string/music_preferences"
                 android:textColor="#FFFFFF"
-                android:textSize="20sp" />
+                android:textSize="24sp" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="16dp"
+                android:paddingHorizontal="48dp"
                 android:text="@string/foggy_weather"
                 android:textColor="#FFFFFF"
-                android:textSize="16sp" />
+                android:textSize="22sp" />
 
 
             <com.google.android.material.textfield.TextInputLayout
@@ -150,7 +159,7 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
+                android:layout_marginHorizontal="48dp"
                 android:layout_marginBottom="12dp"
                 app:startIconDrawable="@drawable/foggy_icon"
                 app:startIconTint="@color/white">
@@ -169,11 +178,11 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="16dp"
+                android:paddingHorizontal="48dp"
                 android:paddingTop="4dp"
                 android:text="@string/rainy_weather"
                 android:textColor="#FFFFFF"
-                android:textSize="16sp" />
+                android:textSize="22sp" />
 
 
             <com.google.android.material.textfield.TextInputLayout
@@ -181,7 +190,7 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
+                android:layout_marginHorizontal="48dp"
                 android:layout_marginBottom="12dp"
                 app:startIconDrawable="@drawable/rainy_icon"
                 app:startIconTint="@color/white">
@@ -198,17 +207,17 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="16dp"
+                android:paddingHorizontal="48dp"
                 android:text="@string/sunny_weather"
                 android:textColor="#FFFFFF"
-                android:textSize="16sp" />
+                android:textSize="22sp" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/sunny_dropdown_menu"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
+                android:layout_marginHorizontal="48dp"
                 android:layout_marginBottom="12dp"
                 app:startIconDrawable="@drawable/sunny_icon"
                 app:startIconTint="@color/white">
@@ -225,17 +234,17 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="16dp"
+                android:paddingHorizontal="48dp"
                 android:text="@string/snowy_weather"
                 android:textColor="#FFFFFF"
-                android:textSize="16sp" />
+                android:textSize="22sp" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/snowy_dropdown_menu"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
+                android:layout_marginHorizontal="48dp"
                 android:layout_marginBottom="12dp"
                 app:startIconDrawable="@drawable/snowy_icon"
                 app:startIconTint="@color/white">
@@ -253,17 +262,17 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="16dp"
+                android:paddingHorizontal="48dp"
                 android:text="@string/cloudy_weather"
                 android:textColor="#FFFFFF"
-                android:textSize="16sp" />
+                android:textSize="22sp" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/cloudy_dropdown_menu"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
+                android:layout_marginHorizontal="48dp"
                 android:layout_marginBottom="12dp"
                 app:startIconDrawable="@drawable/cloudy_icon"
                 app:startIconTint="@color/white">
@@ -280,17 +289,17 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="16dp"
+                android:paddingHorizontal="48dp"
                 android:text="@string/stormy_weather"
                 android:textColor="#FFFFFF"
-                android:textSize="16sp" />
+                android:textSize="22sp" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/stormy_dropdown_menu"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
+                android:layout_marginHorizontal="48dp"
                 android:layout_marginBottom="18dp"
                 app:startIconDrawable="@drawable/stormy_icon"
                 app:startIconTint="@color/white">
@@ -308,9 +317,11 @@
                 android:id="@+id/reset_music_pref_btn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
+                android:layout_marginHorizontal="48dp"
                 android:background="@drawable/textfield_background"
+                android:textSize="20sp"
                 android:text="@string/reset_music_preferences"
+                app:backgroundTint="@color/black"
                 android:textColor="#FFFFFF" />
 
 

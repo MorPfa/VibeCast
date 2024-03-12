@@ -19,7 +19,6 @@
             android:id="@+id/linearLayout2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
             android:gravity="center"
             android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -33,7 +32,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/loading_placeholder"
                 android:textColor="#FFFFFF"
-                android:textSize="16sp"
+                android:textSize="20sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -41,7 +40,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/center_row_seperator"
                 android:textColor="#FFFFFF"
-                android:textSize="16sp"
+                android:textSize="20sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -50,7 +49,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/loading_placeholder"
                 android:textColor="#FFFFFF"
-                android:textSize="16sp"
+                android:textSize="20sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -58,7 +57,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/center_row_seperator"
                 android:textColor="#FFFFFF"
-                android:textSize="16sp"
+                android:textSize="20sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -67,7 +66,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/loading_placeholder"
                 android:textColor="#FFFFFF"
-                android:textSize="16sp"
+                android:textSize="20sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -76,7 +75,6 @@
             android:id="@+id/linearLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
             android:gravity="center"
             android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -90,7 +88,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/loading_placeholder"
                 android:textColor="#FFFFFF"
-                android:textSize="16sp"
+                android:textSize="20sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -98,7 +96,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/center_row_seperator"
                 android:textColor="#FFFFFF"
-                android:textSize="16sp"
+                android:textSize="20sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -107,7 +105,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/loading_placeholder"
                 android:textColor="#FFFFFF"
-                android:textSize="16sp"
+                android:textSize="20sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -115,7 +113,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/center_row_seperator"
                 android:textColor="#FFFFFF"
-                android:textSize="16sp"
+                android:textSize="20sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -124,7 +122,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/loading_placeholder"
                 android:textColor="#FFFFFF"
-                android:textSize="16sp"
+                android:textSize="20sp"
                 android:textStyle="bold" />
 
 
@@ -133,7 +131,6 @@
 
         <LinearLayout
             android:layout_width="wrap_content"
-
             android:layout_height="wrap_content"
             android:gravity="center"
             android:paddingHorizontal="8dp"
@@ -150,7 +147,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/loading_placeholder"
                 android:textColor="#FFFFFF"
-                android:textSize="16sp"
+                android:textSize="20sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -158,7 +155,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/center_row_seperator"
                 android:textColor="#FFFFFF"
-                android:textSize="16sp"
+                android:textSize="20sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -167,7 +164,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/loading_placeholder"
                 android:textColor="#FFFFFF"
-                android:textSize="16sp"
+                android:textSize="20sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -175,7 +172,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/center_row_seperator"
                 android:textColor="#FFFFFF"
-                android:textSize="16sp"
+                android:textSize="20sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -184,7 +181,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/loading_placeholder"
                 android:textColor="#FFFFFF"
-                android:textSize="16sp"
+                android:textSize="20sp"
                 android:textStyle="bold" />
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

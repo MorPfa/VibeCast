@@ -32,7 +32,6 @@
         android:src="@drawable/item_not_selected_icon"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-
         android:focusable="true" />
 
 

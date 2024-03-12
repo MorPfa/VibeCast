@@ -59,7 +59,7 @@ class GalleryFragment : Fragment() {
             adapter.submitList(images)
 
         }
-        viewModel.backgroundImage?.observe(viewLifecycleOwner){ image ->
+        viewModel.backgroundImage.observe(viewLifecycleOwner){ image ->
             if(image != null){
                 imageLoader.loadUrlIntoImageView(
                     image,
@@ -79,8 +79,6 @@ class GalleryFragment : Fragment() {
     private fun showImageDialog(image: ImageDto) {
         val dialogFragment = ImageItemFragment.newInstance(image)
         dialogFragment.show(childFragmentManager, "image_dialog")
-
-
     }
 
     /**

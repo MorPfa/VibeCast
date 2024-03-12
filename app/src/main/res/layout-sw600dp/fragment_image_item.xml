@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="6dp"
+    android:background="@android:color/transparent">
+
+    <ImageView
+        android:id="@+id/saved_image"
+        android:layout_width="700dp"
+        android:layout_height="900dp"
+        android:contentDescription="@string/saved_image"
+        android:paddingHorizontal="12dp"
+        android:paddingTop="16dp"
+        android:scaleType="centerCrop"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/attribution_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:gravity="center"
+        android:padding="6dp"
+        android:text="@string/title"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@id/date_saved_text"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/saved_image" />
+
+    <TextView
+        android:id="@+id/date_saved_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:gravity="center"
+        android:padding="6dp"
+        android:text="@string/title"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@id/buttons"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/attribution_text" />
+
+    <LinearLayout
+        android:id="@+id/buttons"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHorizontal_bias="0.5">
+
+        <Button
+            android:id="@+id/removeBtn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/image_remove_btn"
+            android:paddingTop="8dp"
+            android:paddingBottom="10dp"
+            android:text="@string/remove_btn"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            style="?android:attr/buttonBarButtonStyle" />
+
+        <Button
+            android:id="@+id/downloadBtn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/image_remove_btn"
+            android:paddingTop="8dp"
+            android:paddingBottom="10dp"
+            android:text="@string/downloadBtn"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            style="?android:attr/buttonBarButtonStyle" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

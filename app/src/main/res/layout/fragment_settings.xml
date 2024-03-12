@@ -124,6 +124,7 @@
                 android:layout_marginVertical="4dp"
                 android:layout_marginHorizontal="16dp"
                 android:background="@drawable/textfield_background"
+                app:backgroundTint="@color/black"
                 android:text="@string/reset_background_image"
                 android:textColor="#FFFFFF" />
 
@@ -317,6 +318,7 @@
                 android:layout_marginHorizontal="16dp"
                 android:background="@drawable/textfield_background"
                 android:text="@string/reset_music_preferences"
+                app:backgroundTint="@color/black"
                 android:textColor="#FFFFFF" />
 
 

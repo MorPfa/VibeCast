@@ -93,7 +93,7 @@
     <string name="location_5">%1$s</string>
     <string name="location_6">%1$s</string>
     <string name="none_saved">You don\'t have any saved locations</string>
-    <string name="visited_places">Visited places</string>
+    <string name="saved_places">Saved places</string>
     <string name="saved_images">Saved Images</string>
     <string name="saved_songs">Saved Songs</string>
     <string name="location_reminder">You listened to this song in %1$s</string>
