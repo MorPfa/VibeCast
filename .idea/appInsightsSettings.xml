@@ -9,10 +9,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="app.vibecast" />
+                  <option name="mobileSdkAppId" value="1:573624043511:android:75832f1b4d371a489910f2" />
+                  <option name="projectId" value="vibecast" />
+                  <option name="projectNumber" value="573624043511" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
