@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "573624043511",
+    "project_id": "vibecast",
+    "storage_bucket": "vibecast.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:573624043511:android:75832f1b4d371a489910f2",
+        "android_client_info": {
+          "package_name": "app.vibecast"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBw-j8qBW86Vib2N27LSneAXKiZyXE33I4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -9,6 +9,8 @@ plugins {
     id("androidx.navigation.safeargs")
     id("org.jetbrains.kotlin.plugin.serialization")
     id("kotlin-parcelize")
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -99,12 +101,9 @@ android {
 dependencies {
 
 
+
+    //Viewpager
     implementation("androidx.viewpager2:viewpager2:1.0.0")
-
-
-    implementation ("jp.wasabeef:glide-transformations:4.3.0")
-
-
 
 
 
@@ -171,6 +170,7 @@ dependencies {
     implementation ("com.github.bumptech.glide:glide:4.16.0")
     kapt("com.github.bumptech.glide:compiler:4.16.0")
     implementation("jp.wasabeef:glide-transformations:4.3.0")
+    implementation ("jp.wasabeef:glide-transformations:4.3.0")
 
 
 //    Moshi
