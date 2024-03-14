@@ -145,8 +145,6 @@ class MusicViewModel @Inject constructor(
                 override fun onConnected(appRemote: SpotifyAppRemote) {
                     spotifyAppRemote = appRemote
                     Timber.tag("Spotify").d("Connected! Yay!")
-                    // Now you can start interacting with App Remote
-                    //            subscribeToPlayerContext()
                     subscribeToPlayerState()
                     _token.value = token
 
@@ -154,7 +152,7 @@ class MusicViewModel @Inject constructor(
 
                 override fun onFailure(throwable: Throwable) {
                     Timber.tag("Spotify").e(throwable)
-                    // Something went wrong when attempting to connect! Handle errors here
+
                 }
             })
     }

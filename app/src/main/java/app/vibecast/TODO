@@ -1,21 +1,13 @@
 
 
 Today:
-fix larger screen formats
 
 
 
 
-
-
-
-
-
-fix screen rotation issues
+Tasks:
 
 optimize image accuracy (maybe go back to GET /search/photos endpoint and combine query with collections)
-
-
-implement firebase
+implement firebase auth and database
 
 
