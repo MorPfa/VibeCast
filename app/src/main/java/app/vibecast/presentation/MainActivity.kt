@@ -363,9 +363,4 @@ class MainActivity : AppCompatActivity() {
         authorizeClient()
     }
 
-
-    override fun onDestroy() {
-        super.onDestroy()
-
-    }
 }
