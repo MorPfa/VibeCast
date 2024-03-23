@@ -1,7 +1,7 @@
 # VibeCast
 
 VibeCast is a unique Android application that lets users immerse themselves in the perfect ambiance by providing a blend of visual imagery and music that matches the weather conditions of their current location.
-It combines the power of the Unsplash API, the Spotify API, and the OpenWeatherMap API to create a personalized experience for users.
+It combines the power of the Unsplash API, the Spotify SDK, and the OpenWeatherMap API to create a personalized experience for users.
 
 ## Features
 
