@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -21,7 +20,6 @@ import app.vibecast.presentation.screens.main_screen.image.ImageViewModel
 import app.vibecast.presentation.screens.main_screen.weather.LocationModel
 import app.vibecast.presentation.util.LocationAdapter
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.circularreveal.cardview.CircularRevealCardView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -64,7 +62,7 @@ class AccountFragment : Fragment() {
                 binding.savedImageCount.text = getString(R.string.saved_image_count, it)
 
             }
-            imageViewModel.backgroundImage?.observe(viewLifecycleOwner){ image ->
+            imageViewModel.backgroundImage.observe(viewLifecycleOwner){ image ->
                 if(image != null){
                     imageLoader.loadUrlIntoImageView(
                         image,
@@ -96,14 +94,8 @@ class AccountFragment : Fragment() {
     private fun showDeleteConfirmationDialog(location: LocationModel) {
         val alertDialogBuilder = AlertDialog.Builder(requireContext())
         val customView = LayoutInflater.from(requireContext()).inflate(R.layout.confirm_delete_dialog, null)
-        val cardView = customView.findViewById<CircularRevealCardView>(R.id.dialog_card)
-        cardView.setCardBackgroundColor(ContextCompat.getColor(requireContext(), R.color.black))
-        cardView.radius = 36f
-        cardView.clipToOutline = true
-
         val removeButton = customView.findViewById<MaterialButton>(R.id.removeBtn)
         val cancelButton = customView.findViewById<MaterialButton>(R.id.cancelBtn)
-
 
         removeButton.setOnClickListener {
             mainViewModel.deleteLocation(location)

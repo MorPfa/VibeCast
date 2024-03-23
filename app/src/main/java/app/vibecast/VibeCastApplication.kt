@@ -6,18 +6,21 @@ import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 import timber.log.Timber.*
 
+
+
+
+
 @HiltAndroidApp
 class VibeCastApplication : Application(){
     override fun onCreate() {
         super.onCreate()
         initTimber()
-//        if (BuildConfig.DEBUG) {
-//            Timber.plant(DebugTree())
-//        } else {
-//            Timber.plant()
-//        }
     }
+
+
     private fun initTimber()  = when {
+
+
         BuildConfig.DEBUG -> {
             Timber.plant(object : DebugTree() {
                 override fun createStackElementTag(element: StackTraceElement): String {

@@ -6,7 +6,6 @@ Today:
 
 
 Tasks:
-
 optimize image accuracy (maybe go back to GET /search/photos endpoint and combine query with collections)
 implement firebase auth and database
 
