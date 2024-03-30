@@ -10,7 +10,7 @@
         android:id="@+id/nav_loading"
         android:name="app.vibecast.presentation.screens.splash_screen.LoadingFragment"
         android:label="fragment_loading"
-        tools:layout="@layout/fragment_loading" >
+        tools:layout="@layout/fragment_loading">
         <action
             android:id="@+id/action_splashFragment_to_nav_home"
             app:destination="@id/nav_home"
@@ -22,25 +22,29 @@
     <fragment
         android:id="@+id/nav_home"
         android:name="app.vibecast.presentation.screens.main_screen.MainScreenFragment"
-        tools:layout="@layout/fragment_main_screen" >
+        tools:layout="@layout/fragment_main_screen">
+
 
         <action
-            android:id="@+id/action_nav_home_to_savedLocationFragment"
+            android:id="@+id/home_to_saved"
             app:destination="@id/nav_saved" />
 
-
         <action
-            android:id="@+id/action_nav_home_to_searchResultFragment"
+            android:id="@+id/home_to_search"
             app:destination="@id/nav_search" />
+        <action
+            android:id="@+id/home_to_login"
+            app:destination="@id/nav_login" />
+
     </fragment>
 
 
-<fragment
+    <fragment
         android:id="@+id/nav_account"
         android:name="app.vibecast.presentation.screens.account_screen.AccountFragment"
         tools:layout="@layout/fragment_account">
 
-</fragment>
+    </fragment>
 
 
     <fragment
@@ -56,22 +60,54 @@
         android:id="@+id/nav_saved"
         android:name="app.vibecast.presentation.screens.saved_screen.SavedLocationFragment"
         android:label="fragment_saved_location"
-        tools:layout="@layout/fragment_saved_location" >
+        tools:layout="@layout/fragment_saved_location">
+
         <action
-            android:id="@+id/action_nav_saved_to_nav_search"
-            app:destination="@id/nav_search" />
+            android:id="@+id/saved_to_search"
+            app:destination="@id/nav_search"/>
+
         <action
-            android:id="@+id/action_nav_saved_to_nav_home"
-            app:destination="@id/nav_home" />
+            android:id="@+id/saved_to_home"
+            app:destination="@id/nav_home"/>
+
     </fragment>
     <fragment
         android:id="@+id/nav_search"
         android:name="app.vibecast.presentation.screens.search_screen.SearchResultFragment"
         android:label="fragment_search_result"
-        tools:layout="@layout/fragment_search_result" >
+        tools:layout="@layout/fragment_search_result">
         <action
             android:id="@+id/action_nav_search_to_nav_home"
             app:destination="@id/nav_home" />
+    </fragment>
+    <activity
+        android:id="@+id/nav_login_activity"
+        android:name="app.vibecast.presentation.user.auth.LoginActivity"
+        android:label="activity_login"
+        tools:layout="@layout/activity_login" />
+
+
+    <activity
+        android:id="@+id/mainActivity"
+        android:name="app.vibecast.presentation.MainActivity"
+        android:label="MainActivity" />
+    <fragment
+        android:id="@+id/nav_login"
+        android:name="app.vibecast.presentation.user.auth.LoginFragment"
+        android:label="fragment_login"
+        tools:layout="@layout/fragment_login" >
+        <action
+            android:id="@+id/login_to_registration"
+            app:destination="@id/nav_registration" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_registration"
+        android:name="app.vibecast.presentation.user.auth.RegistrationFragment"
+        android:label="fragment_registration"
+        tools:layout="@layout/fragment_registration" >
+        <action
+            android:id="@+id/registration_to_login"
+            app:destination="@id/nav_login" />
     </fragment>
 
 

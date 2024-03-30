@@ -132,6 +132,7 @@
     <string name="stormy_weather">Stormy weather</string>
     <string name="background_image">Background Image</string>
     <string name="reset_background_image">Reset Background Image</string>
+    <string name="login">Login</string>
     <string-array name="music_genres">
         <item>Jazz</item>
         <item>Rock</item>
@@ -152,7 +153,25 @@
 
 
     </string-array>
-
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome !"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Login failed"</string>
+    <string name="sign_in">Sign In</string>
+    <string name="create_account">Create one now</string>
+    <string name="don_t_have_an_account">Don\'t have an account?</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="submit">Submit</string>
+    <string name="create_account_header">Create Account</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
 
 
 </resources>

@@ -11,8 +11,11 @@ import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -33,11 +36,15 @@ import app.vibecast.presentation.screens.main_screen.music.MusicViewModel
 import app.vibecast.presentation.screens.main_screen.image.ImageViewModel
 import app.vibecast.presentation.permissions.LocationPermissionState
 import app.vibecast.presentation.permissions.PermissionHelper
+import app.vibecast.presentation.screens.account_screen.AccountViewModel
 import app.vibecast.presentation.screens.main_screen.MainScreenFragmentDirections
 import app.vibecast.presentation.screens.saved_screen.SavedLocationFragmentDirections
-
+import app.vibecast.presentation.user.auth.LoginActivity
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.spotify.sdk.android.auth.AuthorizationClient
 import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
@@ -48,27 +55,30 @@ import timber.log.Timber
 const val TAG = "TestTag"
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private lateinit var searchView: SearchView
     private val mainViewModel: MainViewModel by viewModels()
     private val imageViewModel: ImageViewModel by viewModels()
     private val musicViewModel: MusicViewModel by viewModels()
+    private val accountViewModel: AccountViewModel by viewModels()
     private var showIcons: Boolean = true
     private lateinit var permissionHelper: PermissionHelper
+    private lateinit var auth: FirebaseAuth
+    private lateinit var loginLauncher: ActivityResultLauncher<Intent>
     private val redirectUri = "vibecast://callback"
     private val clientId = BuildConfig.SPOTIFY_KEY
     private val REQUEST_CODE = 1337
 
 
-
-    private fun authorizeClient(){
-        val request = AuthorizationRequest.Builder(clientId,AuthorizationResponse.Type.TOKEN ,redirectUri)
-            .setShowDialog(true)
-            .setScopes(arrayOf("user-read-email"))
-            .setCampaign("your-campaign-token")
-            .build()
+    private fun authorizeClient() {
+        val request =
+            AuthorizationRequest.Builder(clientId, AuthorizationResponse.Type.TOKEN, redirectUri)
+                .setShowDialog(true)
+                .setScopes(arrayOf("user-read-email"))
+                .setCampaign("your-campaign-token")
+                .build()
         AuthorizationClient.openLoginActivity(this, REQUEST_CODE, request)
     }
 
@@ -83,17 +93,17 @@ class MainActivity : AppCompatActivity() {
                     musicViewModel.connectToSpotify(response.accessToken)
                     Timber.tag("Spotify").d("authorized")
                 }
+
                 AuthorizationResponse.Type.ERROR -> {
                     Timber.tag("Spotify").d("Error while authorizing")
                 }
+
                 else -> {
                     Timber.tag("Spotify").d("I have no idea what happened")
                 }
             }
         }
     }
-
-
 
 
     companion object {
@@ -104,10 +114,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        auth = Firebase.auth
         permissionHelper = PermissionHelper(this)
         handleLocationAndWeather()
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
+        navView.setNavigationItemSelectedListener(this)
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_home) as NavHostFragment
         val navController = navHostFragment.navController
@@ -118,12 +130,19 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_account,
                 R.id.nav_pictures,
                 R.id.nav_settings,
+                R.id.nav_login
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
         NavigationUI.setupWithNavController(binding.navView, navController)
+        val navHeader = binding.navView.getHeaderView(0)
+        val profileImageView = navHeader.findViewById<ImageView>(R.id.profileImageIcon)
+        val userNameTv = navHeader.findViewById<TextView>(R.id.user_name_tv)
+        val userEmailTv = navHeader.findViewById<TextView>(R.id.user_email_tv)
+        userNameTv.text = "Test"
+        userEmailTv.text = "Test"
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
@@ -156,10 +175,40 @@ class MainActivity : AppCompatActivity() {
                     showIcons = true
                     invalidateOptionsMenu()
                 }
+
+                R.id.nav_login -> {
+                    showIcons = false
+                    invalidateOptionsMenu()
+                }
+
+                R.id.nav_registration -> {
+                    showIcons = false
+                    invalidateOptionsMenu()
+                }
             }
         }
+        loginLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    // Handle the result, for example, update UI or reload data
+                }
+            }
 
     }
+
+
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.nav_login -> {
+                val intent = Intent(this, LoginActivity::class.java)
+                loginLauncher.launch(intent)
+                return true
+            }
+            // Handle other item clicks if needed
+            else -> return false
+        }
+    }
+
 
     private fun handleLocationAndWeather() {
         // Check if location permission is granted
@@ -219,11 +268,11 @@ class MainActivity : AppCompatActivity() {
                         findNavController(R.id.nav_host_fragment_content_home).currentDestination
                     if (currentDestination?.id == R.id.nav_home) {
                         val action =
-                            MainScreenFragmentDirections.actionNavHomeToSearchResultFragment()
+                            MainScreenFragmentDirections.homeToSearch()
                         findNavController(R.id.nav_host_fragment_content_home).navigate(action)
                     } else if (currentDestination?.id == R.id.nav_saved) {
                         val action =
-                            SavedLocationFragmentDirections.actionNavSavedToNavSearch()
+                            SavedLocationFragmentDirections.savedToSearch()
                         findNavController(R.id.nav_host_fragment_content_home).navigate(action)
                     }
                     searchView.clearFocus()
@@ -361,6 +410,7 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
 //        authorizeClient()
+
     }
 
 }

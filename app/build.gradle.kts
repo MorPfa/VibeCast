@@ -134,6 +134,8 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:21.0.1")
     implementation("androidx.test:core-ktx:1.5.0")
     implementation(files("libs/spotify-app-remote-release-0.8.0.aar"))
+    implementation("androidx.annotation:annotation:1.6.0")
+    implementation("androidx.activity:activity:1.8.0")
 
     debugImplementation("androidx.fragment:fragment-testing:1.6.2")
     implementation("androidx.test.espresso:espresso-contrib:3.5.1")

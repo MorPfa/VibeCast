@@ -1,12 +1,17 @@
 
 
-Today:
+Next tasks:
+Add auth set up
+figure out auth flow
+implement mechanism to update nav drawer with account credentials
+implement mechanism to fetch images, locations and songs from firebase and fallback strategy if its unavailable
+figure out how to track number of songs played (increment counter if song was played for more than 50%??)
 
 
 
 
-Tasks:
+General Tasks:
 optimize image accuracy (maybe go back to GET /search/photos endpoint and combine query with collections)
-implement firebase auth and database
+
 
 

@@ -178,7 +178,7 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
             if (mainViewModel.locations.value?.size != 0) {
                 mainViewModel.getSavedLocationWeather()
                 val action =
-                    MainScreenFragmentDirections.actionNavHomeToSavedLocationFragment()
+                    MainScreenFragmentDirections.homeToSaved()
                 findNavController().navigate(action)
             } else {
                 val snackbar = Snackbar.make(

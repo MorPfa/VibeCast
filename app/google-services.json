@@ -12,7 +12,20 @@
           "package_name": "app.vibecast"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "573624043511-03ip0163g36ra0ptgtdaom6ve65nap8l.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "app.vibecast",
+            "certificate_hash": "3805ae8131e8490fa23604d8b669c4c0f748d5fc"
+          }
+        },
+        {
+          "client_id": "573624043511-8sh2tlg2nptup1959dvt0d173orjik7t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBw-j8qBW86Vib2N27LSneAXKiZyXE33I4"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "573624043511-8sh2tlg2nptup1959dvt0d173orjik7t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
