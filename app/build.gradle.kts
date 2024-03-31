@@ -113,7 +113,9 @@ dependencies {
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth")
+    implementation ("com.firebaseui:firebase-ui-auth:7.2.0")
 
+    
     //Datastore
 //    implementation("androidx.datastore:datastore:1.0.0")
 //    implementation ("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5")

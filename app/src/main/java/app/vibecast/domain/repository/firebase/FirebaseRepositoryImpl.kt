@@ -6,4 +6,9 @@ import javax.inject.Inject
 
 
 class FirebaseRepositoryImpl @Inject constructor() : FirebaseRepository {
+
+
+    override fun createAccount(email: String, password: String) {
+        TODO("Not yet implemented")
+    }
 }
