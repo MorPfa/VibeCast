@@ -2,20 +2,19 @@ package app.vibecast.presentation.user.auth
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import app.vibecast.databinding.FragmentLoginBinding
 import app.vibecast.presentation.MainActivity
 import app.vibecast.presentation.user.auth.util.LoginResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
-import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import timber.log.Timber
@@ -37,6 +36,9 @@ class LoginFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         auth = Firebase.auth
+        if(auth.currentUser != null){
+            findNavController().navigate(LoginFragmentDirections.loginToLogout())
+        }
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
@@ -93,7 +95,6 @@ class LoginFragment : Fragment() {
                 if (task.isSuccessful) {
 
                     Timber.tag("auth").d("signInWithEmail:success")
-                    val user = auth.currentUser
                     Toast.makeText(
                         requireContext(),
                         "Signed in successfully", Toast.LENGTH_SHORT
@@ -120,7 +121,7 @@ class LoginFragment : Fragment() {
         if (!isEmailValid(email)) {
             return LoginResult.INVALID_EMAIL
         }
-        return if (!isPasswordCorrect(password)) {
+        return if (!isPasswordEmpty(password)) {
             LoginResult.NO_PASSWORD
         } else {
             LoginResult.SUCCESS
@@ -134,9 +135,8 @@ class LoginFragment : Fragment() {
         return validEmail.matches(email)
     }
 
-    private fun isPasswordCorrect(password: String): Boolean {
-        if (password.isEmpty()) return false
-        return true
+    private fun isPasswordEmpty(password: String): Boolean {
+        return password.isNotEmpty()
     }
 
     companion object {
@@ -150,4 +150,5 @@ class LoginFragment : Fragment() {
                 }
             }
     }
+
 }

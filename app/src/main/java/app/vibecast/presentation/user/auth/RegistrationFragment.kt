@@ -1,6 +1,6 @@
 package app.vibecast.presentation.user.auth
 
-import android.app.Activity
+
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -14,6 +14,8 @@ import app.vibecast.databinding.FragmentRegistrationBinding
 import app.vibecast.presentation.MainActivity
 import app.vibecast.presentation.user.auth.util.RegistrationResult
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import timber.log.Timber
@@ -31,6 +33,7 @@ class RegistrationFragment : Fragment() {
     private lateinit var passwordInput: EditText
     private lateinit var confirmPasswordInput: EditText
     private lateinit var submitBtn: Button
+    private lateinit var userNameInput: EditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,6 +53,7 @@ class RegistrationFragment : Fragment() {
         passwordInput = binding.passwordInput
         confirmPasswordInput = binding.confirmPasswordInput
         submitBtn = binding.submitBtn
+        userNameInput = binding.usernameInput
         return binding.root
     }
 
@@ -58,9 +62,10 @@ class RegistrationFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         submitBtn.setOnClickListener {
             val email = emailInput.text.toString()
+            val userName = userNameInput.text.toString()
             val password1 = passwordInput.text.toString()
             val password2 = confirmPasswordInput.text.toString()
-            val result = validateInput(email, password1, password2)
+            val result = validateInput(userName, email, password1, password2)
             when (result) {
                 RegistrationResult.INVALID_EMAIL -> {
                     Toast.makeText(
@@ -75,37 +80,49 @@ class RegistrationFragment : Fragment() {
                         "Passwords don't match", Toast.LENGTH_SHORT
                     ).show()
                 }
+
                 RegistrationResult.EMPTY_PASSWORD -> {
                     Toast.makeText(
                         requireContext(),
                         "Please enter a password", Toast.LENGTH_SHORT
                     ).show()
                 }
+
+                RegistrationResult.EMPTY_USERNAME -> {
+                    Toast.makeText(
+                        requireContext(),
+                        "Please enter a username", Toast.LENGTH_SHORT
+                    ).show()
+                }
+
                 RegistrationResult.EMPTY_EMAIL -> {
                     Toast.makeText(
                         requireContext(),
                         "Please enter an email address", Toast.LENGTH_SHORT
                     ).show()
                 }
+
                 RegistrationResult.PASSWORD_TOO_SHORT -> {
                     Toast.makeText(
                         requireContext(),
                         "Password needs to be at least 6 characters", Toast.LENGTH_SHORT
                     ).show()
                 }
+
                 RegistrationResult.SUCCESS -> {
-                    createAccount(email, password1)
+                    createAccount(userName, email, password1)
+                }
             }
         }
     }
-}
 
-    private fun createAccount(email : String, password : String){
+    private fun createAccount(userName: String, email: String, password: String) {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(requireActivity()) { task ->
                 if (task.isSuccessful) {
                     Timber.tag("auth").d("createUserWithEmail:success")
                     val user = auth.currentUser
+                    addUserName(user, userName)
                     Toast.makeText(
                         requireContext(),
                         "Created Account successfully", Toast.LENGTH_SHORT
@@ -125,43 +142,64 @@ class RegistrationFragment : Fragment() {
             }
     }
 
-private fun validateInput(email: String, password1: String, password2: String): RegistrationResult {
-    if (password1.isEmpty()) return RegistrationResult.EMPTY_PASSWORD
-    if(password1.length < 6) return RegistrationResult.PASSWORD_TOO_SHORT
-    if(email.isEmpty()) return RegistrationResult.EMPTY_EMAIL
-    if (!doPasswordsMatch(password1, password2)) {
-        return RegistrationResult.PASSWORD_MISMATCH
-    }
-    return if (!isEmailValid(email)) {
-        RegistrationResult.INVALID_EMAIL
-    } else {
-        RegistrationResult.SUCCESS
-    }
-}
 
-private fun doPasswordsMatch(password1: String, password2: String): Boolean {
-    return if(password1.length < 6 || password2.length < 6) false
-    else {
-        password1 == password2
-    }
-
-}
-
-private fun isEmailValid(email: String): Boolean {
-    val validEmail = Regex("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}")
-
-    return validEmail.matches(email)
-}
-
-companion object {
-
-    @JvmStatic
-    fun newInstance(param1: String, param2: String) =
-        RegistrationFragment().apply {
-            arguments = Bundle().apply {
-                putString(ARG_PARAM1, param1)
-                putString(ARG_PARAM2, param2)
+    private fun addUserName(user : FirebaseUser?, userName: String){
+        val profileUpdates = UserProfileChangeRequest.Builder()
+            .setDisplayName(userName)
+            .build()
+        user?.updateProfile(profileUpdates)
+            ?.addOnCompleteListener { profileUpdateTask ->
+                if (profileUpdateTask.isSuccessful) {
+                    Timber.tag("auth").d("User profile updated with username")
+                } else {
+                    Timber.tag("auth").e(profileUpdateTask.exception, "Failed to update user profile with username")
+                }
             }
+    }
+
+    private fun validateInput(
+        userName: String,
+        email: String,
+        password1: String,
+        password2: String,
+    ): RegistrationResult {
+        if(userName.isEmpty()) return RegistrationResult.EMPTY_USERNAME
+        if (password1.isEmpty()) return RegistrationResult.EMPTY_PASSWORD
+        if (password1.length < 6) return RegistrationResult.PASSWORD_TOO_SHORT
+        if (email.isEmpty()) return RegistrationResult.EMPTY_EMAIL
+        if (!doPasswordsMatch(password1, password2)) {
+            return RegistrationResult.PASSWORD_MISMATCH
         }
-}
+        return if (!isEmailValid(email)) {
+            RegistrationResult.INVALID_EMAIL
+        } else {
+            RegistrationResult.SUCCESS
+        }
+    }
+
+    private fun doPasswordsMatch(password1: String, password2: String): Boolean {
+        return if (password1.length < 6 || password2.length < 6) false
+        else {
+            password1 == password2
+        }
+
+    }
+
+    private fun isEmailValid(email: String): Boolean {
+        val validEmail = Regex("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}")
+
+        return validEmail.matches(email)
+    }
+
+    companion object {
+
+        @JvmStatic
+        fun newInstance(param1: String, param2: String) =
+            RegistrationFragment().apply {
+                arguments = Bundle().apply {
+                    putString(ARG_PARAM1, param1)
+                    putString(ARG_PARAM2, param2)
+                }
+            }
+    }
 }

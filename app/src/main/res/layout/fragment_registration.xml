@@ -29,6 +29,19 @@
             android:text="@string/create_account_header"
             android:textSize="36sp" />
 
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/username_input_field"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/username_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/username_title" />
+        </com.google.android.material.textfield.TextInputLayout>
+
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/email_input_field"

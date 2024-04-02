@@ -20,8 +20,6 @@ class AccountViewModel @Inject constructor(
     private val locationRepository: LocationRepository
 ) : ViewModel() {
 
-    private var auth : FirebaseAuth = Firebase.auth
-
     fun addLocation(location: LocationModel) {
         locationRepository.addLocation(LocationDto(location.cityName, location.country))
     }
@@ -39,12 +37,6 @@ class AccountViewModel @Inject constructor(
         )
     }
 
-    fun createAccount(email : String, password : String){
 
-    }
-
-    fun isUserLoggedIn() : Boolean {
-        return true
-    }
 
 }

@@ -1,9 +1,11 @@
 
 
 Next tasks:
-Add auth set up
-figure out auth flow
-implement mechanism to update nav drawer with account credentials
+
+figure out navigation from main activity to login activity
+move firebase logic from activity/ fragment to data layer
+
+
 implement mechanism to fetch images, locations and songs from firebase and fallback strategy if its unavailable
 figure out how to track number of songs played (increment counter if song was played for more than 50%??)
 

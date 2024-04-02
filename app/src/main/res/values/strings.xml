@@ -172,6 +172,11 @@
     <string name="create_account_header">Create Account</string>
     <string name="forgot_password">Forgot password?</string>
     <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="username_title">Username</string>
+    <string name="are_you_sure_you_want_to_logout">Are you sure you want to logout?</string>
+    <string name="confirm">Confirm</string>
+    <string name="delete_account">Delete account</string>
+    <string name="are_you_sure_you_want_to_delete_your_account">Are you sure you want to delete your account?</string>
 
 
 </resources>

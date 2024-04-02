@@ -35,6 +35,9 @@
         <action
             android:id="@+id/home_to_login"
             app:destination="@id/nav_login" />
+        <action
+            android:id="@+id/action_nav_home_to_logoutFragment"
+            app:destination="@id/nav_logout" />
 
     </fragment>
 
@@ -80,17 +83,10 @@
             android:id="@+id/action_nav_search_to_nav_home"
             app:destination="@id/nav_home" />
     </fragment>
-    <activity
-        android:id="@+id/nav_login_activity"
-        android:name="app.vibecast.presentation.user.auth.LoginActivity"
-        android:label="activity_login"
-        tools:layout="@layout/activity_login" />
 
 
-    <activity
-        android:id="@+id/mainActivity"
-        android:name="app.vibecast.presentation.MainActivity"
-        android:label="MainActivity" />
+
+
     <fragment
         android:id="@+id/nav_login"
         android:name="app.vibecast.presentation.user.auth.LoginFragment"
@@ -99,6 +95,9 @@
         <action
             android:id="@+id/login_to_registration"
             app:destination="@id/nav_registration" />
+        <action
+            android:id="@+id/login_to_logout"
+            app:destination="@id/nav_logout" />
     </fragment>
     <fragment
         android:id="@+id/nav_registration"
@@ -109,6 +108,16 @@
             android:id="@+id/registration_to_login"
             app:destination="@id/nav_login" />
     </fragment>
+    <fragment
+        android:id="@+id/nav_logout"
+        android:name="app.vibecast.presentation.user.auth.LogoutFragment"
+        android:label="fragment_logout"
+        tools:layout="@layout/fragment_logout" >
+        <action
+            android:id="@+id/logout_to_home"
+            app:destination="@id/nav_home" />
+    </fragment>
+
 
 
 </navigation>
