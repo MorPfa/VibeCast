@@ -116,6 +116,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         auth = Firebase.auth
@@ -135,7 +136,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_settings,
 
 
-            ), drawerLayout
+                ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
@@ -143,15 +144,23 @@ class MainActivity : AppCompatActivity() {
         NavigationUI.setupWithNavController(binding.navView, navController)
         val navHeader = binding.navView.getHeaderView(0)
         val loginText = binding.navView.menu.findItem(R.id.nav_login)
-        if(auth.currentUser != null){
+        if (auth.currentUser != null) {
             loginText.title = "Logout"
-        }else {
+        } else {
             loginText.title = "Login"
         }
         val profileImageView = navHeader.findViewById<ImageView>(R.id.profileImageIcon)
         userNameTv = navHeader.findViewById(R.id.user_name_tv)
         userEmailTv = navHeader.findViewById(R.id.user_email_tv)
 
+        currentUser = auth.currentUser
+        if (currentUser != null) {
+            setUpNavHeader(
+                email = currentUser?.email ?: "-",
+
+                )
+
+        }
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
                 R.id.nav_account -> {
@@ -204,13 +213,15 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun setUpNavHeader(email: String, userName: String) {
+    private fun setUpNavHeader(email: String) {
         userEmailTv.text = email
-        userNameTv.text = userName
+        accountViewModel.userName.observe(this) { username ->
+            Timber.tag("auth activity").d(username.toString())
+            userNameTv.text = auth.currentUser?.displayName
+        }
+
+
     }
-
-
-
 
 
     private fun handleLocationAndWeather() {
@@ -405,8 +416,8 @@ class MainActivity : AppCompatActivity() {
         if (navController.currentDestination?.id == R.id.nav_search) {
             mainViewModel.checkPermissionState()
         }
-        if(navController.currentDestination?.id == R.id.nav_logout){
-                navController.navigate(R.id.nav_home)
+        if (navController.currentDestination?.id == R.id.nav_logout) {
+            navController.navigate(R.id.nav_home)
         }
 
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
@@ -416,14 +427,7 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
 //        authorizeClient()
-        currentUser = auth.currentUser
-        if (currentUser != null) {
-            setUpNavHeader(
-                email = currentUser?.email ?: "-",
-                userName = currentUser?.displayName ?: "-"
-            )
 
-        }
 
     }
 

@@ -1,18 +1,27 @@
 package app.vibecast.presentation.user.auth
 
+import android.app.AlertDialog
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import app.vibecast.R
 import app.vibecast.databinding.FragmentLoginBinding
 import app.vibecast.presentation.MainActivity
+import app.vibecast.presentation.screens.main_screen.image.ImageViewModel
 import app.vibecast.presentation.user.auth.util.LoginResult
+import com.google.android.material.button.MaterialButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.ktx.auth
@@ -32,10 +41,15 @@ class LoginFragment : Fragment() {
     private lateinit var emailInput: EditText
     private lateinit var passwordInput: EditText
     private lateinit var signInBtn: Button
+    private lateinit var noAccountBtn: TextView
+    private lateinit var forgotBtn : TextView
+    private var forgotPasswordDialog: AlertDialog? = null
+    private val imageViewModel : ImageViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         auth = Firebase.auth
+
         if(auth.currentUser != null){
             findNavController().navigate(LoginFragmentDirections.loginToLogout())
         }
@@ -53,16 +67,43 @@ class LoginFragment : Fragment() {
         emailInput = binding.emailInput
         passwordInput = binding.passwordInput
         signInBtn = binding.signInBtn
+        noAccountBtn = binding.noAccount
+        forgotBtn = binding.forgotPassword
+        val bgImage = imageViewModel.pickDefaultBackground()
+        binding.backgroundImageView.setImageResource(bgImage)
         return binding.root
     }
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.noAccount.setOnClickListener {
+        noAccountBtn.setOnClickListener {
             val action = LoginFragmentDirections.loginToRegistration()
             findNavController().navigate(action)
         }
+
+        forgotBtn.setOnClickListener {
+            val alertDialogBuilder = AlertDialog.Builder(requireContext())
+            val dialog = LayoutInflater.from(requireContext()).inflate(R.layout.forgot_password_dialog, null)
+            val userEmail = dialog.findViewById<EditText>(R.id.editBox)
+            val cancelBtn = dialog.findViewById<MaterialButton>(R.id.btnCancel)
+            val resetBtn = dialog.findViewById<MaterialButton>(R.id.btnReset)
+
+            resetBtn.setOnClickListener {
+                compareEmail(userEmail)
+                forgotPasswordDialog?.dismiss()
+            }
+
+            cancelBtn.setOnClickListener {
+                forgotPasswordDialog?.dismiss()
+            }
+
+            alertDialogBuilder.setView(dialog)
+            forgotPasswordDialog = alertDialogBuilder.create()
+            forgotPasswordDialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            forgotPasswordDialog?.show()
+        }
+
         signInBtn.setOnClickListener {
             val email = emailInput.text.toString()
             val password = passwordInput.text.toString()
@@ -87,6 +128,22 @@ class LoginFragment : Fragment() {
                 }
             }
         }
+    }
+
+
+    private fun compareEmail(email: EditText){
+        if (email.text.toString().isEmpty()){
+            return
+        }
+        if (!Patterns.EMAIL_ADDRESS.matcher(email.text.toString()).matches()){
+            return
+        }
+        auth.sendPasswordResetEmail(email.text.toString())
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Toast.makeText(requireContext(), "Check your email", Toast.LENGTH_SHORT).show()
+                }
+            }
     }
 
     private fun signInWithEmail(email: String, password: String) {

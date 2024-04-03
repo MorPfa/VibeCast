@@ -62,6 +62,7 @@
             tools:layout_editor_absoluteY="136dp" />
 
         <TextView
+            android:id="@+id/userEmail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/loading_placeholder"

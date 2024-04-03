@@ -1,16 +1,21 @@
 package app.vibecast.presentation.user.auth
 
-import android.app.Dialog
+import android.app.AlertDialog
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import app.vibecast.R
 import app.vibecast.databinding.FragmentLogoutBinding
 import app.vibecast.presentation.MainActivity
+import app.vibecast.presentation.screens.main_screen.image.ImageViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -27,7 +32,10 @@ class LogoutFragment : Fragment() {
     private lateinit var binding: FragmentLogoutBinding
     private lateinit var logoutBtn : Button
     private lateinit var deleteBtn : Button
+    private var deleteDialog: AlertDialog? = null
+    private var logoutDialog: AlertDialog? = null
     private lateinit var auth : FirebaseAuth
+    private val imageViewModel : ImageViewModel by activityViewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         auth = Firebase.auth
@@ -42,6 +50,8 @@ class LogoutFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         binding = FragmentLogoutBinding.inflate(inflater, container, false)
+        val bgImage = imageViewModel.pickDefaultBackground()
+        binding.backgroundImageView.setImageResource(bgImage)
         logoutBtn = binding.logoutBtn
         deleteBtn = binding.deleteBtn
         logoutBtn.setOnClickListener{
@@ -57,42 +67,41 @@ class LogoutFragment : Fragment() {
 
     private fun showLogoutDialog() {
 
-        val dialogView: View = getLayoutInflater().inflate(R.layout.logout_dialog, null)
+        val alertDialogBuilder = AlertDialog.Builder(requireContext())
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.delete_account_dialog, null)
 
-        val dialog = Dialog(requireContext())
-        dialog.setContentView(dialogView)
-        dialog.setCancelable(true)
+        val confirmBtn = dialogView.findViewById<Button>(R.id.confirmBtn)
+        val cancelBtn = dialogView.findViewById<Button>(R.id.cancelBtn)
 
-        val confirmBtn = dialog.findViewById<Button>(R.id.confirmBtn)
-        val cancelBtn = dialog.findViewById<Button>(R.id.cancelBtn)
 
 
         cancelBtn.setOnClickListener { // Dismiss the dialog when the button is clicked
-            dialog.dismiss()
+            logoutDialog?.dismiss()
         }
 
         confirmBtn.setOnClickListener{
             auth.signOut()
+            logoutDialog?.dismiss()
             val intent = Intent(activity, MainActivity::class.java)
             startActivity(intent)
         }
-        dialog.show()
+        alertDialogBuilder.setView(dialogView)
+        logoutDialog = alertDialogBuilder.create()
+        logoutDialog?.setCancelable(true)
+        logoutDialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        logoutDialog?.show()
     }
 
     private fun showDeleteDialog() {
+        val alertDialogBuilder = AlertDialog.Builder(requireContext())
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.delete_account_dialog, null)
 
-        val dialogView: View = getLayoutInflater().inflate(R.layout.delete_account_dialog, null)
-
-        val dialog = Dialog(requireContext())
-        dialog.setContentView(dialogView)
-        dialog.setCancelable(true)
-
-        val confirmBtn = dialog.findViewById<Button>(R.id.confirmBtn)
-        val cancelBtn = dialog.findViewById<Button>(R.id.cancelBtn)
+        val confirmBtn = dialogView.findViewById<Button>(R.id.confirmBtn)
+        val cancelBtn = dialogView.findViewById<Button>(R.id.cancelBtn)
 
 
         cancelBtn.setOnClickListener { // Dismiss the dialog when the button is clicked
-            dialog.dismiss()
+            deleteDialog?.dismiss()
         }
 
         confirmBtn.setOnClickListener{
@@ -101,14 +110,26 @@ class LogoutFragment : Fragment() {
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                        Timber.tag("auth").d("Account deleted")
+                        auth.signOut()
+                        deleteDialog?.dismiss()
+                        val intent = Intent(activity, MainActivity::class.java)
+                        startActivity(intent)
+                    }
+                    else {
+                        Toast.makeText(requireContext(), "Something went wrong", Toast.LENGTH_SHORT).show()
                     }
                 }
-            auth.signOut()
-            val intent = Intent(activity, MainActivity::class.java)
-            startActivity(intent)
+
         }
-        dialog.show()
+        alertDialogBuilder.setView(dialogView)
+        deleteDialog = alertDialogBuilder.create()
+        deleteDialog?.setCancelable(true)
+        deleteDialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        deleteDialog?.show()
+
     }
+
+
 
     companion object {
 

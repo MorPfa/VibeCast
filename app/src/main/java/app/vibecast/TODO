@@ -2,7 +2,6 @@
 
 Next tasks:
 
-figure out navigation from main activity to login activity
 move firebase logic from activity/ fragment to data layer
 
 

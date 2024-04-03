@@ -20,6 +20,9 @@ import app.vibecast.presentation.screens.main_screen.image.ImageViewModel
 import app.vibecast.presentation.screens.main_screen.weather.LocationModel
 import app.vibecast.presentation.util.LocationAdapter
 import com.google.android.material.button.MaterialButton
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -30,12 +33,14 @@ class AccountFragment : Fragment() {
     private val binding get() = _binding!!
     private val mainViewModel: MainViewModel by activityViewModels()
     private val imageViewModel: ImageViewModel by activityViewModels()
+    private lateinit var auth: FirebaseAuth
 
 
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        auth = Firebase.auth
         imageViewModel.setImageCountLiveData()
 
     }
@@ -46,6 +51,8 @@ class AccountFragment : Fragment() {
     ): View {
 
         _binding = FragmentAccountBinding.inflate(inflater,container,false)
+        binding.username.text = auth.currentUser?.displayName ?: "-"
+        binding.userEmail.text = auth.currentUser?.email ?: "-"
         val savedLocationsRv : RecyclerView = binding.savedLocations
         val adapter = LocationAdapter(requireContext())
         savedLocationsRv.adapter = adapter

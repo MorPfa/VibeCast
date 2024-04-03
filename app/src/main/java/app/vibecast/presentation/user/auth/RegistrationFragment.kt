@@ -10,23 +10,30 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import app.vibecast.databinding.FragmentRegistrationBinding
 import app.vibecast.presentation.MainActivity
+import app.vibecast.presentation.screens.account_screen.AccountViewModel
+import app.vibecast.presentation.screens.main_screen.image.ImageViewModel
 import app.vibecast.presentation.user.auth.util.RegistrationResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
 
+@AndroidEntryPoint
 class RegistrationFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
+    private val accountViewModel : AccountViewModel by activityViewModels()
+    private val imageViewModel : ImageViewModel by activityViewModels()
     private lateinit var binding: FragmentRegistrationBinding
     private lateinit var auth: FirebaseAuth
     private lateinit var emailInput: EditText
@@ -49,6 +56,8 @@ class RegistrationFragment : Fragment() {
         savedInstanceState: Bundle?,
     ): View {
         binding = FragmentRegistrationBinding.inflate(inflater, container, false)
+        val bgImage = imageViewModel.pickDefaultBackground()
+        binding.backgroundImageView.setImageResource(bgImage)
         emailInput = binding.emailInput
         passwordInput = binding.passwordInput
         confirmPasswordInput = binding.confirmPasswordInput
@@ -137,7 +146,6 @@ class RegistrationFragment : Fragment() {
                         "Authentication failed.",
                         Toast.LENGTH_SHORT,
                     ).show()
-//                    updateUI(null)
                 }
             }
     }
@@ -151,6 +159,7 @@ class RegistrationFragment : Fragment() {
             ?.addOnCompleteListener { profileUpdateTask ->
                 if (profileUpdateTask.isSuccessful) {
                     Timber.tag("auth").d("User profile updated with username")
+                    accountViewModel.updateUserName(userName)
                 } else {
                     Timber.tag("auth").e(profileUpdateTask.exception, "Failed to update user profile with username")
                 }
