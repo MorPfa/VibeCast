@@ -47,6 +47,9 @@
         android:name="app.vibecast.presentation.screens.account_screen.AccountFragment"
         tools:layout="@layout/fragment_account">
 
+        <action
+            android:id="@+id/account_to_editProfile"
+            app:destination="@id/editProfileFragment" />
     </fragment>
 
 
@@ -117,7 +120,11 @@
             android:id="@+id/logout_to_home"
             app:destination="@id/nav_home" />
     </fragment>
-
+    <fragment
+        android:id="@+id/editProfileFragment"
+        android:name="app.vibecast.presentation.screens.account_screen.EditProfileFragment"
+        android:label="fragment_edit_profile"
+        tools:layout="@layout/fragment_edit_profile" />
 
 
 </navigation>

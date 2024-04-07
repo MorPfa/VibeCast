@@ -29,6 +29,21 @@
         android:orientation="vertical"
         >
 
+        <ImageButton
+            android:id="@+id/editProfileBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|end"
+            android:layout_marginTop="82dp"
+            android:layout_marginEnd="4dp"
+            android:src="@drawable/edit_icon"
+            android:background="@android:color/transparent"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="@string/change_profile_picture"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView"
             android:layout_width="120dp"
@@ -39,6 +54,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
+
+
         <ImageView
             android:id="@+id/profilePicture"
             android:layout_width="match_parent"
@@ -47,7 +64,7 @@
             android:scaleType="centerCrop"
             android:src="@drawable/osman_rana_gxezuwo5m4i_unsplash2" />
 
-    </androidx.cardview.widget.CardView>
+        </androidx.cardview.widget.CardView>
 
 
         <TextView

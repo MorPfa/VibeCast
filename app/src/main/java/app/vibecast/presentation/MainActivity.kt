@@ -14,8 +14,6 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -39,7 +37,6 @@ import app.vibecast.presentation.screens.main_screen.MainViewModel
 import app.vibecast.presentation.screens.main_screen.image.ImageViewModel
 import app.vibecast.presentation.screens.main_screen.music.MusicViewModel
 import app.vibecast.presentation.screens.saved_screen.SavedLocationFragmentDirections
-
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
@@ -67,7 +64,6 @@ class MainActivity : AppCompatActivity() {
     private var showIcons: Boolean = true
     private lateinit var permissionHelper: PermissionHelper
     private lateinit var auth: FirebaseAuth
-    private lateinit var loginLauncher: ActivityResultLauncher<Intent>
     private val redirectUri = "vibecast://callback"
     private val clientId = BuildConfig.SPOTIFY_KEY
     private val REQUEST_CODE = 1337
@@ -122,6 +118,7 @@ class MainActivity : AppCompatActivity() {
         auth = Firebase.auth
         permissionHelper = PermissionHelper(this)
         handleLocationAndWeather()
+
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
         val navHostFragment =
@@ -204,13 +201,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-        loginLauncher =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-                if (result.resultCode == RESULT_OK) {
-                    // Handle the result, for example, update UI or reload data
-                }
-            }
-
+        accountViewModel.syncData()
     }
 
     private fun setUpNavHeader(email: String) {
@@ -383,10 +374,12 @@ class MainActivity : AppCompatActivity() {
                     if (!item.isChecked) {
                         item.isChecked = true
                         imageViewModel.addImage(imageViewModel.image.value!!)
+                        accountViewModel.addImageToFirebase(imageViewModel.image.value!!)
                         item.icon = ContextCompat.getDrawable(this, R.drawable.favorite_selected)
                     } else {
                         item.isChecked = false
                         imageViewModel.deleteImage(imageViewModel.image.value!!)
+                        accountViewModel.deleteImageFromFirebase(imageViewModel.image.value!!)
                         item.icon = ContextCompat.getDrawable(this, R.drawable.favorite_unselected)
                     }
                 }
@@ -397,10 +390,13 @@ class MainActivity : AppCompatActivity() {
                 if (!item.isChecked) {
                     item.isChecked = true
                     mainViewModel.addLocation(mainViewModel.currentLocation.value!!)
+                    accountViewModel.addLocationToFirebase(
+                        mainViewModel.currentLocation.value!!)
                     item.icon = ContextCompat.getDrawable(this, R.drawable.delete_location_icon)
                 } else {
                     item.isChecked = false
                     mainViewModel.deleteLocation(mainViewModel.currentLocation.value!!)
+                    accountViewModel.deleteLocationFromFirebase(mainViewModel.currentLocation.value!!)
                     item.icon = ContextCompat.getDrawable(this, R.drawable.save_location_icon)
                 }
                 true

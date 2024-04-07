@@ -7,9 +7,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
+import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import app.vibecast.R
@@ -33,6 +36,8 @@ class AccountFragment : Fragment() {
     private val binding get() = _binding!!
     private val mainViewModel: MainViewModel by activityViewModels()
     private val imageViewModel: ImageViewModel by activityViewModels()
+    private lateinit var profilePic : ImageView
+    private lateinit var changePictureBtn : ImageButton
     private lateinit var auth: FirebaseAuth
 
 
@@ -51,6 +56,8 @@ class AccountFragment : Fragment() {
     ): View {
 
         _binding = FragmentAccountBinding.inflate(inflater,container,false)
+        profilePic = binding.profilePicture
+        changePictureBtn = binding.editProfileBtn
         binding.username.text = auth.currentUser?.displayName ?: "-"
         binding.userEmail.text = auth.currentUser?.email ?: "-"
         val savedLocationsRv : RecyclerView = binding.savedLocations
@@ -60,6 +67,11 @@ class AccountFragment : Fragment() {
         val layoutManager = LinearLayoutManager(requireContext())
         savedLocationsRv.layoutManager = layoutManager
         val imageLoader = ImageLoader(requireContext())
+
+        changePictureBtn.setOnClickListener{
+            val action = AccountFragmentDirections.accountToEditProfile()
+            findNavController().navigate(action)
+        }
         adapter.setOnItemClickListener { position ->
             val clickedItem = adapter.currentList[position]
             showDeleteConfirmationDialog(clickedItem)

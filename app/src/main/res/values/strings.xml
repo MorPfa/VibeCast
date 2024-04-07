@@ -180,6 +180,9 @@
     <string name="reset">Reset</string>
     <string name="forgot_password_header">Forgot Password</string>
     <string name="enter_your_email_address">Enter your email address</string>
+    <string name="change_profile_picture">Change profile picture</string>
+    <string name="choose_your_profile_picture">Choose your profile picture</string>
+    <string name="username_prompt">Username</string>
 
 
 </resources>

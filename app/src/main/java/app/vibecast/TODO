@@ -2,6 +2,9 @@
 
 Next tasks:
 
+
+
+fix navigation back from auth
 move firebase logic from activity/ fragment to data layer
 
 

@@ -187,7 +187,11 @@ class LoginFragment : Fragment() {
 
 
     private fun isEmailValid(email: String): Boolean {
-        if (email.isEmpty()) return false
+        if (email.isEmpty()) {
+//            passwordInput.error = "Test"
+            //TODO customize this
+            return false
+        }
         val validEmail = Regex("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}")
         return validEmail.matches(email)
     }

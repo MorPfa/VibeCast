@@ -233,7 +233,7 @@ class SearchResultFragment : Fragment(), MusicViewModel.PlayerStateListener{
                 val weather =
                     weatherData.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
                 observeImageData(city, weather!!)
-                musicViewModel.getPlaylist(weather)
+//                musicViewModel.getPlaylist(weather)
                 binding.mainTemp.text =
                     getString(R.string.center_temp, currentWeather.temperature)
                 //            Current hour values

@@ -15,6 +15,7 @@ import androidx.fragment.app.activityViewModels
 import app.vibecast.R
 import app.vibecast.databinding.FragmentLogoutBinding
 import app.vibecast.presentation.MainActivity
+import app.vibecast.presentation.screens.account_screen.AccountViewModel
 import app.vibecast.presentation.screens.main_screen.image.ImageViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -36,6 +37,7 @@ class LogoutFragment : Fragment() {
     private var logoutDialog: AlertDialog? = null
     private lateinit var auth : FirebaseAuth
     private val imageViewModel : ImageViewModel by activityViewModels()
+    private val accountViewModel : AccountViewModel by activityViewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         auth = Firebase.auth
@@ -110,6 +112,7 @@ class LogoutFragment : Fragment() {
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                        Timber.tag("auth").d("Account deleted")
+                        accountViewModel.deleteUserData()
                         auth.signOut()
                         deleteDialog?.dismiss()
                         val intent = Intent(activity, MainActivity::class.java)
