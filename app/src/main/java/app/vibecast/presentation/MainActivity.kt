@@ -471,9 +471,7 @@ class MainActivity : AppCompatActivity() {
         if (navController.currentDestination?.id == R.id.nav_search) {
             mainViewModel.checkPermissionState()
         }
-//        if (navController.currentDestination?.id == R.id.nav_logout) {
-//            navController.navigate(R.id.nav_home)
-//        }
+
 
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
