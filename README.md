@@ -1,7 +1,7 @@
 # VibeCast
 
 VibeCast is a unique Android application that lets users immerse themselves in the perfect ambiance by providing a blend of visual imagery and music that matches the weather conditions of their current location.
-It combines the power of the Unsplash API, the Spotify API, and the OpenWeatherMap API to create a personalized experience for users.
+It combines the power of the Unsplash API, the Spotify SDK, and the OpenWeatherMap API to create a personalized experience for users.
 
 ## Features
 
@@ -15,8 +15,9 @@ It combines the power of the Unsplash API, the Spotify API, and the OpenWeatherM
 
 
 
+<img src="https://github.com/MorPfa/VibeCast/assets/108638105/c6a7d58a-60cd-4a14-add4-4766759f1a38" alt="Screenshot 1" width="300">
+<img src="https://github.com/MorPfa/VibeCast/assets/108638105/260a4acd-e888-4707-8d18-a0487a2514ec" alt="Screenshot 1" width="300">
+<img src="https://github.com/MorPfa/VibeCast/assets/108638105/6b03f128-4999-4c73-958c-0a5a328beb85" alt="Screenshot 1" width="300">
+<img src="https://github.com/MorPfa/VibeCast/assets/108638105/88050e42-1f97-4f9c-a723-9f3bfc1e0650" alt="Screenshot 1" width="300">
+<img src="https://github.com/MorPfa/VibeCast/assets/108638105/ed705145-7d35-4f0c-9962-d24b387db4c1" alt="Screenshot 1" width="300">
 
-![Home screen 1](https://github.com/MorPfa/VibeCast/assets/108638105/6c23eba1-1f75-4cae-acae-b98eadbab6b2)
-![Home screen 2](https://github.com/MorPfa/VibeCast/assets/108638105/fe52a91f-18cb-4408-bdf3-0b1aa1b184a0)
-![Navigation Drawer](https://github.com/MorPfa/VibeCast/assets/108638105/72986749-1fd4-4661-a0d0-ed944b86332f)
-![Pictures gallery  screen](https://github.com/MorPfa/VibeCast/assets/108638105/9d9ced18-45c0-4376-9430-318ec9d8ef18)
