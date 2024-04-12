@@ -24,9 +24,9 @@ class LocalLocationDataSourceImpl @Inject constructor(
     override suspend fun addLocationWithWeather(location: LocationWithWeatherDataDto)  {
         val preferredUnit = dataStoreRepository.getPreference()
         locationDao.addLocationWithWeather(
-            LocationEntity(location.location.cityName, location.location.country),
+            LocationEntity(location.location.city, location.location.country),
             WeatherEntity(
-                location.location.cityName,
+                location.location.city,
                 location.location.country,
                 location.weather,
                 System.currentTimeMillis(),
@@ -61,11 +61,11 @@ class LocalLocationDataSourceImpl @Inject constructor(
     }
 
     override suspend fun addLocation(location: LocationDto) = locationDao.addLocation(
-        LocationEntity(location.cityName, location.country)
+        LocationEntity(location.city, location.country)
     )
 
     override suspend fun deleteLocation(location: LocationDto) = locationDao.deleteLocation(
-        LocationEntity(location.cityName, location.country)
+        LocationEntity(location.city, location.country)
     )
 
     /**

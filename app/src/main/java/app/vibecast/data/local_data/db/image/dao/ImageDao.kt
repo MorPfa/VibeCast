@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Upsert
 import app.vibecast.data.local_data.db.image.model.ImageEntity
+
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -19,4 +20,5 @@ interface ImageDao {
 
     @Delete
     suspend fun deleteImage(imageEntity: ImageEntity)
+
 }

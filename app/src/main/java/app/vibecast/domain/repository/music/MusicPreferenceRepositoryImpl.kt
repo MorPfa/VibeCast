@@ -1,12 +1,11 @@
 package app.vibecast.domain.repository.music
 
-import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import app.vibecast.presentation.TAG
 import kotlinx.coroutines.flow.first
+import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -61,7 +60,7 @@ class MusicPreferenceRepositoryImpl @Inject constructor(
                     resultMap[weatherCondition] = value.toString()
                 } else {
 
-                    Log.d(TAG, "Unknown key: $key")
+                    Timber.tag("musicPref").d("Unknown key: $key")
                 }
             }
             resultMap

@@ -76,8 +76,7 @@ class MainActivity : AppCompatActivity() {
         val request =
             AuthorizationRequest.Builder(clientId, AuthorizationResponse.Type.TOKEN, redirectUri)
                 .setShowDialog(true)
-                .setScopes(arrayOf("user-read-email"))
-                .setCampaign("your-campaign-token")
+                .setScopes(arrayOf("streaming","app-remote-control", "user-read-currently-playing"))
                 .build()
         AuthorizationClient.openLoginActivity(this, REQUEST_CODE, request)
     }
@@ -140,11 +139,10 @@ class MainActivity : AppCompatActivity() {
 
         NavigationUI.setupWithNavController(binding.navView, navController)
         val navHeader = binding.navView.getHeaderView(0)
-        val loginText = binding.navView.menu.findItem(R.id.nav_login)
+        val loginText = binding.navView.menu.findItem(R.id.nav_logout)
         if (auth.currentUser != null) {
+            loginText.isVisible = true
             loginText.title = "Logout"
-        } else {
-            loginText.title = "Login"
         }
         val profileImageView = navHeader.findViewById<ImageView>(R.id.profileImageIcon)
         userNameTv = navHeader.findViewById(R.id.user_name_tv)
@@ -152,10 +150,8 @@ class MainActivity : AppCompatActivity() {
 
         currentUser = auth.currentUser
         if (currentUser != null) {
-            setUpNavHeader(
-                email = currentUser?.email ?: "-",
 
-                )
+            setUpNavHeader()
 
         }
         navController.addOnDestinationChangedListener { _, destination, _ ->
@@ -190,28 +186,28 @@ class MainActivity : AppCompatActivity() {
                     invalidateOptionsMenu()
                 }
 
-                R.id.nav_login -> {
+                R.id.nav_logout -> {
                     showIcons = false
                     invalidateOptionsMenu()
                 }
 
-                R.id.nav_registration -> {
-                    showIcons = false
-                    invalidateOptionsMenu()
-                }
+
             }
         }
         accountViewModel.syncData()
+        mainViewModel.setUpLocationData()
     }
 
-    private fun setUpNavHeader(email: String) {
-        userEmailTv.text = email
-        accountViewModel.userName.observe(this) { username ->
-            Timber.tag("auth activity").d(username.toString())
-            userNameTv.text = auth.currentUser?.displayName
+    private fun setUpNavHeader() {
+        accountViewModel.userName.observe(this) { userName ->
+            Timber.tag("auth activity").d(userName.toString())
+            userNameTv.text = userName
         }
 
-
+        accountViewModel.userEmail.observe(this) { userEmail ->
+            Timber.tag("auth activity").d(userEmail.toString())
+            userEmailTv.text = userEmail
+        }
     }
 
 
@@ -370,34 +366,97 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_save_image -> {
-                if (imageViewModel.image.value != null) {
-                    if (!item.isChecked) {
-                        item.isChecked = true
-                        imageViewModel.addImage(imageViewModel.image.value!!)
-                        accountViewModel.addImageToFirebase(imageViewModel.image.value!!)
-                        item.icon = ContextCompat.getDrawable(this, R.drawable.favorite_selected)
-                    } else {
-                        item.isChecked = false
-                        imageViewModel.deleteImage(imageViewModel.image.value!!)
-                        accountViewModel.deleteImageFromFirebase(imageViewModel.image.value!!)
-                        item.icon = ContextCompat.getDrawable(this, R.drawable.favorite_unselected)
+                if(currentUser != null) {
+                    if (imageViewModel.image.value != null) {
+                        if (!item.isChecked) {
+                            item.isChecked = true
+                            imageViewModel.addImage(imageViewModel.image.value!!)
+                            accountViewModel.addImageToFirebase(imageViewModel.image.value!!)
+                            item.icon =
+                                ContextCompat.getDrawable(this, R.drawable.favorite_selected)
+                        } else {
+                            item.isChecked = false
+                            imageViewModel.deleteImage(imageViewModel.image.value!!)
+                            accountViewModel.deleteImageFromFirebase(imageViewModel.image.value!!)
+                            item.icon =
+                                ContextCompat.getDrawable(this, R.drawable.favorite_unselected)
+                        }
                     }
+                } else {
+                    val snackbar = Snackbar.make(
+                        findViewById(android.R.id.content),
+                        getString(R.string.save_image_account_warning),
+                        Snackbar.LENGTH_SHORT
+                    )
+
+                    val snackbarView = snackbar.view
+                    val snackbarText =
+                        snackbarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+                    snackbarText.setTextColor(
+                        ContextCompat.getColor(
+                            this@MainActivity,
+                            R.color.white
+                        )
+                    )
+                    snackbarView.background =
+                        ContextCompat.getDrawable(this@MainActivity, R.drawable.snackbar_background)
+                    val params = snackbarView.layoutParams as FrameLayout.LayoutParams
+                    params.gravity = Gravity.TOP
+                    snackbarView.layoutParams = params
+                    val actionBarHeight = getActionBarHeight()
+                    params.setMargins(0, actionBarHeight, 0, 0)
+                    snackbarView.layoutParams = params
+                    if (resources.configuration.screenLayout and Configuration.SCREENLAYOUT_SIZE_MASK >= Configuration.SCREENLAYOUT_SIZE_LARGE) {
+                        params.gravity = Gravity.CENTER_HORIZONTAL
+                    }
+                    snackbar.show()
                 }
                 true
             }
 
             R.id.action_save_location -> {
-                if (!item.isChecked) {
-                    item.isChecked = true
-                    mainViewModel.addLocation(mainViewModel.currentLocation.value!!)
-                    accountViewModel.addLocationToFirebase(
-                        mainViewModel.currentLocation.value!!)
-                    item.icon = ContextCompat.getDrawable(this, R.drawable.delete_location_icon)
+                if(currentUser != null) {
+                    if (!item.isChecked) {
+                        item.isChecked = true
+                        mainViewModel.addLocation(mainViewModel.currentLocation.value!!)
+                        accountViewModel.addLocationToFirebase(
+                            mainViewModel.currentLocation.value!!
+                        )
+                        item.icon = ContextCompat.getDrawable(this, R.drawable.delete_location_icon)
+                    } else {
+                        item.isChecked = false
+                        mainViewModel.deleteLocation(mainViewModel.currentLocation.value!!)
+                        accountViewModel.deleteLocationFromFirebase(mainViewModel.currentLocation.value!!)
+                        item.icon = ContextCompat.getDrawable(this, R.drawable.save_location_icon)
+                    }
                 } else {
-                    item.isChecked = false
-                    mainViewModel.deleteLocation(mainViewModel.currentLocation.value!!)
-                    accountViewModel.deleteLocationFromFirebase(mainViewModel.currentLocation.value!!)
-                    item.icon = ContextCompat.getDrawable(this, R.drawable.save_location_icon)
+                    val snackbar = Snackbar.make(
+                        findViewById(android.R.id.content),
+                        getString(R.string.save_location_acount_warning),
+                        Snackbar.LENGTH_SHORT
+                    )
+
+                    val snackbarView = snackbar.view
+                    val snackbarText =
+                        snackbarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+                    snackbarText.setTextColor(
+                        ContextCompat.getColor(
+                            this@MainActivity,
+                            R.color.white
+                        )
+                    )
+                    snackbarView.background =
+                        ContextCompat.getDrawable(this@MainActivity, R.drawable.snackbar_background)
+                    val params = snackbarView.layoutParams as FrameLayout.LayoutParams
+                    params.gravity = Gravity.TOP
+                    snackbarView.layoutParams = params
+                    val actionBarHeight = getActionBarHeight()
+                    params.setMargins(0, actionBarHeight, 0, 0)
+                    snackbarView.layoutParams = params
+                    if (resources.configuration.screenLayout and Configuration.SCREENLAYOUT_SIZE_MASK >= Configuration.SCREENLAYOUT_SIZE_LARGE) {
+                        params.gravity = Gravity.CENTER_HORIZONTAL
+                    }
+                    snackbar.show()
                 }
                 true
             }
@@ -412,9 +471,9 @@ class MainActivity : AppCompatActivity() {
         if (navController.currentDestination?.id == R.id.nav_search) {
             mainViewModel.checkPermissionState()
         }
-        if (navController.currentDestination?.id == R.id.nav_logout) {
-            navController.navigate(R.id.nav_home)
-        }
+//        if (navController.currentDestination?.id == R.id.nav_logout) {
+//            navController.navigate(R.id.nav_home)
+//        }
 
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }

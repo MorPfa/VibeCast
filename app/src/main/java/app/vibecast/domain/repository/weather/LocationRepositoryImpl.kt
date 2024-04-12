@@ -29,7 +29,7 @@ class LocationRepositoryImpl @Inject constructor(
         backgroundScope.launch {
             localLocationDataSource.getLocationWithWeather().map { locationWithWeatherDataList ->
                     locationWithWeatherDataList.map { locationWithWeatherData ->
-                        val cityName = locationWithWeatherData.location.cityName
+                        val cityName = locationWithWeatherData.location.city
                         val newWeatherData = remoteWeatherDataSource.getWeather(cityName).firstOrNull()
                         if (newWeatherData != null) {
                             locationWithWeatherData.weather = newWeatherData.weather
@@ -81,7 +81,7 @@ class LocationRepositoryImpl @Inject constructor(
     private fun List<LocationDto>.toLocationModels(): List<LocationModel> {
         return map { locationDto ->
             LocationModel(
-                cityName = locationDto.cityName,
+                cityName = locationDto.city,
                 country = locationDto.country
             )
         }

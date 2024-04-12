@@ -35,6 +35,8 @@ class ImageViewModel @Inject constructor(
 
     val backgroundImage : MutableLiveData<String?> = imagePrefRepository.getPreference().asLiveData() as MutableLiveData<String?>
 
+
+
     private fun updateBackgroundImage(url : String){
         backgroundImage.value = url
     }
@@ -73,6 +75,7 @@ class ImageViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 imageRepository.addImage(imageDto)
+
             } catch (e: Exception) {
                 Log.e(TAGS.IMAGE_ERROR,e.toString())
                 throw e

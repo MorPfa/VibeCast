@@ -2,6 +2,7 @@ package app.vibecast.data.remote_data.network.music.api
 
 
 import app.vibecast.data.remote_data.network.music.model.PlaylistApiModel
+import app.vibecast.data.remote_data.network.music.model.SearchModel
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Path
@@ -17,4 +18,14 @@ interface MusicService {
         @Query("limit") limit: Int =10,
         @Query("offset") offset: Int =0
     ) : PlaylistApiModel
+
+
+    @GET("search")
+    suspend fun getCurrentSong(
+        @Header("Authorization") accessCode: String,
+        @Query("q") query : String,
+        @Query("type") type : String = "artist",
+        @Query("limit") limit: Int =5,
+        @Query("offset") offset: Int =0
+    ) : SearchModel
 }

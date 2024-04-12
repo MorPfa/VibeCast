@@ -1,6 +1,6 @@
 package app.vibecast.domain.model
 
 data class LocationDto (
-    var cityName : String,
+    var city : String,
     var country : String
     )

@@ -87,7 +87,7 @@ class WeatherRepositoryImpl @Inject constructor(
             Log.d(TAG, "$e")
             remoteWeatherDataSource.getWeather(cityName).map { data ->
                 data.weather.country = data.location.country
-                data.weather.cityName = data.location.cityName
+                data.weather.cityName = data.location.city
                 data
             }.onEach {  localWeatherDataSource.addWeather(it.weather) }
                 .collect {
@@ -146,7 +146,7 @@ class WeatherRepositoryImpl @Inject constructor(
                             }
                             .onEach { localWeatherDataSource.addWeather(it.weather) }
                             .collect {
-                                it.location.cityName = data.cityName
+                                it.location.city = data.cityName
                                 it.location.country = data.countryName
                                 val currentWeatherCondition = it.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
                                 currentWeather.emit(currentWeatherCondition)

@@ -3,10 +3,11 @@ package app.vibecast.presentation.screens.settings_screen
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import app.vibecast.domain.repository.firebase.FirebaseRepository
 import app.vibecast.domain.repository.music.MusicPreferenceRepository
-import app.vibecast.domain.repository.weather.UnitPreferenceRepository
-import app.vibecast.domain.repository.weather.Unit
 import app.vibecast.domain.repository.music.WeatherCondition
+import app.vibecast.domain.repository.weather.Unit
+import app.vibecast.domain.repository.weather.UnitPreferenceRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -21,6 +22,7 @@ class PreferencesViewModel
     private val unitPrefRepo: UnitPreferenceRepository,
     private val musicPrefRepo: MusicPreferenceRepository,
 ) : ViewModel() {
+
 
     /**
      * Updates preferred data
@@ -38,8 +40,11 @@ class PreferencesViewModel
         viewModelScope.launch {
             musicPrefRepo.savePreference(musicPref)
 
+
         }
     }
+
+
 
     /**
      * Gets preferred data
@@ -72,7 +77,9 @@ class PreferencesViewModel
         viewModelScope.launch {
             when (prefType) {
                 UserPreferences.WEATHER -> unitPrefRepo.clearPreference()
-                UserPreferences.MUSIC -> musicPrefRepo.clearPreference()
+                UserPreferences.MUSIC -> {
+                    musicPrefRepo.clearPreference()
+                }
             }
         }
     }

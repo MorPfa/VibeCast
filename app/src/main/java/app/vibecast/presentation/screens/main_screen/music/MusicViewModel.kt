@@ -2,10 +2,13 @@ package app.vibecast.presentation.screens.main_screen.music
 
 
 import android.app.Application
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.vibecast.BuildConfig
+import app.vibecast.data.remote_data.network.music.model.Song
+import app.vibecast.domain.model.FirebaseMusicPreferences
 import app.vibecast.domain.repository.music.MusicPreferenceRepository
 import app.vibecast.domain.repository.music.MusicRepository
 import app.vibecast.domain.repository.music.WeatherCondition
@@ -40,6 +43,12 @@ class MusicViewModel @Inject constructor(
     private val genreFormatter = GenreFormatter()
 
 
+    private var _currentPlaylist = MutableLiveData<String>()
+    val currentPlaylist : LiveData<String> get() = _currentPlaylist
+
+    private var _currentSong = MutableLiveData<Song>()
+    val currentSong : LiveData<Song> get() = _currentSong
+
     private suspend fun getGenre(weather: String): String {
         val category = when (weather) {
             "Thunderstorm" -> WeatherCondition.STORMY
@@ -63,8 +72,16 @@ class MusicViewModel @Inject constructor(
     }
 
     private val _token = MutableLiveData<String>()
-    private var token = _token
+     var token = _token
 
+
+     fun getCurrentSong(song : String, artist : String, accessCode : String){
+         viewModelScope.launch(Dispatchers.IO) {
+             musicRepository.getCurrentSong(song, artist, accessCode).collect{ result ->
+                 _currentSong.value = result
+             }
+         }
+     }
 
     fun getPlaylist(weather: String) {
         try {
@@ -73,6 +90,8 @@ class MusicViewModel @Inject constructor(
                 Timber.tag("Spotify").d("Formatted genre : $genre")
                 musicRepository.getPlaylist(genre, token.value!!).collect {result ->
                     val playlists = result.playlists.items
+                    _currentPlaylist.value = result.playlists.items[0].externalUrls.spotify
+
                     Timber.tag("Spotify").d("Weather: $weather")
                     val index = playlists.indices.random()
                     Timber.tag("Spotify").d("Playlist name : ${playlists[index].name}")
@@ -93,6 +112,27 @@ class MusicViewModel @Inject constructor(
         } catch (e: Exception) {
             Timber.tag("Spotify").d(e.localizedMessage ?: "null")
         }
+    }
+
+
+    fun updateMusicPreferencesFirebase(preferences : FirebaseMusicPreferences){
+
+    }
+
+    fun saveSong(song : Song) {
+
+    }
+
+    fun deleteSong(song: Song){
+
+    }
+
+    fun getAllSavedSongs(){
+
+    }
+
+    fun getSavedSong(song: Song){
+
     }
 
 
@@ -155,11 +195,6 @@ class MusicViewModel @Inject constructor(
 
                 }
             })
-    }
-
-
-    fun disconnectFromSpotify() {
-        SpotifyAppRemote.disconnect(spotifyAppRemote)
     }
 
 

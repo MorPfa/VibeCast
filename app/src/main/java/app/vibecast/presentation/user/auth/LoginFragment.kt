@@ -1,6 +1,7 @@
 package app.vibecast.presentation.user.auth
 
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -21,6 +22,7 @@ import app.vibecast.databinding.FragmentLoginBinding
 import app.vibecast.presentation.MainActivity
 import app.vibecast.presentation.screens.main_screen.image.ImageViewModel
 import app.vibecast.presentation.user.auth.util.LoginResult
+import com.google.android.gms.common.SignInButton
 import com.google.android.material.button.MaterialButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
@@ -43,16 +45,30 @@ class LoginFragment : Fragment() {
     private lateinit var signInBtn: Button
     private lateinit var noAccountBtn: TextView
     private lateinit var forgotBtn : TextView
+    private lateinit var googleSignInBtn : SignInButton
     private var forgotPasswordDialog: AlertDialog? = null
     private val imageViewModel : ImageViewModel by activityViewModels()
 
+
+    private var listener: OnGoogleSignInClickListener? = null
+
+
+    interface OnGoogleSignInClickListener {
+        fun onGoogleSignInClick()
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is OnGoogleSignInClickListener) {
+            listener = context
+        } else {
+            throw RuntimeException("$context must implement OnGoogleSignUpClickListener")
+        }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         auth = Firebase.auth
 
-        if(auth.currentUser != null){
-            findNavController().navigate(LoginFragmentDirections.loginToLogout())
-        }
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
@@ -69,6 +85,7 @@ class LoginFragment : Fragment() {
         signInBtn = binding.signInBtn
         noAccountBtn = binding.noAccount
         forgotBtn = binding.forgotPassword
+        googleSignInBtn = binding.signInWithGoogle
         val bgImage = imageViewModel.pickDefaultBackground()
         binding.backgroundImageView.setImageResource(bgImage)
         return binding.root
@@ -77,8 +94,12 @@ class LoginFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        googleSignInBtn.setOnClickListener {
+            listener?.onGoogleSignInClick()
+
+        }
         noAccountBtn.setOnClickListener {
-            val action = LoginFragmentDirections.loginToRegistration()
+            val action = LoginFragmentDirections.actionLoginFragmentToRegistrationFragment()
             findNavController().navigate(action)
         }
 

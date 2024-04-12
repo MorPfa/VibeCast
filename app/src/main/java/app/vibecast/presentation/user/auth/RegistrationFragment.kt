@@ -1,6 +1,7 @@
 package app.vibecast.presentation.user.auth
 
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -16,6 +17,7 @@ import app.vibecast.presentation.MainActivity
 import app.vibecast.presentation.screens.account_screen.AccountViewModel
 import app.vibecast.presentation.screens.main_screen.image.ImageViewModel
 import app.vibecast.presentation.user.auth.util.RegistrationResult
+import com.google.android.gms.common.SignInButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
@@ -41,6 +43,14 @@ class RegistrationFragment : Fragment() {
     private lateinit var confirmPasswordInput: EditText
     private lateinit var submitBtn: Button
     private lateinit var userNameInput: EditText
+    private lateinit var googleSignINBtn : SignInButton
+
+    private var listener: OnGoogleSignUpClickListener? = null
+
+
+    interface OnGoogleSignUpClickListener {
+        fun onGoogleSignUpClick()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,11 +61,28 @@ class RegistrationFragment : Fragment() {
         }
     }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is OnGoogleSignUpClickListener) {
+            listener = context
+        } else {
+            throw RuntimeException("$context must implement OnGoogleSignUpClickListener")
+        }
+    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
         binding = FragmentRegistrationBinding.inflate(inflater, container, false)
+        googleSignINBtn = binding.signInWithGoogle
+
+
+
+        googleSignINBtn.setOnClickListener {
+            listener?.onGoogleSignUpClick()
+
+        }
+
         val bgImage = imageViewModel.pickDefaultBackground()
         binding.backgroundImageView.setImageResource(bgImage)
         emailInput = binding.emailInput
@@ -63,12 +90,14 @@ class RegistrationFragment : Fragment() {
         confirmPasswordInput = binding.confirmPasswordInput
         submitBtn = binding.submitBtn
         userNameInput = binding.usernameInput
+
         return binding.root
     }
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         submitBtn.setOnClickListener {
             val email = emailInput.text.toString()
             val userName = userNameInput.text.toString()

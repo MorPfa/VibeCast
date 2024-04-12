@@ -7,10 +7,12 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.viewModelScope
 import app.vibecast.domain.model.CurrentWeather
 import app.vibecast.domain.model.HourlyWeather
+import app.vibecast.domain.model.ImageDto
 import app.vibecast.domain.model.LocationDto
 import app.vibecast.domain.model.LocationWithWeatherDataDto
 import app.vibecast.domain.model.WeatherCondition
@@ -47,7 +49,16 @@ class  MainViewModel @Inject constructor(
     private val locationRepository: LocationRepository,
     private val dataStoreRepository: UnitPreferenceRepository,
 ) : ViewModel() {
-    init {
+//    init {
+//        viewModelScope.launch {
+//            locationRepository.getLocations().collect { locations ->
+//                withContext(Dispatchers.Main) { _locations.value = locations }
+//
+//            }
+//        }
+//    }
+
+    fun setUpLocationData(){
         viewModelScope.launch {
             locationRepository.getLocations().collect { locations ->
                 withContext(Dispatchers.Main) { _locations.value = locations }
@@ -55,6 +66,7 @@ class  MainViewModel @Inject constructor(
             }
         }
     }
+
 
     private val _currentWeather = MutableLiveData<LocationWeatherModel>()
     val currentWeather: LiveData<LocationWeatherModel> get() = _currentWeather.distinctUntilChanged()
@@ -155,7 +167,7 @@ class  MainViewModel @Inject constructor(
         try {
             val weatherData = convertWeatherDtoToWeatherModel(locationWithWeatherDataDto.weather)
             val locationData = LocationModel(
-                locationWithWeatherDataDto.location.cityName,
+                locationWithWeatherDataDto.location.city,
                 locationWithWeatherDataDto.location.country
             )
             withContext(Dispatchers.Main) {
@@ -192,7 +204,7 @@ class  MainViewModel @Inject constructor(
                             updateWeatherData(data, _searchedWeather)
                             setCurrLocation(
                                 LocationModel(
-                                    data.location.cityName,
+                                    data.location.city,
                                     data.location.country
                                 )
                             )
@@ -236,7 +248,7 @@ class  MainViewModel @Inject constructor(
                                         updateWeatherData(data, _savedWeather)
                                         setCurrLocation(
                                             LocationModel(
-                                                data.location.cityName,
+                                                data.location.city,
                                                 data.location.country
                                             )
                                         )
@@ -258,6 +270,7 @@ class  MainViewModel @Inject constructor(
 
     private var _locations = MutableLiveData<List<LocationModel>>()
     val locations: LiveData<List<LocationModel>> get() = _locations
+
 
     private var _currentLocation = MutableLiveData<LocationModel>()
     val currentLocation: LiveData<LocationModel> get() = _currentLocation.distinctUntilChanged()

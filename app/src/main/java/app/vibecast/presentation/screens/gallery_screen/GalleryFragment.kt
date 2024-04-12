@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import app.vibecast.databinding.FragmentPicturesBinding
 import app.vibecast.domain.model.ImageDto
+import app.vibecast.presentation.screens.account_screen.AccountViewModel
 import app.vibecast.presentation.screens.main_screen.image.ImageAdapter
 import app.vibecast.presentation.screens.main_screen.image.ImageLoader
 import app.vibecast.presentation.screens.main_screen.image.ImageViewModel
@@ -30,7 +31,8 @@ class GalleryFragment : Fragment() {
 
     private var _binding: FragmentPicturesBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: ImageViewModel by activityViewModels()
+    private val accountViewModel : AccountViewModel by activityViewModels()
+    private val imageViewModel: ImageViewModel by activityViewModels()
 
 
     override fun onCreateView(
@@ -43,7 +45,7 @@ class GalleryFragment : Fragment() {
         _binding = FragmentPicturesBinding.inflate(inflater,container,false)
         val recyclerView: RecyclerView = binding.recyclerView
         val imageLoader = ImageLoader(requireContext())
-        val adapter = ImageAdapter(imageLoader, viewModel)
+        val adapter = ImageAdapter(imageLoader, imageViewModel, accountViewModel)
         recyclerView.adapter = adapter
         recyclerView.setHasFixedSize(true)
         val spanCount = if (isTablet(requireActivity())) 4 else 3
@@ -55,11 +57,11 @@ class GalleryFragment : Fragment() {
             showImageDialog(clickedImage)
         }
 
-        viewModel.galleryImages.observe(viewLifecycleOwner) { images ->
+        imageViewModel.galleryImages.observe(viewLifecycleOwner) { images ->
             adapter.submitList(images)
 
         }
-        viewModel.backgroundImage.observe(viewLifecycleOwner){ image ->
+        imageViewModel.backgroundImage.observe(viewLifecycleOwner){ image ->
             if(image != null){
                 imageLoader.loadUrlIntoImageView(
                     image,
@@ -67,7 +69,7 @@ class GalleryFragment : Fragment() {
                     true, 0
                 )
             } else {
-                val bgImage = viewModel.pickDefaultBackground()
+                val bgImage = imageViewModel.pickDefaultBackground()
                 binding.backgroundImageView.setImageResource(bgImage)
             }
 

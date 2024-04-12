@@ -1,6 +1,7 @@
 package app.vibecast.presentation.screens.account_screen
 
 import android.app.AlertDialog
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -21,6 +22,7 @@ import app.vibecast.presentation.screens.main_screen.MainViewModel
 import app.vibecast.presentation.screens.main_screen.image.ImageLoader
 import app.vibecast.presentation.screens.main_screen.image.ImageViewModel
 import app.vibecast.presentation.screens.main_screen.weather.LocationModel
+import app.vibecast.presentation.user.auth.AuthActivity
 import app.vibecast.presentation.util.LocationAdapter
 import com.google.android.material.button.MaterialButton
 import com.google.firebase.auth.FirebaseAuth
@@ -36,6 +38,7 @@ class AccountFragment : Fragment() {
     private val binding get() = _binding!!
     private val mainViewModel: MainViewModel by activityViewModels()
     private val imageViewModel: ImageViewModel by activityViewModels()
+    private val accountViewModel : AccountViewModel by activityViewModels()
     private lateinit var profilePic : ImageView
     private lateinit var changePictureBtn : ImageButton
     private lateinit var auth: FirebaseAuth
@@ -46,6 +49,7 @@ class AccountFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         auth = Firebase.auth
+
         imageViewModel.setImageCountLiveData()
 
     }
@@ -69,6 +73,7 @@ class AccountFragment : Fragment() {
         val imageLoader = ImageLoader(requireContext())
 
         changePictureBtn.setOnClickListener{
+
             val action = AccountFragmentDirections.accountToEditProfile()
             findNavController().navigate(action)
         }
@@ -118,6 +123,7 @@ class AccountFragment : Fragment() {
 
         removeButton.setOnClickListener {
             mainViewModel.deleteLocation(location)
+//            accountViewModel.deleteLocationFromFirebase(location)
             mainViewModel.resetIndex()
             alertDialog?.dismiss()
         }

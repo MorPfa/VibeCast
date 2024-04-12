@@ -13,14 +13,12 @@ import app.vibecast.domain.repository.firebase.FirebaseRepository
 import app.vibecast.domain.repository.weather.LocationRepository
 import app.vibecast.presentation.screens.main_screen.weather.LocationModel
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
@@ -32,6 +30,21 @@ class AccountViewModel @Inject constructor(
     private var auth: FirebaseAuth = Firebase.auth
 
     private val _userName = MutableLiveData<String?>()
+    val userName: LiveData<String?>
+        get() = _userName
+
+    private val _userEmail = MutableLiveData<String?>()
+    val userEmail: LiveData<String?>
+        get() = _userEmail
+    fun updateUserInfo(name: String, email : String) {
+        _userName.value = name
+        _userEmail.value = email
+    }
+
+    fun updateUserName(name: String) {
+        _userName.value = name
+
+    }
 
     init {
         _userName.value = auth.currentUser?.displayName
@@ -106,13 +119,6 @@ class AccountViewModel @Inject constructor(
 
     }
 
-    val userName: LiveData<String?>
-        get() = _userName
-
-
-    fun updateUserName(userName: String) {
-        _userName.value = userName
-    }
 
 
     fun addLocation(location: LocationModel) {
@@ -121,7 +127,7 @@ class AccountViewModel @Inject constructor(
     }
 
     fun deleteLocation(location: LocationDto) {
-        locationRepository.deleteLocation(LocationDto(location.cityName, location.country))
+        locationRepository.deleteLocation(LocationDto(location.city, location.country))
     }
 
 

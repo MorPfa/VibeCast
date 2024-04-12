@@ -14,6 +14,7 @@ import app.vibecast.domain.repository.weather.WeatherUnitRepositoryImpl
 import app.vibecast.data.local_data.db.AppDatabase
 import app.vibecast.data.local_data.db.location.dao.LocationDao
 import app.vibecast.data.local_data.db.image.dao.ImageDao
+import app.vibecast.data.local_data.db.music.dao.SongDao
 import app.vibecast.data.local_data.db.user.UserDao
 import app.vibecast.data.local_data.db.weather.dao.WeatherDao
 import app.vibecast.domain.repository.music.MusicPreferenceRepository
@@ -83,4 +84,7 @@ class PersistenceModule {
 
     @Provides
     fun provideImageDao(appDatabase: AppDatabase) : ImageDao = appDatabase.imageDao()
+
+    @Provides
+    fun provideSongDao(appDatabase: AppDatabase) : SongDao = appDatabase.songDao()
 }

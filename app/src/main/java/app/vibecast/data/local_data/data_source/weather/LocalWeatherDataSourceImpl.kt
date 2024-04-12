@@ -36,7 +36,7 @@ class LocalWeatherDataSourceImpl @Inject constructor(
                 locationWithWeatherEntity.let {
 
                     val locationDto = LocationDto(
-                        cityName = it.location.cityName,
+                        city = it.location.cityName,
                         country = it.location.country
                     )
 
@@ -52,8 +52,8 @@ class LocalWeatherDataSourceImpl @Inject constructor(
      */
     override suspend fun addLocationWithWeather(location: LocationWithWeatherDataDto) {
         locationDao.addLocationWithWeather(
-            LocationEntity(location.location.cityName, location.location.country),
-            location.weather.toWeatherEntity(location.location.cityName)
+            LocationEntity(location.location.city, location.location.country),
+            location.weather.toWeatherEntity(location.location.city)
         )
     }
     /**

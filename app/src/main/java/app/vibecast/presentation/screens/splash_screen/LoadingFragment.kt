@@ -50,7 +50,7 @@ class LoadingFragment : Fragment() {
             if (isAdded) {
                 navigateToNextScreen()
             }
-        }, 2200)
+        }, 4200)
 
     }
     private fun navigateToNextScreen() {

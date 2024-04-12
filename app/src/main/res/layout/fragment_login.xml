@@ -113,14 +113,12 @@
             android:layout_margin="8dp"
             />
 
-        <com.google.android.material.button.MaterialButton
+        <com.google.android.gms.common.SignInButton
             android:id="@+id/signInWithGoogle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:background="@drawable/textfield_background"
-            android:text="@string/sign_in_with_google"
-            android:elevation="16dp"/>
+            android:layout_marginHorizontal="38dp"
+            />
 
 
         <TextView

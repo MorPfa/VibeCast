@@ -1,7 +1,9 @@
 package app.vibecast.presentation.screens.main_screen
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -40,8 +42,8 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
     private val imageViewModel: ImageViewModel by activityViewModels()
     private val musicViewModel: MusicViewModel by activityViewModels()
     private lateinit var playbackButton: ImageButton
-    private lateinit var shuffleButton : ImageButton
-    private lateinit var repeatButton : ImageButton
+    private lateinit var shuffleButton: ImageButton
+    private lateinit var repeatButton: ImageButton
     private lateinit var trackProgressBar: TrackProgressBar
 
 
@@ -68,11 +70,59 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
 
     private fun updateTrackInfo(playerState: PlayerState) {
         binding.musicWidget.apply {
-            songTitleTextView.text =  playerState.track.name
-            artistNameTextView.text =  playerState.track.artist.name
+            songTitleTextView.text = playerState.track.name
+            songTitleTextView.setOnClickListener {
+                val spotifyUri = playerState.track.uri
+                showInfoInSpotify(spotifyUri)
+
+            }
+            artistNameTextView.text = playerState.track.artist.name
+            artistNameTextView.setOnClickListener {
+                val spotifyUri = playerState.track.artist.uri
+                showInfoInSpotify(spotifyUri)
+
+            }
 
         }
     }
+
+
+    private fun showInfoInSpotify(uri: String) {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(uri))
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        val packageManager = context?.packageManager
+        if (packageManager != null && intent.resolveActivity(packageManager) != null) {
+            // Open the Spotify app
+            context?.startActivity(intent)
+        } else {
+//            // If Spotify app is not installed, open the Spotify web page instead
+            findNavController().navigate(MainScreenFragmentDirections.navHomeToWeb())
+        }
+    }
+
+
+
+//    private fun openUrlInBrowser(url: String) {
+//
+//
+////        val intent = CustomTabsIntent.Builder().build()
+////        val headers = HashMap<String, String>().apply {
+////            put("Authorization", "Bearer ${musicViewModel.token.value}")
+////        }
+////        intent.intent.putExtra(Browser.EXTRA_HEADERS, headers)
+////
+////        val headersBundle = intent.intent.getBundleExtra(Browser.EXTRA_HEADERS)
+////
+////        Timber.tag("spotify").d("Headers: $headersBundle")
+////        Timber.tag("spotify").d("Headers: ${intent.intent.extras}")
+////        Timber.tag("spotify").d("Url $url")
+////        Timber.tag("spotify").d("Url parsed ${Uri.parse(url)}")
+////
+////
+////        intent.launchUrl(requireContext(), Uri.parse(url))
+//
+//    }
+
 
     private fun updateShuffleBtn(playerState: PlayerState) {
         shuffleButton.apply {
@@ -108,10 +158,12 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
                     setImageResource(R.drawable.repeat_all_enabled)
 
                 }
+
                 Repeat.ONE -> {
                     setImageResource(R.drawable.repeat_one_enabled)
 
                 }
+
                 else -> {
                     setImageResource(R.drawable.repeat_disabled2)
 
@@ -133,7 +185,10 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         _binding = FragmentMainScreenBinding.inflate(inflater, container, false)
         musicViewModel.setPlayerStateListener(this)
-        trackProgressBar = TrackProgressBar(binding.musicWidget.progressBar) { seekToPosition: Long -> musicViewModel.seekTo(seekToPosition) }
+        trackProgressBar =
+            TrackProgressBar(binding.musicWidget.progressBar) { seekToPosition: Long ->
+                musicViewModel.seekTo(seekToPosition)
+            }
         playbackButton = binding.musicWidget.playPauseButton
         shuffleButton = binding.musicWidget.shuffleButton
         repeatButton = binding.musicWidget.repeatButton
@@ -146,8 +201,9 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
             musicViewModel.setRepeatStatus()
         }
         playbackButton.setOnClickListener {
-            try{ musicViewModel.onPlayPauseButtonClicked() }
-            catch (e : Exception){
+            try {
+                musicViewModel.onPlayPauseButtonClicked()
+            } catch (e: Exception) {
                 val snackbar = Snackbar.make(
                     requireView(),
                     "Log into spotify to enable music",
@@ -257,7 +313,6 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
     }
 
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         lifecycleScope.launch {
@@ -268,9 +323,10 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
                         val city = weatherData.location.cityName
                         val weather =
                             weatherData.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
+                               observeImageData(city, weather!!)
 //                        musicViewModel.getPlaylist(weather!!)
 
-                        observeImageData(city, weather!!)
+
                         binding.mainTempDisplay.text =
                             getString(R.string.center_temp, currentWeather.temperature)
                         //            Current hour values

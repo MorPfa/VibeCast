@@ -7,10 +7,12 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import app.vibecast.databinding.ItemCardviewBinding
 import app.vibecast.domain.model.ImageDto
+import app.vibecast.presentation.screens.account_screen.AccountViewModel
 
 class ImageAdapter(
     private val imageLoader: ImageLoader,
-    private val viewModel: ImageViewModel,
+    private val imageViewModel: ImageViewModel,
+    private val accountViewModel: AccountViewModel
 ) : ListAdapter<ImageDto, ImageAdapter.PictureViewHolder>(ImageDiffCallback()) {
 
     /**
@@ -48,7 +50,8 @@ class ImageAdapter(
 
 
         holder.removeButton.setOnClickListener {
-            viewModel.deleteImage(image)
+            imageViewModel.deleteImage(image)
+//            accountViewModel.deleteImageFromFirebase(image)
         }
     }
 

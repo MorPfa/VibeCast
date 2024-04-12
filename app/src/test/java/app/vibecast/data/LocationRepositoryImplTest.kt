@@ -46,7 +46,7 @@ class LocationRepositoryImplTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         locationDto = LocationDto(
-            cityName = "Seattle",
+            city = "Seattle",
             country = "US"
         )
 

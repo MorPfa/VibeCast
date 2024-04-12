@@ -21,6 +21,7 @@ import androidx.lifecycle.lifecycleScope
 import app.vibecast.R
 import app.vibecast.databinding.FragmentImageItemBinding
 import app.vibecast.domain.model.ImageDto
+import app.vibecast.presentation.screens.account_screen.AccountViewModel
 import app.vibecast.presentation.screens.main_screen.image.ImageLoader
 import app.vibecast.presentation.screens.main_screen.image.ImageSaver
 import app.vibecast.presentation.screens.main_screen.image.ImageViewModel
@@ -31,7 +32,8 @@ import java.util.Locale
 private const val IMAGE = "image"
 
 class ImageItemFragment : DialogFragment() {
-    private val viewModel: ImageViewModel by activityViewModels()
+    private val imageViewModel: ImageViewModel by activityViewModels()
+    private val accountViewModel : AccountViewModel by activityViewModels()
     private var image: ImageDto? = null
 
 
@@ -101,12 +103,15 @@ class ImageItemFragment : DialogFragment() {
 
 
         binding.removeBtn.setOnClickListener {
-            image?.let { imageDto -> viewModel.deleteImage(imageDto) }
+            image?.let { image ->
+                imageViewModel.deleteImage(image)
+                accountViewModel.deleteImageFromFirebase(image)
+            }
             dialog?.dismiss()
         }
         binding.downloadBtn.setOnClickListener{
             lifecycleScope.launch {
-                viewModel.getImageForDownload(image?.links!!.downloadLink).collect{ image ->
+                imageViewModel.getImageForDownload(image?.links!!.downloadLink).collect{ image ->
                     ImageSaver.saveImageFromUrlToGallery(
                         image, requireContext()
                     )

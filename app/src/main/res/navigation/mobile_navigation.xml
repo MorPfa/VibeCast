@@ -27,17 +27,23 @@
 
         <action
             android:id="@+id/home_to_saved"
-            app:destination="@id/nav_saved" />
+            app:destination="@id/nav_saved"
+            app:enterAnim="@anim/fui_slide_in_right"
+            app:popExitAnim="@anim/fui_slide_out_left" />
 
         <action
             android:id="@+id/home_to_search"
-            app:destination="@id/nav_search" />
+            app:destination="@id/nav_search"
+            app:enterAnim="@anim/fui_slide_out_left"
+            app:popExitAnim="@anim/fui_slide_out_left" />
+
+
         <action
-            android:id="@+id/home_to_login"
-            app:destination="@id/nav_login" />
-        <action
-            android:id="@+id/action_nav_home_to_logoutFragment"
-            app:destination="@id/nav_logout" />
+            android:id="@+id/nav_home_to_web"
+            app:destination="@id/nav_web"
+            app:enterAnim="@anim/fui_slide_out_left"
+            app:popExitAnim="@anim/fui_slide_out_left" />
+
 
     </fragment>
 
@@ -49,7 +55,9 @@
 
         <action
             android:id="@+id/account_to_editProfile"
-            app:destination="@id/editProfileFragment" />
+            app:destination="@id/editProfileFragment"
+            app:enterAnim="@anim/fui_slide_out_left"
+            app:popExitAnim="@anim/fui_slide_out_left" />
     </fragment>
 
 
@@ -70,11 +78,15 @@
 
         <action
             android:id="@+id/saved_to_search"
-            app:destination="@id/nav_search"/>
+            app:destination="@id/nav_search"
+            app:enterAnim="@anim/fui_slide_out_left"
+            app:popExitAnim="@anim/fui_slide_out_left" />
 
         <action
             android:id="@+id/saved_to_home"
-            app:destination="@id/nav_home"/>
+            app:destination="@id/nav_home"
+            app:enterAnim="@anim/fui_slide_out_left"
+            app:popExitAnim="@anim/fui_slide_out_left" />
 
     </fragment>
     <fragment
@@ -84,47 +96,39 @@
         tools:layout="@layout/fragment_search_result">
         <action
             android:id="@+id/action_nav_search_to_nav_home"
-            app:destination="@id/nav_home" />
+            app:destination="@id/nav_home"
+            app:enterAnim="@anim/fui_slide_out_left"
+            app:popExitAnim="@anim/fui_slide_out_left" />
     </fragment>
 
 
 
 
-    <fragment
-        android:id="@+id/nav_login"
-        android:name="app.vibecast.presentation.user.auth.LoginFragment"
-        android:label="fragment_login"
-        tools:layout="@layout/fragment_login" >
-        <action
-            android:id="@+id/login_to_registration"
-            app:destination="@id/nav_registration" />
-        <action
-            android:id="@+id/login_to_logout"
-            app:destination="@id/nav_logout" />
-    </fragment>
-    <fragment
-        android:id="@+id/nav_registration"
-        android:name="app.vibecast.presentation.user.auth.RegistrationFragment"
-        android:label="fragment_registration"
-        tools:layout="@layout/fragment_registration" >
-        <action
-            android:id="@+id/registration_to_login"
-            app:destination="@id/nav_login" />
-    </fragment>
-    <fragment
-        android:id="@+id/nav_logout"
-        android:name="app.vibecast.presentation.user.auth.LogoutFragment"
-        android:label="fragment_logout"
-        tools:layout="@layout/fragment_logout" >
-        <action
-            android:id="@+id/logout_to_home"
-            app:destination="@id/nav_home" />
-    </fragment>
+
     <fragment
         android:id="@+id/editProfileFragment"
         android:name="app.vibecast.presentation.screens.account_screen.EditProfileFragment"
         android:label="fragment_edit_profile"
         tools:layout="@layout/fragment_edit_profile" />
+    <fragment
+        android:id="@+id/nav_web"
+        android:name="app.vibecast.presentation.screens.main_screen.music.WebFragment"
+        android:label="fragment_web"
+        tools:layout="@layout/fragment_web" />
+    <fragment
+        android:id="@+id/nav_redirect"
+        android:name="app.vibecast.presentation.user.auth.RedirectFragment"
+        android:label="fragment_redirect"
+        tools:layout="@layout/fragment_redirect" >
+        <action
+            android:id="@+id/nav_redirect_to_nav_account"
+            app:destination="@id/nav_account" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_logout"
+        android:name="app.vibecast.presentation.user.auth.LogoutFragment"
+        android:label="fragment_logout"
+        tools:layout="@layout/fragment_logout" />
 
 
 </navigation>

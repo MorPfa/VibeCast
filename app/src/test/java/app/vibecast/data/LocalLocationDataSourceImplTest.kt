@@ -87,7 +87,7 @@ class LocalLocationDataSourceImplTest {
         )
 
         locationDto = LocationDto(
-            cityName = "Seattle",
+            city = "Seattle",
             country = "US"
         )
 
