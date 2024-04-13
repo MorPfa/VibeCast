@@ -19,8 +19,6 @@ import app.vibecast.presentation.screens.main_screen.image.ImageViewModel
 import app.vibecast.presentation.user.auth.util.RegistrationResult
 import com.google.android.gms.common.SignInButton
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
@@ -34,8 +32,8 @@ private const val ARG_PARAM2 = "param2"
 class RegistrationFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
-    private val accountViewModel : AccountViewModel by activityViewModels()
-    private val imageViewModel : ImageViewModel by activityViewModels()
+    private val accountViewModel: AccountViewModel by activityViewModels()
+    private val imageViewModel: ImageViewModel by activityViewModels()
     private lateinit var binding: FragmentRegistrationBinding
     private lateinit var auth: FirebaseAuth
     private lateinit var emailInput: EditText
@@ -43,7 +41,7 @@ class RegistrationFragment : Fragment() {
     private lateinit var confirmPasswordInput: EditText
     private lateinit var submitBtn: Button
     private lateinit var userNameInput: EditText
-    private lateinit var googleSignINBtn : SignInButton
+    private lateinit var googleSignINBtn: SignInButton
 
     private var listener: OnGoogleSignUpClickListener? = null
 
@@ -69,6 +67,7 @@ class RegistrationFragment : Fragment() {
             throw RuntimeException("$context must implement OnGoogleSignUpClickListener")
         }
     }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
@@ -160,13 +159,14 @@ class RegistrationFragment : Fragment() {
                 if (task.isSuccessful) {
                     Timber.tag("auth").d("createUserWithEmail:success")
                     val user = auth.currentUser
-                    addUserName(user, userName)
+                   accountViewModel.addUserName(user, userName)
                     Toast.makeText(
                         requireContext(),
                         "Created Account successfully", Toast.LENGTH_SHORT
                     ).show()
                     val intent = Intent(activity, MainActivity::class.java)
                     startActivity(intent)
+                    requireActivity().finish()
                 } else {
                     // If sign in fails, display a message to the user.
                     Timber.tag("auth").w("createUserWithEmail:failure ${task.exception}")
@@ -179,29 +179,13 @@ class RegistrationFragment : Fragment() {
             }
     }
 
-
-    private fun addUserName(user : FirebaseUser?, userName: String){
-        val profileUpdates = UserProfileChangeRequest.Builder()
-            .setDisplayName(userName)
-            .build()
-        user?.updateProfile(profileUpdates)
-            ?.addOnCompleteListener { profileUpdateTask ->
-                if (profileUpdateTask.isSuccessful) {
-                    Timber.tag("auth").d("User profile updated with username")
-                    accountViewModel.updateUserName(userName)
-                } else {
-                    Timber.tag("auth").e(profileUpdateTask.exception, "Failed to update user profile with username")
-                }
-            }
-    }
-
     private fun validateInput(
         userName: String,
         email: String,
         password1: String,
         password2: String,
     ): RegistrationResult {
-        if(userName.isEmpty()) return RegistrationResult.EMPTY_USERNAME
+        if (userName.isEmpty()) return RegistrationResult.EMPTY_USERNAME
         if (password1.isEmpty()) return RegistrationResult.EMPTY_PASSWORD
         if (password1.length < 6) return RegistrationResult.PASSWORD_TOO_SHORT
         if (email.isEmpty()) return RegistrationResult.EMPTY_EMAIL

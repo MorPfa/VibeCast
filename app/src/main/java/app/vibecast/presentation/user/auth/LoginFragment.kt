@@ -177,8 +177,11 @@ class LoginFragment : Fragment() {
                         requireContext(),
                         "Signed in successfully", Toast.LENGTH_SHORT
                     ).show()
+                    requireActivity().finish()
+
                     val intent = Intent(activity, MainActivity::class.java)
                     startActivity(intent)
+
                 } else {
                     Timber.tag("auth").w("signInWithEmail:failure ${task.exception}")
                     try {

@@ -68,16 +68,13 @@ class LogoutFragment : Fragment() {
 
 
     private fun showLogoutDialog() {
-
         val alertDialogBuilder = AlertDialog.Builder(requireContext())
         val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.delete_account_dialog, null)
 
         val confirmBtn = dialogView.findViewById<Button>(R.id.confirmBtn)
         val cancelBtn = dialogView.findViewById<Button>(R.id.cancelBtn)
 
-
-
-        cancelBtn.setOnClickListener { // Dismiss the dialog when the button is clicked
+        cancelBtn.setOnClickListener {
             logoutDialog?.dismiss()
         }
 
@@ -86,6 +83,7 @@ class LogoutFragment : Fragment() {
             logoutDialog?.dismiss()
             val intent = Intent(activity, MainActivity::class.java)
             startActivity(intent)
+            requireActivity().finish()
         }
         alertDialogBuilder.setView(dialogView)
         logoutDialog = alertDialogBuilder.create()
@@ -101,8 +99,7 @@ class LogoutFragment : Fragment() {
         val confirmBtn = dialogView.findViewById<Button>(R.id.confirmBtn)
         val cancelBtn = dialogView.findViewById<Button>(R.id.cancelBtn)
 
-
-        cancelBtn.setOnClickListener { // Dismiss the dialog when the button is clicked
+        cancelBtn.setOnClickListener {
             deleteDialog?.dismiss()
         }
 
@@ -117,6 +114,7 @@ class LogoutFragment : Fragment() {
                         deleteDialog?.dismiss()
                         val intent = Intent(activity, MainActivity::class.java)
                         startActivity(intent)
+                        requireActivity().finish()
                     }
                     else {
                         Toast.makeText(requireContext(), "Something went wrong", Toast.LENGTH_SHORT).show()

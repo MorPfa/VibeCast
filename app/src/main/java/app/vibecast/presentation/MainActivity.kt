@@ -29,6 +29,7 @@ import androidx.navigation.ui.setupWithNavController
 import app.vibecast.BuildConfig
 import app.vibecast.R
 import app.vibecast.databinding.ActivityMainBinding
+import app.vibecast.domain.model.SongDto
 import app.vibecast.presentation.permissions.LocationPermissionState
 import app.vibecast.presentation.permissions.PermissionHelper
 import app.vibecast.presentation.screens.account_screen.AccountViewModel
@@ -76,7 +77,13 @@ class MainActivity : AppCompatActivity() {
         val request =
             AuthorizationRequest.Builder(clientId, AuthorizationResponse.Type.TOKEN, redirectUri)
                 .setShowDialog(true)
-                .setScopes(arrayOf("streaming","app-remote-control", "user-read-currently-playing"))
+                .setScopes(
+                    arrayOf(
+                        "streaming",
+                        "app-remote-control",
+                        "user-read-currently-playing"
+                    )
+                )
                 .build()
         AuthorizationClient.openLoginActivity(this, REQUEST_CODE, request)
     }
@@ -343,16 +350,20 @@ class MainActivity : AppCompatActivity() {
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         val saveImageItem = menu.findItem(R.id.action_save_image)
         val saveLocationItem = menu.findItem(R.id.action_save_location)
+        val saveSongItem = menu.findItem(R.id.action_save_song)
         val searchItem = menu.findItem(R.id.action_search)
+
         if (showIcons) {
             saveImageItem?.isVisible = true
             saveLocationItem?.isVisible = true
+            saveSongItem?.isVisible = true
             searchItem?.isVisible = true
             saveImageItem?.icon = ContextCompat.getDrawable(this, R.drawable.favorite_unselected)
         } else {
             saveImageItem?.icon = ContextCompat.getDrawable(this, R.drawable.favorite_selected)
             saveImageItem?.isVisible = false
             saveLocationItem?.isVisible = false
+            saveSongItem?.isVisible = false
             searchItem?.isVisible = false
         }
 
@@ -366,7 +377,7 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_save_image -> {
-                if(currentUser != null) {
+                if (currentUser != null) {
                     if (imageViewModel.image.value != null) {
                         if (!item.isChecked) {
                             item.isChecked = true
@@ -415,13 +426,11 @@ class MainActivity : AppCompatActivity() {
             }
 
             R.id.action_save_location -> {
-                if(currentUser != null) {
+                if (currentUser != null) {
                     if (!item.isChecked) {
                         item.isChecked = true
                         mainViewModel.addLocation(mainViewModel.currentLocation.value!!)
-                        accountViewModel.addLocationToFirebase(
-                            mainViewModel.currentLocation.value!!
-                        )
+                        accountViewModel.addLocationToFirebase(mainViewModel.currentLocation.value!!)
                         item.icon = ContextCompat.getDrawable(this, R.drawable.delete_location_icon)
                     } else {
                         item.isChecked = false
@@ -461,6 +470,65 @@ class MainActivity : AppCompatActivity() {
                 true
             }
 
+            R.id.action_save_song -> {
+                if (currentUser != null) {
+                    if (!item.isChecked) {
+                        item.isChecked = true
+                        val currentSong = musicViewModel.playerState.value
+
+                        currentSong?.let {
+                            Timber.tag("imageTest").d("saved uri ${it.track.imageUri}")
+                            musicViewModel.saveSong(
+                                SongDto(
+                                    album = currentSong.track.album.name,
+                                    name = currentSong.track.name,
+                                    imageUri = currentSong.track.imageUri,
+                                    url = "",
+                                    uri = currentSong.track.uri,
+                                    previewUrl = null
+                                )
+                            )
+                        }
+
+                        item.icon =
+                            ContextCompat.getDrawable(this, R.drawable.save_song_selected)
+                    } else {
+                        item.isChecked = false
+
+                        item.icon = ContextCompat.getDrawable(this, R.drawable.save_song_unselected)
+                    }
+                } else {
+                    val snackbar = Snackbar.make(
+                        findViewById(android.R.id.content),
+                        getString(R.string.please_login_or_create_an_account_to_save_a_song),
+                        Snackbar.LENGTH_SHORT
+                    )
+
+                    val snackbarView = snackbar.view
+                    val snackbarText =
+                        snackbarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+                    snackbarText.setTextColor(
+                        ContextCompat.getColor(
+                            this@MainActivity,
+                            R.color.white
+                        )
+                    )
+                    snackbarView.background =
+                        ContextCompat.getDrawable(this@MainActivity, R.drawable.snackbar_background)
+                    val params = snackbarView.layoutParams as FrameLayout.LayoutParams
+                    params.gravity = Gravity.TOP
+                    snackbarView.layoutParams = params
+                    val actionBarHeight = getActionBarHeight()
+                    params.setMargins(0, actionBarHeight, 0, 0)
+                    snackbarView.layoutParams = params
+                    if (resources.configuration.screenLayout and Configuration.SCREENLAYOUT_SIZE_MASK >= Configuration.SCREENLAYOUT_SIZE_LARGE) {
+                        params.gravity = Gravity.CENTER_HORIZONTAL
+                    }
+                    snackbar.show()
+                }
+                true
+            }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -472,14 +540,13 @@ class MainActivity : AppCompatActivity() {
             mainViewModel.checkPermissionState()
         }
 
-
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
 
     override fun onStart() {
         super.onStart()
-//        authorizeClient()
+        authorizeClient()
 
 
     }

@@ -1,14 +1,14 @@
 package app.vibecast.data.local_data.data_source.music
 
-import app.vibecast.data.remote_data.network.music.model.Song
+import app.vibecast.domain.model.SongDto
 import kotlinx.coroutines.flow.Flow
 
 interface LocalMusicDataSource {
 
-    suspend fun saveSong(song: Song)
+    suspend fun saveSong(song: SongDto)
 
-    suspend fun deleteSong(song: Song)
+    suspend fun deleteSong(song: SongDto)
 
-    fun getSavedSong(song: Song) : Flow<Song>
-    fun getAllSavedSongs() : Flow<List<Song>>
+    fun getSavedSong(song: SongDto) : Flow<SongDto>
+    fun getAllSavedSongs() : Flow<List<SongDto>>
 }

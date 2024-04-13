@@ -1,25 +1,27 @@
 
 
 TASKS:
+today:
+implement logic to save current song
+implement logic to fetch current song so user can be redirected to web page if app not installed
 
 
 
 Next tasks:
-implement logic to fetch current song so user can be redirected to web page if app not installed
-move firebase logic from activity/ fragment to data layer
-figure out how to track number of songs played (increment counter if song was played for more than 50%??)
 
 
 
 General Firebase:
 persist and set profile picture
-improve firebase sync performance by checking size instead of iterating over all items
-merge branch with master
+
 
 General Spotify:
 allow user to save songs (heart icon in top app bar / save track name, artist and uri display in recyclerview and
 send intent to spotify app or open in browser when card is clicked)
+
+Miscellaneous:
 optimize image accuracy (maybe go back to GET /search/photos endpoint and combine query with collections)
+make it so that invalid input for search query shows error
 configure pro guard r8
 replace splash screen fragment with activity
 use benchmarks to improve performance

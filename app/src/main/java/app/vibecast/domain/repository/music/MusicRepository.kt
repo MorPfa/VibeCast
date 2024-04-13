@@ -1,20 +1,20 @@
 package app.vibecast.domain.repository.music
 
 import app.vibecast.data.remote_data.network.music.model.PlaylistApiModel
-import app.vibecast.data.remote_data.network.music.model.Song
+import app.vibecast.domain.model.SongDto
 import kotlinx.coroutines.flow.Flow
 
 interface MusicRepository {
 
     fun getPlaylist(category : String, accessCode : String) : Flow<PlaylistApiModel>
 
-    fun getCurrentSong(song : String, artist : String, accessCode : String) : Flow<Song>
+    fun getCurrentSong(song : String, artist : String, accessCode : String) : Flow<SongDto>
 
-    suspend fun deleteSong(song: Song)
+    suspend fun deleteSong(song: SongDto)
 
-    suspend fun saveSong(song : Song)
+    suspend fun saveSong(song : SongDto)
 
-    fun getSavedSong(song : Song) : Flow<Song>
+    fun getSavedSong(song : SongDto) : Flow<SongDto>
 
-    fun getAllSavedSongs() : Flow<Song>
+    fun getAllSavedSongs() : Flow<List<SongDto>>
 }

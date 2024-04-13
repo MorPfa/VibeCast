@@ -228,6 +228,8 @@
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
     <string name="firebase_client">573624043511-8sh2tlg2nptup1959dvt0d173orjik7t.apps.googleusercontent.com</string>
+    <string name="save_song">Save song</string>
+    <string name="please_login_or_create_an_account_to_save_a_song">Please login or create an account to save a song</string>
 
 
 </resources>

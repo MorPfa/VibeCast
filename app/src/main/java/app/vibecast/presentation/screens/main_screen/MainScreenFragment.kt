@@ -31,6 +31,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 
 @AndroidEntryPoint
@@ -59,7 +60,9 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
 
 
     private fun updateTrackCoverArt(playerState: PlayerState) {
-        // Get image from track
+
+
+        Timber.tag("imageTest").d(playerState.track.imageUri.toString())
         musicViewModel.assertAppRemoteConnected()
             .imagesApi
             .getImage(playerState.track.imageUri, Image.Dimension.X_SMALL)
@@ -321,10 +324,9 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
 
                     weatherData.weather.currentWeather?.let { currentWeather ->
                         val city = weatherData.location.cityName
-                        val weather =
-                            weatherData.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
-                               observeImageData(city, weather!!)
-//                        musicViewModel.getPlaylist(weather!!)
+                        val weather = weatherData.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
+                        observeImageData(city, weather!!)
+                        musicViewModel.getPlaylist(weather!!)
 
 
                         binding.mainTempDisplay.text =

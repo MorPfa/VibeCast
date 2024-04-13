@@ -45,6 +45,7 @@
             app:popExitAnim="@anim/fui_slide_out_left" />
 
 
+
     </fragment>
 
 
@@ -58,6 +59,9 @@
             app:destination="@id/editProfileFragment"
             app:enterAnim="@anim/fui_slide_out_left"
             app:popExitAnim="@anim/fui_slide_out_left" />
+        <action
+            android:id="@+id/nav_account_to_nav_home"
+            app:destination="@id/nav_home" />
     </fragment>
 
 
@@ -120,9 +124,11 @@
         android:name="app.vibecast.presentation.user.auth.RedirectFragment"
         android:label="fragment_redirect"
         tools:layout="@layout/fragment_redirect" >
+
         <action
             android:id="@+id/nav_redirect_to_nav_account"
-            app:destination="@id/nav_account" />
+            app:destination="@id/nav_account"
+            app:popUpTo="@id/nav_home" />
     </fragment>
     <fragment
         android:id="@+id/nav_logout"

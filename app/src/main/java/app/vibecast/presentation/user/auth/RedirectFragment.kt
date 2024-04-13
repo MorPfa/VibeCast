@@ -42,10 +42,12 @@ class RedirectFragment : Fragment() {
         if (auth.currentUser == null){
             val intent = Intent(requireActivity(), AuthActivity::class.java)
             requireActivity().startActivity(intent)
+            requireActivity().finish()
             findNavController().popBackStack()
 
         }else {
             findNavController().navigate(RedirectFragmentDirections.navRedirectToNavAccount())
+
         }
         binding = FragmentRedirectBinding.inflate(inflater, container, false)
         return binding.root

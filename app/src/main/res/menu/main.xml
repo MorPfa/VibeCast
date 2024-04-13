@@ -1,12 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+
+    <item
+        android:title="@string/save_song"
+        android:id="@+id/action_save_song"
+        android:icon="@drawable/save_song_unselected"
+        app:showAsAction="always"
+        android:checkable="true"/>
     <item
         android:id="@+id/action_save_location"
         android:icon="@drawable/save_location_icon"
         android:title="@string/save_location"
         android:checkable="true"
-        app:showAsAction="ifRoom"
+        app:showAsAction="always"
         />
 
     <item
@@ -14,7 +22,7 @@
         android:icon="@drawable/favorite_unselected"
         android:title="@string/save_image_btn"
         android:checkable="true"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
 
 
     <item
@@ -22,7 +30,8 @@
         android:title="@string/search_bar_text"
         app:showAsAction="always"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
-
       />
+
+
 
 </menu>

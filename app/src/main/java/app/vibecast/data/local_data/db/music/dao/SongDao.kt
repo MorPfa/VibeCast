@@ -5,7 +5,6 @@ import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Upsert
 import app.vibecast.data.local_data.db.music.model.SongEntity
-import app.vibecast.data.remote_data.network.music.model.Song
 import kotlinx.coroutines.flow.Flow
 
 

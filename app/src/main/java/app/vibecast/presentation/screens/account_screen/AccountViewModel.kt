@@ -13,6 +13,8 @@ import app.vibecast.domain.repository.firebase.FirebaseRepository
 import app.vibecast.domain.repository.weather.LocationRepository
 import app.vibecast.presentation.screens.main_screen.weather.LocationModel
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -36,7 +38,8 @@ class AccountViewModel @Inject constructor(
     private val _userEmail = MutableLiveData<String?>()
     val userEmail: LiveData<String?>
         get() = _userEmail
-    fun updateUserInfo(name: String, email : String) {
+
+    fun updateUserInfo(name: String, email: String) {
         _userName.value = name
         _userEmail.value = email
     }
@@ -44,6 +47,24 @@ class AccountViewModel @Inject constructor(
     fun updateUserName(name: String) {
         _userName.value = name
 
+    }
+
+    fun addUserName(user: FirebaseUser?, userName: String) {
+        val profileUpdates = UserProfileChangeRequest.Builder()
+            .setDisplayName(userName)
+            .build()
+        user?.updateProfile(profileUpdates)
+            ?.addOnCompleteListener { profileUpdateTask ->
+                if (profileUpdateTask.isSuccessful) {
+                    Timber.tag("auth").d("User profile updated with username")
+                    _userName.value = userName
+                } else {
+                    Timber.tag("auth").e(
+                        profileUpdateTask.exception,
+                        "Failed to update user profile with username"
+                    )
+                }
+            }
     }
 
     init {
@@ -78,7 +99,7 @@ class AccountViewModel @Inject constructor(
         }
     }
 
-    fun syncData(){
+    fun syncData() {
         viewModelScope.launch(Dispatchers.IO) {
             firebaseRepository.syncData()
         }
@@ -92,7 +113,7 @@ class AccountViewModel @Inject constructor(
                     country = location.country,
                     city = location.cityName,
                     id = location.cityName,
-                    )
+                )
             )
         }
     }
@@ -110,7 +131,6 @@ class AccountViewModel @Inject constructor(
     }
 
 
-
     fun getImageFromFirebase() {
 
     }
@@ -118,7 +138,6 @@ class AccountViewModel @Inject constructor(
     fun getLocationFromFirebase() {
 
     }
-
 
 
     fun addLocation(location: LocationModel) {

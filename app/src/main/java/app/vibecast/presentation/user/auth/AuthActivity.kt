@@ -5,8 +5,12 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.NavController
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import app.vibecast.R
 import app.vibecast.databinding.ActivityAuthBinding
+import app.vibecast.presentation.MainActivity
 import app.vibecast.presentation.screens.account_screen.AccountViewModel
 import app.vibecast.presentation.user.auth.util.Constants.RC_SIGN_IN
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -25,6 +29,7 @@ class AuthActivity : AppCompatActivity(), RegistrationFragment.OnGoogleSignUpCli
     private lateinit var binding : ActivityAuthBinding
     private lateinit var auth: FirebaseAuth
     private val viewModel : AccountViewModel by viewModels()
+
 
 
     override fun onGoogleSignInClick() {
@@ -81,6 +86,9 @@ class AuthActivity : AppCompatActivity(), RegistrationFragment.OnGoogleSignUpCli
                 if (task.isSuccessful) {
                     val user = auth.currentUser
                     viewModel.updateUserInfo(user?.displayName!!, user.email!!)
+                    findNavController(R.id.nav_host_fragment).popBackStack()
+                    val intent = Intent(this, MainActivity::class.java)
+                    startActivity(intent)
                     finish()
 
                 } else {

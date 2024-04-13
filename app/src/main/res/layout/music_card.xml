@@ -7,21 +7,18 @@
     android:layout_margin="6dp"
     android:background="@drawable/rounded_black_background">
 
-
-    <androidx.appcompat.widget.AppCompatImageView
+    <ImageView
         android:id="@+id/saved_image"
         android:layout_width="match_parent"
         android:layout_height="120dp"
         android:paddingTop="16dp"
-        android:adjustViewBounds="true"
-        android:contentDescription="@string/cover_art_description"
+        android:contentDescription="@string/saved_image"
         android:scaleType="centerInside"
+        android:src="@drawable/kanye_album_cover"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/cover_art_placeholder"
-       />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/attribution_text"

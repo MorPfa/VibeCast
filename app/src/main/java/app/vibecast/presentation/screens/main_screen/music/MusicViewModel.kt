@@ -5,10 +5,11 @@ import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import app.vibecast.BuildConfig
-import app.vibecast.data.remote_data.network.music.model.Song
-import app.vibecast.domain.model.FirebaseMusicPreferences
+import app.vibecast.data.remote_data.network.music.model.SongModel
+import app.vibecast.domain.model.SongDto
 import app.vibecast.domain.repository.music.MusicPreferenceRepository
 import app.vibecast.domain.repository.music.MusicRepository
 import app.vibecast.domain.repository.music.WeatherCondition
@@ -19,6 +20,7 @@ import com.spotify.android.appremote.api.Connector
 import com.spotify.android.appremote.api.SpotifyAppRemote
 import com.spotify.android.appremote.api.error.SpotifyDisconnectedException
 import com.spotify.protocol.client.Subscription
+import com.spotify.protocol.types.ImageUri
 import com.spotify.protocol.types.PlayerState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -46,8 +48,11 @@ class MusicViewModel @Inject constructor(
     private var _currentPlaylist = MutableLiveData<String>()
     val currentPlaylist : LiveData<String> get() = _currentPlaylist
 
-    private var _currentSong = MutableLiveData<Song>()
-    val currentSong : LiveData<Song> get() = _currentSong
+
+    val savedSongs: LiveData<List<SongDto>> = musicRepository.getAllSavedSongs().asLiveData()
+
+    private var _currentSong = MutableLiveData<SongDto>()
+    val currentSong : LiveData<SongDto> get() = _currentSong
 
     private suspend fun getGenre(weather: String): String {
         val category = when (weather) {
@@ -114,24 +119,26 @@ class MusicViewModel @Inject constructor(
         }
     }
 
-
-    fun updateMusicPreferencesFirebase(preferences : FirebaseMusicPreferences){
-
-    }
-
-    fun saveSong(song : Song) {
+    fun saveSong(song : SongDto) {
+        viewModelScope.launch(Dispatchers.IO) {
+            musicRepository.saveSong(song)
+        }
 
     }
 
-    fun deleteSong(song: Song){
+    fun deleteSong(songModel: SongModel){
 
     }
 
     fun getAllSavedSongs(){
+            viewModelScope.launch(Dispatchers.IO) {
+                musicRepository.getAllSavedSongs().collect{
 
+                }
+            }
     }
 
-    fun getSavedSong(song: Song){
+    fun getSavedSong(songModel: SongModel){
 
     }
 
@@ -306,8 +313,15 @@ class MusicViewModel @Inject constructor(
         playerStateListener = listener
     }
 
+
+    private var _playerState = MutableLiveData<PlayerState>()
+
+    val playerState : LiveData<PlayerState> get() = _playerState
+
+
     private val playerStateEventCallback = Subscription.EventCallback<PlayerState> { playerState ->
         playerStateListener?.onPlayerStateUpdated(playerState)
+        _playerState.value = playerState
 //        Timber.tag("Spotify").v("Player State: %s", gson.toJson(playerState))
     }
 
