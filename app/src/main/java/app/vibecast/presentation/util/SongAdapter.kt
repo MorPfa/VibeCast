@@ -1,16 +1,15 @@
 package app.vibecast.presentation.util
 
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import app.vibecast.R
 import app.vibecast.databinding.ItemMusicCardviewBinding
 import app.vibecast.domain.model.SongDto
 import app.vibecast.presentation.screens.main_screen.music.MusicViewModel
 import com.spotify.protocol.types.Image
-import com.spotify.protocol.types.ImageUri
 import timber.log.Timber
 
 
@@ -28,7 +27,8 @@ class SongAdapter(private val musicViewModel: MusicViewModel) :
 
     inner class SongViewHolder(binding: ItemMusicCardviewBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        val artistName = binding.attributionText
+        val artistName = binding.artist
+        val songName = binding.song
         val coverArt = binding.savedImage
 
         init {
@@ -47,22 +47,26 @@ class SongAdapter(private val musicViewModel: MusicViewModel) :
     override fun onBindViewHolder(holder: SongViewHolder, position: Int) {
         val song = getItem(position)
         Timber.tag("imageTest").d("curr uri ${song.imageUri}")
-        holder.artistName.text = song.name
-        musicViewModel.assertAppRemoteConnected()
-            .imagesApi
-            .getImage(song.imageUri, Image.Dimension.X_SMALL)
-            .setResultCallback { bitmap ->
-              holder.coverArt.setImageBitmap(bitmap)
-            }
+        holder.songName.text = song.name
+        holder.artistName.text = song.artist
+        if (song.imageUri != null) {
+            musicViewModel.assertAppRemoteConnected()
+                .imagesApi
+                .getImage(song.imageUri, Image.Dimension.X_SMALL)
+                .setResultCallback { bitmap ->
+                    holder.coverArt.setImageBitmap(bitmap)
+                }
+
+        } else {
+            holder.coverArt.setImageResource(R.drawable.cover_art_placeholder)
+        }
     }
-
-
 }
 
 
 class SongDiffCallback : DiffUtil.ItemCallback<SongDto>() {
     override fun areItemsTheSame(oldItem: SongDto, newItem: SongDto): Boolean {
-        return oldItem.uri == newItem.uri
+        return oldItem.trackUri == newItem.trackUri
     }
 
     override fun areContentsTheSame(oldItem: SongDto, newItem: SongDto): Boolean {

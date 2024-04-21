@@ -12,14 +12,20 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import app.vibecast.R
 import app.vibecast.databinding.FragmentEditProfileBinding
 import app.vibecast.presentation.screens.main_screen.image.ImageLoader
+import app.vibecast.presentation.screens.account_screen.util.ImageSaver
+import app.vibecast.presentation.screens.account_screen.util.UpdateResult
 import app.vibecast.presentation.screens.main_screen.image.ImageViewModel
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -47,8 +53,9 @@ class EditProfileFragment : Fragment() {
     private lateinit var userEmail: EditText
     private lateinit var submitBTn: Button
     private var currentUser: FirebaseUser? = null
-    private lateinit var currentUsername : String
-    private lateinit var currentEmail : String
+    private lateinit var currentUsername: String
+    private lateinit var currentEmail: String
+    private var newProfilePic: Bitmap? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,19 +82,21 @@ class EditProfileFragment : Fragment() {
         userEmail.setText(currentUser?.email ?: "")
         userName.setText(currentUser?.displayName ?: "")
 
-
+        val savedBitmap = ImageSaver.loadImageFromInternalStorage(requireContext())
+        savedBitmap?.let {
+            profilePic.setImageBitmap(it)
+        }
         submitBTn.setOnClickListener {
             submitChanges()
         }
 
         profilePic.setOnClickListener {
-            imageChooser()
+            pickImageFromGallery()
         }
 
         lifecycleScope.launch {
-
-            imageViewModel.backgroundImage.observe(viewLifecycleOwner){ image ->
-                if(image != null){
+            imageViewModel.backgroundImage.observe(viewLifecycleOwner) { image ->
+                if (image != null) {
                     imageLoader.loadUrlIntoImageView(
                         image,
                         binding.backgroundImageView,
@@ -97,7 +106,6 @@ class EditProfileFragment : Fragment() {
                     val bgImage = imageViewModel.pickDefaultBackground()
                     binding.backgroundImageView.setImageResource(bgImage)
                 }
-
             }
         }
         return binding.root
@@ -107,6 +115,12 @@ class EditProfileFragment : Fragment() {
         val email = userEmail.text.toString()
         val userName = userName.text.toString()
         val validInput = validateInput(email, userName)
+
+        newProfilePic?.let {
+            ImageSaver.saveImageToInternalStorage(
+                it, requireContext()
+            )
+        }
 
         if (validInput) {
             Timber.tag("auth").d(currentEmail)
@@ -122,12 +136,42 @@ class EditProfileFragment : Fragment() {
                     Timber.tag("auth").d("failed to re-authenticate.")
                     Timber.tag("auth").d(it.localizedMessage)
                 }
+        }
+    }
 
+    private fun pickImageFromGallery() {
+        val intent = Intent().apply {
+            type = "image/*"
+            action = Intent.ACTION_GET_CONTENT
+        }
+        imagePicker.launch(intent)
+    }
+
+    private var imagePicker = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result: ActivityResult ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val data = result.data
+            if (data != null && data.data != null) {
+                val selectedImageUri: Uri? = data.data
+                selectedImageUri?.let {
+                    try {
+                        val selectedImageBitmap = MediaStore.Images.Media.getBitmap(
+                            requireContext().contentResolver,
+                            selectedImageUri
+                        )
+                        profilePic.setImageBitmap(selectedImageBitmap)
+                        newProfilePic = selectedImageBitmap
+                    } catch (e: IOException) {
+                        e.printStackTrace()
+                    }
+                }
+            }
         }
     }
 
 
-    private fun updateUser(userName: String, email: String){
+    private fun updateUser(userName: String, email: String) {
         editUserName(currentUser, userName)
         editUserEmail(currentUser, email)
     }
@@ -142,9 +186,12 @@ class EditProfileFragment : Fragment() {
                 if (profileUpdateTask.isSuccessful) {
                     Timber.tag("auth").d("updated username")
                     accountViewModel.updateUserName(userName)
+                    showResultSnackBar(UpdateResult.SUCCESS)
                 } else {
                     Timber.tag("auth").e(profileUpdateTask.exception, "Failed to update username")
+                    showResultSnackBar(UpdateResult.ERROR)
                 }
+
             }
     }
 
@@ -153,8 +200,10 @@ class EditProfileFragment : Fragment() {
             .addOnCompleteListener { profileUpdateTask ->
                 if (profileUpdateTask.isSuccessful) {
                     Timber.tag("auth").d("User profile updated with username")
+                    showResultSnackBar(UpdateResult.SUCCESS)
                 } else {
                     Timber.tag("auth").e(profileUpdateTask.exception, "Failed to update  email")
+                    showResultSnackBar(UpdateResult.ERROR)
                 }
             }
     }
@@ -180,43 +229,39 @@ class EditProfileFragment : Fragment() {
         return validEmail.matches(email)
     }
 
+    private fun showResultSnackBar(result: UpdateResult) {
+        when (result) {
+            UpdateResult.SUCCESS -> {
+                val snackbar = Snackbar.make(
+                    requireView(),
+                    "Updated profile successfully",
+                    Snackbar.LENGTH_SHORT
+                )
+                val snackbarView = snackbar.view
+                val snackbarText =
+                    snackbarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+                snackbarText.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+                snackbarView.background =
+                    ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
+                snackbar.show()
+            }
 
-    private fun imageChooser() {
-        val i = Intent()
-        i.setType("image/*")
-        i.setAction(Intent.ACTION_GET_CONTENT)
-        launchSomeActivity.launch(i)
-    }
-
-    private var launchSomeActivity = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result: ActivityResult ->
-        if (result.resultCode
-            == Activity.RESULT_OK
-        ) {
-            val data = result.data
-            // do your operation from here....
-            if (data != null
-                && data.data != null
-            ) {
-                val selectedImageUri: Uri? = data.data
-                val selectedImageBitmap: Bitmap
-                try {
-                    selectedImageBitmap = MediaStore.Images.Media.getBitmap(
-                        requireContext().contentResolver,
-                        selectedImageUri
-                    )
-                    profilePic.setImageBitmap(
-                        selectedImageBitmap
-                    )
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                }
-
+            UpdateResult.ERROR -> {
+                val snackbar = Snackbar.make(
+                    requireView(),
+                    "Couldn't update profile",
+                    Snackbar.LENGTH_SHORT
+                )
+                val snackbarView = snackbar.view
+                val snackbarText =
+                    snackbarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+                snackbarText.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+                snackbarView.background =
+                    ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
+                snackbar.show()
             }
         }
     }
-
 
     companion object {
         @JvmStatic
@@ -229,3 +274,5 @@ class EditProfileFragment : Fragment() {
             }
     }
 }
+
+

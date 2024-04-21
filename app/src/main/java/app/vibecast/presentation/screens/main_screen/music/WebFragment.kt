@@ -7,23 +7,21 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import app.vibecast.databinding.FragmentWebBinding
+import app.vibecast.presentation.screens.main_screen.music.util.InfoType
 
 
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+private const val TYPE_PARAM = "infoType"
 
 
 class WebFragment : Fragment() {
-    private var param1: String? = null
-    private var param2: String? = null
-    private lateinit var binding : FragmentWebBinding
+    private var type: InfoType? = null
+    private lateinit var binding: FragmentWebBinding
     private val musicViewModel: MusicViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+            type = it.getSerializable(TYPE_PARAM) as? InfoType
         }
     }
 
@@ -33,22 +31,29 @@ class WebFragment : Fragment() {
     ): View {
         binding = FragmentWebBinding.inflate(inflater, container, false)
         val webView = binding.webView
-        val url = musicViewModel.currentPlaylist.value!!
         val headers = HashMap<String, String>().apply {
             put("Authorization", "Bearer ${musicViewModel.token.value}")
         }
-        webView.loadUrl(url, headers)
+        musicViewModel.currentSong.observe(viewLifecycleOwner) { song ->
+            if (type == InfoType.SONG) {
+                webView.loadUrl(song.externalUrls.spotify, headers)
+            } else {
+                webView.loadUrl(song.artists[0].externalUrls.spotify, headers)
+            }
+        }
         return binding.root
     }
+
+
 
     companion object {
 
         @JvmStatic
-        fun newInstance(param1: String, param2: String) =
+        fun newInstance(type: InfoType) =
             WebFragment().apply {
                 arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+                    putSerializable(TYPE_PARAM, type)
+
                 }
             }
     }

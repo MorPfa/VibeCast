@@ -32,7 +32,6 @@ object ImageSaver {
             .load(imageUrl)
             .into(object : CustomTarget<Bitmap>() {
                 override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
-                    // When the image is loaded successfully, save it to the gallery
                     saveImageToGallery(resource, context)
                 }
 
@@ -52,7 +51,6 @@ object ImageSaver {
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val imageFileName = "JPEG_$timeStamp.jpg"
 
-        // Create an image file and save it to the gallery
         val imageFile = createImageFile(context, imageFileName)
 
         if (imageFile != null) {

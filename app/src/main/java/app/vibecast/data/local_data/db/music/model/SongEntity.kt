@@ -11,7 +11,10 @@ data class SongEntity (
     @ColumnInfo(name = "uri") val uri: String,
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "album") val album: String,
+    @ColumnInfo(name = "artist") val artist: String,
     @ColumnInfo(name = "imageUri") val imageUri: ImageUri,
+    @ColumnInfo(name = "artistUri") val artistUri: String,
+    @ColumnInfo(name = "albumUri") val albumUri: String,
     @ColumnInfo(name = "url") val url : String,
     @ColumnInfo(name = "previewUrl") val previewUrl : String?,
 )

@@ -130,6 +130,7 @@
                     android:layout_gravity="center"
                     android:textAlignment="center"/>
                 <TextView
+                    android:id="@+id/savedSongCount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/white"

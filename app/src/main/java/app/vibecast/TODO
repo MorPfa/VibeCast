@@ -2,29 +2,30 @@
 
 TASKS:
 today:
-implement logic to save current song
-implement logic to fetch current song so user can be redirected to web page if app not installed
+make it so that invalid input for search query shows error
+replace splash screen fragment with activity
 
 
 
 Next tasks:
-
-
-
-General Firebase:
-persist and set profile picture
-
+delete profile picture locally when deleting account
+figure out if you actually want to upload profile picture
 
 General Spotify:
-allow user to save songs (heart icon in top app bar / save track name, artist and uri display in recyclerview and
-send intent to spotify app or open in browser when card is clicked)
+fix spotify auth (cache token maybe??/ allow user to reconnect manually?)
+
+General firebase:
+
+
 
 Miscellaneous:
 optimize image accuracy (maybe go back to GET /search/photos endpoint and combine query with collections)
-make it so that invalid input for search query shows error
+
 configure pro guard r8
-replace splash screen fragment with activity
+
 use benchmarks to improve performance
 
 
-
+Nice to have's:
+fix save icon issue (determine check status based off db)
+make long press on screen show bg image

@@ -4,6 +4,7 @@ import app.vibecast.data.local_data.data_source.music.LocalMusicDataSource
 import app.vibecast.data.remote_data.data_source.music.RemoteMusicDataSource
 import app.vibecast.data.remote_data.network.music.model.PlaylistApiModel
 import app.vibecast.domain.model.SongDto
+import app.vibecast.domain.model.TracksDto
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import timber.log.Timber
@@ -19,7 +20,7 @@ class MusicRepositoryImpl @Inject constructor(
         try {
             localMusicDataSource.deleteSong(song)
         } catch (e : Exception){
-            Timber.tag("music_db").d("Couldn't delete song")
+            Timber.tag("music_db").d("Couldn't delete song $e")
         }
     }
 
@@ -59,7 +60,6 @@ class MusicRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             Timber.tag("Spotify").d(e.localizedMessage ?: "null")
         }
-
     }
 
 
@@ -67,10 +67,11 @@ class MusicRepositoryImpl @Inject constructor(
         song: String,
         artist: String,
         accessCode: String,
-    ): Flow<SongDto> = flow {
+    ): Flow<TracksDto> = flow {
         try {
             remoteMusicDataSource.getCurrentSong(song, artist, accessCode).collect { result ->
-                emit(result.songRespons[0].toSongDto())
+                Timber.tag("Spotify").d("result $result")
+                emit(TracksDto(result.tracks.href, result.tracks.items[0]))
             }
         } catch (e: Exception) {
             Timber.tag("Spotify").d(e.localizedMessage ?: "null")

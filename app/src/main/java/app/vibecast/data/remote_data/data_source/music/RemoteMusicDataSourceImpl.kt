@@ -2,7 +2,7 @@ package app.vibecast.data.remote_data.data_source.music
 
 import app.vibecast.data.remote_data.network.music.api.MusicService
 import app.vibecast.data.remote_data.network.music.model.PlaylistApiModel
-import app.vibecast.data.remote_data.network.music.model.SearchModel
+import app.vibecast.data.remote_data.network.music.model.TracksResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import timber.log.Timber
@@ -22,10 +22,11 @@ class RemoteMusicDataSourceImpl @Inject constructor(
         }
     }
 
-    override fun getCurrentSong(song: String, artist: String, accessCode : String): Flow<SearchModel> = flow {
+    override fun getCurrentSong(song: String, artist: String, accessCode : String): Flow<TracksResponse> = flow {
         try {
-            val songResult = musicService.getCurrentSong("Bearer $accessCode", song, artist)
-            emit(songResult)
+            val result = musicService.getCurrentSong(accessCode ="Bearer $accessCode", query = "$song $artist")
+            Timber.tag("Spotify").d("result $result")
+            emit(result)
         } catch (e : Exception){
             Timber.tag("Spotify").d(e.localizedMessage ?: "null")
         }

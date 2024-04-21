@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import app.vibecast.BuildConfig
-import app.vibecast.data.remote_data.network.music.model.SongModel
+import app.vibecast.data.remote_data.network.music.model.Items
 import app.vibecast.domain.model.SongDto
 import app.vibecast.domain.repository.music.MusicPreferenceRepository
 import app.vibecast.domain.repository.music.MusicRepository
@@ -20,10 +20,10 @@ import com.spotify.android.appremote.api.Connector
 import com.spotify.android.appremote.api.SpotifyAppRemote
 import com.spotify.android.appremote.api.error.SpotifyDisconnectedException
 import com.spotify.protocol.client.Subscription
-import com.spotify.protocol.types.ImageUri
 import com.spotify.protocol.types.PlayerState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -49,10 +49,26 @@ class MusicViewModel @Inject constructor(
     val currentPlaylist : LiveData<String> get() = _currentPlaylist
 
 
-    val savedSongs: LiveData<List<SongDto>> = musicRepository.getAllSavedSongs().asLiveData()
+    private var _isSongSaved = MutableLiveData(false)
+    val isSongSaved : LiveData<Boolean> get() = _isSongSaved
 
-    private var _currentSong = MutableLiveData<SongDto>()
-    val currentSong : LiveData<SongDto> get() = _currentSong
+     private fun updateSavedSongStatus(trackUri : String){
+//         Timber.tag("music_db").d("curr track $trackUri ${savedSongs.value}")
+        val containsSong = savedSongs.value?.any { song ->
+            song.trackUri == trackUri
+        }
+//         Timber.tag("music_db").d(containsSong.toString())
+        _isSongSaved.value = containsSong
+    }
+
+    val savedSongs: LiveData<List<SongDto>> = musicRepository.getAllSavedSongs().map { songs ->
+        songs.map { song ->
+            song
+        }
+    }.asLiveData()
+
+    private var _currentSong = MutableLiveData<Items>()
+    val currentSong : LiveData<Items> get() = _currentSong
 
     private suspend fun getGenre(weather: String): String {
         val category = when (weather) {
@@ -80,10 +96,14 @@ class MusicViewModel @Inject constructor(
      var token = _token
 
 
-     fun getCurrentSong(song : String, artist : String, accessCode : String){
+     fun getCurrentSong(song : String, artist : String){
          viewModelScope.launch(Dispatchers.IO) {
-             musicRepository.getCurrentSong(song, artist, accessCode).collect{ result ->
-                 _currentSong.value = result
+             musicRepository.getCurrentSong(song, artist, token.value!!).collect{ result ->
+                 Timber.tag("music_db").d("result ${result.items.externalUrls.spotify}")
+                 withContext(Dispatchers.Main){
+                     _currentSong.value = result.items
+                 }
+
              }
          }
      }
@@ -92,12 +112,9 @@ class MusicViewModel @Inject constructor(
         try {
             viewModelScope.launch {
                 val genre = getGenre(weather)
-                Timber.tag("Spotify").d("Formatted genre : $genre")
                 musicRepository.getPlaylist(genre, token.value!!).collect {result ->
                     val playlists = result.playlists.items
                     _currentPlaylist.value = result.playlists.items[0].externalUrls.spotify
-
-                    Timber.tag("Spotify").d("Weather: $weather")
                     val index = playlists.indices.random()
                     Timber.tag("Spotify").d("Playlist name : ${playlists[index].name}")
                     val lofiPlaylist = playlists.find { it.name.contains("lofi", ignoreCase = true) }
@@ -126,20 +143,10 @@ class MusicViewModel @Inject constructor(
 
     }
 
-    fun deleteSong(songModel: SongModel){
-
-    }
-
-    fun getAllSavedSongs(){
-            viewModelScope.launch(Dispatchers.IO) {
-                musicRepository.getAllSavedSongs().collect{
-
-                }
-            }
-    }
-
-    fun getSavedSong(songModel: SongModel){
-
+    fun deleteSong(song: SongDto){
+        viewModelScope.launch(Dispatchers.IO) {
+            musicRepository.deleteSong(song)
+        }
     }
 
 
@@ -322,6 +329,7 @@ class MusicViewModel @Inject constructor(
     private val playerStateEventCallback = Subscription.EventCallback<PlayerState> { playerState ->
         playerStateListener?.onPlayerStateUpdated(playerState)
         _playerState.value = playerState
+        updateSavedSongStatus(playerState.track.uri)
 //        Timber.tag("Spotify").v("Player State: %s", gson.toJson(playerState))
     }
 

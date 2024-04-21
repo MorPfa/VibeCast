@@ -33,6 +33,7 @@ import app.vibecast.domain.model.SongDto
 import app.vibecast.presentation.permissions.LocationPermissionState
 import app.vibecast.presentation.permissions.PermissionHelper
 import app.vibecast.presentation.screens.account_screen.AccountViewModel
+import app.vibecast.presentation.screens.account_screen.util.ImageSaver
 import app.vibecast.presentation.screens.main_screen.MainScreenFragmentDirections
 import app.vibecast.presentation.screens.main_screen.MainViewModel
 import app.vibecast.presentation.screens.main_screen.image.ImageViewModel
@@ -44,6 +45,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.spotify.protocol.types.PlayerState
 import com.spotify.sdk.android.auth.AuthorizationClient
 import com.spotify.sdk.android.auth.AuthorizationRequest
 import com.spotify.sdk.android.auth.AuthorizationResponse
@@ -54,7 +56,7 @@ import timber.log.Timber
 const val TAG = "TestTag"
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), MusicViewModel.PlayerStateListener {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private lateinit var searchView: SearchView
@@ -72,6 +74,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var userNameTv: TextView
     private lateinit var userEmailTv: TextView
 
+
+    override fun onPlayerStateUpdated(playerState: PlayerState) {
+        invalidateOptionsMenu()
+    }
 
     private fun authorizeClient() {
         val request =
@@ -125,12 +131,13 @@ class MainActivity : AppCompatActivity() {
         permissionHelper = PermissionHelper(this)
         handleLocationAndWeather()
 
+        musicViewModel.savedSongs.observe(this){}
+
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_home) as NavHostFragment
         val navController = navHostFragment.navController
-
         appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.nav_home,
@@ -152,6 +159,10 @@ class MainActivity : AppCompatActivity() {
             loginText.title = "Logout"
         }
         val profileImageView = navHeader.findViewById<ImageView>(R.id.profileImageIcon)
+        val savedBitmap = ImageSaver.loadImageFromInternalStorage(this)
+        savedBitmap?.let {
+            profileImageView.setImageBitmap(it)
+        }
         userNameTv = navHeader.findViewById(R.id.user_name_tv)
         userEmailTv = navHeader.findViewById(R.id.user_email_tv)
 
@@ -197,7 +208,10 @@ class MainActivity : AppCompatActivity() {
                     showIcons = false
                     invalidateOptionsMenu()
                 }
-
+                R.id.nav_web -> {
+                    showIcons = false
+                    invalidateOptionsMenu()
+                }
 
             }
         }
@@ -286,33 +300,33 @@ class MainActivity : AppCompatActivity() {
                     searchView.clearFocus()
 
                 } else {
-                    val snackbar = Snackbar.make(
+                    val snackBar = Snackbar.make(
                         findViewById(android.R.id.content),
                         getString(R.string.invalid_query_input),
                         Snackbar.LENGTH_SHORT
                     )
 
-                    val snackbarView = snackbar.view
-                    val snackbarText =
-                        snackbarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
-                    snackbarText.setTextColor(
+                    val snackBarView = snackBar.view
+                    val snackBarText =
+                        snackBarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+                    snackBarText.setTextColor(
                         ContextCompat.getColor(
                             this@MainActivity,
                             R.color.white
                         )
                     )
-                    snackbarView.background =
+                    snackBarView.background =
                         ContextCompat.getDrawable(this@MainActivity, R.drawable.snackbar_background)
-                    val params = snackbarView.layoutParams as FrameLayout.LayoutParams
+                    val params = snackBarView.layoutParams as FrameLayout.LayoutParams
                     params.gravity = Gravity.TOP
-                    snackbarView.layoutParams = params
+                    snackBarView.layoutParams = params
                     val actionBarHeight = getActionBarHeight()
                     params.setMargins(0, actionBarHeight, 0, 0)
-                    snackbarView.layoutParams = params
+                    snackBarView.layoutParams = params
                     if (resources.configuration.screenLayout and Configuration.SCREENLAYOUT_SIZE_MASK >= Configuration.SCREENLAYOUT_SIZE_LARGE) {
                         params.gravity = Gravity.CENTER_HORIZONTAL
                     }
-                    snackbar.show()
+                    snackBar.show()
                 }
                 invalidateOptionsMenu()
                 return true
@@ -353,6 +367,20 @@ class MainActivity : AppCompatActivity() {
         val saveSongItem = menu.findItem(R.id.action_save_song)
         val searchItem = menu.findItem(R.id.action_search)
 
+
+
+        musicViewModel.isSongSaved.observe(this){
+            Timber.tag("music_db").d(it.toString())
+            if(it == false ){
+                saveSongItem?.icon = ContextCompat.getDrawable(this, R.drawable.song_saved_unselected)
+
+            }else {
+                saveSongItem?.icon = ContextCompat.getDrawable(this, R.drawable.save_song_unselected)
+            }
+        }
+
+
+
         if (showIcons) {
             saveImageItem?.isVisible = true
             saveLocationItem?.isVisible = true
@@ -361,6 +389,7 @@ class MainActivity : AppCompatActivity() {
             saveImageItem?.icon = ContextCompat.getDrawable(this, R.drawable.favorite_unselected)
         } else {
             saveImageItem?.icon = ContextCompat.getDrawable(this, R.drawable.favorite_selected)
+
             saveImageItem?.isVisible = false
             saveLocationItem?.isVisible = false
             saveSongItem?.isVisible = false
@@ -394,33 +423,33 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                 } else {
-                    val snackbar = Snackbar.make(
+                    val snackBar = Snackbar.make(
                         findViewById(android.R.id.content),
                         getString(R.string.save_image_account_warning),
                         Snackbar.LENGTH_SHORT
                     )
 
-                    val snackbarView = snackbar.view
-                    val snackbarText =
-                        snackbarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
-                    snackbarText.setTextColor(
+                    val snackBarView = snackBar.view
+                    val snackBarText =
+                        snackBarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+                    snackBarText.setTextColor(
                         ContextCompat.getColor(
                             this@MainActivity,
                             R.color.white
                         )
                     )
-                    snackbarView.background =
+                    snackBarView.background =
                         ContextCompat.getDrawable(this@MainActivity, R.drawable.snackbar_background)
-                    val params = snackbarView.layoutParams as FrameLayout.LayoutParams
+                    val params = snackBarView.layoutParams as FrameLayout.LayoutParams
                     params.gravity = Gravity.TOP
-                    snackbarView.layoutParams = params
+                    snackBarView.layoutParams = params
                     val actionBarHeight = getActionBarHeight()
                     params.setMargins(0, actionBarHeight, 0, 0)
-                    snackbarView.layoutParams = params
+                    snackBarView.layoutParams = params
                     if (resources.configuration.screenLayout and Configuration.SCREENLAYOUT_SIZE_MASK >= Configuration.SCREENLAYOUT_SIZE_LARGE) {
                         params.gravity = Gravity.CENTER_HORIZONTAL
                     }
-                    snackbar.show()
+                    snackBar.show()
                 }
                 true
             }
@@ -439,42 +468,44 @@ class MainActivity : AppCompatActivity() {
                         item.icon = ContextCompat.getDrawable(this, R.drawable.save_location_icon)
                     }
                 } else {
-                    val snackbar = Snackbar.make(
+                    val snackBar = Snackbar.make(
                         findViewById(android.R.id.content),
                         getString(R.string.save_location_acount_warning),
                         Snackbar.LENGTH_SHORT
                     )
 
-                    val snackbarView = snackbar.view
-                    val snackbarText =
-                        snackbarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
-                    snackbarText.setTextColor(
+                    val snackBarView = snackBar.view
+                    val snackBarText =
+                        snackBarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+                    snackBarText.setTextColor(
                         ContextCompat.getColor(
                             this@MainActivity,
                             R.color.white
                         )
                     )
-                    snackbarView.background =
+                    snackBarView.background =
                         ContextCompat.getDrawable(this@MainActivity, R.drawable.snackbar_background)
-                    val params = snackbarView.layoutParams as FrameLayout.LayoutParams
+                    val params = snackBarView.layoutParams as FrameLayout.LayoutParams
                     params.gravity = Gravity.TOP
-                    snackbarView.layoutParams = params
+                    snackBarView.layoutParams = params
                     val actionBarHeight = getActionBarHeight()
                     params.setMargins(0, actionBarHeight, 0, 0)
-                    snackbarView.layoutParams = params
+                    snackBarView.layoutParams = params
                     if (resources.configuration.screenLayout and Configuration.SCREENLAYOUT_SIZE_MASK >= Configuration.SCREENLAYOUT_SIZE_LARGE) {
                         params.gravity = Gravity.CENTER_HORIZONTAL
                     }
-                    snackbar.show()
+                    snackBar.show()
                 }
                 true
             }
 
             R.id.action_save_song -> {
                 if (currentUser != null) {
-                    if (!item.isChecked) {
+                    val currentSong = musicViewModel.playerState.value
+                    if (musicViewModel.isSongSaved.value == false) {
                         item.isChecked = true
-                        val currentSong = musicViewModel.playerState.value
+                        item.icon =
+                            ContextCompat.getDrawable(this, R.drawable.save_song_unselected)
 
                         currentSong?.let {
                             Timber.tag("imageTest").d("saved uri ${it.track.imageUri}")
@@ -484,47 +515,65 @@ class MainActivity : AppCompatActivity() {
                                     name = currentSong.track.name,
                                     imageUri = currentSong.track.imageUri,
                                     url = "",
-                                    uri = currentSong.track.uri,
-                                    previewUrl = null
+                                    trackUri = currentSong.track.uri,
+                                    previewUrl = null,
+                                    artist = currentSong.track.artist.name,
+                                    artistUri = currentSong.track.artist.uri,
+                                    albumUri = currentSong.track.artist.uri,
+
                                 )
                             )
                         }
 
-                        item.icon =
-                            ContextCompat.getDrawable(this, R.drawable.save_song_selected)
-                    } else {
-                        item.isChecked = false
 
-                        item.icon = ContextCompat.getDrawable(this, R.drawable.save_song_unselected)
+                    } else {
+                        currentSong?.let {
+                            Timber.tag("imageTest").d("saved uri ${it.track.imageUri}")
+                            musicViewModel.saveSong(
+                                SongDto(
+                                    album = currentSong.track.album.name,
+                                    name = currentSong.track.name,
+                                    imageUri = currentSong.track.imageUri,
+                                    url = "",
+                                    trackUri = currentSong.track.uri,
+                                    previewUrl = null,
+                                    artist = currentSong.track.artist.name,
+                                    artistUri = currentSong.track.artist.uri,
+                                    albumUri = currentSong.track.artist.uri,
+                                    )
+                            )
+                        }
+                        item.isChecked = false
+                        item.icon = ContextCompat.getDrawable(this, R.drawable.song_saved_unselected)
                     }
                 } else {
-                    val snackbar = Snackbar.make(
+                    val snackBar = Snackbar.make(
                         findViewById(android.R.id.content),
                         getString(R.string.please_login_or_create_an_account_to_save_a_song),
                         Snackbar.LENGTH_SHORT
                     )
 
-                    val snackbarView = snackbar.view
-                    val snackbarText =
-                        snackbarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
-                    snackbarText.setTextColor(
+                    val snackBarView = snackBar.view
+                    val snackBarText =
+                        snackBarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+                    snackBarText.setTextColor(
                         ContextCompat.getColor(
                             this@MainActivity,
                             R.color.white
                         )
                     )
-                    snackbarView.background =
+                    snackBarView.background =
                         ContextCompat.getDrawable(this@MainActivity, R.drawable.snackbar_background)
-                    val params = snackbarView.layoutParams as FrameLayout.LayoutParams
+                    val params = snackBarView.layoutParams as FrameLayout.LayoutParams
                     params.gravity = Gravity.TOP
-                    snackbarView.layoutParams = params
+                    snackBarView.layoutParams = params
                     val actionBarHeight = getActionBarHeight()
                     params.setMargins(0, actionBarHeight, 0, 0)
-                    snackbarView.layoutParams = params
+                    snackBarView.layoutParams = params
                     if (resources.configuration.screenLayout and Configuration.SCREENLAYOUT_SIZE_MASK >= Configuration.SCREENLAYOUT_SIZE_LARGE) {
                         params.gravity = Gravity.CENTER_HORIZONTAL
                     }
-                    snackbar.show()
+                    snackBar.show()
                 }
                 true
             }

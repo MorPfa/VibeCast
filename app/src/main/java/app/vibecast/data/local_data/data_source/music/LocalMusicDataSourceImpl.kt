@@ -16,11 +16,14 @@ class LocalMusicDataSourceImpl @Inject constructor(private val songDao: SongDao)
             songDao.saveSong(
                 SongEntity(
                     url = song.url,
-                    uri = song.uri,
+                    uri = song.trackUri,
                     album = song.album,
                     imageUri = song.imageUri!!,
                     name = song.name,
-                    previewUrl = song.previewUrl
+                    previewUrl = song.previewUrl,
+                    artist = song.artist,
+                    albumUri = song.albumUri,
+                    artistUri = song.artistUri
                 )
             )
         } catch (e: Exception) {
@@ -34,28 +37,34 @@ class LocalMusicDataSourceImpl @Inject constructor(private val songDao: SongDao)
             songDao.deleteSong(
                 SongEntity(
                     url = song.url,
-                    uri = song.uri,
+                    uri = song.trackUri,
                     album = song.album,
                     imageUri = song.imageUri!!,
                     name = song.name,
-                    previewUrl = song.previewUrl
+                    previewUrl = song.previewUrl,
+                    artist = song.artist,
+                    albumUri = song.albumUri,
+                    artistUri = song.artistUri
                 )
             )
         } catch (e: Exception) {
-            Timber.tag("music_db").d("Couldn't delete song")
+            Timber.tag("music_db").d("Couldn't delete song $e")
         }
     }
 
     override fun getSavedSong(song: SongDto): Flow<SongDto> = flow {
         try {
-            songDao.getSavedSong(song.uri).collect {
+            songDao.getSavedSong(song.trackUri).collect {
                 emit(SongDto(
                     album = it.album,
                     name = it.name,
                     url = it.url,
-                    uri = it.uri,
+                    trackUri = it.uri,
                     imageUri = song.imageUri,
-                    previewUrl = it.previewUrl
+                    previewUrl = it.previewUrl,
+                    artist = it.artist,
+                    artistUri = it.artist,
+                    albumUri = song.albumUri,
                 ))
             }
         } catch (e: Exception) {
@@ -72,8 +81,11 @@ class LocalMusicDataSourceImpl @Inject constructor(private val songDao: SongDao)
                         name = songEntity.name,
                         imageUri = songEntity.imageUri,
                         url = songEntity.url,
-                        uri = songEntity.uri,
-                        previewUrl = songEntity.previewUrl
+                        trackUri = songEntity.uri,
+                        previewUrl = songEntity.previewUrl,
+                        artist = songEntity.artist,
+                        albumUri = songEntity.albumUri,
+                        artistUri = songEntity.artistUri
                     )
                 }
                 emit(songList)
@@ -82,6 +94,4 @@ class LocalMusicDataSourceImpl @Inject constructor(private val songDao: SongDao)
             Timber.tag("music_db").d("Couldn't get songs")
         }
     }
-
-
 }

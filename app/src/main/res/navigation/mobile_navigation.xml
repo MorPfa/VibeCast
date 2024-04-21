@@ -42,8 +42,12 @@
             android:id="@+id/nav_home_to_web"
             app:destination="@id/nav_web"
             app:enterAnim="@anim/fui_slide_out_left"
-            app:popExitAnim="@anim/fui_slide_out_left" />
+            app:popExitAnim="@anim/fui_slide_out_left">
 
+            <argument
+                android:name="infoType"
+                app:argType="app.vibecast.presentation.screens.main_screen.music.util.InfoType" />
+        </action>
 
 
     </fragment>
@@ -62,6 +66,14 @@
         <action
             android:id="@+id/nav_account_to_nav_home"
             app:destination="@id/nav_home" />
+        <action
+            android:id="@+id/account_to_web"
+            app:destination="@id/nav_web">
+
+            <argument
+                android:name="infoType"
+                app:argType="app.vibecast.presentation.screens.main_screen.music.util.InfoType" />
+        </action>
     </fragment>
 
 
@@ -91,6 +103,14 @@
             app:destination="@id/nav_home"
             app:enterAnim="@anim/fui_slide_out_left"
             app:popExitAnim="@anim/fui_slide_out_left" />
+        <action
+            android:id="@+id/saved_to_web"
+            app:destination="@id/nav_web">
+
+            <argument
+                android:name="infoType"
+                app:argType="app.vibecast.presentation.screens.main_screen.music.util.InfoType" />
+        </action>
 
     </fragment>
     <fragment
@@ -103,10 +123,14 @@
             app:destination="@id/nav_home"
             app:enterAnim="@anim/fui_slide_out_left"
             app:popExitAnim="@anim/fui_slide_out_left" />
+        <action
+            android:id="@+id/search_to_web"
+            app:destination="@id/nav_web">
+            <argument
+                android:name="infoType"
+                app:argType="app.vibecast.presentation.screens.main_screen.music.util.InfoType" />
+        </action>
     </fragment>
-
-
-
 
 
     <fragment
@@ -123,7 +147,7 @@
         android:id="@+id/nav_redirect"
         android:name="app.vibecast.presentation.user.auth.RedirectFragment"
         android:label="fragment_redirect"
-        tools:layout="@layout/fragment_redirect" >
+        tools:layout="@layout/fragment_redirect">
 
         <action
             android:id="@+id/nav_redirect_to_nav_account"
