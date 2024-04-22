@@ -22,7 +22,7 @@ import androidx.lifecycle.lifecycleScope
 import app.vibecast.R
 import app.vibecast.databinding.FragmentEditProfileBinding
 import app.vibecast.presentation.screens.main_screen.image.ImageLoader
-import app.vibecast.presentation.screens.account_screen.util.ImageSaver
+import app.vibecast.presentation.screens.account_screen.util.ImageHandler
 import app.vibecast.presentation.screens.account_screen.util.UpdateResult
 import app.vibecast.presentation.screens.main_screen.image.ImageViewModel
 import com.google.android.material.snackbar.Snackbar
@@ -82,7 +82,7 @@ class EditProfileFragment : Fragment() {
         userEmail.setText(currentUser?.email ?: "")
         userName.setText(currentUser?.displayName ?: "")
 
-        val savedBitmap = ImageSaver.loadImageFromInternalStorage(requireContext())
+        val savedBitmap = ImageHandler.loadImageFromInternalStorage(requireContext())
         savedBitmap?.let {
             profilePic.setImageBitmap(it)
         }
@@ -117,7 +117,7 @@ class EditProfileFragment : Fragment() {
         val validInput = validateInput(email, userName)
 
         newProfilePic?.let {
-            ImageSaver.saveImageToInternalStorage(
+            ImageHandler.saveImageToInternalStorage(
                 it, requireContext()
             )
         }

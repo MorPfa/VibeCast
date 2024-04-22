@@ -2,29 +2,24 @@
 
 TASKS:
 today:
-replace splash screen fragment with activity
+figure out if you actually want to upload profile picture
 
 
 
 Next tasks:
-delete profile picture locally when deleting account
-figure out if you actually want to upload profile picture
+
 
 General Spotify:
 fix spotify auth (cache token maybe??/ allow user to reconnect manually?)
 
-General firebase:
-
-
 
 Miscellaneous:
 optimize image accuracy (maybe go back to GET /search/photos endpoint and combine query with collections)
-
 configure pro guard r8
-
 use benchmarks to improve performance
 
 
 Nice to have's:
 fix save icon issue (determine check status based off db)
 make long press on screen show bg image
+replace splash screen fragment with activity

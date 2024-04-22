@@ -16,6 +16,7 @@ import app.vibecast.R
 import app.vibecast.databinding.FragmentLogoutBinding
 import app.vibecast.presentation.MainActivity
 import app.vibecast.presentation.screens.account_screen.AccountViewModel
+import app.vibecast.presentation.screens.account_screen.util.ImageHandler
 import app.vibecast.presentation.screens.main_screen.image.ImageViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -110,6 +111,7 @@ class LogoutFragment : Fragment() {
                     if (task.isSuccessful) {
                        Timber.tag("auth").d("Account deleted")
                         accountViewModel.deleteUserData()
+                        ImageHandler.deleteImageFromInternalStorage(requireContext())
                         auth.signOut()
                         deleteDialog?.dismiss()
                         val intent = Intent(activity, MainActivity::class.java)

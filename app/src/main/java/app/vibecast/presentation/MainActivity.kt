@@ -19,7 +19,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -34,7 +33,7 @@ import app.vibecast.domain.model.SongDto
 import app.vibecast.presentation.permissions.LocationPermissionState
 import app.vibecast.presentation.permissions.PermissionHelper
 import app.vibecast.presentation.screens.account_screen.AccountViewModel
-import app.vibecast.presentation.screens.account_screen.util.ImageSaver
+import app.vibecast.presentation.screens.account_screen.util.ImageHandler
 import app.vibecast.presentation.screens.main_screen.MainScreenFragmentDirections
 import app.vibecast.presentation.screens.main_screen.MainViewModel
 import app.vibecast.presentation.screens.main_screen.image.ImageViewModel
@@ -160,7 +159,7 @@ class MainActivity : AppCompatActivity(), MusicViewModel.PlayerStateListener {
             loginText.title = "Logout"
         }
         val profileImageView = navHeader.findViewById<ImageView>(R.id.profileImageIcon)
-        val savedBitmap = ImageSaver.loadImageFromInternalStorage(this)
+        val savedBitmap = ImageHandler.loadImageFromInternalStorage(this)
         savedBitmap?.let {
             profileImageView.setImageBitmap(it)
         }
@@ -596,7 +595,7 @@ class MainActivity : AppCompatActivity(), MusicViewModel.PlayerStateListener {
 
     override fun onStart() {
         super.onStart()
-        authorizeClient()
+//        authorizeClient()
 
 
     }

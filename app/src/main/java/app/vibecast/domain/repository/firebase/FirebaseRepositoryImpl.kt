@@ -12,6 +12,7 @@ import app.vibecast.domain.util.Constants.COUNTER_REF
 import app.vibecast.domain.util.Constants.IMAGES_REF
 import app.vibecast.domain.util.Constants.LOCATIONS_REF
 import app.vibecast.domain.util.Constants.USERS_REF
+import app.vibecast.presentation.screens.account_screen.util.ImageHandler
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot

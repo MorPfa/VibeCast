@@ -14,7 +14,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.OutputStream
 
-object ImageSaver {
+object ImageHandler {
 
     private val firebase: FirebaseAuth = Firebase.auth
 
@@ -48,4 +48,14 @@ object ImageSaver {
             null
         }
     }
+
+    fun deleteImageFromInternalStorage(context: Context) {
+        val wrapper = ContextWrapper(context)
+        val file =
+            File(wrapper.getDir("profile_images", Context.MODE_PRIVATE), "${currentUser?.uid}.jpg")
+        if (file.exists()) {
+            file.delete()
+        }
+    }
+
 }

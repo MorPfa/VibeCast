@@ -21,7 +21,7 @@ import androidx.recyclerview.widget.RecyclerView
 import app.vibecast.R
 import app.vibecast.databinding.FragmentAccountBinding
 import app.vibecast.domain.model.SongDto
-import app.vibecast.presentation.screens.account_screen.util.ImageSaver
+import app.vibecast.presentation.screens.account_screen.util.ImageHandler
 import app.vibecast.presentation.screens.main_screen.MainViewModel
 import app.vibecast.presentation.screens.main_screen.image.ImageLoader
 import app.vibecast.presentation.screens.main_screen.image.ImageViewModel
@@ -85,7 +85,7 @@ class AccountFragment : Fragment() {
         savedSongsRv.setHasFixedSize(true)
         val imageLoader = ImageLoader(requireContext())
 
-        val savedBitmap = ImageSaver.loadImageFromInternalStorage(requireContext())
+        val savedBitmap = ImageHandler.loadImageFromInternalStorage(requireContext())
         savedBitmap?.let {
             profilePic.setImageBitmap(it)
         }
