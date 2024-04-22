@@ -2,7 +2,6 @@
 
 TASKS:
 today:
-make it so that invalid input for search query shows error
 replace splash screen fragment with activity
 
 

@@ -3,11 +3,14 @@ package app.vibecast.presentation.screens.search_screen
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.activity.addCallback
@@ -32,6 +35,7 @@ import com.spotify.protocol.types.Repeat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 
 class SearchResultFragment : Fragment(), MusicViewModel.PlayerStateListener {
@@ -45,6 +49,7 @@ class SearchResultFragment : Fragment(), MusicViewModel.PlayerStateListener {
     private lateinit var shuffleButton: ImageButton
     private lateinit var repeatButton: ImageButton
     private lateinit var trackProgressBar: TrackProgressBar
+    private var noData = false
 
 
     private fun updatePlaybackBtn(playerState: PlayerState) {
@@ -184,6 +189,7 @@ class SearchResultFragment : Fragment(), MusicViewModel.PlayerStateListener {
         requireActivity().onBackPressedDispatcher.addCallback(this) {
             mainViewModel.checkPermissionState()
             findNavController().navigate(R.id.nav_home)
+
         }
 
     }
@@ -196,6 +202,37 @@ class SearchResultFragment : Fragment(), MusicViewModel.PlayerStateListener {
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         _binding = FragmentSearchResultBinding.inflate(inflater, container, false)
         musicViewModel.setPlayerStateListener(this)
+        mainViewModel.emptySearchResponse.observe(viewLifecycleOwner){noData ->
+            if(noData) {
+                val snackBar = Snackbar.make(
+                    requireView(),
+                    getString(R.string.invalid_query_input),
+                    Snackbar.LENGTH_SHORT
+                )
+
+                val snackBarView = snackBar.view
+                val snackBarText =
+                    snackBarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+                snackBarText.setTextColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.white
+                    )
+                )
+                snackBarView.background =
+                    ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
+                val params = snackBarView.layoutParams as FrameLayout.LayoutParams
+                params.gravity = Gravity.TOP
+                snackBarView.layoutParams = params
+                val actionBarHeight = requireActivity().actionBar?.height
+                params.setMargins(0, actionBarHeight ?: 200, 0, 0)
+                snackBarView.layoutParams = params
+                if (resources.configuration.screenLayout and Configuration.SCREENLAYOUT_SIZE_MASK >= Configuration.SCREENLAYOUT_SIZE_LARGE) {
+                    params.gravity = Gravity.CENTER_HORIZONTAL
+                }
+                snackBar.show()
+            }
+        }
         trackProgressBar =
             TrackProgressBar(binding.musicWidget.progressBar) { seekToPosition: Long ->
                 musicViewModel.seekTo(seekToPosition)
@@ -290,60 +327,60 @@ class SearchResultFragment : Fragment(), MusicViewModel.PlayerStateListener {
         super.onViewCreated(view, savedInstanceState)
         mainViewModel.searchedWeather.distinctUntilChanged()
             .observe(viewLifecycleOwner) { weatherData ->
-                weatherData.weather.currentWeather?.let { currentWeather ->
-                    val city = weatherData.location.cityName
-                    val weather =
-                        weatherData.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
-                    observeImageData(city, weather!!)
-                    musicViewModel.getPlaylist(weather)
-                    binding.mainTemp.text =
-                        getString(R.string.center_temp, currentWeather.temperature)
-                    //            Current hour values
-                    binding.centerTempRow.leftWeather.text =
-                        currentWeather.weatherConditions[0].mainDescription
-                    binding.centerTempRow.leftTemp.text = currentWeather.temperature.toString()
-                    binding.centerTempRow.leftTime.text =
-                        weatherData.weather.hourlyWeather?.get(0)?.timestamp
-                    //            Next hour values
-                    binding.centerTempRow.centerWeather.text =
-                        weatherData.weather.hourlyWeather?.get(1)?.weatherConditions?.get(0)?.mainDescription
-                    binding.centerTempRow.centerTemp.text =
-                        weatherData.weather.hourlyWeather?.get(1)?.temperature.toString()
-                    binding.centerTempRow.centerTime.text =
-                        weatherData.weather.hourlyWeather?.get(1)?.timestamp.toString()
-                    //            2 hours from now values
-                    binding.centerTempRow.rightWeather.text =
-                        weatherData.weather.hourlyWeather?.get(2)?.weatherConditions?.get(0)?.mainDescription
-                    binding.centerTempRow.rightTemp.text =
-                        weatherData.weather.hourlyWeather?.get(2)?.temperature.toString()
-                    binding.centerTempRow.rightTime.text =
-                        weatherData.weather.hourlyWeather?.get(2)?.timestamp.toString()
-                    binding.locationDisplay.text =
-                        getString(
-                            R.string.center_location_text,
-                            weatherData.location.cityName,
-                            weatherData.location.country
-                        )
-                    binding.mainWeatherWidget.feelsLikeTv.text =
-                        getString(R.string.feels_like, currentWeather.feelsLike)
-                    binding.mainWeatherWidget.windSpeedTv.text =
-                        getString(R.string.wind_speed, currentWeather.windSpeed)
-                    binding.mainWeatherWidget.visibilityValue.text =
-                        getString(R.string.visibility, currentWeather.visibility)
+                        weatherData?.weather?.currentWeather?.let { currentWeather ->
+                            val city = weatherData.location.cityName
+                            val weather =
+                                weatherData.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
+                            observeImageData(city, weather!!)
 
-                    binding.mainWeatherWidget.chanceOfRainTv.text =
-                        getString(
-                            R.string.chance_of_rain,
-                            weatherData.weather.hourlyWeather?.get(0)?.chanceOfRain
-                        )
-                    binding.mainWeatherWidget.uvIndexTv.text =
-                        getString(R.string.uv_index_value, currentWeather.uvi)
-                    binding.mainWeatherWidget.humidtyTv.text =
-                        getString(
-                            R.string.humidity, currentWeather.humidity
-                        )
+                            musicViewModel.getPlaylist(weather)
+                            binding.mainTemp.text =
+                                getString(R.string.center_temp, currentWeather.temperature)
+                            //            Current hour values
+                            binding.centerTempRow.leftWeather.text =
+                                currentWeather.weatherConditions[0].mainDescription
+                            binding.centerTempRow.leftTemp.text = currentWeather.temperature.toString()
+                            binding.centerTempRow.leftTime.text =
+                                weatherData.weather.hourlyWeather?.get(0)?.timestamp
+                            //            Next hour values
+                            binding.centerTempRow.centerWeather.text =
+                                weatherData.weather.hourlyWeather?.get(1)?.weatherConditions?.get(0)?.mainDescription
+                            binding.centerTempRow.centerTemp.text =
+                                weatherData.weather.hourlyWeather?.get(1)?.temperature.toString()
+                            binding.centerTempRow.centerTime.text =
+                                weatherData.weather.hourlyWeather?.get(1)?.timestamp.toString()
+                            //            2 hours from now values
+                            binding.centerTempRow.rightWeather.text =
+                                weatherData.weather.hourlyWeather?.get(2)?.weatherConditions?.get(0)?.mainDescription
+                            binding.centerTempRow.rightTemp.text =
+                                weatherData.weather.hourlyWeather?.get(2)?.temperature.toString()
+                            binding.centerTempRow.rightTime.text =
+                                weatherData.weather.hourlyWeather?.get(2)?.timestamp.toString()
+                            binding.locationDisplay.text =
+                                getString(
+                                    R.string.center_location_text,
+                                    weatherData.location.cityName,
+                                    weatherData.location.country
+                                )
+                            binding.mainWeatherWidget.feelsLikeTv.text =
+                                getString(R.string.feels_like, currentWeather.feelsLike)
+                            binding.mainWeatherWidget.windSpeedTv.text =
+                                getString(R.string.wind_speed, currentWeather.windSpeed)
+                            binding.mainWeatherWidget.visibilityValue.text =
+                                getString(R.string.visibility, currentWeather.visibility)
 
-                }
+                            binding.mainWeatherWidget.chanceOfRainTv.text =
+                                getString(
+                                    R.string.chance_of_rain,
+                                    weatherData.weather.hourlyWeather?.get(0)?.chanceOfRain
+                                )
+                            binding.mainWeatherWidget.uvIndexTv.text =
+                                getString(R.string.uv_index_value, currentWeather.uvi)
+                            binding.mainWeatherWidget.humidtyTv.text =
+                                getString(
+                                    R.string.humidity, currentWeather.humidity
+                                )
+                        }
             }
 
     }

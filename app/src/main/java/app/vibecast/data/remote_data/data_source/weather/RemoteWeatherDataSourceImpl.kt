@@ -1,29 +1,29 @@
 package app.vibecast.data.remote_data.data_source.weather
 
-import android.util.Log
 import app.vibecast.BuildConfig
-import app.vibecast.domain.util.TAGS.WEATHER_ERROR
-import app.vibecast.domain.repository.weather.Unit
+import app.vibecast.data.remote_data.network.weather.api.WeatherService
 import app.vibecast.data.remote_data.network.weather.model.CityApiModel
 import app.vibecast.data.remote_data.network.weather.model.CoordinateApiModel
 import app.vibecast.data.remote_data.network.weather.model.CurrentWeatherRemote
 import app.vibecast.data.remote_data.network.weather.model.HourlyWeatherRemote
 import app.vibecast.data.remote_data.network.weather.model.WeatherApiModel
 import app.vibecast.data.remote_data.network.weather.model.WeatherConditionRemote
-import app.vibecast.data.remote_data.network.weather.api.WeatherService
 import app.vibecast.domain.model.CurrentWeather
 import app.vibecast.domain.model.HourlyWeather
 import app.vibecast.domain.model.LocationDto
 import app.vibecast.domain.model.LocationWithWeatherDataDto
 import app.vibecast.domain.model.WeatherCondition
 import app.vibecast.domain.model.WeatherDto
+import app.vibecast.domain.repository.weather.Unit
 import app.vibecast.domain.repository.weather.UnitPreferenceRepository
+import app.vibecast.domain.util.TAGS.WEATHER_ERROR
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
+import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -46,10 +46,10 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
                 emit(locationInfo[0])
             }
         } catch (e: HttpException) {
-            Log.e(WEATHER_ERROR, "$e")
+            Timber.tag(WEATHER_ERROR).e(e)
             throw WeatherFetchException("HTTP error fetching weather data", e)
         } catch (e: Exception) {
-            Log.e(WEATHER_ERROR, "$e in Datasource")
+            Timber.tag(WEATHER_ERROR).e("$e in Datasource")
             throw WeatherFetchException("Error fetching city for lat $lat lon $lon", e)
         }
     }.flowOn(Dispatchers.IO)
@@ -73,6 +73,65 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
             throw e
         }
     }
+
+    override fun getSearchCoordinates(name: String): Flow<CoordinateApiModel?> = flow {
+        try {
+            val coordinatesList = weatherService.getCiyCoordinates(name, 1, BuildConfig.OWM_KEY)
+            emit(coordinatesList.firstOrNull())
+
+        } catch (e: HttpException) {
+            throw WeatherFetchException("HTTP error fetching weather", e)
+        } catch (e: Exception) {
+            throw e
+        }
+    }.flowOn(Dispatchers.IO)
+
+    override fun getSearchedWeather(cityName: String): Flow<LocationWithWeatherDataDto?> = flow {
+        getSearchCoordinates(cityName)
+            .collect { coordinate ->
+                coordinate?.let {
+                    try {
+                        preferredUnit = dataStoreRepository.getPreference()
+                        val weatherData: WeatherApiModel = when (preferredUnit) {
+                            Unit.IMPERIAL -> weatherService.getWeather(
+                                it.latitude,
+                                it.longitude,
+                                "minutely,daily,alerts",
+                                "imperial",
+                                BuildConfig.OWM_KEY
+                            )
+
+                            Unit.METRIC -> weatherService.getWeather(
+                                it.latitude,
+                                it.longitude,
+                                "minutely,daily,alerts",
+                                "metric",
+                                BuildConfig.OWM_KEY
+                            )
+
+                            else -> {
+                                weatherService.getWeather(
+                                    it.latitude,
+                                    it.longitude,
+                                    "minutely,daily,alerts",
+                                    "imperial",
+                                    BuildConfig.OWM_KEY
+                                )
+                            }
+                        }
+                        val combinedData = LocationWithWeatherDataDto(
+                            LocationDto(it.name, it.country),
+                            weatherData.toWeatherDto(preferredUnit)
+                        )
+                        emit(combinedData)
+                    } catch (e: Exception) {
+                        Timber.tag(WEATHER_ERROR).e("$e in DataSource")
+
+                    }
+                } ?: emit(null)  // Emit null if coordinate is null
+            }
+    }.flowOn(Dispatchers.IO)
+
 
     /**
      *  Fetches weather data based on city name and preferred measurements
@@ -115,10 +174,10 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
                     )
                     emit(combinedData)
                 } catch (e: HttpException) {
-                    Log.e(WEATHER_ERROR, "$e in DataSource")
+                    Timber.tag(WEATHER_ERROR).e("$e in DataSource")
                     throw WeatherFetchException("HTTP error fetching weather data", e)
                 } catch (e: Exception) {
-                    Log.e(WEATHER_ERROR, "$e in DataSource")
+                    Timber.tag(WEATHER_ERROR).e("$e in DataSource")
                     throw WeatherFetchException("Error fetching weather data for $cityName", e)
                 }
             }
@@ -167,10 +226,10 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
                 )
             )
         } catch (e: HttpException) {
-            Log.e(WEATHER_ERROR, "$e in DataSource")
+            Timber.tag(WEATHER_ERROR).e("$e in DataSource")
             throw WeatherFetchException("HTTP error fetching weather data", e)
         } catch (e: Exception) {
-            Log.e(WEATHER_ERROR, "$e in DataSource")
+            Timber.tag(WEATHER_ERROR).e("$e in DataSource")
             throw WeatherFetchException("Error fetching weather data", e)
         }
     }.flowOn(Dispatchers.IO)
@@ -178,7 +237,6 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
 
     class WeatherFetchException(message: String, cause: Throwable? = null) :
         Exception(message, cause)
-
 
 
     companion object {

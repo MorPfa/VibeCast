@@ -10,7 +10,7 @@ interface WeatherRepository {
 
     fun getWeather(cityName : String) : Flow<LocationWithWeatherDataDto>
 
-    fun getSearchedWeather(cityName : String) : Flow<LocationWithWeatherDataDto>
+    fun getSearchedWeather(cityName : String) : Flow<LocationWithWeatherDataDto?>
 
     fun getWeather(lat: Double, lon: Double): Flow<LocationWithWeatherDataDto>
     fun refreshWeather(cityName : String) : Flow<WeatherDto>

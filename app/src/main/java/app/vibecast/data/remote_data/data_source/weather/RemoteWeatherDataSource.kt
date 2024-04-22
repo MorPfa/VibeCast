@@ -9,10 +9,12 @@ import kotlinx.coroutines.flow.Flow
 interface RemoteWeatherDataSource {
 
     fun getCoordinates(name : String) : Flow<CoordinateApiModel>
+    fun getSearchCoordinates(name : String) : Flow<CoordinateApiModel?>
 
     fun getCity(lat: Double, lon: Double) : Flow<CityApiModel>
 
     fun getWeather(cityName : String) : Flow<LocationWithWeatherDataDto>
+    fun getSearchedWeather(cityName : String) : Flow<LocationWithWeatherDataDto?>
 
     fun getWeather(lat : Double, lon : Double) : Flow<LocationWithWeatherDataDto>
 }

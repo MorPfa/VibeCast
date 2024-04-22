@@ -3,23 +3,24 @@ package app.vibecast.domain.repository.weather
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.util.Log
-import app.vibecast.domain.util.TAGS.WEATHER_ERROR
 import app.vibecast.data.local_data.data_source.weather.LocalWeatherDataSource
 import app.vibecast.data.remote_data.data_source.weather.RemoteWeatherDataSource
 import app.vibecast.domain.model.LocationDto
 import app.vibecast.domain.model.LocationWithWeatherDataDto
 import app.vibecast.domain.model.WeatherDto
+import app.vibecast.domain.util.TAGS.WEATHER_ERROR
 import app.vibecast.presentation.TAG
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -27,7 +28,7 @@ class WeatherRepositoryImpl @Inject constructor(
     private val remoteWeatherDataSource: RemoteWeatherDataSource,
     private val localWeatherDataSource: LocalWeatherDataSource,
     private val dataStoreRepository: UnitPreferenceRepository,
-    @ApplicationContext private val appContext: Context
+    @ApplicationContext private val appContext: Context,
 ) : WeatherRepository {
 
 
@@ -37,16 +38,16 @@ class WeatherRepositoryImpl @Inject constructor(
     /**
      *  Gets weather data and location data from remote datasource based on search query
      */
-    override fun getSearchedWeather(cityName: String): Flow<LocationWithWeatherDataDto> = flow{
+    override fun getSearchedWeather(cityName: String): Flow<LocationWithWeatherDataDto?> = flow{
         try{
-            remoteWeatherDataSource.getWeather(cityName).collect{
-                val currentWeatherCondition = it.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
+            val test = remoteWeatherDataSource.getSearchedWeather(cityName).firstOrNull()
+                val currentWeatherCondition = test?.weather?.currentWeather?.weatherConditions?.get(0)?.mainDescription
                 currentWeather.emit(currentWeatherCondition)
-                emit(it)
-            }
+                emit(test)
+
         }
         catch (e : Exception){
-            Log.e(WEATHER_ERROR, "Error fetching weather data for $cityName", e)
+            Timber.tag(WEATHER_ERROR).e(e, "Error fetching weather data for $cityName")
             throw e
         }
 
@@ -73,7 +74,7 @@ class WeatherRepositoryImpl @Inject constructor(
                     throw DataOutdatedException("Timestamp: $timestamp current time: ${System.currentTimeMillis()}")
                 }
                 else {
-                    Log.d(TAG, "local city")
+                    Timber.tag(TAG).d("local city")
                     val output = LocationWithWeatherDataDto(LocationDto(weatherData.cityName, weatherData.country), weatherData)
                     val currentWeatherCondition = output.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
                     currentWeather.emit(currentWeatherCondition)
@@ -83,8 +84,8 @@ class WeatherRepositoryImpl @Inject constructor(
             }
         }
         catch (e : Exception){
-            Log.d(TAG, "remote city ")
-            Log.d(TAG, "$e")
+            Timber.tag(TAG).d("remote city ")
+            Timber.tag(TAG).d(e)
             remoteWeatherDataSource.getWeather(cityName).map { data ->
                 data.weather.country = data.location.country
                 data.weather.cityName = data.location.city
@@ -109,7 +110,8 @@ class WeatherRepositoryImpl @Inject constructor(
         remoteWeatherDataSource.getCity(lat, lon)
             .onCompletion { cause ->
                 if (cause != null && cause !is CancellationException) {
-                    Log.e(TAG, "Error during flow completion for getWeather with lat=$lat, lon=$lon: $cause in Repository")
+                    Timber.tag(TAG)
+                        .e("Error during flow completion for getWeather with lat= $lat  $lon   $cause  in Repository")
                 }
             }
             .collect { data ->
@@ -128,7 +130,7 @@ class WeatherRepositoryImpl @Inject constructor(
                                 throw DataOutdatedException("Timestamp: $timestamp current time: ${System.currentTimeMillis()}")
                             }
                             else {
-                                Log.d(TAG, "local coordinates")
+                                Timber.tag(TAG).d("local coordinates")
                                 val output = LocationWithWeatherDataDto(LocationDto(weatherData.cityName, weatherData.country), weatherData)
                                 val currentWeatherCondition = output.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
                                 currentWeather.emit(currentWeatherCondition)
@@ -137,8 +139,8 @@ class WeatherRepositoryImpl @Inject constructor(
                         }
                     }
                     catch (e : Exception){
-                        Log.d(TAG, "remote coordinates")
-                        Log.d(TAG, "$e")
+                        Timber.tag(TAG).d("remote coordinates")
+                        Timber.tag(TAG).d(e)
                         remoteWeatherDataSource.getWeather(lat, lon)
                             .map { weather ->
                                 weather.weather.country = data.countryName
@@ -168,7 +170,8 @@ class WeatherRepositoryImpl @Inject constructor(
             }
             .onCompletion { cause ->
                 if (cause != null && cause !is CancellationException) {
-                    Log.e(TAG, "Error during flow completion for refreshWeather with $cityName: $cause in Repository")
+                    Timber.tag(TAG)
+                        .e("Error during flow completion for refreshWeather with  $cityName  $cause  in Repository")
                 }
             }
     }.flowOn(Dispatchers.IO)
@@ -181,7 +184,8 @@ class WeatherRepositoryImpl @Inject constructor(
             }
             .onCompletion { cause ->
                 if (cause != null && cause !is CancellationException) {
-                    Log.e(TAG, "Error during flow completion for refreshWeather with lat=$lat, lon=$lon: $cause in Repository")
+                    Timber.tag(TAG)
+                        .e("Error during flow completion for getWeather with lat= $lat  $lon   $cause  in Repository")
                 }
             }
     }.flowOn(Dispatchers.IO)
@@ -209,9 +213,9 @@ class WeatherRepositoryImpl @Inject constructor(
 
         val difference = currentTimestampInSeconds - savedTimestampInSeconds
 
-        Log.d(TAG, "Current Timestamp: $currentTimestampInSeconds")
-        Log.d(TAG, "Saved Timestamp: $savedTimestampInSeconds")
-        Log.d(TAG, "Difference: $difference")
+        Timber.tag(TAG).d("Current Timestamp: $currentTimestampInSeconds")
+        Timber.tag(TAG).d("Saved Timestamp: $savedTimestampInSeconds")
+        Timber.tag(TAG).d("Difference: $difference")
 
         return difference > outdatedThreshold
     }
