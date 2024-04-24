@@ -113,8 +113,8 @@ class MusicViewModel @Inject constructor(
             viewModelScope.launch {
                 val genre = getGenre(weather)
                 musicRepository.getPlaylist(genre, token.value!!).collect {result ->
-                    val playlists = result.playlists.items
-                    _currentPlaylist.value = result.playlists.items[0].externalUrls.spotify
+                    val playlists = result.items
+                    _currentPlaylist.value = result.items[0].externalUrls.spotify
                     val index = playlists.indices.random()
                     Timber.tag("Spotify").d("Playlist name : ${playlists[index].name}")
                     val lofiPlaylist = playlists.find { it.name.contains("lofi", ignoreCase = true) }

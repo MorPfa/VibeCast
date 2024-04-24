@@ -12,15 +12,20 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
+/**
+ * Implementation of [LocalLocationDataSource]
+ *
+ * Methods:
+ * - [addLocationWithWeather] Adds location data and associated weather data to database to database.
+ * - [getLocationWithWeather] Queries database for all saved locations and their associated weather data
+ */
 class LocalLocationDataSourceImpl @Inject constructor(
     private val locationDao: LocationDao,
     private val dataStoreRepository: UnitPreferenceRepository
 ) : LocalLocationDataSource {
 
 
-    /**
-     *  Adds location data and associated weather data to database
-     */
+
     override suspend fun addLocationWithWeather(location: LocationWithWeatherDataDto)  {
         val preferredUnit = dataStoreRepository.getPreference()
         locationDao.addLocationWithWeather(
@@ -35,9 +40,7 @@ class LocalLocationDataSourceImpl @Inject constructor(
             )
     }
 
-    /**
-     *  Queries database for all saved locations and their associated weather data
-     */
+
     override fun getLocationWithWeather(): Flow<List<LocationWithWeatherDataDto>> =
         locationDao.getLocationsWithWeather().map { locationWithWeatherList ->
             locationWithWeatherList.map { locationWithWeatherData ->
@@ -68,9 +71,7 @@ class LocalLocationDataSourceImpl @Inject constructor(
         LocationEntity(location.city, location.country)
     )
 
-    /**
-     *  Converts DB Entity for weather data into Data Transfer Object
-     */
+
     private fun WeatherEntity.toWeatherDto(): WeatherDto {
         return WeatherDto(
             cityName = cityName,

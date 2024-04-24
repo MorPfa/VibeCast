@@ -7,18 +7,17 @@ import app.vibecast.presentation.screens.main_screen.weather.LocationModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 
-interface  LocationRepository {
+interface LocationRepository {
 
 
-    fun refreshLocationWeather() : Flow<List<LocationWithWeatherDataDto>>
-    fun getLocationWeather(index : Int) : Flow<WeatherDto>
+    fun refreshLocationWeather(): Flow<List<LocationWithWeatherDataDto>>
+    fun getLocationWeather(index: Int): Flow<WeatherDto>
 
+    fun addLocationWeather(location: LocationWithWeatherDataDto)
 
-    fun addLocationWeather(location : LocationWithWeatherDataDto)
+    fun getLocations(): Flow<List<LocationModel>>
 
-    fun getLocations() : Flow<List<LocationModel>>
-
-    fun getLocation(cityName : String) : Flow<LocationDto>
+    fun getLocation(cityName: String): Flow<LocationDto>
 
     fun addLocation(location: LocationDto): Job
 

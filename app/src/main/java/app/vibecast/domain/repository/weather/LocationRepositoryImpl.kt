@@ -16,39 +16,43 @@ import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * Implementation of [LocationRepository]
+ *
+ * Methods:
+ * - [refreshLocationWeather]  Updates weather data for specified location
+ */
 class LocationRepositoryImpl @Inject constructor(
     private val localLocationDataSource: LocalLocationDataSource,
-    private val remoteWeatherDataSource: RemoteWeatherDataSource
+    private val remoteWeatherDataSource: RemoteWeatherDataSource,
 ) : LocationRepository {
     private val backgroundScope = CoroutineScope(Dispatchers.IO)
 
-    /**
-     *  Updates weather data for specified location
-     */
-    override fun refreshLocationWeather() : Flow<List<LocationWithWeatherDataDto>> {
+    override fun refreshLocationWeather(): Flow<List<LocationWithWeatherDataDto>> {
         backgroundScope.launch {
             localLocationDataSource.getLocationWithWeather().map { locationWithWeatherDataList ->
-                    locationWithWeatherDataList.map { locationWithWeatherData ->
-                        val cityName = locationWithWeatherData.location.city
-                        val newWeatherData = remoteWeatherDataSource.getWeather(cityName).firstOrNull()
-                        if (newWeatherData != null) {
-                            locationWithWeatherData.weather = newWeatherData.weather
-                        }
-
-                        localLocationDataSource.addLocationWithWeather(locationWithWeatherData )
-
+                locationWithWeatherDataList.map { locationWithWeatherData ->
+                    val cityName = locationWithWeatherData.location.city
+                    val newWeatherData = remoteWeatherDataSource.getWeather(cityName).firstOrNull()
+                    if (newWeatherData != null) {
+                        locationWithWeatherData.weather = newWeatherData.weather
                     }
 
-                }.single()
+                    localLocationDataSource.addLocationWithWeather(locationWithWeatherData)
+
+                }
+
+            }.single()
         }
         return localLocationDataSource.getLocationWithWeather()
     }
 
     override fun addLocationWeather(location: LocationWithWeatherDataDto) {
         CoroutineScope(Dispatchers.Main).launch {
-        localLocationDataSource.addLocationWithWeather(location)
+            localLocationDataSource.addLocationWithWeather(location)
         }
     }
+
     override fun getLocationWeather(index: Int): Flow<WeatherDto> {
         return localLocationDataSource.getLocationWithWeather().map { locationWithWeatherDataList ->
             if (index in locationWithWeatherDataList.indices) {
@@ -72,7 +76,7 @@ class LocationRepositoryImpl @Inject constructor(
 
 
     override fun getLocations(): Flow<List<LocationModel>> = flow {
-        localLocationDataSource.getLocations().collect{
+        localLocationDataSource.getLocations().collect {
             emit(it.toLocationModels())
         }
     }
@@ -87,12 +91,13 @@ class LocationRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getLocation(cityName: String): Flow<LocationDto> = localLocationDataSource.getLocation(cityName)
+    override fun getLocation(cityName: String): Flow<LocationDto> =
+        localLocationDataSource.getLocation(cityName)
 
     override fun addLocation(location: LocationDto) =
         CoroutineScope(Dispatchers.Main).launch {
-        localLocationDataSource.addLocation(location)
-    }
+            localLocationDataSource.addLocation(location)
+        }
 
     override fun deleteLocation(location: LocationDto) =
         CoroutineScope(Dispatchers.IO).launch {

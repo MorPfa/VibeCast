@@ -2,9 +2,7 @@ package app.vibecast.domain.repository.firebase
 
 import app.vibecast.domain.model.FirebaseImage
 import app.vibecast.domain.model.FirebaseLocation
-import app.vibecast.domain.model.FirebaseMusicPreferences
 import app.vibecast.domain.model.FirebaseResponse
-import app.vibecast.domain.util.DB_STATUS
 import kotlinx.coroutines.flow.Flow
 
 interface FirebaseRepository {
@@ -27,9 +25,6 @@ interface FirebaseRepository {
 
     fun updateImageCount(action: Action)
     fun updateLocationCount(action: Action)
-
-
-
 
 }
 

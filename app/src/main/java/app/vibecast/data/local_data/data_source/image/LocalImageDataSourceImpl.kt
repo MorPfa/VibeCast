@@ -1,6 +1,5 @@
 package app.vibecast.data.local_data.data_source.image
 
-import android.util.Log
 import app.vibecast.data.local_data.db.image.dao.ImageDao
 import app.vibecast.data.local_data.db.image.model.ImageEntity
 import app.vibecast.domain.model.ImageDto
@@ -11,16 +10,22 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.cancellation.CancellationException
-
-
+/**
+ * Implementation of [LocalImageDataSource]
+ *
+ * Methods:
+ * - [getImages] Queries database for all saved images and returns them as Image Data Transfer Objects.
+ * - [addImage] Adds image to database after converting specified image DTO to DB Entity.
+ * - [deleteImage] Deletes image from database after converting specified image DTO to DB Entity.
+ * - [toImageDto] Converts Image Entity to Image Data Transfer Object.
+ */
 class LocalImageDataSourceImpl @Inject constructor(
-    private val imageDao: ImageDao
+    private val imageDao: ImageDao,
 ) : LocalImageDataSource {
-    /**
-     *  Queries database for all saved images and returns them as Image Data Transfer Objects
-     */
+
     override fun getImages(): Flow<List<ImageDto>> = imageDao.getAllImages().map { imageList ->
         try {
             imageList.map { it.toImageDto() }
@@ -30,9 +35,6 @@ class LocalImageDataSourceImpl @Inject constructor(
         }
     }
 
-    /**
-     *  Adds image to database after converting it to DB Entity
-     */
     override suspend fun addImage(image: ImageDto) {
         withContext(Dispatchers.IO) {
             try {
@@ -54,19 +56,16 @@ class LocalImageDataSourceImpl @Inject constructor(
                 )
 
             } catch (e: CancellationException) {
-                Log.e(COROUTINE_ERROR, "Coroutine got cancelled test 2 $e")
+                Timber.tag(COROUTINE_ERROR).e("Coroutine cancelled $e")
                 throw e
 
             } catch (e: Exception) {
-                Log.e(DB_ERROR, "Error inserting image into db $e")
+                Timber.tag(DB_ERROR).e("Error inserting image into db $e")
                 throw e
             }
         }
     }
 
-    /**
-     *  Deletes image from database after converting specified image DTO to DB Entity
-     */
     override suspend fun deleteImage(image: ImageDto) {
         withContext(Dispatchers.IO) {
             try {
@@ -86,20 +85,17 @@ class LocalImageDataSourceImpl @Inject constructor(
                     )
                 )
             } catch (e: CancellationException) {
-                Log.e(COROUTINE_ERROR, "Coroutine got cancelled test 3 $e")
+                Timber.tag(COROUTINE_ERROR).e("Coroutine cancelled $e")
                 throw e
             }
             catch(e: Exception) {
-                Log.e(DB_ERROR, "Error deleting image from db")
+                Timber.tag(DB_ERROR).e("Error deleting image from db")
                 throw e
             }
         }
     }
 
 
-    /**
-     * Converts Image Entity to Image Data Transfer Object
-     */
     private fun ImageEntity.toImageDto(): ImageDto {
         return ImageDto(
             id = this.id,

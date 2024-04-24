@@ -27,23 +27,22 @@ import dagger.hilt.components.SingletonComponent
 abstract class RepositoryModule {
 
     @Binds
-    abstract fun bindWeatherRepository(weatherRepositoryImpl: WeatherRepositoryImpl) : WeatherRepository
+    abstract fun bindWeatherRepository(weatherRepositoryImpl: WeatherRepositoryImpl): WeatherRepository
 
     @Binds
-    abstract fun bindFirebaseRepository(firebaseRepositoryImpl: FirebaseRepositoryImpl) : FirebaseRepository
+    abstract fun bindFirebaseRepository(firebaseRepositoryImpl: FirebaseRepositoryImpl): FirebaseRepository
 
     @Binds
-    abstract fun bindLocationRepository(locationRepositoryImpl: LocationRepositoryImpl) : LocationRepository
+    abstract fun bindLocationRepository(locationRepositoryImpl: LocationRepositoryImpl): LocationRepository
 
     @Binds
-    abstract  fun bindImageRepository(imageRepositoryImpl: ImageRepositoryImpl) : ImageRepository
+    abstract fun bindImageRepository(imageRepositoryImpl: ImageRepositoryImpl): ImageRepository
 
     @Binds
-    abstract  fun bindMusicRepository(musicRepositoryImpl: MusicRepositoryImpl) : MusicRepository
+    abstract fun bindMusicRepository(musicRepositoryImpl: MusicRepositoryImpl): MusicRepository
 
     @Binds
-    abstract  fun bindImagePreferenceRepository(imagePreferenceRepositoryImp: ImagePreferenceRepositoryImpl) : ImagePreferenceRepository
-
+    abstract fun bindImagePreferenceRepository(imagePreferenceRepositoryImp: ImagePreferenceRepositoryImpl): ImagePreferenceRepository
 
 
 }

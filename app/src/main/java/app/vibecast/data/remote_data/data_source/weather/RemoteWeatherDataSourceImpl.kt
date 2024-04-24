@@ -27,6 +27,18 @@ import timber.log.Timber
 import javax.inject.Inject
 
 
+/**
+ * Implementation of [RemoteWeatherDataSource]
+ *
+ * Methods:
+ * - [getCity] Calls reverse geo coding endpoint to fetch city info for users coordinates
+ * - [getCoordinates] Calls geo coding endpoint to fetch coordinates for specified city
+ * - [getSearchCoordinates] Same as [getCoordinates] but specifically for search results since result needs to be nullable
+ * - [getWeather] Fetches weather data based on coordinates and preferred measurements
+ * - [getWeather] Fetches weather data based on city name and preferred measurements
+ * - [toWeatherDto] Extension function to convert an API response model to a Data Transfer Object
+ */
+
 class RemoteWeatherDataSourceImpl @Inject constructor(
     private val weatherService: WeatherService,
     private val dataStoreRepository: UnitPreferenceRepository,
@@ -35,10 +47,6 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
 
     private var preferredUnit: Unit? = null
 
-    /**
-     *  Fetches city name based on coordinates using reverse geo coding API endpoint
-     *  when data needs to be fetched based on users current location
-     */
     override fun getCity(lat: Double, lon: Double): Flow<CityApiModel> = flow {
         try {
             val locationInfo = weatherService.getCiyName(lat, lon, 1, BuildConfig.OWM_KEY)
@@ -54,11 +62,6 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
         }
     }.flowOn(Dispatchers.IO)
 
-
-    /**
-     *  Fetches list of coordinates based on city name using geo coding API endpoint
-     *  when data needs to be fetched based on searched or saved location
-     */
     override fun getCoordinates(name: String): Flow<CoordinateApiModel> = flow {
         try {
             val coordinatesList = withContext(Dispatchers.IO) {
@@ -126,16 +129,12 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
                         emit(combinedData)
                     } catch (e: Exception) {
                         Timber.tag(WEATHER_ERROR).e("$e in DataSource")
-
                     }
-                } ?: emit(null)  // Emit null if coordinate is null
+                } ?: emit(null)
             }
     }.flowOn(Dispatchers.IO)
 
 
-    /**
-     *  Fetches weather data based on city name and preferred measurements
-     */
     override fun getWeather(cityName: String): Flow<LocationWithWeatherDataDto> = flow {
         getCoordinates(cityName)
             .collect {
@@ -184,9 +183,6 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
     }.flowOn(Dispatchers.IO)
 
 
-    /**
-     *  Fetches weather data based on coordinates and preferred measurements
-     */
     override fun getWeather(lat: Double, lon: Double): Flow<LocationWithWeatherDataDto> = flow {
         try {
             preferredUnit = dataStoreRepository.getPreference()
@@ -240,10 +236,6 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
 
 
     companion object {
-        /**
-         *  Extension function to convert an API response model to
-         *  a Data Transfer Object to be used in the domain layer
-         */
         fun WeatherApiModel.toWeatherDto(preferredUnit: Unit?): WeatherDto {
             return WeatherDto(
                 cityName = cityName,

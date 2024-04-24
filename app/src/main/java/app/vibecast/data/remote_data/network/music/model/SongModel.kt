@@ -4,15 +4,15 @@ import app.vibecast.domain.model.SongDto
 import com.spotify.protocol.types.ImageUri
 
 data class SongModel(
-    val name : String,
+    val name: String,
     val album: String,
     val artist: String,
-    val imageUri : ImageUri?,
+    val imageUri: ImageUri?,
     val trackUri: String,
     val artistUri: String,
     val albumUri: String,
     val url: String,
-    val previewUrl: String?
+    val previewUrl: String?,
 ) {
     fun toSongDto(): SongDto {
         return SongDto(

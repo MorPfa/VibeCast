@@ -34,18 +34,19 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 class PersistenceModule {
 
-    val DATASTORE_NAME = "preferences"
+    private val DATASTORE_NAME = "preferences"
+
     @Singleton
     @Provides
     fun providesUnitPreferenceRepo(
-        dataStore: DataStore<Preferences>
-    ) : UnitPreferenceRepository = WeatherUnitRepositoryImpl(dataStore)
+        dataStore: DataStore<Preferences>,
+    ): UnitPreferenceRepository = WeatherUnitRepositoryImpl(dataStore)
 
     @Singleton
     @Provides
     fun providesMusicPreferenceRepo(
-        dataStore: DataStore<Preferences>
-    ) : MusicPreferenceRepository = MusicPreferenceRepositoryImpl(dataStore)
+        dataStore: DataStore<Preferences>,
+    ): MusicPreferenceRepository = MusicPreferenceRepositoryImpl(dataStore)
 
 
     @Singleton
@@ -56,12 +57,12 @@ class PersistenceModule {
                 produceNewData = { emptyPreferences() }
             ),
             scope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
-            produceFile = {context.preferencesDataStoreFile(DATASTORE_NAME)}
+            produceFile = { context.preferencesDataStoreFile(DATASTORE_NAME) }
         )
     }
 
     @Provides
-    fun provideAppDatabase(@ApplicationContext context: Context) : AppDatabase =
+    fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase =
         Room.databaseBuilder(
             context,
             AppDatabase::class.java,
@@ -72,19 +73,18 @@ class PersistenceModule {
 
 
     @Provides
-    fun provideWeatherDao(appDatabase: AppDatabase) : WeatherDao = appDatabase.weatherDao()
-
+    fun provideWeatherDao(appDatabase: AppDatabase): WeatherDao = appDatabase.weatherDao()
 
 
     @Provides
-    fun provideUserDao(appDatabase: AppDatabase) : UserDao = appDatabase.userDao()
+    fun provideUserDao(appDatabase: AppDatabase): UserDao = appDatabase.userDao()
 
     @Provides
-    fun provideLocationDao(appDatabase: AppDatabase) : LocationDao = appDatabase.locationDao()
+    fun provideLocationDao(appDatabase: AppDatabase): LocationDao = appDatabase.locationDao()
 
     @Provides
-    fun provideImageDao(appDatabase: AppDatabase) : ImageDao = appDatabase.imageDao()
+    fun provideImageDao(appDatabase: AppDatabase): ImageDao = appDatabase.imageDao()
 
     @Provides
-    fun provideSongDao(appDatabase: AppDatabase) : SongDao = appDatabase.songDao()
+    fun provideSongDao(appDatabase: AppDatabase): SongDao = appDatabase.songDao()
 }

@@ -9,5 +9,4 @@ data class LocationEntity (
     @PrimaryKey(autoGenerate = false)
     @ColumnInfo(name = "cityName") val cityName : String,
     @ColumnInfo(name = "country") val country : String,
-
     )

@@ -24,6 +24,19 @@ import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.cancellation.CancellationException
 
+
+/**
+ * Implementation of [WeatherRepository]
+ *
+ * Methods:
+ * - [getSearchedWeather] Gets weather data and location data from remote datasource based on search query
+ * - [getWeather] Attempts to get weather and location data for saved location from database.
+ *                If data is older than 20 minutes or the preference for weather units has changed since
+ *                data was last cached, DataOutdatedException is thrown and data is fetched from server
+ * - [getWeather] Same as [getWeather] but based on coordinates for users current location
+ * - [isDataOutdated] Checks timestamp on saved database and determines if it is out of date
+ * - [isWrongUnit] Checks if preference for weather data units has changed since data has last been saved to database
+ */
 class WeatherRepositoryImpl @Inject constructor(
     private val remoteWeatherDataSource: RemoteWeatherDataSource,
     private val localWeatherDataSource: LocalWeatherDataSource,
@@ -32,33 +45,23 @@ class WeatherRepositoryImpl @Inject constructor(
 ) : WeatherRepository {
 
 
+    override val currentWeather = MutableStateFlow<String?>(null)
 
-     override val currentWeather = MutableStateFlow<String?>(null)
-
-    /**
-     *  Gets weather data and location data from remote datasource based on search query
-     */
-    override fun getSearchedWeather(cityName: String): Flow<LocationWithWeatherDataDto?> = flow{
-        try{
+    override fun getSearchedWeather(cityName: String): Flow<LocationWithWeatherDataDto?> = flow {
+        try {
             val test = remoteWeatherDataSource.getSearchedWeather(cityName).firstOrNull()
-                val currentWeatherCondition = test?.weather?.currentWeather?.weatherConditions?.get(0)?.mainDescription
-                currentWeather.emit(currentWeatherCondition)
-                emit(test)
+            val currentWeatherCondition =
+                test?.weather?.currentWeather?.weatherConditions?.get(0)?.mainDescription
+            currentWeather.emit(currentWeatherCondition)
+            emit(test)
 
-        }
-        catch (e : Exception){
+        } catch (e: Exception) {
             Timber.tag(WEATHER_ERROR).e(e, "Error fetching weather data for $cityName")
             throw e
         }
 
     }.flowOn(Dispatchers.IO)
 
-    /**
-     *  Attempts to get weather data and location data for saved location from database.
-     *  If data is older than 20 minutes or the preference for weather units
-     *  has changed since data was last cached, DataOutdatedException is thrown
-     *  and data is fetched from server
-     */
 
     override fun getWeather(cityName: String): Flow<LocationWithWeatherDataDto> = flow {
         try {
@@ -69,30 +72,34 @@ class WeatherRepositoryImpl @Inject constructor(
                     (isDataOutdated(timestamp) && isInternetAvailable(appContext))
                     ||
                     (isWrongUnit(weatherData.unit) && isInternetAvailable(appContext))
-                )
-                {
+                ) {
                     throw DataOutdatedException("Timestamp: $timestamp current time: ${System.currentTimeMillis()}")
-                }
-                else {
+                } else {
                     Timber.tag(TAG).d("local city")
-                    val output = LocationWithWeatherDataDto(LocationDto(weatherData.cityName, weatherData.country), weatherData)
-                    val currentWeatherCondition = output.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
+                    val output = LocationWithWeatherDataDto(
+                        LocationDto(
+                            weatherData.cityName,
+                            weatherData.country
+                        ), weatherData
+                    )
+                    val currentWeatherCondition =
+                        output.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
                     currentWeather.emit(currentWeatherCondition)
                     emit(output)
                 }
 
             }
-        }
-        catch (e : Exception){
+        } catch (e: Exception) {
             Timber.tag(TAG).d("remote city ")
             Timber.tag(TAG).d(e)
             remoteWeatherDataSource.getWeather(cityName).map { data ->
                 data.weather.country = data.location.country
                 data.weather.cityName = data.location.city
                 data
-            }.onEach {  localWeatherDataSource.addWeather(it.weather) }
+            }.onEach { localWeatherDataSource.addWeather(it.weather) }
                 .collect {
-                    val currentWeatherCondition = it.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
+                    val currentWeatherCondition =
+                        it.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
                     currentWeather.emit(currentWeatherCondition)
                     emit(it)
                 }
@@ -100,12 +107,6 @@ class WeatherRepositoryImpl @Inject constructor(
     }.flowOn(Dispatchers.IO)
 
 
-    /**
-     *  Attempts to get weather data and location data for current location from database.
-     *  If data is older than 20 minutes or the preference for weather units
-     *  has changed since data was last cached, DataOutdatedException is thrown
-     *  and data is fetched from server
-     */
     override fun getWeather(lat: Double, lon: Double): Flow<LocationWithWeatherDataDto> = flow {
         remoteWeatherDataSource.getCity(lat, lon)
             .onCompletion { cause ->
@@ -125,20 +126,23 @@ class WeatherRepositoryImpl @Inject constructor(
                                 (isDataOutdated(timestamp) && isInternetAvailable(appContext))
                                 ||
                                 (isWrongUnit(weatherData.unit) && isInternetAvailable(appContext))
-                                )
-                            {
+                            ) {
                                 throw DataOutdatedException("Timestamp: $timestamp current time: ${System.currentTimeMillis()}")
-                            }
-                            else {
+                            } else {
                                 Timber.tag(TAG).d("local coordinates")
-                                val output = LocationWithWeatherDataDto(LocationDto(weatherData.cityName, weatherData.country), weatherData)
-                                val currentWeatherCondition = output.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
+                                val output = LocationWithWeatherDataDto(
+                                    LocationDto(
+                                        weatherData.cityName,
+                                        weatherData.country
+                                    ), weatherData
+                                )
+                                val currentWeatherCondition =
+                                    output.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
                                 currentWeather.emit(currentWeatherCondition)
                                 emit(output)
                             }
                         }
-                    }
-                    catch (e : Exception){
+                    } catch (e: Exception) {
                         Timber.tag(TAG).d("remote coordinates")
                         Timber.tag(TAG).d(e)
                         remoteWeatherDataSource.getWeather(lat, lon)
@@ -150,7 +154,8 @@ class WeatherRepositoryImpl @Inject constructor(
                             .collect {
                                 it.location.city = data.cityName
                                 it.location.country = data.countryName
-                                val currentWeatherCondition = it.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
+                                val currentWeatherCondition =
+                                    it.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
                                 currentWeather.emit(currentWeatherCondition)
                                 emit(it)
                             }
@@ -158,8 +163,6 @@ class WeatherRepositoryImpl @Inject constructor(
                 }
             }
     }.flowOn(Dispatchers.IO)
-
-
 
 
     override fun refreshWeather(cityName: String): Flow<WeatherDto> = flow {
@@ -191,7 +194,6 @@ class WeatherRepositoryImpl @Inject constructor(
     }.flowOn(Dispatchers.IO)
 
 
-
     private fun isInternetAvailable(context: Context): Boolean {
         val connectivityManager =
             context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -220,11 +222,10 @@ class WeatherRepositoryImpl @Inject constructor(
         return difference > outdatedThreshold
     }
 
-    private suspend fun isWrongUnit(unit : Unit?) : Boolean{
+    private suspend fun isWrongUnit(unit: Unit?): Boolean {
         val previousUnit = dataStoreRepository.getPreference()
         return unit?.name != previousUnit.name
     }
-
 
 
     class DataOutdatedException(message: String) : Exception(message)

@@ -28,7 +28,6 @@ interface LocationDao {
     suspend fun addLocationWithWeather(locationEntity: LocationEntity, weatherEntity: WeatherEntity)
 
 
-
     @Query("SELECT * FROM locations WHERE cityName = :cityName")
     fun getLocation(cityName : String) : Flow<LocationEntity>
 

@@ -6,19 +6,15 @@ import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 import timber.log.Timber.*
 
-
-
-
-
 @HiltAndroidApp
-class VibeCastApplication : Application(){
+class VibeCastApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         initTimber()
     }
 
 
-    private fun initTimber()  = when {
+    private fun initTimber() = when {
 
 
         BuildConfig.DEBUG -> {
@@ -28,6 +24,7 @@ class VibeCastApplication : Application(){
                 }
             })
         }
+
         else -> {
             Timber.plant(CrashlyticsTree())
         }

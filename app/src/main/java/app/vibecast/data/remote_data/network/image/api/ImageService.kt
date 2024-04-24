@@ -19,15 +19,15 @@ interface ImageService {
     @GET
     suspend fun getImageForDownload(
         @Url query: String,
-    ) : DownloadUrl
+    ): DownloadUrl
 
     @Headers("Accept-Version: v1", "Authorization: Client-ID $CLIENT_ID")
     @GET("photos/random")
     suspend fun getImages(
         @Query("query") query: String,
-        @Query("orientation") orientation : String,
-        @Query("count") count : Int,
-        @Query("content_filter") contentFilter : String
-    ) : List<ImageApiModel>
+        @Query("orientation") orientation: String,
+        @Query("count") count: Int,
+        @Query("content_filter") contentFilter: String,
+    ): List<ImageApiModel>
 
 }

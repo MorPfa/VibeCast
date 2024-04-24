@@ -32,13 +32,13 @@ class LogoutFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
     private lateinit var binding: FragmentLogoutBinding
-    private lateinit var logoutBtn : Button
-    private lateinit var deleteBtn : Button
+    private lateinit var logoutBtn: Button
+    private lateinit var deleteBtn: Button
     private var deleteDialog: AlertDialog? = null
     private var logoutDialog: AlertDialog? = null
-    private lateinit var auth : FirebaseAuth
-    private val imageViewModel : ImageViewModel by activityViewModels()
-    private val accountViewModel : AccountViewModel by activityViewModels()
+    private lateinit var auth: FirebaseAuth
+    private val imageViewModel: ImageViewModel by activityViewModels()
+    private val accountViewModel: AccountViewModel by activityViewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         auth = Firebase.auth
@@ -57,11 +57,11 @@ class LogoutFragment : Fragment() {
         binding.backgroundImageView.setImageResource(bgImage)
         logoutBtn = binding.logoutBtn
         deleteBtn = binding.deleteBtn
-        logoutBtn.setOnClickListener{
+        logoutBtn.setOnClickListener {
             showLogoutDialog()
 
         }
-        deleteBtn.setOnClickListener{
+        deleteBtn.setOnClickListener {
             showDeleteDialog()
         }
         return binding.root
@@ -70,7 +70,8 @@ class LogoutFragment : Fragment() {
 
     private fun showLogoutDialog() {
         val alertDialogBuilder = AlertDialog.Builder(requireContext())
-        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.delete_account_dialog, null)
+        val dialogView =
+            LayoutInflater.from(requireContext()).inflate(R.layout.delete_account_dialog, null)
 
         val confirmBtn = dialogView.findViewById<Button>(R.id.confirmBtn)
         val cancelBtn = dialogView.findViewById<Button>(R.id.cancelBtn)
@@ -79,7 +80,7 @@ class LogoutFragment : Fragment() {
             logoutDialog?.dismiss()
         }
 
-        confirmBtn.setOnClickListener{
+        confirmBtn.setOnClickListener {
             auth.signOut()
             logoutDialog?.dismiss()
             val intent = Intent(activity, MainActivity::class.java)
@@ -95,7 +96,8 @@ class LogoutFragment : Fragment() {
 
     private fun showDeleteDialog() {
         val alertDialogBuilder = AlertDialog.Builder(requireContext())
-        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.delete_account_dialog, null)
+        val dialogView =
+            LayoutInflater.from(requireContext()).inflate(R.layout.delete_account_dialog, null)
 
         val confirmBtn = dialogView.findViewById<Button>(R.id.confirmBtn)
         val cancelBtn = dialogView.findViewById<Button>(R.id.cancelBtn)
@@ -104,12 +106,12 @@ class LogoutFragment : Fragment() {
             deleteDialog?.dismiss()
         }
 
-        confirmBtn.setOnClickListener{
+        confirmBtn.setOnClickListener {
             val user = auth.currentUser!!
             user.delete()
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                       Timber.tag("auth").d("Account deleted")
+                        Timber.tag("auth").d("Account deleted")
                         accountViewModel.deleteUserData()
                         ImageHandler.deleteImageFromInternalStorage(requireContext())
                         auth.signOut()
@@ -117,9 +119,9 @@ class LogoutFragment : Fragment() {
                         val intent = Intent(activity, MainActivity::class.java)
                         startActivity(intent)
                         requireActivity().finish()
-                    }
-                    else {
-                        Toast.makeText(requireContext(), "Something went wrong", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(requireContext(), "Something went wrong", Toast.LENGTH_SHORT)
+                            .show()
                     }
                 }
 
@@ -131,7 +133,6 @@ class LogoutFragment : Fragment() {
         deleteDialog?.show()
 
     }
-
 
 
     companion object {

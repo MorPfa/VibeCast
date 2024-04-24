@@ -8,12 +8,16 @@ import com.google.android.gms.location.LocationServices
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
-class LocationGetter@Inject constructor(
-   @ApplicationContext private val context: Context) {
+class LocationGetter @Inject constructor(
+    @ApplicationContext private val context: Context,
+) {
 
-     val client = LocationServices.getFusedLocationProviderClient(context)
+    val client = LocationServices.getFusedLocationProviderClient(context)
 
-    fun isPermissionGranted() : Boolean {
-        return ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+    fun isPermissionGranted(): Boolean {
+        return ActivityCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
     }
 }

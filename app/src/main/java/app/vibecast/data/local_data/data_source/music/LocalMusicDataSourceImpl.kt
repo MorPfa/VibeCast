@@ -8,6 +8,15 @@ import kotlinx.coroutines.flow.flow
 import timber.log.Timber
 import javax.inject.Inject
 
+/**
+ * Implementation of [LocalMusicDataSource]
+ *
+ * Methods:
+ * - [saveSong] Adds song to database after after converting specified song DTO to DB Entity.
+ * - [getSavedSong] Gets specified song from database and converts it to song DTO.
+ * - [deleteSong] Deletes song from database after converting specified song DTO to DB Entity.
+ * - [getAllSavedSongs] Gets all songs from database and converts each to Data Transfer Object.
+ */
 class LocalMusicDataSourceImpl @Inject constructor(private val songDao: SongDao) :
     LocalMusicDataSource {
 
@@ -55,17 +64,19 @@ class LocalMusicDataSourceImpl @Inject constructor(private val songDao: SongDao)
     override fun getSavedSong(song: SongDto): Flow<SongDto> = flow {
         try {
             songDao.getSavedSong(song.trackUri).collect {
-                emit(SongDto(
-                    album = it.album,
-                    name = it.name,
-                    url = it.url,
-                    trackUri = it.uri,
-                    imageUri = song.imageUri,
-                    previewUrl = it.previewUrl,
-                    artist = it.artist,
-                    artistUri = it.artist,
-                    albumUri = song.albumUri,
-                ))
+                emit(
+                    SongDto(
+                        album = it.album,
+                        name = it.name,
+                        url = it.url,
+                        trackUri = it.uri,
+                        imageUri = song.imageUri,
+                        previewUrl = it.previewUrl,
+                        artist = it.artist,
+                        artistUri = it.artist,
+                        albumUri = song.albumUri,
+                    )
+                )
             }
         } catch (e: Exception) {
             Timber.tag("music_db").d("Couldn't get song")

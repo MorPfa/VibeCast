@@ -33,12 +33,12 @@ private const val IMAGE = "image"
 
 class ImageItemFragment : DialogFragment() {
     private val imageViewModel: ImageViewModel by activityViewModels()
-    private val accountViewModel : AccountViewModel by activityViewModels()
+    private val accountViewModel: AccountViewModel by activityViewModels()
     private var image: ImageDto? = null
 
 
-    private lateinit var binding : FragmentImageItemBinding
-    private lateinit var imageLoader : ImageLoader
+    private lateinit var binding: FragmentImageItemBinding
+    private lateinit var imageLoader: ImageLoader
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,14 +47,22 @@ class ImageItemFragment : DialogFragment() {
             image = it.parcelable(IMAGE)
         }
     }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentImageItemBinding.inflate(inflater, container, false)
         dialog?.window?.setBackgroundDrawableResource(R.drawable.dialog_fragment_background)
         imageLoader = ImageLoader(requireContext())
-        image?.urls?.let { imageLoader.loadUrlIntoImageView(it.regular, binding.savedImage, false, 0) }
+        image?.urls?.let {
+            imageLoader.loadUrlIntoImageView(
+                it.regular,
+                binding.savedImage,
+                false,
+                0
+            )
+        }
         val userName = image?.user?.name
         val unsplashText = "Unsplash"
         val userUrl = image?.user?.attributionUrl
@@ -77,11 +85,31 @@ class ImageItemFragment : DialogFragment() {
                     openUrlInBrowser(unsplashUrl)
                 }
             }
-            userLink.setSpan(clickableSpanUser, 0, userName!!.length, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
-            userLink.setSpan(linkColorSpanUser, 0, userName.length, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
+            userLink.setSpan(
+                clickableSpanUser,
+                0,
+                userName!!.length,
+                SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+            userLink.setSpan(
+                linkColorSpanUser,
+                0,
+                userName.length,
+                SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
 
-            unsplashLink.setSpan(clickableSpanUnsplash, 0, unsplashText.length, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
-            unsplashLink.setSpan(linkColorSpanUnsplash, 0, unsplashText.length, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE)
+            unsplashLink.setSpan(
+                clickableSpanUnsplash,
+                0,
+                unsplashText.length,
+                SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+            unsplashLink.setSpan(
+                linkColorSpanUnsplash,
+                0,
+                unsplashText.length,
+                SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
         }
 
 
@@ -90,8 +118,8 @@ class ImageItemFragment : DialogFragment() {
             .append(userLink)
             .append(" on ")
             .append(unsplashLink)
-            binding.attributionText.text = attributionTextSpanBuilder
-            binding.attributionText.movementMethod = LinkMovementMethod.getInstance()
+        binding.attributionText.text = attributionTextSpanBuilder
+        binding.attributionText.movementMethod = LinkMovementMethod.getInstance()
 
         val savedDate = convertUnixTimestamp(image?.timestamp)
 
@@ -109,9 +137,9 @@ class ImageItemFragment : DialogFragment() {
             }
             dialog?.dismiss()
         }
-        binding.downloadBtn.setOnClickListener{
+        binding.downloadBtn.setOnClickListener {
             lifecycleScope.launch {
-                imageViewModel.getImageForDownload(image?.links!!.downloadLink).collect{ image ->
+                imageViewModel.getImageForDownload(image?.links!!.downloadLink).collect { image ->
                     ImageSaver.saveImageFromUrlToGallery(
                         image, requireContext()
                     )
@@ -130,14 +158,13 @@ class ImageItemFragment : DialogFragment() {
     }
 
     private fun convertUnixTimestamp(unixTimestamp: Long?): String? {
-        return if (unixTimestamp != null){
+        return if (unixTimestamp != null) {
             val date = Date(unixTimestamp)
             val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
             sdf.format(date)
+        } else {
+            "(Date not found)"
         }
-         else {
-             "(Date not found)"
-         }
 
     }
 

@@ -63,8 +63,6 @@ class RegistrationFragment : Fragment() {
         super.onAttach(context)
         if (context is OnGoogleSignUpClickListener) {
             listener = context
-        } else {
-            throw RuntimeException("$context must implement OnGoogleSignUpClickListener")
         }
     }
 
@@ -159,7 +157,7 @@ class RegistrationFragment : Fragment() {
                 if (task.isSuccessful) {
                     Timber.tag("auth").d("createUserWithEmail:success")
                     val user = auth.currentUser
-                   accountViewModel.addUserName(user, userName)
+                    accountViewModel.addUserName(user, userName)
                     Toast.makeText(
                         requireContext(),
                         "Created Account successfully", Toast.LENGTH_SHORT

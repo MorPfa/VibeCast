@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -71,14 +69,16 @@
                     android:layout_height="wrap_content"
                     android:checked="true"
                     android:text="@string/imperial"
-                    android:textColor="#FFFFFF" />
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp" />
 
                 <RadioButton
                     android:id="@+id/radioMetric"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/metric"
-                    android:textColor="#FFFFFF" />
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp" />
             </RadioGroup>
 
             <TextView
@@ -94,9 +94,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="20dp"
-                android:padding="16dp"
+                android:padding="12dp"
                 android:text="@string/allow_vibecast_to_use_your_location"
                 android:textColor="#FFFFFF"
+                android:textSize="16sp"
                 android:theme="@style/SwitchTheme" />
 
 
@@ -113,20 +114,20 @@
                 android:id="@+id/bg_image_selector"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="60dp"
                 android:layout_marginHorizontal="16dp"
-                android:background="@drawable/rounded_black_background" />
+                android:background="@drawable/rounded_black_background"
+                android:paddingHorizontal="60dp" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/reset_bg_image_btn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginVertical="4dp"
                 android:layout_marginHorizontal="16dp"
+                android:layout_marginVertical="4dp"
                 android:background="@drawable/textfield_background"
-                app:backgroundTint="@color/black"
                 android:text="@string/reset_background_image"
-                android:textColor="#FFFFFF" />
+                android:textColor="#FFFFFF"
+                app:backgroundTint="@color/black" />
 
 
             <TextView
@@ -318,8 +319,8 @@
                 android:layout_marginHorizontal="16dp"
                 android:background="@drawable/textfield_background"
                 android:text="@string/reset_music_preferences"
-                app:backgroundTint="@color/black"
-                android:textColor="#FFFFFF" />
+                android:textColor="#FFFFFF"
+                app:backgroundTint="@color/black" />
 
 
         </LinearLayout>

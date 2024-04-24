@@ -15,7 +15,7 @@ import javax.inject.Inject
 class SyncSavedLocationsWeatherWorker @Inject constructor(
     appContext: Context,
     workerParameters: WorkerParameters,
-    private val locationRepository: LocationRepository
+    private val locationRepository: LocationRepository,
 ) : CoroutineWorker(appContext, workerParameters) {
 
 
@@ -27,6 +27,7 @@ class SyncSavedLocationsWeatherWorker @Inject constructor(
             Result.failure()
         }
     }
+
     fun enqueueWeatherSyncWork(context: Context) {
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -40,7 +41,11 @@ class SyncSavedLocationsWeatherWorker @Inject constructor(
             .build()
 
         WorkManager.getInstance(context)
-            .enqueueUniquePeriodicWork("weatherSyncWork", ExistingPeriodicWorkPolicy.KEEP, periodicWorkRequest)
+            .enqueueUniquePeriodicWork(
+                "weatherSyncWork",
+                ExistingPeriodicWorkPolicy.KEEP,
+                periodicWorkRequest
+            )
     }
 
 }

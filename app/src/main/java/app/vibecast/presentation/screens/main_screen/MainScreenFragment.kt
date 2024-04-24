@@ -177,7 +177,7 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
     ): View {
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         _binding = FragmentMainScreenBinding.inflate(inflater, container, false)
-        musicViewModel.currentSong.observe(viewLifecycleOwner){}
+
         musicViewModel.setPlayerStateListener(this)
         trackProgressBar =
             TrackProgressBar(binding.musicWidget.progressBar) { seekToPosition: Long ->
@@ -318,7 +318,7 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
                         val city = weatherData.location.cityName
                         val weather = weatherData.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
                         observeImageData(city, weather!!)
-//                        musicViewModel.getPlaylist(weather!!)
+                        musicViewModel.getPlaylist(weather!!)
 
 
                         binding.mainTempDisplay.text =
@@ -377,6 +377,7 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
     override fun onDestroyView() {
         super.onDestroyView()
         mainViewModel.currentWeather.removeObservers(viewLifecycleOwner)
+        musicViewModel.currentSong.removeObservers(viewLifecycleOwner)
         _binding = null
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }

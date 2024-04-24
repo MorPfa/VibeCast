@@ -4,15 +4,15 @@ import app.vibecast.domain.repository.weather.Unit
 
 
 data class WeatherDto(
-    var cityName : String,
-    var country : String,
+    var cityName: String,
+    var country: String,
     val latitude: Double,
     val longitude: Double,
-    val dataTimestamp : Long,
-    val timezone : String,
-    val unit : Unit?,
+    val dataTimestamp: Long,
+    val timezone: String,
+    val unit: Unit?,
     val currentWeather: CurrentWeather?,
-    val hourlyWeather: List<HourlyWeather>?
+    val hourlyWeather: List<HourlyWeather>?,
 )
 
 
@@ -25,7 +25,7 @@ data class CurrentWeather(
     val cloudCover: Int,
     val visibility: Int,
     val windSpeed: Double,
-    val weatherConditions: List<WeatherCondition>
+    val weatherConditions: List<WeatherCondition>,
 )
 
 data class HourlyWeather(
@@ -36,10 +36,10 @@ data class HourlyWeather(
     val uvi: Double,
     val windSpeed: Double,
     val weatherConditions: List<WeatherCondition>,
-    val chanceOfRain: Double
+    val chanceOfRain: Double,
 )
 
 data class WeatherCondition(
     val mainDescription: String,
-    val icon: String
+    val icon: String,
 )

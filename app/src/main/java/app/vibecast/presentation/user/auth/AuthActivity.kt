@@ -5,9 +5,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.NavController
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.NavHostFragment
 import app.vibecast.R
 import app.vibecast.databinding.ActivityAuthBinding
 import app.vibecast.presentation.MainActivity
@@ -24,12 +22,12 @@ import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 
 @AndroidEntryPoint
-class AuthActivity : AppCompatActivity(), RegistrationFragment.OnGoogleSignUpClickListener, LoginFragment.OnGoogleSignInClickListener {
+class AuthActivity : AppCompatActivity(), RegistrationFragment.OnGoogleSignUpClickListener,
+    LoginFragment.OnGoogleSignInClickListener {
 
-    private lateinit var binding : ActivityAuthBinding
+    private lateinit var binding: ActivityAuthBinding
     private lateinit var auth: FirebaseAuth
-    private val viewModel : AccountViewModel by viewModels()
-
+    private val viewModel: AccountViewModel by viewModels()
 
 
     override fun onGoogleSignInClick() {
@@ -80,7 +78,7 @@ class AuthActivity : AppCompatActivity(), RegistrationFragment.OnGoogleSignUpCli
     }
 
     private fun firebaseAuthWithGoogle(idToken: String) {
-        val credential = GoogleAuthProvider.getCredential(idToken,  null)
+        val credential = GoogleAuthProvider.getCredential(idToken, null)
         auth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
@@ -93,11 +91,11 @@ class AuthActivity : AppCompatActivity(), RegistrationFragment.OnGoogleSignUpCli
 
                 } else {
                     Timber.tag("googleAuth").d("Auth failed")
-                    // If sign in fails, display a message to the user.
                     Toast.makeText(this, "Authentication Failed.", Toast.LENGTH_SHORT).show()
                 }
             }
     }
+
     override fun onSupportNavigateUp(): Boolean {
         finish()
         return super.onSupportNavigateUp()

@@ -48,7 +48,6 @@ class LocationAdapter(
 
     }
 
-
     class LocationDiffCallback : DiffUtil.ItemCallback<LocationModel>() {
         override fun areItemsTheSame(oldItem: LocationModel, newItem: LocationModel): Boolean {
             return oldItem.cityName == newItem.cityName

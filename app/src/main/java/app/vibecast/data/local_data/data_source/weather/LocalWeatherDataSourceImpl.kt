@@ -14,22 +14,27 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 
+/**
+ * Implementation of [LocalWeatherDataSource]
+ *
+ * Methods:
+ * - [getWeather] Queries database for last saved weather data for specified city and returns weather Data Transfer Objects.
+ * - [getLocationWithWeather] Queries database for saved location and and associated weather data.
+ * - [addLocationWithWeather] Adds location with associated weather data to database.
+ * - [toWeather] Converts DB Entity for weather data into Data Transfer Object.
+ * - [toWeatherEntity] Converts weather Data Transfer Object to DB Entity
+ */
+
 class LocalWeatherDataSourceImpl @Inject constructor(
     private val weatherDao: WeatherDao,
     private val locationDao: LocationDao
 ) : LocalWeatherDataSource {
 
-    /**
-     *  Queries database for last saved weather data in specific city
-     */
     override fun getWeather(cityName: String): Flow<WeatherDto> = weatherDao.getWeather(cityName).map {
             weatherEntity -> weatherEntity.toWeather()
     }.flowOn(Dispatchers.IO)
 
 
-    /**
-     *  Queries database for last saved weather data in specific city along with detailed location data
-     */
     override fun getLocationWithWeather(cityName: String): Flow<LocationWithWeatherDataDto> =
         locationDao.getLocationWithWeather(cityName)
             .map { locationWithWeatherEntity ->
@@ -47,25 +52,17 @@ class LocalWeatherDataSourceImpl @Inject constructor(
             }
 
 
-    /**
-     *  Adds weather data and location data to database
-     */
     override suspend fun addLocationWithWeather(location: LocationWithWeatherDataDto) {
         locationDao.addLocationWithWeather(
             LocationEntity(location.location.city, location.location.country),
             location.weather.toWeatherEntity(location.location.city)
         )
     }
-    /**
-     *  Adds weather data to database
-     */
+
     override suspend fun addWeather(weather : WeatherDto) {
        weatherDao.addWeather(weather.toWeatherEntity(weather.cityName))
     }
 
-    /**
-     *  Converts DB Entity for weather data into Data Transfer Object
-     */
     private fun WeatherEntity.toWeather(): WeatherDto {
         return WeatherDto(
             cityName = cityName,
@@ -80,9 +77,6 @@ class LocalWeatherDataSourceImpl @Inject constructor(
         )
     }
 
-    /**
-     *  Converts Data Transfer Object for weather data into DB Entity
-     */
     private fun WeatherDto.toWeatherEntity(cityName: String): WeatherEntity {
         return WeatherEntity(
             cityName = cityName,

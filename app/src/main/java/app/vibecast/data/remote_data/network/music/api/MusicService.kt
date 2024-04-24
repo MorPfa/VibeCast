@@ -15,17 +15,17 @@ interface MusicService {
     suspend fun getPlaylist(
         @Path("category_id") categoryId: String,
         @Header("Authorization") accessCode: String,
-        @Query("limit") limit: Int =10,
-        @Query("offset") offset: Int =0
-    ) : PlaylistApiModel
+        @Query("limit") limit: Int = 10,
+        @Query("offset") offset: Int = 0,
+    ): PlaylistApiModel
 
 
     @GET("search")
     suspend fun getCurrentSong(
         @Header("Authorization") accessCode: String,
-        @Query("q") query : String,
-        @Query("type") type : String = "track",
-        @Query("limit") limit: Int =5,
-        @Query("offset") offset: Int =0
-    ) : TracksResponse
+        @Query("q") query: String,
+        @Query("type") type: String = "track",
+        @Query("limit") limit: Int = 5,
+        @Query("offset") offset: Int = 0,
+    ): TracksResponse
 }

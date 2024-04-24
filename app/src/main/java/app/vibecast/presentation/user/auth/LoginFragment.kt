@@ -44,10 +44,10 @@ class LoginFragment : Fragment() {
     private lateinit var passwordInput: EditText
     private lateinit var signInBtn: Button
     private lateinit var noAccountBtn: TextView
-    private lateinit var forgotBtn : TextView
-    private lateinit var googleSignInBtn : SignInButton
+    private lateinit var forgotBtn: TextView
+    private lateinit var googleSignInBtn: SignInButton
     private var forgotPasswordDialog: AlertDialog? = null
-    private val imageViewModel : ImageViewModel by activityViewModels()
+    private val imageViewModel: ImageViewModel by activityViewModels()
 
 
     private var listener: OnGoogleSignInClickListener? = null
@@ -61,10 +61,9 @@ class LoginFragment : Fragment() {
         super.onAttach(context)
         if (context is OnGoogleSignInClickListener) {
             listener = context
-        } else {
-            throw RuntimeException("$context must implement OnGoogleSignUpClickListener")
         }
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         auth = Firebase.auth
@@ -105,7 +104,8 @@ class LoginFragment : Fragment() {
 
         forgotBtn.setOnClickListener {
             val alertDialogBuilder = AlertDialog.Builder(requireContext())
-            val dialog = LayoutInflater.from(requireContext()).inflate(R.layout.forgot_password_dialog, null)
+            val dialog =
+                LayoutInflater.from(requireContext()).inflate(R.layout.forgot_password_dialog, null)
             val userEmail = dialog.findViewById<EditText>(R.id.editBox)
             val cancelBtn = dialog.findViewById<MaterialButton>(R.id.btnCancel)
             val resetBtn = dialog.findViewById<MaterialButton>(R.id.btnReset)
@@ -152,11 +152,11 @@ class LoginFragment : Fragment() {
     }
 
 
-    private fun compareEmail(email: EditText){
-        if (email.text.toString().isEmpty()){
+    private fun compareEmail(email: EditText) {
+        if (email.text.toString().isEmpty()) {
             return
         }
-        if (!Patterns.EMAIL_ADDRESS.matcher(email.text.toString()).matches()){
+        if (!Patterns.EMAIL_ADDRESS.matcher(email.text.toString()).matches()) {
             return
         }
         auth.sendPasswordResetEmail(email.text.toString())
@@ -171,7 +171,6 @@ class LoginFragment : Fragment() {
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(requireActivity()) { task ->
                 if (task.isSuccessful) {
-
                     Timber.tag("auth").d("signInWithEmail:success")
                     Toast.makeText(
                         requireContext(),
@@ -188,10 +187,18 @@ class LoginFragment : Fragment() {
                         throw task.exception!!
                     } catch (invalidCredentials: FirebaseAuthInvalidCredentialsException) {
                         // Handle incorrect password
-                        Toast.makeText(requireContext(), "Email and password do not match", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            requireContext(),
+                            "Email and password do not match",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     } catch (e: Exception) {
                         // Handle other exceptions
-                        Toast.makeText(requireContext(), "Authentication failed", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            requireContext(),
+                            "Authentication failed",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }

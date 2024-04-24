@@ -8,12 +8,18 @@ import kotlinx.coroutines.flow.first
 import timber.log.Timber
 import javax.inject.Inject
 
-
+/**
+ * Implementation of [MusicPreferenceRepository]
+ *
+ * Methods:
+ * - [savePreference] Save map of music genres user linked with weather conditions
+ * - [getPreferences] Gets all set preferences for music genres
+ * - [getPreference] Gets preferred music genre for specified weather condition
+ * - [clearPreference] Resets music preferences
+ */
 class MusicPreferenceRepositoryImpl @Inject constructor(
     private val dataStore: DataStore<Preferences>
 ) : MusicPreferenceRepository {
-
-
 
     override suspend fun savePreference(preference: Map<WeatherCondition, String>) {
         dataStore.edit { preferences ->

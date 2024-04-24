@@ -1,23 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/weather_widget_background"
-    >
+    android:background="@drawable/weather_widget_background">
 
 
     <androidx.appcompat.widget.AppCompatImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/spotify_logo"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         android:layout_marginHorizontal="8dp"
         android:layout_marginVertical="2dp"
-        />
+        android:src="@drawable/spotify_logo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/albumArtImageView"
@@ -25,14 +21,14 @@
         android:layout_height="116dp"
         android:layout_marginVertical="1dp"
         android:adjustViewBounds="true"
+        android:background="#494646"
         android:contentDescription="@string/cover_art_description"
         android:scaleType="centerInside"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/music_info"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.5"
-        app:srcCompat="@drawable/cover_art_placeholder"
-        android:background="#494646"/>
+        app:srcCompat="@drawable/cover_art_placeholder" />
 
 
     <LinearLayout
@@ -48,7 +44,6 @@
         app:layout_constraintVertical_bias="0.5">
 
 
-
         <TextView
             android:id="@+id/songTitleTextView"
             android:layout_width="match_parent"
@@ -57,10 +52,7 @@
             android:textAlignment="center"
             android:textColor="@color/white"
             android:textSize="18sp"
-            android:textStyle="bold"
-            />
-
-
+            android:textStyle="bold" />
 
 
         <TextView
@@ -71,8 +63,7 @@
             android:text="@string/loading_placeholder"
             android:textAlignment="center"
             android:textColor="@color/white"
-            android:textSize="14sp"
-            />
+            android:textSize="14sp" />
 
 
         <androidx.appcompat.widget.AppCompatSeekBar
@@ -80,8 +71,7 @@
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:progressTint="@color/white"
-            android:thumbTint="@android:color/white"
-            />
+            android:thumbTint="@android:color/white" />
 
 
         <LinearLayout
@@ -89,16 +79,15 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:orientation="horizontal"
-           >
+            android:orientation="horizontal">
 
             <ImageButton
                 android:id="@+id/shuffleButton"
                 android:layout_width="44dp"
                 android:layout_height="44dp"
-                android:paddingStart="10dp"
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/shuffle_current_playlist"
+                android:paddingStart="10dp"
                 app:srcCompat="@drawable/shuffle_disabled" />
 
             <ImageButton
@@ -130,9 +119,9 @@
                 android:id="@+id/repeatButton"
                 android:layout_width="44dp"
                 android:layout_height="44dp"
-                android:paddingEnd="5dp"
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/play_playlist_in_loop"
+                android:paddingEnd="5dp"
                 app:srcCompat="@drawable/repeat_disabled2" />
 
         </LinearLayout>

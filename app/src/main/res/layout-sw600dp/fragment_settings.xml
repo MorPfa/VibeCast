@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -42,8 +41,8 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingVertical="16dp"
                 android:paddingHorizontal="48dp"
+                android:paddingVertical="16dp"
                 android:text="@string/settings_header"
                 android:textColor="#FFFFFF"
                 android:textSize="28sp"
@@ -52,8 +51,8 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingVertical="16dp"
                 android:paddingHorizontal="48dp"
+                android:paddingVertical="16dp"
                 android:text="@string/preferred_measurements"
                 android:textColor="#FFFFFF"
                 android:textSize="24sp" />
@@ -71,24 +70,24 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:checked="true"
-                    android:textSize="22sp"
                     android:text="@string/imperial"
-                    android:textColor="#FFFFFF" />
+                    android:textColor="#FFFFFF"
+                    android:textSize="22sp" />
 
                 <RadioButton
                     android:id="@+id/radioMetric"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="22sp"
                     android:text="@string/metric"
-                    android:textColor="#FFFFFF" />
+                    android:textColor="#FFFFFF"
+                    android:textSize="22sp" />
             </RadioGroup>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingVertical="16dp"
                 android:paddingHorizontal="48dp"
+                android:paddingVertical="16dp"
                 android:text="@string/permissions"
                 android:textColor="#FFFFFF"
                 android:textSize="24sp" />
@@ -100,16 +99,16 @@
                 android:layout_marginHorizontal="48dp"
                 android:padding="16dp"
                 android:text="@string/allow_vibecast_to_use_your_location"
-                android:textSize="22sp"
                 android:textColor="#FFFFFF"
+                android:textSize="22sp"
                 android:theme="@style/SwitchTheme" />
 
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingVertical="16dp"
                 android:paddingHorizontal="48dp"
+                android:paddingVertical="16dp"
                 android:text="@string/background_image"
                 android:textColor="#FFFFFF"
                 android:textSize="22sp" />
@@ -119,21 +118,21 @@
                 android:id="@+id/bg_image_selector"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="200dp"
                 android:layout_marginHorizontal="48dp"
-                android:background="@drawable/rounded_black_background" />
+                android:background="@drawable/rounded_black_background"
+                android:paddingHorizontal="200dp" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/reset_bg_image_btn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginVertical="4dp"
                 android:layout_marginHorizontal="48dp"
+                android:layout_marginVertical="4dp"
                 android:background="@drawable/textfield_background"
-                android:textSize="20sp"
                 android:text="@string/reset_background_image"
-                app:backgroundTint="@color/black"
-                android:textColor="#FFFFFF" />
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                app:backgroundTint="@color/black" />
 
 
             <TextView
@@ -319,10 +318,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="48dp"
                 android:background="@drawable/textfield_background"
-                android:textSize="20sp"
                 android:text="@string/reset_music_preferences"
-                app:backgroundTint="@color/black"
-                android:textColor="#FFFFFF" />
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                app:backgroundTint="@color/black" />
 
 
         </LinearLayout>

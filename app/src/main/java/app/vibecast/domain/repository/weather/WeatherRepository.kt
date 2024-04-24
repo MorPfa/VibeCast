@@ -7,15 +7,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 interface WeatherRepository {
 
+    fun getWeather(cityName: String): Flow<LocationWithWeatherDataDto>
 
-    fun getWeather(cityName : String) : Flow<LocationWithWeatherDataDto>
-
-    fun getSearchedWeather(cityName : String) : Flow<LocationWithWeatherDataDto?>
+    fun getSearchedWeather(cityName: String): Flow<LocationWithWeatherDataDto?>
 
     fun getWeather(lat: Double, lon: Double): Flow<LocationWithWeatherDataDto>
-    fun refreshWeather(cityName : String) : Flow<WeatherDto>
+    fun refreshWeather(cityName: String): Flow<WeatherDto>
 
-    fun refreshWeather(lat : Double, lon : Double) : Flow<WeatherDto>
+    fun refreshWeather(lat: Double, lon: Double): Flow<WeatherDto>
 
-    val currentWeather : MutableStateFlow<String?>
+    val currentWeather: MutableStateFlow<String?>
 }

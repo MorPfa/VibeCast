@@ -7,4 +7,4 @@ data class Album(
     @SerializedName("name") val name: String,
     @SerializedName("external_urls") val externalUrls: ExternalUrls,
 
-)
+    )

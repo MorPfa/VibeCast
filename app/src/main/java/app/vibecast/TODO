@@ -2,24 +2,28 @@
 
 TASKS:
 today:
-figure out if you actually want to upload profile picture
+fix edit account choose icon text
+fix saved location / saved song recycler view layout
+fix gallery screen header ( maybe show headers in app bar?)
+fine tune layouts for all screen sizes
+fix search bug
+fix spotify auth (cache token maybe or reauthorize if auth exception is thrown)
 
 
 
 Next tasks:
-
-
-General Spotify:
-fix spotify auth (cache token maybe??/ allow user to reconnect manually?)
+optimize image accuracy (maybe go back to GET /search/photos endpoint and combine query with collections)
 
 
 Miscellaneous:
-optimize image accuracy (maybe go back to GET /search/photos endpoint and combine query with collections)
-configure pro guard r8
 use benchmarks to improve performance
+configure pro guard r8
+
 
 
 Nice to have's:
 fix save icon issue (determine check status based off db)
 make long press on screen show bg image
 replace splash screen fragment with activity
+upload profile picture to firestore
+save background image to internal storage so it can be set with no internet connection

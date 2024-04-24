@@ -12,7 +12,7 @@ data class ImageDto(
     val urls: PhotoUrls,
     val user: UnsplashUser,
     val links: PhotoLinks,
-    val timestamp : Long?,
+    val timestamp: Long?,
 ) : Parcelable {
 
     @Parcelize
@@ -20,13 +20,13 @@ data class ImageDto(
         val full: String,
         val regular: String,
         val small: String,
-        val thumb: String
+        val thumb: String,
     ) : Parcelable
 
     @Parcelize
     data class PhotoLinks(
         val user: String,
-        val downloadLink: String
+        val downloadLink: String,
     ) : Parcelable
 
     @Parcelize

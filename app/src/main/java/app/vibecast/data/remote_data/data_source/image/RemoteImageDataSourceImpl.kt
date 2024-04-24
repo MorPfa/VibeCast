@@ -1,5 +1,6 @@
 package app.vibecast.data.remote_data.data_source.image
 
+
 import app.vibecast.data.remote_data.network.image.model.ImageApiModel
 import app.vibecast.data.remote_data.network.image.api.ImageService
 import app.vibecast.domain.model.ImageDto
@@ -9,14 +10,22 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import retrofit2.HttpException
 import javax.inject.Inject
+import app.vibecast.data.remote_data.data_source.image.util.ImageFetchException
+import app.vibecast.data.remote_data.data_source.image.util.EmptyApiResponseException
 
+
+/**
+ * Implementation of [RemoteImageDataSource]
+ *
+ * Methods:
+ * - [getImages] Fetches list of random images that match query string and returns them as Image Data Transfer Objects.
+ * - [getImageForDownload] Fetches the download URL for specified image which is necessary due to the Unsplash API Guidelines
+ * - [toImagesDto] Converts API response model to Data Transfer Object
+ */
 class RemoteImageDataSourceImpl @Inject constructor(
     private val imageService: ImageService,
 ) : RemoteImageDataSource {
 
-    /**
-     *  Fetches list of random images that match query string in some way
-     */
     override fun getImages(query: String): Flow<ImageDto> = flow {
         try {
             val images = imageService.getImages(query, "portrait", 1, "high")
@@ -26,28 +35,18 @@ class RemoteImageDataSourceImpl @Inject constructor(
                 throw EmptyApiResponseException("Empty API response")
             }
         } catch (e: EmptyApiResponseException) {
-            throw e  // Rethrow the same exception
+            throw e
         } catch (e: HttpException) {
             throw ImageFetchException("HTTP error fetching images", e)
         }
     }.flowOn(Dispatchers.IO)
 
-    /**
-     *  Fetches the specific download URL for specified image which is necessary
-     *  due to the Unsplash API Guidelines
-     */
+
     override fun getImageForDownload(query: String): Flow<String> = flow {
         val image = imageService.getImageForDownload(query).url
         emit(image)
     }
 
-    class EmptyApiResponseException(message: String) : Exception(message)
-    class ImageFetchException(message: String, cause: Throwable? = null) : Exception(message, cause)
-
-
-    /**
-     *  Converts API response model to Data Transfer Object
-     */
     private fun ImageApiModel.toImagesDto(): ImageDto {
         return ImageDto(
             id = this.id,

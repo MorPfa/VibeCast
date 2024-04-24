@@ -14,7 +14,6 @@ interface ImageDao {
     @Query("SELECT * FROM images ORDER BY timestamp DESC")
     fun getAllImages() : Flow<List<ImageEntity>>
 
-
     @Upsert
     suspend fun addImage(imageEntity: ImageEntity)
 

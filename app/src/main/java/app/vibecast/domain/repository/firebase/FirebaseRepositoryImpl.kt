@@ -12,7 +12,6 @@ import app.vibecast.domain.util.Constants.COUNTER_REF
 import app.vibecast.domain.util.Constants.IMAGES_REF
 import app.vibecast.domain.util.Constants.LOCATIONS_REF
 import app.vibecast.domain.util.Constants.USERS_REF
-import app.vibecast.presentation.screens.account_screen.util.ImageHandler
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
@@ -36,7 +35,14 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
-
+/**
+ * Implementation of [FirebaseRepository]
+ *
+ * Methods:
+ * - [syncImageData] Checks for missing data in local database and firebase database and fills in missing items
+ * - [syncLocationData] Checks for missing data in local database and firebase database and fills in missing items
+ * - [deleteUserData] Wipes all user data from firebase when user deletes account
+ */
 class FirebaseRepositoryImpl @Inject constructor(
     private val locationDataSource: LocalLocationDataSource,
     private val imageDataSource: LocalImageDataSource,
@@ -48,15 +54,22 @@ class FirebaseRepositoryImpl @Inject constructor(
     private val currentUser = auth.currentUser
 
 
+    override suspend fun syncData() {
+        coroutineScope {
+            val locationDeferred = async { syncLocationData() }
+            val imageDeferred = async { syncImageData() }
+
+            locationDeferred.await()
+            imageDeferred.await()
+        }
+    }
+
     private suspend fun syncImageData() {
-        Timber.tag("firebaseDB").d("called images")
         imageDataSource.getImages()
             .combine(getAllImages()) { localData, firebaseResponse ->
                 val localDataCount = localData.size
                 firebaseResponse.data?.let { firebaseData ->
                     val firebaseCount = firebaseData.size
-                    Timber.tag("firebaseDB").d("Firebase data: $firebaseData")
-
                     if (localDataCount > firebaseCount) {
                         localData.forEach { image ->
                             val containsLocation = firebaseData.any { firebaseImage ->
@@ -103,6 +116,52 @@ class FirebaseRepositoryImpl @Inject constructor(
                     }
                 }
 
+                if (firebaseResponse.exception != null) {
+                    Timber.tag("firebaseDB")
+                        .e("Error fetching Firebase locations: ${firebaseResponse.exception}")
+                }
+            }.collect {}
+    }
+
+    private suspend fun syncLocationData() {
+
+        locationDataSource.getLocations()
+            .combine(getAllLocations()) { localData, firebaseResponse ->
+                val localDataCount = localData.size
+                firebaseResponse.data?.let { firebaseData ->
+                    val firebaseCount = firebaseData.size
+                    Timber.tag("firebaseDB").d("Firebase data: $firebaseData")
+
+                    if (localDataCount > firebaseCount) {
+                        localData.forEach { location ->
+                            val containsLocation = firebaseData.any { firebaseLocation ->
+                                firebaseLocation.city == location.city
+                            }
+                            if (!containsLocation) {
+                                addLocation(
+                                    FirebaseLocation(
+                                        id = location.city,
+                                        city = location.city,
+                                        country = location.country
+                                    )
+                                )
+                            }
+                        }
+                    }
+
+                    if (localDataCount < firebaseCount) {
+                        firebaseData.forEach { location ->
+                            val containsLocation = localData.any { localLocation ->
+                                localLocation.city == location.city
+                            }
+                            if (!containsLocation) {
+                                locationDataSource.addLocation(
+                                    LocationDto(city = location.city, country = location.country)
+                                )
+                            }
+                        }
+                    }
+                }
 
                 if (firebaseResponse.exception != null) {
                     Timber.tag("firebaseDB")
@@ -225,76 +284,14 @@ class FirebaseRepositoryImpl @Inject constructor(
     }
 
 
-    override suspend fun syncData() {
-        coroutineScope {
-            val locationDeferred = async { syncLocationData() }
-            val imageDeferred = async { syncImageData() }
-
-            locationDeferred.await()
-            imageDeferred.await()
-        }
-
-    }
-
-    private suspend fun syncLocationData() {
-
-        locationDataSource.getLocations()
-            .combine(getAllLocations()) { localData, firebaseResponse ->
-                val localDataCount = localData.size
-                firebaseResponse.data?.let { firebaseData ->
-                    val firebaseCount = firebaseData.size
-                    Timber.tag("firebaseDB").d("Firebase data: $firebaseData")
-
-                    if (localDataCount > firebaseCount) {
-                        localData.forEach { location ->
-                            val containsLocation = firebaseData.any { firebaseLocation ->
-                                firebaseLocation.city == location.city
-                            }
-                            if (!containsLocation) {
-                                addLocation(
-                                    FirebaseLocation(
-                                        id = location.city,
-                                        city = location.city,
-                                        country = location.country
-                                    )
-                                )
-                            }
-                        }
-                    }
-
-                    if (localDataCount < firebaseCount) {
-                        firebaseData.forEach { location ->
-                            val containsLocation = localData.any { localLocation ->
-                                localLocation.city == location.city
-                            }
-                            if (!containsLocation) {
-                                locationDataSource.addLocation(
-                                    LocationDto(city = location.city, country = location.country)
-                                )
-                            }
-                        }
-                    }
-                }
-
-
-                if (firebaseResponse.exception != null) {
-                    Timber.tag("firebaseDB")
-                        .e("Error fetching Firebase locations: ${firebaseResponse.exception}")
-                }
-            }.collect {}
-    }
-
-
     override suspend fun deleteUserData() {
         currentUser?.let { user ->
             val userRef = usersRef.child(user.uid)
             userRef.removeValue().addOnCompleteListener { databaseTask ->
                 if (databaseTask.isSuccessful) {
-                    // User data successfully deleted from the database
                     Timber.tag("firebaseDB").d("Deleted user data successfully")
 
                 } else {
-                    // Failed to delete user data from the database
                     Timber.tag("firebaseDB").d("Failed user data deletion successfully")
                 }
             }

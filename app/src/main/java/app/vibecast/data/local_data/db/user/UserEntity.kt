@@ -11,5 +11,4 @@ data class UserEntity (
     @ColumnInfo(name = "userName") val userName : String,
     @ColumnInfo(name = "email") val email : String,
     @ColumnInfo(name = "profilePicture") val profilePicture : String
-
     )

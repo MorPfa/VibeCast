@@ -29,11 +29,8 @@ import app.vibecast.data.local_data.db.weather.util.WeatherTypeConverter
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun weatherDao(): WeatherDao
-
     abstract fun userDao(): UserDao
     abstract fun locationDao(): LocationDao
-
     abstract fun imageDao(): ImageDao
-
     abstract fun songDao(): SongDao
 }

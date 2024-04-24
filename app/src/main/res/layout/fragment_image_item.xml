@@ -4,7 +4,7 @@
     android:id="@+id/layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="6dp"
+    android:layout_margin="28dp"
     android:background="@android:color/transparent">
 
     <ImageView
@@ -12,7 +12,6 @@
         android:layout_width="350dp"
         android:layout_height="460dp"
         android:contentDescription="@string/saved_image"
-        android:paddingHorizontal="12dp"
         android:paddingTop="16dp"
         android:scaleType="centerCrop"
         app:layout_constraintEnd_toEndOf="parent"
@@ -24,30 +23,30 @@
         android:id="@+id/attribution_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAlignment="center"
         android:gravity="center"
         android:padding="6dp"
         android:text="@string/title"
+        android:textAlignment="center"
         android:textColor="@android:color/white"
         android:textSize="13sp"
         app:layout_constraintBottom_toTopOf="@id/date_saved_text"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/saved_image" />
 
     <TextView
         android:id="@+id/date_saved_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAlignment="center"
         android:gravity="center"
         android:padding="6dp"
         android:text="@string/title"
+        android:textAlignment="center"
         android:textColor="@android:color/white"
         android:textSize="13sp"
         app:layout_constraintBottom_toTopOf="@id/buttons"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/attribution_text" />
 
     <LinearLayout
@@ -57,11 +56,12 @@
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintHorizontal_bias="0.5">
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent">
 
         <Button
             android:id="@+id/removeBtn"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -70,11 +70,11 @@
             android:paddingBottom="10dp"
             android:text="@string/remove_btn"
             android:textColor="@android:color/white"
-            android:textSize="13sp"
-            style="?android:attr/buttonBarButtonStyle" />
+            android:textSize="13sp" />
 
         <Button
             android:id="@+id/downloadBtn"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -83,8 +83,7 @@
             android:paddingBottom="10dp"
             android:text="@string/downloadBtn"
             android:textColor="@android:color/white"
-            android:textSize="13sp"
-            style="?android:attr/buttonBarButtonStyle" />
+            android:textSize="13sp" />
 
     </LinearLayout>
 

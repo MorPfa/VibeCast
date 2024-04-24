@@ -5,7 +5,7 @@ import app.vibecast.BuildConfig
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import timber.log.Timber
 
-class CrashlyticsTree: Timber.Tree() {
+class CrashlyticsTree : Timber.Tree() {
 
     private val crashlytics = FirebaseCrashlytics.getInstance()
 
@@ -29,8 +29,7 @@ class CrashlyticsTree: Timber.Tree() {
 
         if (t == null) {
             crashlytics.recordException(Exception(message))
-        }
-        else {
+        } else {
             crashlytics.recordException(t)
         }
     }

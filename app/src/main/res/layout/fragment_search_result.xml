@@ -12,14 +12,14 @@
         android:id="@+id/backgroundImageView"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:importantForAccessibility="no"
         android:scaleType="centerCrop"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5"
-        android:importantForAccessibility="no" />
+        app:layout_constraintVertical_bias="0.5" />
 
     <LinearLayout
         android:id="@+id/upper_half"
@@ -33,8 +33,8 @@
             android:id="@+id/location_display"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/loading_placeholder"
             android:layout_marginBottom="68dp"
+            android:text="@string/loading_placeholder"
             android:textColor="#FFFFFF"
             android:textSize="42sp" />
 
@@ -64,21 +64,19 @@
             app:layout_constraintTop_toBottomOf="@id/music_widget" />
 
 
-
-                <TextView
-                    android:id="@+id/main_temp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/loading_placeholder"
-                    android:textColor="#FFFFFF"
-                    android:textSize="102sp"
-                    android:layout_marginBottom="24dp"
-                    app:layout_constraintBottom_toTopOf="@+id/main_weather_widget"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/center_temp_row"
-                    />
+        <TextView
+            android:id="@+id/main_temp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:text="@string/loading_placeholder"
+            android:textColor="#FFFFFF"
+            android:textSize="102sp"
+            app:layout_constraintBottom_toTopOf="@+id/main_weather_widget"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/center_temp_row" />
 
 
     </LinearLayout>
@@ -93,7 +91,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent" />
-
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

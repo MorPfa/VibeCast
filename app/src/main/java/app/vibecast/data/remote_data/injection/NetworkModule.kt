@@ -20,7 +20,11 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Named
-
+/**
+ * Hilt Module to provide network related utilities
+ * Methods:
+    - All methods provide dependencies for Hilt but some of them have commented out versions that include Http loggers
+ */
 
 @Module
 @InstallIn(SingletonComponent::class)

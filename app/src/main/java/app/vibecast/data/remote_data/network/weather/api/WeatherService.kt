@@ -11,7 +11,8 @@ interface WeatherService {
     suspend fun getCiyCoordinates(
         @Query("q") cityName: String,
         @Query("limit") limit: Int,
-        @Query("appid") apiKey: String): List<CoordinateApiModel>
+        @Query("appid") apiKey: String,
+    ): List<CoordinateApiModel>
 
 
     @GET("geo/1.0/reverse")
@@ -19,7 +20,8 @@ interface WeatherService {
         @Query("lat") latitude: Double,
         @Query("lon") longitude: Double,
         @Query("limit") limit: Int,
-        @Query("appid") apiKey: String): List<CityApiModel>
+        @Query("appid") apiKey: String,
+    ): List<CityApiModel>
 
     @GET("data/3.0/onecall")
     suspend fun getWeather(
@@ -27,7 +29,7 @@ interface WeatherService {
         @Query("lon") longitude: Double,
         @Query("exclude") exclude: String,
         @Query("units") units: String,
-        @Query("appid") apiKey: String
-    ) : WeatherApiModel
+        @Query("appid") apiKey: String,
+    ): WeatherApiModel
 
 }

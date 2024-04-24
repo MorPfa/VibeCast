@@ -15,7 +15,7 @@ import com.google.firebase.ktx.Firebase
 
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
-private lateinit var binding : FragmentRedirectBinding
+private lateinit var binding: FragmentRedirectBinding
 private lateinit var auth: FirebaseAuth
 
 
@@ -39,13 +39,13 @@ class RedirectFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        if (auth.currentUser == null){
+        if (auth.currentUser == null) {
             val intent = Intent(requireActivity(), AuthActivity::class.java)
             requireActivity().startActivity(intent)
             requireActivity().finish()
             findNavController().popBackStack()
 
-        }else {
+        } else {
             findNavController().navigate(RedirectFragmentDirections.navRedirectToNavAccount())
 
         }

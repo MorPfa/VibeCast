@@ -131,7 +131,7 @@ class MainActivity : AppCompatActivity(), MusicViewModel.PlayerStateListener {
         permissionHelper = PermissionHelper(this)
         handleLocationAndWeather()
 
-        musicViewModel.savedSongs.observe(this){}
+        musicViewModel.savedSongs.observe(this) {}
 
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
@@ -208,6 +208,7 @@ class MainActivity : AppCompatActivity(), MusicViewModel.PlayerStateListener {
                     showIcons = false
                     invalidateOptionsMenu()
                 }
+
                 R.id.nav_web -> {
                     showIcons = false
                     invalidateOptionsMenu()
@@ -369,13 +370,15 @@ class MainActivity : AppCompatActivity(), MusicViewModel.PlayerStateListener {
 
 
 
-        musicViewModel.isSongSaved.observe(this){
+        musicViewModel.isSongSaved.observe(this) {
             Timber.tag("music_db").d(it.toString())
-            if(it == false ){
-                saveSongItem?.icon = ContextCompat.getDrawable(this, R.drawable.song_saved_unselected)
+            if (it == false) {
+                saveSongItem?.icon =
+                    ContextCompat.getDrawable(this, R.drawable.song_saved_unselected)
 
-            }else {
-                saveSongItem?.icon = ContextCompat.getDrawable(this, R.drawable.save_song_unselected)
+            } else {
+                saveSongItem?.icon =
+                    ContextCompat.getDrawable(this, R.drawable.save_song_unselected)
             }
         }
 
@@ -521,7 +524,7 @@ class MainActivity : AppCompatActivity(), MusicViewModel.PlayerStateListener {
                                     artistUri = currentSong.track.artist.uri,
                                     albumUri = currentSong.track.artist.uri,
 
-                                )
+                                    )
                             )
                         }
 
@@ -540,11 +543,12 @@ class MainActivity : AppCompatActivity(), MusicViewModel.PlayerStateListener {
                                     artist = currentSong.track.artist.name,
                                     artistUri = currentSong.track.artist.uri,
                                     albumUri = currentSong.track.artist.uri,
-                                    )
+                                )
                             )
                         }
                         item.isChecked = false
-                        item.icon = ContextCompat.getDrawable(this, R.drawable.song_saved_unselected)
+                        item.icon =
+                            ContextCompat.getDrawable(this, R.drawable.song_saved_unselected)
                     }
                 } else {
                     val snackBar = Snackbar.make(
@@ -595,7 +599,7 @@ class MainActivity : AppCompatActivity(), MusicViewModel.PlayerStateListener {
 
     override fun onStart() {
         super.onStart()
-//        authorizeClient()
+        authorizeClient()
 
 
     }

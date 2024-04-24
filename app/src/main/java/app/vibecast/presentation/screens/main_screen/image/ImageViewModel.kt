@@ -33,7 +33,7 @@ class ImageViewModel @Inject constructor(
 
     val galleryImages: LiveData<List<ImageDto>> = imageRepository.getLocalImages().asLiveData()
 
-    val backgroundImage : MutableLiveData<String?> = imagePrefRepository.getPreference().asLiveData() as MutableLiveData<String?>
+    val backgroundImage : MutableLiveData<String?> = imagePrefRepository.getBackgroundImage().asLiveData() as MutableLiveData<String?>
 
 
 
@@ -44,7 +44,7 @@ class ImageViewModel @Inject constructor(
 
     fun saveBackgroundImage(url : String){
         viewModelScope.launch {
-            imagePrefRepository.savePreference(url)
+            imagePrefRepository.saveBackgroundImage(url)
             updateBackgroundImage(url)
         }
     }
@@ -114,7 +114,7 @@ class ImageViewModel @Inject constructor(
 
     fun resetBackgroundImage() {
         viewModelScope.launch {
-            imagePrefRepository.clearPreference()
+            imagePrefRepository.resetBackgroundImage()
         }
         backgroundImage.value = null
     }

@@ -2,13 +2,25 @@ package app.vibecast.domain.repository.music
 
 import app.vibecast.data.local_data.data_source.music.LocalMusicDataSource
 import app.vibecast.data.remote_data.data_source.music.RemoteMusicDataSource
-import app.vibecast.data.remote_data.network.music.model.PlaylistApiModel
+import app.vibecast.domain.model.PlaylistDto
 import app.vibecast.domain.model.SongDto
 import app.vibecast.domain.model.TracksDto
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import timber.log.Timber
 import javax.inject.Inject
+
+
+/**
+ * Implementation of [MusicRepository]
+ *
+ * Methods:
+ * - [deleteSong] Deletes saved song from database
+ * - [saveSong] Saves song to database
+ * - [getAllSavedSongs] Gets all saved songs from database
+ * - [getCurrentSong] Fetches info for currently playing song
+ * - [getPlaylist] Fetches playlist to queue when app is launched
+ */
 
 class MusicRepositoryImpl @Inject constructor(
     private val remoteMusicDataSource: RemoteMusicDataSource,
@@ -52,7 +64,7 @@ class MusicRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getPlaylist(category: String, accessCode: String): Flow<PlaylistApiModel> = flow {
+    override fun getPlaylist(category: String, accessCode: String): Flow<PlaylistDto> = flow {
         try {
             remoteMusicDataSource.getPlaylist(category, accessCode).collect {
                 emit(it)
@@ -69,9 +81,9 @@ class MusicRepositoryImpl @Inject constructor(
         accessCode: String,
     ): Flow<TracksDto> = flow {
         try {
-            remoteMusicDataSource.getCurrentSong(song, artist, accessCode).collect { result ->
-                Timber.tag("Spotify").d("result $result")
-                emit(TracksDto(result.tracks.href, result.tracks.items[0]))
+            remoteMusicDataSource.getCurrentSong(song, artist, accessCode).collect { song ->
+                Timber.tag("Spotify").d("result $song")
+                emit(song)
             }
         } catch (e: Exception) {
             Timber.tag("Spotify").d(e.localizedMessage ?: "null")

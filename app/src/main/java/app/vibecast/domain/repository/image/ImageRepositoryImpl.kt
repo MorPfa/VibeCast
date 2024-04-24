@@ -1,12 +1,11 @@
 package app.vibecast.domain.repository.image
 
-import android.util.Log
-import app.vibecast.domain.util.TAGS.COROUTINE_ERROR
-import app.vibecast.domain.util.TAGS.IMAGE_ERROR
 import app.vibecast.data.local_data.data_source.image.LocalImageDataSource
 import app.vibecast.data.remote_data.data_source.image.RemoteImageDataSource
-import app.vibecast.data.remote_data.data_source.image.RemoteImageDataSourceImpl
+import app.vibecast.data.remote_data.data_source.image.util.ImageFetchException
 import app.vibecast.domain.model.ImageDto
+import app.vibecast.domain.util.TAGS.COROUTINE_ERROR
+import app.vibecast.domain.util.TAGS.IMAGE_ERROR
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -14,13 +13,14 @@ import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.cancellation.CancellationException
 
 
 class ImageRepositoryImpl @Inject constructor(
     private val remoteImageDataSource: RemoteImageDataSource,
-    private val localImageDataSource: LocalImageDataSource
+    private val localImageDataSource: LocalImageDataSource,
 ) : ImageRepository {
 
 
@@ -33,8 +33,8 @@ class ImageRepositoryImpl @Inject constructor(
         try {
             emitAll(remoteImageDataSource.getImages(query))
         } catch (e: Exception) {
-            Log.e(IMAGE_ERROR, e.toString())
-            throw RemoteImageDataSourceImpl.ImageFetchException("Error fetching remote images", e)
+            Timber.tag(IMAGE_ERROR).e(e.localizedMessage)
+            throw ImageFetchException("Error fetching remote images", e)
         }
     }.flowOn(Dispatchers.IO)
 
@@ -55,9 +55,9 @@ class ImageRepositoryImpl @Inject constructor(
         try {
             emitAll(localImageDataSource.getImages())
         } catch (e: CancellationException) {
-            Log.e(COROUTINE_ERROR, "Coroutine cancelled 1: $e")
+            Timber.tag(COROUTINE_ERROR).e("Coroutine cancelled $e")
         } catch (e: Exception) {
-            Log.e(IMAGE_ERROR, "Error fetching local images: $e")
+            Timber.tag(IMAGE_ERROR).e("Error fetching local images: $e")
         }
     }.flowOn(Dispatchers.IO)
 
@@ -69,9 +69,9 @@ class ImageRepositoryImpl @Inject constructor(
             try {
                 localImageDataSource.addImage(imageDto)
             } catch (e: CancellationException) {
-                Log.e(COROUTINE_ERROR, e.toString().plus("test"))
+                Timber.tag(COROUTINE_ERROR).e(e.localizedMessage)
             } catch (e: Exception) {
-                Log.e(IMAGE_ERROR, e.toString())
+                Timber.tag(IMAGE_ERROR).e(e.localizedMessage)
             }
         }
     }
@@ -84,9 +84,9 @@ class ImageRepositoryImpl @Inject constructor(
             try {
                 localImageDataSource.deleteImage(imageDto)
             } catch (e: CancellationException) {
-                Log.e(COROUTINE_ERROR, e.toString().plus("test"))
+                Timber.tag(COROUTINE_ERROR).e(e.localizedMessage)
             } catch (e: Exception) {
-                Log.e(IMAGE_ERROR, e.toString())
+                Timber.tag(IMAGE_ERROR).e(e.localizedMessage)
             }
         }
     }
