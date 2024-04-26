@@ -223,9 +223,8 @@ class MainActivity : AppCompatActivity(), MusicViewModel.PlayerStateListener {
     private fun setUpNavHeader() {
         accountViewModel.userName.observe(this) { userName ->
             Timber.tag("auth activity").d(userName.toString())
-            userNameTv.text = userName
+            userNameTv.text = userName ?: currentUser?.displayName
         }
-
         accountViewModel.userEmail.observe(this) { userEmail ->
             Timber.tag("auth activity").d(userEmail.toString())
             userEmailTv.text = userEmail
@@ -599,7 +598,7 @@ class MainActivity : AppCompatActivity(), MusicViewModel.PlayerStateListener {
 
     override fun onStart() {
         super.onStart()
-        authorizeClient()
+//        authorizeClient()
 
 
     }

@@ -18,6 +18,7 @@ import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -31,7 +32,7 @@ class AccountViewModel @Inject constructor(
 
     private var auth: FirebaseAuth = Firebase.auth
 
-    private val _userName = MutableLiveData<String?>()
+    private val _userName = MutableLiveData<String>()
     val userName: LiveData<String?>
         get() = _userName
 
@@ -39,36 +40,42 @@ class AccountViewModel @Inject constructor(
     val userEmail: LiveData<String?>
         get() = _userEmail
 
-    fun updateUserInfo(name: String, email: String) {
-        _userName.value = name
-        _userEmail.value = email
-    }
 
     fun updateUserName(name: String) {
         _userName.value = name
 
     }
 
-    fun addUserName(user: FirebaseUser?, userName: String) {
+
+
+    suspend fun addUserName(user: FirebaseUser?, userName: String): Boolean {
+        val deferred = CompletableDeferred<Boolean>()
+
         val profileUpdates = UserProfileChangeRequest.Builder()
             .setDisplayName(userName)
             .build()
+
         user?.updateProfile(profileUpdates)
             ?.addOnCompleteListener { profileUpdateTask ->
                 if (profileUpdateTask.isSuccessful) {
                     Timber.tag("auth").d("User profile updated with username")
                     _userName.value = userName
+                    deferred.complete(true)
                 } else {
                     Timber.tag("auth").e(
                         profileUpdateTask.exception,
                         "Failed to update user profile with username"
                     )
+                    deferred.complete(false)
                 }
             }
+
+        return deferred.await()
     }
 
     init {
         _userName.value = auth.currentUser?.displayName
+        _userEmail.value = auth.currentUser?.email
     }
 
 
@@ -128,15 +135,6 @@ class AccountViewModel @Inject constructor(
                 )
             )
         }
-    }
-
-
-    fun getImageFromFirebase() {
-
-    }
-
-    fun getLocationFromFirebase() {
-
     }
 
 

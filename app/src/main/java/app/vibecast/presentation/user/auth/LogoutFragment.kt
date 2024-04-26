@@ -71,7 +71,7 @@ class LogoutFragment : Fragment() {
     private fun showLogoutDialog() {
         val alertDialogBuilder = AlertDialog.Builder(requireContext())
         val dialogView =
-            LayoutInflater.from(requireContext()).inflate(R.layout.delete_account_dialog, null)
+            LayoutInflater.from(requireContext()).inflate(R.layout.logout_dialog, null)
 
         val confirmBtn = dialogView.findViewById<Button>(R.id.confirmBtn)
         val cancelBtn = dialogView.findViewById<Button>(R.id.cancelBtn)
@@ -101,6 +101,8 @@ class LogoutFragment : Fragment() {
 
         val confirmBtn = dialogView.findViewById<Button>(R.id.confirmBtn)
         val cancelBtn = dialogView.findViewById<Button>(R.id.cancelBtn)
+
+
 
         cancelBtn.setOnClickListener {
             deleteDialog?.dismiss()

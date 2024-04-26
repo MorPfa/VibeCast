@@ -67,7 +67,9 @@
                     android:id="@+id/radioImperial"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:buttonTint="@color/black"
                     android:checked="true"
+                    android:paddingHorizontal="8dp"
                     android:text="@string/imperial"
                     android:textColor="#FFFFFF"
                     android:textSize="16sp" />
@@ -76,6 +78,8 @@
                     android:id="@+id/radioMetric"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:buttonTint="@color/black"
+                    android:paddingHorizontal="8dp"
                     android:text="@string/metric"
                     android:textColor="#FFFFFF"
                     android:textSize="16sp" />

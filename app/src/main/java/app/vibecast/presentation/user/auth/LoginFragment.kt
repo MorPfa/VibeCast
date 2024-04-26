@@ -20,6 +20,7 @@ import androidx.navigation.fragment.findNavController
 import app.vibecast.R
 import app.vibecast.databinding.FragmentLoginBinding
 import app.vibecast.presentation.MainActivity
+import app.vibecast.presentation.screens.account_screen.AccountViewModel
 import app.vibecast.presentation.screens.main_screen.image.ImageViewModel
 import app.vibecast.presentation.user.auth.util.LoginResult
 import com.google.android.gms.common.SignInButton
@@ -48,6 +49,7 @@ class LoginFragment : Fragment() {
     private lateinit var googleSignInBtn: SignInButton
     private var forgotPasswordDialog: AlertDialog? = null
     private val imageViewModel: ImageViewModel by activityViewModels()
+    private val accountViewModel: AccountViewModel by activityViewModels()
 
 
     private var listener: OnGoogleSignInClickListener? = null
@@ -177,7 +179,6 @@ class LoginFragment : Fragment() {
                         "Signed in successfully", Toast.LENGTH_SHORT
                     ).show()
                     requireActivity().finish()
-
                     val intent = Intent(activity, MainActivity::class.java)
                     startActivity(intent)
 

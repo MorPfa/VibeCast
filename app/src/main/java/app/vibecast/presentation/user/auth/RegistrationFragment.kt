@@ -12,6 +12,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import app.vibecast.databinding.FragmentRegistrationBinding
 import app.vibecast.presentation.MainActivity
 import app.vibecast.presentation.screens.account_screen.AccountViewModel
@@ -22,6 +23,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 private const val ARG_PARAM1 = "param1"
@@ -157,14 +159,22 @@ class RegistrationFragment : Fragment() {
                 if (task.isSuccessful) {
                     Timber.tag("auth").d("createUserWithEmail:success")
                     val user = auth.currentUser
-                    accountViewModel.addUserName(user, userName)
-                    Toast.makeText(
-                        requireContext(),
-                        "Created Account successfully", Toast.LENGTH_SHORT
-                    ).show()
-                    val intent = Intent(activity, MainActivity::class.java)
-                    startActivity(intent)
-                    requireActivity().finish()
+                    lifecycleScope.launch {
+                        accountViewModel.addUserName(user, userName)
+                    }
+
+                    accountViewModel.userName.observe(viewLifecycleOwner) {
+                        if (it != null) {
+                            Toast.makeText(
+                                requireContext(),
+                                "Created Account successfully", Toast.LENGTH_SHORT
+                            ).show()
+                            val intent = Intent(activity, MainActivity::class.java)
+                            startActivity(intent)
+                            requireActivity().finish()
+                        }
+                    }
+
                 } else {
                     // If sign in fails, display a message to the user.
                     Timber.tag("auth").w("createUserWithEmail:failure ${task.exception}")

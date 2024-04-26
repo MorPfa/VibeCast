@@ -86,7 +86,7 @@
                 app:iconTint="@color/white" />
 
             <TextView
-                android:id="@+id/main_temp"
+                android:id="@+id/main_temp_display"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/loading_placeholder"

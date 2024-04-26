@@ -134,16 +134,6 @@
         </com.google.android.material.textfield.TextInputLayout>
 
 
-        <!--        <Button-->
-        <!--            android:id="@+id/signInWithGoogle"-->
-        <!--            android:layout_width="match_parent"-->
-        <!--            android:layout_height="wrap_content"-->
-        <!--            android:background="@drawable/textfield_background"-->
-        <!--            android:elevation="16dp"-->
-        <!--            android:text="@string/sign_in_with_google"-->
-        <!--            android:layout_margin="8dp"-->
-        <!--           />-->
-
         <com.google.android.gms.common.SignInButton
             android:id="@+id/signInWithGoogle"
             android:layout_width="match_parent"
@@ -155,6 +145,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
+            android:backgroundTint="@color/black"
             android:background="@drawable/textfield_background"
             android:elevation="16dp"
             android:text="@string/submit" />

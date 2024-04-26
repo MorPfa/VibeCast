@@ -22,7 +22,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import app.vibecast.R
 import app.vibecast.databinding.FragmentSearchResultBinding
-
 import app.vibecast.presentation.screens.main_screen.MainViewModel
 import app.vibecast.presentation.screens.main_screen.image.ImageViewModel
 import app.vibecast.presentation.screens.main_screen.music.MusicViewModel
@@ -35,7 +34,6 @@ import com.spotify.protocol.types.Repeat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 
 
 class SearchResultFragment : Fragment(), MusicViewModel.PlayerStateListener {
@@ -49,7 +47,6 @@ class SearchResultFragment : Fragment(), MusicViewModel.PlayerStateListener {
     private lateinit var shuffleButton: ImageButton
     private lateinit var repeatButton: ImageButton
     private lateinit var trackProgressBar: TrackProgressBar
-    private var noData = false
 
 
     private fun updatePlaybackBtn(playerState: PlayerState) {
@@ -241,39 +238,62 @@ class SearchResultFragment : Fragment(), MusicViewModel.PlayerStateListener {
         shuffleButton = binding.musicWidget.shuffleButton
         repeatButton = binding.musicWidget.repeatButton
         repeatButton.setOnClickListener {
-            musicViewModel.setRepeatStatus()
+            try {
+                musicViewModel.setRepeatStatus()
+            }catch (e : Exception){
+                showSpotifySnackBar()
+            }
+
         }
         playbackButton.setOnClickListener {
             try {
                 musicViewModel.onPlayPauseButtonClicked()
             } catch (e: Exception) {
-                val snackBar = Snackbar.make(
-                    requireView(),
-                    "Log into spotify to enable music",
-                    Snackbar.LENGTH_SHORT
-                )
-                val snackBarView = snackBar.view
-                val snackBarText =
-                    snackBarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
-                snackBarText.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-                snackBarView.background =
-                    ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
-                snackBar.show()
+                showSpotifySnackBar()
             }
 
         }
         shuffleButton.setOnClickListener {
-            musicViewModel.setShuffleStatus()
+            try {
+                musicViewModel.setShuffleStatus()
+            } catch (e: Exception) {
+                showSpotifySnackBar()
+            }
+
         }
         binding.musicWidget.forwardButton.setOnClickListener {
-            musicViewModel.onSkipNextButtonClicked()
+            try {
+                musicViewModel.onSkipNextButtonClicked()
+            } catch (e: Exception) {
+                showSpotifySnackBar()
+            }
+
         }
         binding.musicWidget.rewindButton.setOnClickListener {
-            musicViewModel.onSkipPreviousButtonClicked()
+            try {
+                musicViewModel.onSkipPreviousButtonClicked()
+            } catch (e: Exception) {
+                showSpotifySnackBar()
+            }
+
+
         }
         return binding.root
     }
-
+    private fun showSpotifySnackBar() {
+        val snackBar = Snackbar.make(
+            requireView(),
+            "Log into spotify to enable music",
+            Snackbar.LENGTH_SHORT
+        )
+        val snackBarView = snackBar.view
+        val snackBarText =
+            snackBarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+        snackBarText.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+        snackBarView.background =
+            ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
+        snackBar.show()
+    }
     /**
      * Loads and sets new image as background image when location or weather conditions change
      */
@@ -333,7 +353,7 @@ class SearchResultFragment : Fragment(), MusicViewModel.PlayerStateListener {
                                 weatherData.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
                             observeImageData(city, weather!!)
 
-                            musicViewModel.getPlaylist(weather)
+//                            musicViewModel.getPlaylist(weather)
                             binding.mainTemp.text =
                                 getString(R.string.center_temp, currentWeather.temperature)
                             //            Current hour values

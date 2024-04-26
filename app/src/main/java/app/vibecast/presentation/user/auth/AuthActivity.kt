@@ -6,6 +6,9 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupActionBarWithNavController
 import app.vibecast.R
 import app.vibecast.databinding.ActivityAuthBinding
 import app.vibecast.presentation.MainActivity
@@ -28,7 +31,7 @@ class AuthActivity : AppCompatActivity(), RegistrationFragment.OnGoogleSignUpCli
     private lateinit var binding: ActivityAuthBinding
     private lateinit var auth: FirebaseAuth
     private val viewModel: AccountViewModel by viewModels()
-
+    private lateinit var appBarConfiguration: AppBarConfiguration
 
     override fun onGoogleSignInClick() {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -57,7 +60,18 @@ class AuthActivity : AppCompatActivity(), RegistrationFragment.OnGoogleSignUpCli
         binding = ActivityAuthBinding.inflate(layoutInflater)
         setContentView(binding.root)
         auth = Firebase.auth
-
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navController = navHostFragment.navController
+        appBarConfiguration = AppBarConfiguration(
+            setOf(
+                R.id.nav_home,
+                R.id.nav_account,
+                R.id.nav_pictures,
+                R.id.nav_settings,
+            )
+        )
+        setupActionBarWithNavController(navController, appBarConfiguration)
 
     }
 
@@ -82,8 +96,6 @@ class AuthActivity : AppCompatActivity(), RegistrationFragment.OnGoogleSignUpCli
         auth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    val user = auth.currentUser
-                    viewModel.updateUserInfo(user?.displayName!!, user.email!!)
                     findNavController(R.id.nav_host_fragment).popBackStack()
                     val intent = Intent(this, MainActivity::class.java)
                     startActivity(intent)
@@ -97,7 +109,28 @@ class AuthActivity : AppCompatActivity(), RegistrationFragment.OnGoogleSignUpCli
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        finish()
+        val navController = findNavController(R.id.nav_host_fragment)
+        if (navController.currentDestination?.id == R.id.registrationFragment) {
+            navController.popBackStack()
+        } else {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+
         return super.onSupportNavigateUp()
     }
+
+    override fun onBackPressed() {
+        val navController = findNavController(R.id.nav_host_fragment)
+        if (navController.currentDestination?.id == R.id.registrationFragment) {
+            navController.popBackStack()
+        } else {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+            finish()
+            super.onBackPressed()
+        }
+    }
+
 }

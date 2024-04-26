@@ -48,8 +48,6 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
     private lateinit var trackProgressBar: TrackProgressBar
 
 
-
-
     private fun updatePlaybackBtn(playerState: PlayerState) {
 
         if (playerState.isPaused) {
@@ -87,7 +85,7 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
     }
 
 
-    private fun showSongInfoInSpotify(playerState : PlayerState) {
+    private fun showSongInfoInSpotify(playerState: PlayerState) {
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(playerState.track.uri))
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         val packageManager = context?.packageManager
@@ -102,7 +100,7 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
         }
     }
 
-    private fun showArtistInfoInSpotify(playerState : PlayerState) {
+    private fun showArtistInfoInSpotify(playerState: PlayerState) {
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(playerState.track.artist.uri))
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         val packageManager = context?.packageManager
@@ -170,6 +168,22 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
         updateUI(playerState)
     }
 
+
+    private fun showSpotifySnackBar() {
+        val snackBar = Snackbar.make(
+            requireView(),
+            "Log into spotify to enable music",
+            Snackbar.LENGTH_SHORT
+        )
+        val snackBarView = snackBar.view
+        val snackBarText =
+            snackBarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+        snackBarText.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+        snackBarView.background =
+            ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
+        snackBar.show()
+    }
+
     @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -192,35 +206,44 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
 
 
         repeatButton.setOnClickListener {
-            musicViewModel.setRepeatStatus()
+            try {
+                musicViewModel.setRepeatStatus()
+            }catch (e : Exception){
+                showSpotifySnackBar()
+            }
+
         }
         playbackButton.setOnClickListener {
             try {
                 musicViewModel.onPlayPauseButtonClicked()
             } catch (e: Exception) {
-                val snackbar = Snackbar.make(
-                    requireView(),
-                    "Log into spotify to enable music",
-                    Snackbar.LENGTH_SHORT
-                )
-                val snackbarView = snackbar.view
-                val snackbarText =
-                    snackbarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
-                snackbarText.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-                snackbarView.background =
-                    ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
-                snackbar.show()
+                showSpotifySnackBar()
             }
 
         }
         shuffleButton.setOnClickListener {
-            musicViewModel.setShuffleStatus()
+            try {
+                musicViewModel.setShuffleStatus()
+            } catch (e: Exception) {
+                showSpotifySnackBar()
+            }
+
         }
         binding.musicWidget.forwardButton.setOnClickListener {
-            musicViewModel.onSkipNextButtonClicked()
+            try {
+                musicViewModel.onSkipNextButtonClicked()
+            } catch (e: Exception) {
+                showSpotifySnackBar()
+            }
+
         }
         binding.musicWidget.rewindButton.setOnClickListener {
-            musicViewModel.onSkipPreviousButtonClicked()
+            try {
+                musicViewModel.onSkipPreviousButtonClicked()
+            } catch (e: Exception) {
+                showSpotifySnackBar()
+            }
+
 
         }
 
@@ -316,9 +339,10 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
 
                     weatherData.weather.currentWeather?.let { currentWeather ->
                         val city = weatherData.location.cityName
-                        val weather = weatherData.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
+                        val weather =
+                            weatherData.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
                         observeImageData(city, weather!!)
-                        musicViewModel.getPlaylist(weather!!)
+//                        musicViewModel.getPlaylist(weather!!)
 
 
                         binding.mainTempDisplay.text =

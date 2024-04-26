@@ -75,7 +75,7 @@
     <string name="lorem_ipusm">Lorem ipsum dolor sit amet, consectetur adipiscing elit. </string>
     <string name="remove_btn">Remove</string>
     <string name="display_temperature_in_fahrenheit">Use Metric System</string>
-    <string name="saved_locations">My saved Locations</string>
+    <string name="saved_locations">Saved Locations</string>
     <string name="profile_picture_content_desc">Users profile picture</string>
     <string name="name">%1$s</string>
     <string name="save_location">Save location</string>
@@ -93,8 +93,8 @@
     <string name="location_5">%1$s</string>
     <string name="location_6">%1$s</string>
     <string name="none_saved">You don\'t have any saved locations</string>
-    <string name="saved_places">Saved places</string>
-    <string name="saved_images">Saved Images</string>
+    <string name="saved_places">Places</string>
+    <string name="saved_images">Images</string>
     <string name="saved_songs">Saved Songs</string>
     <string name="location_reminder">You listened to this song in %1$s</string>
     <string name="home">Home</string>
@@ -232,6 +232,7 @@
     <string name="please_login_or_create_an_account_to_save_a_song">Please login or create an account to save a song</string>
     <string name="listen_to_this_song_on_spotify">Listen to this song on spotify</string>
     <string name="check_out_the_artist_on_spotify">Check out the artist on spotify</string>
+    <string name="reset_password_content_desc">Enter your email address to receive an email to reset your password</string>
 
 
 </resources>

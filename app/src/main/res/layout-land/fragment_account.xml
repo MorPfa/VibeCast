@@ -41,26 +41,16 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardView"
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/profilePicture"
             android:layout_width="120dp"
             android:layout_height="120dp"
             android:layout_gravity="center"
-            android:layout_marginTop="100dp"
-            app:cardCornerRadius="60dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageView
-                android:id="@+id/profilePicture"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:contentDescription="@string/profile_picture_content_desc"
-                android:scaleType="centerCrop"
-                android:src="@drawable/osman_rana_gxezuwo5m4i_unsplash2" />
-
-
-        </androidx.cardview.widget.CardView>
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/profile_picture_content_desc"
+            android:scaleType="centerCrop"
+            android:src="@drawable/account_icon_circle"
+            app:shapeAppearanceOverlay="@style/Circular" />
 
 
         <TextView
@@ -86,102 +76,97 @@
 
             />
 
-        <RelativeLayout
+
+        <GridLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
             android:background="@drawable/rounded_black_background"
-            app:cardCornerRadius="16dp"
-            app:strokeWidth="2dp">
+            android:columnCount="3"
+            android:layout_gravity="center"
+            android:orientation="horizontal"
+            android:padding="12dp"
+            android:rowCount="2">
 
-            <GridLayout
+            <TextView
+                android:id="@+id/saved_locations_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:columnCount="3"
-                android:orientation="horizontal"
-                android:padding="12dp"
-                android:rowCount="2">
+                android:layout_gravity="center"
+                android:paddingHorizontal="12dp"
+                android:paddingTop="12dp"
+                android:text="@string/loading_placeholder"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
-                <TextView
-                    android:id="@+id/saved_locations_count"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:paddingHorizontal="12dp"
-                    android:paddingTop="12dp"
-                    android:text="@string/loading_placeholder"
-                    android:textAlignment="center"
-                    android:textColor="@color/white"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+            <TextView
+                android:id="@+id/savedImageCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:paddingHorizontal="12dp"
+                android:paddingTop="12dp"
+                android:text="@string/saved_image_count"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
-                <TextView
-                    android:id="@+id/savedImageCount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:paddingHorizontal="12dp"
-                    android:paddingTop="12dp"
-                    android:text="@string/saved_image_count"
-                    android:textAlignment="center"
-                    android:textColor="@color/white"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+            <TextView
+                android:id="@+id/savedSongCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:paddingHorizontal="12dp"
+                android:paddingTop="12dp"
+                android:text="@string/loading_placeholder"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
-                <TextView
-                    android:id="@+id/savedSongCount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:paddingHorizontal="12dp"
-                    android:paddingTop="12dp"
-                    android:text="@string/loading_placeholder"
-                    android:textAlignment="center"
-                    android:textColor="@color/white"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:paddingHorizontal="12dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="12dp"
+                android:text="@string/saved_places"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:paddingHorizontal="12dp"
-                    android:paddingTop="6dp"
-                    android:paddingBottom="12dp"
-                    android:text="@string/saved_places"
-                    android:textAlignment="center"
-                    android:textColor="@color/white"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:paddingHorizontal="12dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="12dp"
+                android:text="@string/saved_images"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:paddingHorizontal="12dp"
-                    android:paddingTop="6dp"
-                    android:paddingBottom="12dp"
-                    android:text="@string/saved_images"
-                    android:textAlignment="center"
-                    android:textColor="@color/white"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:paddingHorizontal="12dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="12dp"
+                android:text="@string/saved_songs"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:paddingHorizontal="12dp"
-                    android:paddingTop="6dp"
-                    android:paddingBottom="12dp"
-                    android:text="@string/saved_songs"
-                    android:textAlignment="center"
-                    android:textColor="@color/white"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+        </GridLayout>
 
-            </GridLayout>
-        </RelativeLayout>
 
         <TextView
             android:id="@+id/saved_locations_header"

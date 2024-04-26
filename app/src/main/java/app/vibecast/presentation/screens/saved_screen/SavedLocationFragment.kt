@@ -195,39 +195,64 @@ class SavedLocationFragment : Fragment(), MusicViewModel.PlayerStateListener {
         shuffleButton = binding.musicWidget.shuffleButton
         repeatButton = binding.musicWidget.repeatButton
         repeatButton.setOnClickListener {
-            musicViewModel.setRepeatStatus()
+            try {
+                musicViewModel.setRepeatStatus()
+            }catch (e : Exception){
+                showSpotifySnackBar()
+            }
+
         }
         playbackButton.setOnClickListener {
             try {
                 musicViewModel.onPlayPauseButtonClicked()
             } catch (e: Exception) {
-                val snackBar = Snackbar.make(
-                    requireView(),
-                    "Log into spotify to enable music",
-                    Snackbar.LENGTH_SHORT
-                )
-                val snackBarView = snackBar.view
-                val snackBarText =
-                    snackBarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
-                snackBarText.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-                snackBarView.background =
-                    ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
-                snackBar.show()
+                showSpotifySnackBar()
             }
 
         }
         shuffleButton.setOnClickListener {
-            musicViewModel.setShuffleStatus()
+            try {
+                musicViewModel.setShuffleStatus()
+            } catch (e: Exception) {
+                showSpotifySnackBar()
+            }
+
         }
         binding.musicWidget.forwardButton.setOnClickListener {
-            musicViewModel.onSkipNextButtonClicked()
+            try {
+                musicViewModel.onSkipNextButtonClicked()
+            } catch (e: Exception) {
+                showSpotifySnackBar()
+            }
+
         }
         binding.musicWidget.rewindButton.setOnClickListener {
-            musicViewModel.onSkipPreviousButtonClicked()
+            try {
+                musicViewModel.onSkipPreviousButtonClicked()
+            } catch (e: Exception) {
+                showSpotifySnackBar()
+            }
+
+
         }
         return binding.root
     }
 
+
+    private fun showSpotifySnackBar() {
+        val snackBar = Snackbar.make(
+            requireView(),
+            "Log into spotify to enable music",
+            Snackbar.LENGTH_SHORT
+        )
+        val snackBarView = snackBar.view
+        val snackBarText =
+            snackBarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+        snackBarText.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+        snackBarView.background =
+            ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
+        snackBar.show()
+    }
     /**
      * Loads and sets new image as background image when location or weather conditions change
      */
@@ -334,8 +359,8 @@ class SavedLocationFragment : Fragment(), MusicViewModel.PlayerStateListener {
                 val weather =
                     weatherData.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
                 observeImageData(city, weather!!)
-                musicViewModel.getPlaylist(weather)
-                binding.mainTemp.text =
+//                musicViewModel.getPlaylist(weather)
+                binding.mainTempDisplay.text =
                     getString(R.string.center_temp, currentWeather.temperature)
                 //            Current hour values
                 binding.centerTempRow.leftWeather.text =
