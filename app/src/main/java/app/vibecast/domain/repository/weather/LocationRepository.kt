@@ -4,7 +4,6 @@ import app.vibecast.domain.model.LocationDto
 import app.vibecast.domain.model.LocationWithWeatherDataDto
 import app.vibecast.domain.model.WeatherDto
 import app.vibecast.presentation.screens.main_screen.weather.LocationModel
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 
 interface LocationRepository {
@@ -19,7 +18,8 @@ interface LocationRepository {
 
     fun getLocation(cityName: String): Flow<LocationDto>
 
-    fun addLocation(location: LocationDto): Job
+    fun addLocation(location: LocationDto)
 
-    fun deleteLocation(location: LocationDto): Job
+    fun deleteLocation(location: LocationDto)
+    fun deleteAllLocations()
 }

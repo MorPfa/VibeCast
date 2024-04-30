@@ -10,8 +10,8 @@
 
     <ImageView
         android:id="@+id/backgroundImageView"
-        android:layout_width="411dp"
-        android:layout_height="810dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:importantForAccessibility="no"
         android:scaleType="centerCrop"
         app:layout_constraintBottom_toBottomOf="parent"

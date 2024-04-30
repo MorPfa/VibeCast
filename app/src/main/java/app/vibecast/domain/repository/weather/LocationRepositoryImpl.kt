@@ -94,14 +94,21 @@ class LocationRepositoryImpl @Inject constructor(
     override fun getLocation(cityName: String): Flow<LocationDto> =
         localLocationDataSource.getLocation(cityName)
 
-    override fun addLocation(location: LocationDto) =
-        CoroutineScope(Dispatchers.Main).launch {
+    override fun addLocation(location: LocationDto) {
+        CoroutineScope(Dispatchers.IO).launch {
             localLocationDataSource.addLocation(location)
         }
+    }
 
-    override fun deleteLocation(location: LocationDto) =
+    override fun deleteLocation(location: LocationDto) {
         CoroutineScope(Dispatchers.IO).launch {
             localLocationDataSource.deleteLocation(location)
         }
+    }
 
+    override fun deleteAllLocations() {
+        CoroutineScope(Dispatchers.IO).launch {
+            localLocationDataSource.deleteAllLocations()
+        }
+    }
 }

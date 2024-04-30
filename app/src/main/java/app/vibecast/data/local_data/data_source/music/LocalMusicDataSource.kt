@@ -8,6 +8,7 @@ interface LocalMusicDataSource {
     suspend fun saveSong(song: SongDto)
 
     suspend fun deleteSong(song: SongDto)
+    suspend fun deleteAllSongs()
 
     fun getSavedSong(song: SongDto) : Flow<SongDto>
     fun getAllSavedSongs() : Flow<List<SongDto>>

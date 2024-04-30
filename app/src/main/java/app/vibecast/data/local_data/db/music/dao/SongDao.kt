@@ -16,6 +16,8 @@ interface SongDao {
 
     @Delete
     suspend fun deleteSong(song: SongEntity)
+    @Query("DELETE FROM songs")
+    suspend fun deleteAllSongs()
 
     @Query("SELECT * FROM songs WHERE uri == :uri")
     fun getSavedSong(uri : String) : Flow<SongEntity>

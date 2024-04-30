@@ -26,7 +26,7 @@
             android:layout_marginTop="6dp"
             android:text="@string/air_quality"
             android:textColor="#FFFFFF"
-            android:textSize="24sp"
+            android:textSize="28sp"
             android:textStyle="bold" />
 
         <GridLayout
@@ -43,30 +43,33 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
+                android:paddingVertical="8dp"
                 android:text="@string/loading_placeholder"
                 android:textAlignment="textStart"
                 android:textColor="#FFFFFF"
-                android:textSize="20sp" />
+                android:textSize="24sp" />
 
             <TextView
                 android:id="@+id/wind_speed_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
+                android:paddingVertical="8dp"
                 android:text="@string/loading_placeholder"
                 android:textAlignment="textStart"
                 android:textColor="#FFFFFF"
-                android:textSize="20sp" />
+                android:textSize="24sp" />
 
             <TextView
                 android:id="@+id/visibility_value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_columnWeight="1"
+                android:paddingVertical="8dp"
                 android:text="@string/loading_placeholder"
                 android:textAlignment="textStart"
                 android:textColor="#FFFFFF"
-                android:textSize="20sp" />
+                android:textSize="24sp" />
 
             <TextView
                 android:id="@+id/chance_of_rain_tv"
@@ -76,7 +79,7 @@
                 android:text="@string/loading_placeholder"
                 android:textAlignment="textStart"
                 android:textColor="#FFFFFF"
-                android:textSize="20sp" />
+                android:textSize="24sp" />
 
             <TextView
                 android:id="@+id/uv_index_tv"
@@ -86,7 +89,7 @@
                 android:text="@string/loading_placeholder"
                 android:textAlignment="textStart"
                 android:textColor="#FFFFFF"
-                android:textSize="20sp" />
+                android:textSize="24sp" />
 
             <TextView
                 android:id="@+id/humidty_tv"
@@ -96,7 +99,7 @@
                 android:text="@string/loading_placeholder"
                 android:textAlignment="textStart"
                 android:textColor="#FFFFFF"
-                android:textSize="20sp" />
+                android:textSize="24sp" />
         </GridLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

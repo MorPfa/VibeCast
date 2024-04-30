@@ -15,6 +15,7 @@ interface ImageRepository {
     fun addImage(imageDto: ImageDto)
 
     fun deleteImage(imageDto: ImageDto)
+    fun deleteAllImages()
 
 
 }

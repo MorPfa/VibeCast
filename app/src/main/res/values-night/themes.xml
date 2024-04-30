@@ -9,6 +9,12 @@
 
     <style name="NavDrawerTheme" parent="Theme.VibeCast">
         <item name="android:textSize">@dimen/nav_item_textsize</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="NavDrawerHeaderTheme" parent="Theme.VibeCast">
+        <item name="android:textSize">@dimen/nav_item_textsize</item>
+        <item name="android:textColor">@color/white</item>
     </style>
 
     <style name="RadioButtonTheme" parent="Theme.AppCompat.Light">

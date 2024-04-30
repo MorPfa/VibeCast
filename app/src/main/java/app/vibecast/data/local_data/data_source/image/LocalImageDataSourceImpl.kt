@@ -26,6 +26,7 @@ class LocalImageDataSourceImpl @Inject constructor(
     private val imageDao: ImageDao,
 ) : LocalImageDataSource {
 
+
     override fun getImages(): Flow<List<ImageDto>> = imageDao.getAllImages().map { imageList ->
         try {
             imageList.map { it.toImageDto() }
@@ -61,6 +62,22 @@ class LocalImageDataSourceImpl @Inject constructor(
 
             } catch (e: Exception) {
                 Timber.tag(DB_ERROR).e("Error inserting image into db $e")
+                throw e
+            }
+        }
+    }
+
+    override suspend fun deleteAllImages() {
+        withContext(Dispatchers.IO) {
+            try {
+                ensureActive()
+                imageDao.deleteAllImages()
+            } catch (e: CancellationException) {
+                Timber.tag(COROUTINE_ERROR).e("Coroutine cancelled $e")
+                throw e
+            }
+            catch(e: Exception) {
+                Timber.tag(DB_ERROR).e("Error deleting image from db")
                 throw e
             }
         }

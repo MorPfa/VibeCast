@@ -32,19 +32,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="top|end"
-            android:layout_marginTop="1dp"
-            android:layout_marginEnd="1dp"
+            android:layout_marginTop="98dp"
+            android:layout_marginEnd="6dp"
+            android:background="@android:color/transparent"
             android:clickable="true"
             android:contentDescription="@string/change_profile_picture"
             android:focusable="true"
-            android:src="@drawable/edit_icon"
+            android:src="@drawable/edit_icon_large"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/profilePicture"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
             android:layout_gravity="center"
             android:background="@android:color/transparent"
             android:contentDescription="@string/profile_picture_content_desc"
@@ -60,7 +61,7 @@
             android:layout_gravity="center"
             android:text="@string/loading_placeholder"
             android:textColor="@android:color/white"
-            android:textSize="26sp"
+            android:textSize="32sp"
             tools:layout_editor_absoluteX="120dp"
             tools:layout_editor_absoluteY="136dp" />
 
@@ -72,7 +73,7 @@
             android:layout_marginBottom="12dp"
             android:text="@string/loading_placeholder"
             android:textColor="@color/white"
-            android:textSize="16sp"
+            android:textSize="22sp"
 
             />
 
@@ -97,7 +98,7 @@
                 android:text="@string/loading_placeholder"
                 android:textAlignment="center"
                 android:textColor="@color/white"
-                android:textSize="24sp"
+                android:textSize="28sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -110,7 +111,7 @@
                 android:text="@string/loading_placeholder"
                 android:textAlignment="center"
                 android:textColor="@color/white"
-                android:textSize="24sp"
+                android:textSize="28sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -123,46 +124,46 @@
                 android:text="@string/loading_placeholder"
                 android:textAlignment="center"
                 android:textColor="@color/white"
-                android:textSize="24sp"
+                android:textSize="28sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:paddingHorizontal="14dp"
+                android:paddingHorizontal="28dp"
                 android:paddingTop="6dp"
                 android:paddingBottom="12dp"
                 android:text="@string/saved_places"
                 android:textAlignment="center"
                 android:textColor="@color/white"
-                android:textSize="24sp"
+                android:textSize="28sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:paddingHorizontal="14dp"
+                android:paddingHorizontal="22dp"
                 android:paddingTop="6dp"
                 android:paddingBottom="12dp"
                 android:text="@string/saved_images"
                 android:textAlignment="center"
                 android:textColor="@color/white"
-                android:textSize="24sp"
+                android:textSize="28sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:paddingHorizontal="14dp"
+                android:paddingHorizontal="28dp"
                 android:paddingTop="6dp"
                 android:paddingBottom="12dp"
                 android:text="@string/saved_songs"
                 android:textAlignment="center"
                 android:textColor="@color/white"
-                android:textSize="24sp"
+                android:textSize="28sp"
                 android:textStyle="bold" />
 
         </GridLayout>
@@ -176,7 +177,7 @@
             android:text="@string/saved_locations"
             android:textAlignment="center"
             android:textColor="@color/white"
-            android:textSize="28sp" />
+            android:textSize="32sp" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/saved_locations"
@@ -193,13 +194,14 @@
             android:layout_gravity="center"
             android:text="@string/saved_songs"
             android:textColor="@color/white"
-            android:textSize="28sp" />
+            android:textSize="32sp" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/savedSongs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            android:layout_marginHorizontal="172dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"

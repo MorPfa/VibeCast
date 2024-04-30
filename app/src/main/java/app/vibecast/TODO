@@ -2,8 +2,9 @@
 
 TASKS:
 today:
-add snack bar to edit profile submit
-fix search bug
+configure toast message or switch for snackbar
+figure out delete account issue
+
 
 Next tasks:
 fix spotify auth (cache token maybe or reauthorize if auth exception is thrown)

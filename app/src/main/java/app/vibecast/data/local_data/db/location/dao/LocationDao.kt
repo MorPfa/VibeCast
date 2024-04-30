@@ -39,4 +39,6 @@ interface LocationDao {
 
     @Delete
     suspend fun deleteLocation(locationEntity: LocationEntity)
+    @Query("DELETE FROM locations")
+    suspend fun deleteAllLocations()
 }

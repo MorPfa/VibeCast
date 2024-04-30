@@ -47,14 +47,7 @@ class MainViewModel @Inject constructor(
     private val locationRepository: LocationRepository,
     private val dataStoreRepository: UnitPreferenceRepository,
 ) : ViewModel() {
-//    init {
-//        viewModelScope.launch {
-//            locationRepository.getLocations().collect { locations ->
-//                withContext(Dispatchers.Main) { _locations.value = locations }
-//
-//            }
-//        }
-//    }
+
 
     fun setUpLocationData() {
         viewModelScope.launch {

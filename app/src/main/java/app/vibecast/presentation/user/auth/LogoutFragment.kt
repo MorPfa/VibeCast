@@ -114,6 +114,7 @@ class LogoutFragment : Fragment() {
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         Timber.tag("auth").d("Account deleted")
+
                         accountViewModel.deleteUserData()
                         ImageHandler.deleteImageFromInternalStorage(requireContext())
                         auth.signOut()

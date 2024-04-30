@@ -18,4 +18,5 @@ interface LocalLocationDataSource {
     suspend fun addLocation(location: LocationDto)
 
     suspend fun deleteLocation(location: LocationDto)
+    suspend fun deleteAllLocations()
 }

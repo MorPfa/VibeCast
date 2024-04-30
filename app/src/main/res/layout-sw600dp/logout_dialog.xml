@@ -5,19 +5,18 @@
     android:id="@+id/dialog_card"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/rounded_black_background">
+    android:background="@drawable/logout_dialog_bg">
 
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/logoutHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="28dp"
-        android:text="@string/confirm_location_removal"
+        android:paddingVertical="16dp"
+        android:text="@string/are_you_sure_you_want_to_logout"
         android:textAlignment="center"
         android:textColor="@color/white"
-        android:textSize="@dimen/delete_location_dialog_header"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:textSize="28sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -25,36 +24,39 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView2">
+        app:layout_constraintTop_toBottomOf="@+id/logoutHeader">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/removeBtn"
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/confirmBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="8dp"
+            android:layout_marginVertical="6dp"
             android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:padding="8dp"
-            android:text="@string/remove"
+            android:background="@drawable/textview_background"
+            android:padding="4dp"
+            android:text="@string/logout"
             android:textColor="@color/white"
-            android:textSize="@dimen/dialog_button_textsize" />
+            android:textSize="26sp" />
 
-        <com.google.android.material.button.MaterialButton
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/cancelBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="8dp"
+            android:layout_marginVertical="6dp"
             android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:padding="8dp"
+            android:background="@drawable/textview_background"
+            android:padding="4dp"
             android:text="@string/cancel"
             android:textColor="@color/white"
-            android:textSize="@dimen/dialog_button_textsize" />
+            android:textSize="26sp" />
     </LinearLayout>
 
 

@@ -24,18 +24,18 @@
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/profilePicture"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:layout_marginTop="82dp"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
         android:layout_gravity="center"
+        android:layout_marginTop="118dp"
         android:background="@android:color/transparent"
         android:contentDescription="@string/profile_picture_content_desc"
         android:scaleType="centerCrop"
         android:src="@drawable/account_icon_circle"
-        app:shapeAppearanceOverlay="@style/Circular"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent"
+        app:shapeAppearanceOverlay="@style/Circular" />
 
     <TextView
         android:id="@+id/textView"
@@ -47,7 +47,7 @@
         android:elevation="16dp"
         android:text="@string/choose_your_profile_picture"
         android:textColor="@color/white"
-        android:textSize="17sp"
+        android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -59,7 +59,7 @@
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="8dp"
+        android:layout_marginHorizontal="92dp"
         android:layout_marginVertical="12dp"
         android:elevation="16dp"
         android:textColor="@color/white"
@@ -77,7 +77,8 @@
             android:hint="@string/username_prompt"
             android:inputType="textEmailAddress"
             android:textColor="@color/white"
-            android:textColorHint="@color/white" />
+            android:textColorHint="@color/white"
+            android:textSize="26sp" />
     </com.google.android.material.textfield.TextInputLayout>
 
 
@@ -86,7 +87,7 @@
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="8dp"
+        android:layout_marginHorizontal="92dp"
         android:layout_marginVertical="12dp"
         android:elevation="16dp"
         android:textColor="@color/white"
@@ -104,7 +105,8 @@
             android:hint="@string/prompt_email"
             android:inputType="textEmailAddress"
             android:textColor="@color/white"
-            android:textColorHint="@color/white" />
+            android:textColorHint="@color/white"
+            android:textSize="26sp" />
     </com.google.android.material.textfield.TextInputLayout>
 
 
@@ -112,14 +114,14 @@
         android:id="@+id/submitBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="8dp"
+        android:layout_marginHorizontal="92dp"
         android:layout_marginVertical="16dp"
         android:background="@drawable/textfield_background"
         android:backgroundTint="@color/black"
         android:elevation="16dp"
         android:text="@string/submit"
         android:textColor="@color/white"
-        android:textSize="16sp"
+        android:textSize="21sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"

@@ -12,6 +12,7 @@ interface MusicRepository {
     fun getCurrentSong(song: String, artist: String, accessCode: String): Flow<TracksDto>
 
     suspend fun deleteSong(song: SongDto)
+    suspend fun deleteAllSongs()
 
     suspend fun saveSong(song: SongDto)
 

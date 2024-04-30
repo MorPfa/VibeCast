@@ -95,7 +95,7 @@
     <string name="none_saved">You don\'t have any saved locations</string>
     <string name="saved_places">Places</string>
     <string name="saved_images">Images</string>
-    <string name="saved_songs">Saved Songs</string>
+    <string name="saved_songs">Songs</string>
     <string name="location_reminder">You listened to this song in %1$s</string>
     <string name="home">Home</string>
     <string name="location_request_toast">Location permission is required to show you weather data for your current location</string>
@@ -233,6 +233,7 @@
     <string name="listen_to_this_song_on_spotify">Listen to this song on spotify</string>
     <string name="check_out_the_artist_on_spotify">Check out the artist on spotify</string>
     <string name="reset_password_content_desc">Enter your email address to receive an email to reset your password</string>
+    <string name="initial_value">0</string>
 
 
 </resources>

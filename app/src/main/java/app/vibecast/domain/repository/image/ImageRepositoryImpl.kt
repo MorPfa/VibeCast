@@ -76,6 +76,18 @@ class ImageRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun deleteAllImages() {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                localImageDataSource.deleteAllImages()
+            } catch (e: CancellationException) {
+                Timber.tag(COROUTINE_ERROR).e(e.localizedMessage)
+            } catch (e: Exception) {
+                Timber.tag(IMAGE_ERROR).e(e.localizedMessage)
+            }
+        }
+    }
+
     /**
      *  Deletes image from database
      */

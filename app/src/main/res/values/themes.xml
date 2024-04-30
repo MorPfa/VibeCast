@@ -24,7 +24,15 @@
         <item name="colorAccent">#181819</item> <!-- Turquoise color for the switch -->
 
     </style>
+    <style name="NavDrawerTheme" parent="Theme.VibeCast">
+        <item name="android:textSize">@dimen/nav_item_textsize</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
 
+    <style name="NavDrawerHeaderTheme" parent="Theme.VibeCast">
+        <item name="android:textSize">@dimen/nav_item_textsize</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
 
     <style name="Theme.VibeCast.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" >
 

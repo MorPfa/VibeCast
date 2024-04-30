@@ -1,6 +1,5 @@
 package app.vibecast.presentation.screens.main_screen.image
 
-import android.util.Log
 import android.widget.ImageView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -20,6 +19,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -49,12 +49,13 @@ class ImageViewModel @Inject constructor(
         }
     }
 
+
     fun deleteImage(imageDto: ImageDto) {
         viewModelScope.launch {
             try {
                 imageRepository.deleteImage(imageDto)
             } catch (e: Exception) {
-                Log.e(TAGS.IMAGE_ERROR,e.toString())
+                Timber.tag(TAGS.IMAGE_ERROR).e(e.toString())
                 throw e
             }
         }
@@ -77,7 +78,7 @@ class ImageViewModel @Inject constructor(
                 imageRepository.addImage(imageDto)
 
             } catch (e: Exception) {
-                Log.e(TAGS.IMAGE_ERROR,e.toString())
+                Timber.tag(TAGS.IMAGE_ERROR).e(e.toString())
                 throw e
             }
         }
@@ -127,7 +128,7 @@ class ImageViewModel @Inject constructor(
     fun loadImage(query: String, weatherCondition: String): Flow<ImageDto?> = flow {
         emitAll(imagePicker.pickImage(query, weatherCondition).flowOn(Dispatchers.IO))
     }.catch { e ->
-        Log.e(TAGS.IMAGE_ERROR, "Error loading image: $e in ViewModel")
+        Timber.tag(TAGS.IMAGE_ERROR).e("Error loading image: $e in ViewModel")
         throw e
     }
 

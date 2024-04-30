@@ -71,6 +71,7 @@ class LocalLocationDataSourceImpl @Inject constructor(
         LocationEntity(location.city, location.country)
     )
 
+    override suspend fun deleteAllLocations() = locationDao.deleteAllLocations()
 
     private fun WeatherEntity.toWeatherDto(): WeatherDto {
         return WeatherDto(

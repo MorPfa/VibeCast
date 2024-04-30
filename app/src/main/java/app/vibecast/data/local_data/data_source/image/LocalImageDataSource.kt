@@ -11,6 +11,7 @@ interface LocalImageDataSource {
     suspend fun addImage(image : ImageDto)
 
     suspend fun deleteImage(image: ImageDto)
+    suspend fun deleteAllImages()
 
 
 }

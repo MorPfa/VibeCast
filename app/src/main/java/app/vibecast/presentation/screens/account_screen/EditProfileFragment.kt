@@ -116,11 +116,6 @@ class EditProfileFragment : Fragment() {
         val userName = userName.text.toString()
         val validInput = validateInput(email, userName)
 
-        newProfilePic?.let {
-            ImageHandler.saveImageToInternalStorage(
-                it, requireContext()
-            )
-        }
 
         if (validInput) {
             Timber.tag("auth").d(currentEmail)
@@ -162,6 +157,23 @@ class EditProfileFragment : Fragment() {
                         )
                         profilePic.setImageBitmap(selectedImageBitmap)
                         newProfilePic = selectedImageBitmap
+                        newProfilePic?.let {
+                            ImageHandler.saveImageToInternalStorage(
+                                it, requireContext()
+                            )
+                            val snackbar = Snackbar.make(
+                                requireView(),
+                                "Updated profile picture",
+                                Snackbar.LENGTH_SHORT
+                            )
+                            val snackbarView = snackbar.view
+                            val snackbarText =
+                                snackbarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+                            snackbarText.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+                            snackbarView.background =
+                                ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
+                            snackbar.show()
+                        }
                     } catch (e: IOException) {
                         e.printStackTrace()
                     }

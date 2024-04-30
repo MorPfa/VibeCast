@@ -14,27 +14,16 @@
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardView"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/profileImageIcon"
+        android:layout_width="@dimen/profile_picture_width"
+        android:layout_height="@dimen/profile_picture_height"
         android:layout_gravity="start"
-        android:paddingTop="@dimen/nav_header_vertical_spacing"
-        app:cardCornerRadius="60dp"
-        app:cardBackgroundColor="@android:color/transparent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-
-        <ImageView
-            android:id="@+id/profileImageIcon"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:contentDescription="@string/nav_header_desc"
-            android:scaleType="centerCrop"
-            android:src="@drawable/account_icon_circle" />
-
-    </androidx.cardview.widget.CardView>
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/profile_picture_content_desc"
+        android:scaleType="centerCrop"
+        android:src="@drawable/account_icon_circle"
+        app:shapeAppearanceOverlay="@style/Circular" />
 
     <TextView
         android:id="@+id/user_name_tv"
@@ -42,11 +31,12 @@
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         android:text="@string/loading_placeholder"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+        android:textAppearance="@style/NavDrawerHeaderTheme" />
 
     <TextView
         android:id="@+id/user_email_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/loading_placeholder" />
+        android:text="@string/loading_placeholder"
+        android:textAppearance="@style/NavDrawerHeaderTheme" />
 </LinearLayout>

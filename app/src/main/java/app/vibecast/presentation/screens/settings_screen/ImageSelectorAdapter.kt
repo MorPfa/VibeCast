@@ -38,7 +38,7 @@ class ImageSelectorAdapter(
     override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
         val image = getItem(position)
         imageLoader.loadUrlIntoImageView(image.urls.regular, holder.savedImage, true, 32)
-        viewModel.backgroundImage?.observe(owner) { backgroundImage ->
+        viewModel.backgroundImage.observe(owner) { backgroundImage ->
             if (image.urls.regular == backgroundImage) {
                 holder.selectedIcon.setImageResource(R.drawable.item_selected_icon)
             } else {

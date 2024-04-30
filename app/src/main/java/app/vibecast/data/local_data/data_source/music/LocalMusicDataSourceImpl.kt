@@ -61,6 +61,14 @@ class LocalMusicDataSourceImpl @Inject constructor(private val songDao: SongDao)
         }
     }
 
+    override suspend fun deleteAllSongs() {
+        try {
+            songDao.deleteAllSongs()
+        } catch (e: Exception) {
+            Timber.tag("music_db").d("Couldn't wipe song table $e")
+        }
+    }
+
     override fun getSavedSong(song: SongDto): Flow<SongDto> = flow {
         try {
             songDao.getSavedSong(song.trackUri).collect {

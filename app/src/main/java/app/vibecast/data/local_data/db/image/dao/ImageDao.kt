@@ -20,4 +20,7 @@ interface ImageDao {
     @Delete
     suspend fun deleteImage(imageEntity: ImageEntity)
 
+    @Query("DELETE FROM images")
+    suspend fun deleteAllImages()
+
 }

@@ -10,6 +10,8 @@ import app.vibecast.domain.model.FirebaseLocation
 import app.vibecast.domain.model.ImageDto
 import app.vibecast.domain.model.LocationDto
 import app.vibecast.domain.repository.firebase.FirebaseRepository
+import app.vibecast.domain.repository.image.ImageRepository
+import app.vibecast.domain.repository.music.MusicRepository
 import app.vibecast.domain.repository.weather.LocationRepository
 import app.vibecast.presentation.screens.main_screen.weather.LocationModel
 import com.google.firebase.auth.FirebaseAuth
@@ -28,6 +30,8 @@ import javax.inject.Inject
 class AccountViewModel @Inject constructor(
     private val firebaseRepository: FirebaseRepository,
     private val locationRepository: LocationRepository,
+    private val imageRepository: ImageRepository,
+    private val musicRepository: MusicRepository,
 ) : ViewModel() {
 
     private var auth: FirebaseAuth = Firebase.auth
@@ -103,8 +107,12 @@ class AccountViewModel @Inject constructor(
     fun deleteUserData() {
         viewModelScope.launch(Dispatchers.IO) {
             firebaseRepository.deleteUserData()
+            imageRepository.deleteAllImages()
+            locationRepository.deleteAllLocations()
+            musicRepository.deleteAllSongs()
         }
     }
+
 
     fun syncData() {
         viewModelScope.launch(Dispatchers.IO) {

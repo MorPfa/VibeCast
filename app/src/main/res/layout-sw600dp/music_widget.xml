@@ -52,7 +52,7 @@
             android:text="@string/loading_placeholder"
             android:textAlignment="center"
             android:textColor="@color/white"
-            android:textSize="20sp"
+            android:textSize="24sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@+id/artistNameTextView"
             app:layout_constraintEnd_toEndOf="parent"
@@ -67,7 +67,7 @@
             android:text="@string/loading_placeholder"
             android:textAlignment="center"
             android:textColor="@color/white"
-            android:textSize="16sp"
+            android:textSize="20sp"
             app:layout_constraintBottom_toTopOf="@+id/progressBar"
             app:layout_constraintStart_toEndOf="@id/albumArtImageView" />
 
