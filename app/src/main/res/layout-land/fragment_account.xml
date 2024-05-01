@@ -22,193 +22,208 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.5" />
 
-    <LinearLayout
+
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <ImageButton
-            android:id="@+id/editProfileBtn"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="top|end"
-            android:layout_marginTop="1dp"
-            android:layout_marginEnd="1dp"
-            android:clickable="true"
-            android:contentDescription="@string/change_profile_picture"
-            android:focusable="true"
-            android:src="@drawable/edit_icon"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:orientation="vertical">
 
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/profilePicture"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:layout_gravity="center"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/profile_picture_content_desc"
-            android:scaleType="centerCrop"
-            android:src="@drawable/account_icon_circle"
-            app:shapeAppearanceOverlay="@style/Circular" />
+            <ImageButton
+                android:id="@+id/editProfileBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|end"
+                android:layout_marginTop="82dp"
+                android:layout_marginEnd="1dp"
+                android:background="@android:color/transparent"
+                android:clickable="true"
+                android:contentDescription="@string/change_profile_picture"
+                android:focusable="true"
+                android:src="@drawable/edit_icon"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/profilePicture"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="6dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/profile_picture_content_desc"
+                android:scaleType="centerCrop"
+                android:src="@drawable/account_icon_circle"
+                app:shapeAppearanceOverlay="@style/Circular" />
 
-        <TextView
-            android:id="@+id/username"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="@string/loading_placeholder"
-            android:textColor="@android:color/white"
-            android:textSize="26sp"
-            tools:layout_editor_absoluteX="120dp"
-            tools:layout_editor_absoluteY="136dp" />
-
-        <TextView
-            android:id="@+id/userEmail"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginBottom="12dp"
-            android:text="@string/loading_placeholder"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-
-            />
-
-
-        <GridLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/rounded_black_background"
-            android:columnCount="3"
-            android:layout_gravity="center"
-            android:orientation="horizontal"
-            android:padding="12dp"
-            android:rowCount="2">
 
             <TextView
-                android:id="@+id/saved_locations_count"
+                android:id="@+id/username"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:paddingHorizontal="12dp"
-                android:paddingTop="12dp"
                 android:text="@string/loading_placeholder"
-                android:textAlignment="center"
-                android:textColor="@color/white"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                android:textColor="@android:color/white"
+                android:textSize="26sp"
+                tools:layout_editor_absoluteX="120dp"
+                tools:layout_editor_absoluteY="136dp" />
 
             <TextView
-                android:id="@+id/savedImageCount"
+                android:id="@+id/userEmail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:paddingHorizontal="12dp"
-                android:paddingTop="12dp"
-                android:text="@string/saved_image_count"
-                android:textAlignment="center"
-                android:textColor="@color/white"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/savedSongCount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:paddingHorizontal="12dp"
-                android:paddingTop="12dp"
+                android:layout_marginBottom="12dp"
                 android:text="@string/loading_placeholder"
-                android:textAlignment="center"
-                android:textColor="@color/white"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:paddingHorizontal="12dp"
-                android:paddingTop="6dp"
-                android:paddingBottom="12dp"
-                android:text="@string/saved_places"
-                android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textSize="16sp"
-                android:textStyle="bold" />
 
-            <TextView
+                />
+
+
+            <GridLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:paddingHorizontal="12dp"
-                android:paddingTop="6dp"
-                android:paddingBottom="12dp"
-                android:text="@string/saved_images"
+                android:background="@drawable/rounded_black_background"
+                android:columnCount="3"
+                android:orientation="horizontal"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="6dp"
+                android:rowCount="2">
+
+                <TextView
+                    android:id="@+id/saved_locations_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:paddingHorizontal="12dp"
+                    android:paddingTop="12dp"
+                    android:text="@string/loading_placeholder"
+                    android:textAlignment="center"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/savedImageCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:paddingHorizontal="12dp"
+                    android:paddingTop="12dp"
+                    android:text="@string/saved_image_count"
+                    android:textAlignment="center"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/savedSongCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:paddingHorizontal="12dp"
+                    android:paddingTop="12dp"
+                    android:text="@string/loading_placeholder"
+                    android:textAlignment="center"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:paddingStart="24dp"
+                    android:paddingEnd="18dp"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="12dp"
+                    android:text="@string/saved_places"
+                    android:textAlignment="center"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:paddingHorizontal="12dp"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="12dp"
+                    android:text="@string/saved_images"
+                    android:textAlignment="center"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="24dp"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="12dp"
+                    android:text="@string/saved_songs"
+                    android:textAlignment="center"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+            </GridLayout>
+
+
+            <TextView
+                android:id="@+id/saved_locations_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:padding="8dp"
+                android:text="@string/saved_locations"
                 android:textAlignment="center"
                 android:textColor="@color/white"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textSize="22sp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/saved_locations"
+                android:layout_width="match_parent"
+                android:layout_height="180dp"
+                android:layout_marginHorizontal="96dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/location_item_card" />
+
 
             <TextView
+                android:id="@+id/saved_songs_header"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:paddingHorizontal="12dp"
-                android:paddingTop="6dp"
-                android:paddingBottom="12dp"
                 android:text="@string/saved_songs"
-                android:textAlignment="center"
-                android:textColor="@color/white"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textSize="22sp" />
 
-        </GridLayout>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/savedSongs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/saved_songs_header"
+                app:layout_constraintVertical_bias="0.5"
+                app:spanCount="2"
+                tools:listitem="@layout/item_music_cardview" />
 
-
-        <TextView
-            android:id="@+id/saved_locations_header"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:padding="8dp"
-            android:text="@string/saved_locations"
-            android:textAlignment="center"
-            android:textColor="@color/white"
-            android:textSize="22sp" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/saved_locations"
-            android:layout_width="match_parent"
-            android:layout_height="180dp"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:listitem="@layout/location_item_card" />
-
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="@string/saved_songs"
-            android:textSize="18sp" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/savedSongs"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/your_saved_images"
-            app:layout_constraintVertical_bias="0.5"
-            app:spanCount="3"
-            tools:listitem="@layout/item_music_cardview" />
-
-    </LinearLayout>
-
+        </LinearLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

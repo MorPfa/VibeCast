@@ -208,7 +208,10 @@ class MainActivity : AppCompatActivity(), MusicViewModel.PlayerStateListener {
                     showIcons = false
                     invalidateOptionsMenu()
                 }
-
+                R.id.nav_edit_profile -> {
+                    showIcons = false
+                    invalidateOptionsMenu()
+                }
             }
         }
         accountViewModel.syncData()

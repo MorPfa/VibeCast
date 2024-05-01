@@ -3,7 +3,6 @@
 TASKS:
 today:
 sync songs from firebase
-figure out screen rotation
 
 
 Next tasks:
@@ -19,6 +18,7 @@ configure pro guard r8
 
 
 Nice to have's:
+make token observation in fragment more elegant
 fix save icon issue (determine check status based off db)
 make long press on screen show bg image
 replace splash screen fragment with activity

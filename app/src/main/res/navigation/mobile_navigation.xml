@@ -60,7 +60,7 @@
 
         <action
             android:id="@+id/account_to_editProfile"
-            app:destination="@id/editProfileFragment"
+            app:destination="@id/nav_edit_profile"
             app:enterAnim="@anim/fui_slide_out_left"
             app:popExitAnim="@anim/fui_slide_out_left" />
         <action
@@ -134,7 +134,7 @@
 
 
     <fragment
-        android:id="@+id/editProfileFragment"
+        android:id="@+id/nav_edit_profile"
         android:name="app.vibecast.presentation.screens.account_screen.EditProfileFragment"
         android:label="fragment_edit_profile"
         tools:layout="@layout/fragment_edit_profile" />
