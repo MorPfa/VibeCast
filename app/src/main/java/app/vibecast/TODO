@@ -2,15 +2,13 @@
 
 TASKS:
 today:
-configure toast message or switch for snackbar
-figure out delete account issue
+sync songs from firebase
+figure out screen rotation
 
 
 Next tasks:
-fix spotify auth (cache token maybe or reauthorize if auth exception is thrown)
-figure out screen rotation
-
 optimize image accuracy (maybe go back to GET /search/photos endpoint and combine query with collections)
+ensure spotify works correctly no matter if app is installed or not
 
 
 Miscellaneous:

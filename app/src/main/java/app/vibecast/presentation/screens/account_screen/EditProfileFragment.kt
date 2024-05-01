@@ -161,6 +161,7 @@ class EditProfileFragment : Fragment() {
                             ImageHandler.saveImageToInternalStorage(
                                 it, requireContext()
                             )
+                            accountViewModel.update(true)
                             val snackbar = Snackbar.make(
                                 requireView(),
                                 "Updated profile picture",

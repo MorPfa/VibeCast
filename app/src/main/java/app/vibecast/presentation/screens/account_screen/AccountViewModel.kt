@@ -47,10 +47,25 @@ class AccountViewModel @Inject constructor(
 
     fun updateUserName(name: String) {
         _userName.value = name
-
     }
 
+    private val _updateNavHeader = MutableLiveData(true)
+    val updateNavHeader: LiveData<Boolean>
+        get() = _updateNavHeader
 
+
+    fun update(value : Boolean){
+        _updateNavHeader.value = value
+    }
+
+    fun deleteLocalData() {
+        viewModelScope.launch(Dispatchers.IO) {
+
+            imageRepository.deleteAllImages()
+            locationRepository.deleteAllLocations()
+            musicRepository.deleteAllSongs()
+        }
+    }
 
     suspend fun addUserName(user: FirebaseUser?, userName: String): Boolean {
         val deferred = CompletableDeferred<Boolean>()

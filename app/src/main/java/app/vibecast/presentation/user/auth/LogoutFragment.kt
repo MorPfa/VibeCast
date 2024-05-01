@@ -5,11 +5,13 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.Toast
+import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import app.vibecast.R
@@ -18,6 +20,7 @@ import app.vibecast.presentation.MainActivity
 import app.vibecast.presentation.screens.account_screen.AccountViewModel
 import app.vibecast.presentation.screens.account_screen.util.ImageHandler
 import app.vibecast.presentation.screens.main_screen.image.ImageViewModel
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -83,6 +86,7 @@ class LogoutFragment : Fragment() {
         confirmBtn.setOnClickListener {
             auth.signOut()
             logoutDialog?.dismiss()
+            accountViewModel.deleteLocalData()
             val intent = Intent(activity, MainActivity::class.java)
             startActivity(intent)
             requireActivity().finish()
@@ -123,8 +127,19 @@ class LogoutFragment : Fragment() {
                         startActivity(intent)
                         requireActivity().finish()
                     } else {
-                        Toast.makeText(requireContext(), "Something went wrong", Toast.LENGTH_SHORT)
-                            .show()
+                        val snackBar = Snackbar.make(
+                            requireView(),
+                            "Something went wrong",
+                            Snackbar.LENGTH_SHORT
+                        )
+                        val snackBarView = snackBar.view
+                        val snackBarText =
+                            snackBarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+                        snackBarText.gravity = Gravity.CENTER
+                        snackBarText.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+                        snackBarView.background =
+                            ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
+                        snackBar.show()
                     }
                 }
 
@@ -136,7 +151,6 @@ class LogoutFragment : Fragment() {
         deleteDialog?.show()
 
     }
-
 
     companion object {
 

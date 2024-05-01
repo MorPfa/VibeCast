@@ -4,21 +4,25 @@ package app.vibecast.presentation.user.auth
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
-import android.widget.Toast
+import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import app.vibecast.R
 import app.vibecast.databinding.FragmentRegistrationBinding
 import app.vibecast.presentation.MainActivity
 import app.vibecast.presentation.screens.account_screen.AccountViewModel
 import app.vibecast.presentation.screens.main_screen.image.ImageViewModel
 import app.vibecast.presentation.user.auth.util.RegistrationResult
 import com.google.android.gms.common.SignInButton
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -93,6 +97,21 @@ class RegistrationFragment : Fragment() {
         return binding.root
     }
 
+    private fun showSnackBar(text: String) {
+        val snackBar = Snackbar.make(
+            requireView(),
+            text,
+            Snackbar.LENGTH_SHORT
+        )
+        val snackBarView = snackBar.view
+        val snackBarText =
+            snackBarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+        snackBarText.gravity = Gravity.CENTER
+        snackBarText.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+        snackBarView.background =
+            ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
+        snackBar.show()
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -104,47 +123,23 @@ class RegistrationFragment : Fragment() {
             val password2 = confirmPasswordInput.text.toString()
             val result = validateInput(userName, email, password1, password2)
             when (result) {
-                RegistrationResult.INVALID_EMAIL -> {
-                    Toast.makeText(
-                        requireContext(),
-                        "Invalid email address", Toast.LENGTH_SHORT
-                    ).show()
-                }
+                RegistrationResult.INVALID_EMAIL ->
+                    showSnackBar("Invalid email address")
 
-                RegistrationResult.PASSWORD_MISMATCH -> {
-                    Toast.makeText(
-                        requireContext(),
-                        "Passwords don't match", Toast.LENGTH_SHORT
-                    ).show()
-                }
+                RegistrationResult.PASSWORD_MISMATCH ->
+                    showSnackBar("Passwords don't match")
 
-                RegistrationResult.EMPTY_PASSWORD -> {
-                    Toast.makeText(
-                        requireContext(),
-                        "Please enter a password", Toast.LENGTH_SHORT
-                    ).show()
-                }
+                RegistrationResult.EMPTY_PASSWORD ->
+                    showSnackBar("Please enter a password")
 
-                RegistrationResult.EMPTY_USERNAME -> {
-                    Toast.makeText(
-                        requireContext(),
-                        "Please enter a username", Toast.LENGTH_SHORT
-                    ).show()
-                }
+                RegistrationResult.EMPTY_USERNAME ->
+                    showSnackBar("Please enter a username")
 
-                RegistrationResult.EMPTY_EMAIL -> {
-                    Toast.makeText(
-                        requireContext(),
-                        "Please enter an email address", Toast.LENGTH_SHORT
-                    ).show()
-                }
+                RegistrationResult.EMPTY_EMAIL ->
+                    showSnackBar("Please enter an email address")
 
-                RegistrationResult.PASSWORD_TOO_SHORT -> {
-                    Toast.makeText(
-                        requireContext(),
-                        "Password needs to be at least 6 characters", Toast.LENGTH_SHORT
-                    ).show()
-                }
+                RegistrationResult.PASSWORD_TOO_SHORT ->
+                    showSnackBar("Password needs to be at least 6 characters")
 
                 RegistrationResult.SUCCESS -> {
                     createAccount(userName, email, password1)
@@ -165,10 +160,7 @@ class RegistrationFragment : Fragment() {
 
                     accountViewModel.userName.observe(viewLifecycleOwner) {
                         if (it != null) {
-                            Toast.makeText(
-                                requireContext(),
-                                "Created Account successfully", Toast.LENGTH_SHORT
-                            ).show()
+                            showSnackBar("Created Account successfully")
                             val intent = Intent(activity, MainActivity::class.java)
                             startActivity(intent)
                             requireActivity().finish()
@@ -178,11 +170,7 @@ class RegistrationFragment : Fragment() {
                 } else {
                     // If sign in fails, display a message to the user.
                     Timber.tag("auth").w("createUserWithEmail:failure ${task.exception}")
-                    Toast.makeText(
-                        requireContext(),
-                        "Authentication failed.",
-                        Toast.LENGTH_SHORT,
-                    ).show()
+                    showSnackBar("Authentication failed.")
                 }
             }
     }

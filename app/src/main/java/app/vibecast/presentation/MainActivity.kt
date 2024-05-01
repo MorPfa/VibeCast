@@ -13,7 +13,6 @@ import android.view.MenuItem
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -69,10 +68,10 @@ class MainActivity : AppCompatActivity(), MusicViewModel.PlayerStateListener {
     private lateinit var auth: FirebaseAuth
     private val redirectUri = "vibecast://callback"
     private val clientId = BuildConfig.SPOTIFY_KEY
-    private val REQUEST_CODE = 1337
     private var currentUser: FirebaseUser? = null
     private lateinit var userNameTv: TextView
     private lateinit var userEmailTv: TextView
+    private lateinit var profilePicture: ImageView
 
 
     override fun onPlayerStateUpdated(playerState: PlayerState) {
@@ -92,6 +91,7 @@ class MainActivity : AppCompatActivity(), MusicViewModel.PlayerStateListener {
                 )
                 .build()
         AuthorizationClient.openLoginActivity(this, REQUEST_CODE, request)
+
     }
 
 
@@ -120,6 +120,7 @@ class MainActivity : AppCompatActivity(), MusicViewModel.PlayerStateListener {
 
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
+        private const val REQUEST_CODE = 1337
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -158,20 +159,14 @@ class MainActivity : AppCompatActivity(), MusicViewModel.PlayerStateListener {
             loginText.isVisible = true
             loginText.title = "Logout"
         }
-        val profileImageView = navHeader.findViewById<ImageView>(R.id.profileImageIcon)
-        val savedBitmap = ImageHandler.loadImageFromInternalStorage(this)
-        savedBitmap?.let {
-            profileImageView.setImageBitmap(it)
-        }
+
+
         userNameTv = navHeader.findViewById(R.id.user_name_tv)
         userEmailTv = navHeader.findViewById(R.id.user_email_tv)
+        profilePicture = navHeader.findViewById(R.id.profileImageIcon)
 
         currentUser = auth.currentUser
-        if (currentUser != null) {
 
-            setUpNavHeader()
-
-        }
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
                 R.id.nav_account -> {
@@ -229,6 +224,10 @@ class MainActivity : AppCompatActivity(), MusicViewModel.PlayerStateListener {
             Timber.tag("auth activity").d(userEmail.toString())
             userEmailTv.text = userEmail
         }
+        val savedBitmap = ImageHandler.loadImageFromInternalStorage(this)
+        savedBitmap?.let {
+            profilePicture.setImageBitmap(it)
+        }
     }
 
 
@@ -264,14 +263,28 @@ class MainActivity : AppCompatActivity(), MusicViewModel.PlayerStateListener {
                     // Permission denied, update state and handle accordingly
                     mainViewModel.updatePermissionState(LocationPermissionState.Denied)
                     mainViewModel.checkPermissionState()
-                    Toast.makeText(
-                        this,
-                        getString(R.string.location_request_toast), Toast.LENGTH_SHORT
-                    ).show()
+                    showSnackBar(getString(R.string.location_request_toast))
                 }
             }
 
         }
+    }
+
+
+    private fun showSnackBar(text: String) {
+        val snackBar = Snackbar.make(
+            findViewById(android.R.id.content),
+            text,
+            Snackbar.LENGTH_SHORT
+        )
+        val snackBarView = snackBar.view
+        val snackBarText =
+            snackBarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+        snackBarText.gravity = Gravity.CENTER
+        snackBarText.setTextColor(ContextCompat.getColor(this, R.color.white))
+        snackBarView.background =
+            ContextCompat.getDrawable(this, R.drawable.snackbar_background)
+        snackBar.show()
     }
 
     /**
@@ -598,7 +611,15 @@ class MainActivity : AppCompatActivity(), MusicViewModel.PlayerStateListener {
 
     override fun onStart() {
         super.onStart()
-//        authorizeClient()
+        if (currentUser != null) {
+            accountViewModel.updateNavHeader.observe(this) { shouldUpdate ->
+                if (shouldUpdate) {
+                    setUpNavHeader()
+                }
+            }
+
+        }
+        authorizeClient()
 
 
     }

@@ -2,9 +2,11 @@ package app.vibecast.presentation.user.auth
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
+import android.view.Gravity
+import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -17,6 +19,7 @@ import app.vibecast.presentation.user.auth.util.Constants.RC_SIGN_IN
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
@@ -103,11 +106,28 @@ class AuthActivity : AppCompatActivity(), RegistrationFragment.OnGoogleSignUpCli
 
                 } else {
                     Timber.tag("googleAuth").d("Auth failed")
-                    Toast.makeText(this, "Authentication Failed.", Toast.LENGTH_SHORT).show()
+                    showSnackBar("Authentication Failed.")
+
                 }
             }
     }
 
+
+    private fun showSnackBar(text: String) {
+        val snackBar = Snackbar.make(
+            findViewById(android.R.id.content),
+            text,
+            Snackbar.LENGTH_SHORT
+        )
+        val snackBarView = snackBar.view
+        val snackBarText =
+            snackBarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+        snackBarText.gravity = Gravity.CENTER
+        snackBarText.setTextColor(ContextCompat.getColor(this, R.color.white))
+        snackBarView.background =
+            ContextCompat.getDrawable(this, R.drawable.snackbar_background)
+        snackBar.show()
+    }
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment)
         if (navController.currentDestination?.id == R.id.registrationFragment) {

@@ -11,6 +11,7 @@ import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.google.android.material.snackbar.Snackbar
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -124,6 +125,7 @@ object ImageSaver {
                 }
                 // Show a success message
                 Toast.makeText(context, "Image saved successfully", Toast.LENGTH_SHORT).show()
+                //TODO customize toast
             } catch (e: IOException) {
                 // Handle IOException, if any
                 e.printStackTrace()
@@ -132,4 +134,5 @@ object ImageSaver {
             }
         }
     }
+
 }

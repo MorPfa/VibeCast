@@ -7,24 +7,25 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Patterns
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
-import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import app.vibecast.R
 import app.vibecast.databinding.FragmentLoginBinding
 import app.vibecast.presentation.MainActivity
-import app.vibecast.presentation.screens.account_screen.AccountViewModel
 import app.vibecast.presentation.screens.main_screen.image.ImageViewModel
 import app.vibecast.presentation.user.auth.util.LoginResult
 import com.google.android.gms.common.SignInButton
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.ktx.auth
@@ -49,7 +50,7 @@ class LoginFragment : Fragment() {
     private lateinit var googleSignInBtn: SignInButton
     private var forgotPasswordDialog: AlertDialog? = null
     private val imageViewModel: ImageViewModel by activityViewModels()
-    private val accountViewModel: AccountViewModel by activityViewModels()
+
 
 
     private var listener: OnGoogleSignInClickListener? = null
@@ -113,7 +114,7 @@ class LoginFragment : Fragment() {
             val resetBtn = dialog.findViewById<MaterialButton>(R.id.btnReset)
 
             resetBtn.setOnClickListener {
-                compareEmail(userEmail)
+                resetPassword(userEmail)
                 forgotPasswordDialog?.dismiss()
             }
 
@@ -132,19 +133,9 @@ class LoginFragment : Fragment() {
             val password = passwordInput.text.toString()
             val result = validateInput(email, password)
             when (result) {
-                LoginResult.INVALID_EMAIL -> {
-                    Toast.makeText(
-                        requireContext(),
-                        "Invalid email", Toast.LENGTH_SHORT
-                    ).show()
-                }
+                LoginResult.INVALID_EMAIL -> showSnackBar("Invalid email")
 
-                LoginResult.NO_PASSWORD -> {
-                    Toast.makeText(
-                        requireContext(),
-                        "Please enter your password", Toast.LENGTH_SHORT
-                    ).show()
-                }
+                LoginResult.NO_PASSWORD -> showSnackBar("Please enter your password")
 
                 LoginResult.SUCCESS -> {
                     signInWithEmail(email, password)
@@ -153,8 +144,23 @@ class LoginFragment : Fragment() {
         }
     }
 
+    private fun showSnackBar(text: String) {
+        val snackBar = Snackbar.make(
+            requireView(),
+            text,
+            Snackbar.LENGTH_SHORT
+        )
+        val snackBarView = snackBar.view
+        val snackBarText =
+            snackBarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+        snackBarText.gravity = Gravity.CENTER
+        snackBarText.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+        snackBarView.background =
+            ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
+        snackBar.show()
+    }
 
-    private fun compareEmail(email: EditText) {
+    private fun resetPassword(email: EditText) {
         if (email.text.toString().isEmpty()) {
             return
         }
@@ -164,7 +170,7 @@ class LoginFragment : Fragment() {
         auth.sendPasswordResetEmail(email.text.toString())
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    Toast.makeText(requireContext(), "Check your email", Toast.LENGTH_SHORT).show()
+                    showSnackBar("Check your email")
                 }
             }
     }
@@ -174,10 +180,7 @@ class LoginFragment : Fragment() {
             .addOnCompleteListener(requireActivity()) { task ->
                 if (task.isSuccessful) {
                     Timber.tag("auth").d("signInWithEmail:success")
-                    Toast.makeText(
-                        requireContext(),
-                        "Signed in successfully", Toast.LENGTH_SHORT
-                    ).show()
+                    showSnackBar("Signed in successfully")
                     requireActivity().finish()
                     val intent = Intent(activity, MainActivity::class.java)
                     startActivity(intent)
@@ -187,19 +190,9 @@ class LoginFragment : Fragment() {
                     try {
                         throw task.exception!!
                     } catch (invalidCredentials: FirebaseAuthInvalidCredentialsException) {
-                        // Handle incorrect password
-                        Toast.makeText(
-                            requireContext(),
-                            "Email and password do not match",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        showSnackBar("Email and password do not match")
                     } catch (e: Exception) {
-                        // Handle other exceptions
-                        Toast.makeText(
-                            requireContext(),
-                            "Authentication failed",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        showSnackBar("Authentication failed")
                     }
                 }
             }
@@ -220,8 +213,6 @@ class LoginFragment : Fragment() {
 
     private fun isEmailValid(email: String): Boolean {
         if (email.isEmpty()) {
-//            passwordInput.error = "Test"
-            //TODO customize this
             return false
         }
         val validEmail = Regex("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}")

@@ -41,7 +41,7 @@
             android:layout_weight="1"
             android:background="@drawable/textview_background"
             android:padding="4dp"
-            android:text="@string/delete_account"
+            android:text="@string/confirm"
             android:textColor="@color/white" />
 
         <androidx.appcompat.widget.AppCompatButton
