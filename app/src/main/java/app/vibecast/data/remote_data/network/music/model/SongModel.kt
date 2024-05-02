@@ -7,7 +7,7 @@ data class SongModel(
     val name: String,
     val album: String,
     val artist: String,
-    val imageUri: ImageUri?,
+    val imageUri: ImageUri,
     val trackUri: String,
     val artistUri: String,
     val albumUri: String,

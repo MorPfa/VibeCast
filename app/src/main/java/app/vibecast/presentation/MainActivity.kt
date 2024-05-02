@@ -208,6 +208,7 @@ class MainActivity : AppCompatActivity(), MusicViewModel.PlayerStateListener {
                     showIcons = false
                     invalidateOptionsMenu()
                 }
+
                 R.id.nav_edit_profile -> {
                     showIcons = false
                     invalidateOptionsMenu()
@@ -538,8 +539,20 @@ class MainActivity : AppCompatActivity(), MusicViewModel.PlayerStateListener {
                                     artist = currentSong.track.artist.name,
                                     artistUri = currentSong.track.artist.uri,
                                     albumUri = currentSong.track.artist.uri,
-
-                                    )
+                                )
+                            )
+                            accountViewModel.addSongToFirebase(
+                                SongDto(
+                                    album = currentSong.track.album.name,
+                                    name = currentSong.track.name,
+                                    imageUri = currentSong.track.imageUri,
+                                    url = "",
+                                    trackUri = currentSong.track.uri,
+                                    previewUrl = null,
+                                    artist = currentSong.track.artist.name,
+                                    artistUri = currentSong.track.artist.uri,
+                                    albumUri = currentSong.track.artist.uri,
+                                )
                             )
                         }
 
@@ -547,7 +560,20 @@ class MainActivity : AppCompatActivity(), MusicViewModel.PlayerStateListener {
                     } else {
                         currentSong?.let {
                             Timber.tag("imageTest").d("saved uri ${it.track.imageUri}")
-                            musicViewModel.saveSong(
+                            musicViewModel.deleteSong(
+                                SongDto(
+                                    album = currentSong.track.album.name,
+                                    name = currentSong.track.name,
+                                    imageUri = currentSong.track.imageUri,
+                                    url = "",
+                                    trackUri = currentSong.track.uri,
+                                    previewUrl = null,
+                                    artist = currentSong.track.artist.name,
+                                    artistUri = currentSong.track.artist.uri,
+                                    albumUri = currentSong.track.artist.uri,
+                                )
+                            )
+                            accountViewModel.deleteSongFromFirebase(
                                 SongDto(
                                     album = currentSong.track.album.name,
                                     name = currentSong.track.name,

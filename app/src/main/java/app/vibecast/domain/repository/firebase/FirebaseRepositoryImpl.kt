@@ -2,15 +2,20 @@ package app.vibecast.domain.repository.firebase
 
 
 import app.vibecast.data.local_data.data_source.image.LocalImageDataSource
+import app.vibecast.data.local_data.data_source.music.LocalMusicDataSource
 import app.vibecast.data.local_data.data_source.weather.LocalLocationDataSource
 import app.vibecast.domain.model.FirebaseImage
 import app.vibecast.domain.model.FirebaseLocation
 import app.vibecast.domain.model.FirebaseResponse
+import app.vibecast.domain.model.FirebaseSong
 import app.vibecast.domain.model.ImageDto
 import app.vibecast.domain.model.LocationDto
+import app.vibecast.domain.model.SongDto
+import app.vibecast.domain.repository.firebase.util.ImageUriParser
 import app.vibecast.domain.util.Constants.COUNTER_REF
 import app.vibecast.domain.util.Constants.IMAGES_REF
 import app.vibecast.domain.util.Constants.LOCATIONS_REF
+import app.vibecast.domain.util.Constants.MUSIC_REF
 import app.vibecast.domain.util.Constants.USERS_REF
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -21,6 +26,7 @@ import com.google.firebase.database.MutableData
 import com.google.firebase.database.Transaction
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.spotify.protocol.types.ImageUri
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -46,6 +52,7 @@ import kotlin.coroutines.suspendCoroutine
 class FirebaseRepositoryImpl @Inject constructor(
     private val locationDataSource: LocalLocationDataSource,
     private val imageDataSource: LocalImageDataSource,
+    private val musicDataSource: LocalMusicDataSource,
 ) : FirebaseRepository {
 
     private val databaseRoot: DatabaseReference = Firebase.database.reference
@@ -58,9 +65,129 @@ class FirebaseRepositoryImpl @Inject constructor(
         coroutineScope {
             val locationDeferred = async { syncLocationData() }
             val imageDeferred = async { syncImageData() }
+            val musicDeferred = async { syncMusicData() }
 
             locationDeferred.await()
             imageDeferred.await()
+            musicDeferred.await()
+        }
+    }
+
+
+    private suspend fun syncMusicData() {
+        musicDataSource.getAllSavedSongs().combine(getAllSongs()) { localData, firebaseResponse ->
+            val localDataCount = localData.size
+            firebaseResponse.data?.let { firebaseData ->
+                val firebaseCount = firebaseData.size
+                if (localDataCount > firebaseCount) {
+                    localData.forEach { song ->
+                        val containsLocation = firebaseData.any { firebaseSong ->
+                            firebaseSong.name == song.name
+                        }
+                        if (!containsLocation) {
+                            addSong(
+                                FirebaseSong(
+                                    name = song.name,
+                                    artist = song.artist,
+                                    album = song.album,
+                                    albumUri = song.albumUri,
+                                    imageUri = song.imageUri.raw ?: ImageUriParser.stripImageUri(
+                                        song.imageUri
+                                    ),
+                                    trackUri = song.trackUri,
+                                    artistUri = song.artistUri,
+                                    url = song.url,
+                                    previewUrl = song.previewUrl
+                                )
+                            )
+                        }
+                    }
+                }
+                if (localDataCount < firebaseCount) {
+                    firebaseData.forEach { song ->
+                        val containsLocation = localData.any { localSong ->
+                            localSong.name == song.name
+                        }
+                        if (!containsLocation) {
+                            musicDataSource.saveSong(
+                                SongDto(
+                                    name = song.name,
+                                    artist = song.artist,
+                                    album = song.album,
+                                    albumUri = song.albumUri,
+                                    imageUri = ImageUri(song.imageUri),
+                                    trackUri = song.trackUri,
+                                    artistUri = song.artistUri,
+                                    url = song.url,
+                                    previewUrl = song.previewUrl
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+            if (firebaseResponse.exception != null) {
+                Timber.tag("firebaseDB")
+                    .e("Error fetching Firebase songs: ${firebaseResponse.exception}")
+            }
+        }.collect {}
+    }
+
+
+    override fun getAllSongs(): Flow<FirebaseResponse<FirebaseSong>> = flow {
+        currentUser?.let { user ->
+            val musicRef = usersRef.child(user.uid).child(MUSIC_REF)
+            try {
+                val dataSnapshot = suspendCoroutine<DataSnapshot> { continuation ->
+                    musicRef.get().addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            continuation.resume(task.result)
+                        } else {
+                            continuation.resumeWithException(
+                                task.exception ?: Exception("Unknown error")
+                            )
+                        }
+                    }
+                }
+                val songList = dataSnapshot.children.mapNotNull { songSnapshot ->
+                    songSnapshot.getValue(FirebaseSong::class.java)
+                }
+                emit(FirebaseResponse(data = songList))
+                Timber.tag("firebaseDB").d("Retrieved songs successfully")
+            } catch (e: Exception) {
+                emit(FirebaseResponse(exception = e))
+                Timber.tag("firebaseDB").e("Error getting songs: $e")
+            }
+        }
+    }.flowOn(Dispatchers.IO)
+
+
+    override suspend fun addSong(song: FirebaseSong) {
+        currentUser?.let { user ->
+            val userMusicRef = usersRef.child(user.uid).child(MUSIC_REF)
+            userMusicRef.child(song.trackUri).setValue(song)
+                .addOnSuccessListener {
+                    Timber.tag("firebaseDB").d("Added song successfully")
+
+                }
+                .addOnFailureListener { exception ->
+                    Timber.tag("firebaseDB").d("Couldn't add song $exception")
+                }
+        }
+    }
+
+
+    override suspend fun deleteSong(song: FirebaseSong) {
+        currentUser?.let { user ->
+            val userMusicRef = usersRef.child(user.uid).child(MUSIC_REF)
+            val musicItemRef = userMusicRef.child(song.trackUri)
+            musicItemRef.removeValue().addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Timber.tag("firebaseDB").d("Song deleted successfully")
+                } else {
+                    Timber.tag("firebaseDB").d("Failed to song image: ${task.exception}")
+                }
+            }
         }
     }
 
@@ -73,11 +200,20 @@ class FirebaseRepositoryImpl @Inject constructor(
                     if (localDataCount > firebaseCount) {
                         localData.forEach { image ->
                             val containsLocation = firebaseData.any { firebaseImage ->
-                                firebaseImage.id == image.id
+                                firebaseImage.imageId == image.id
                             }
                             if (!containsLocation) {
                                 addImage(
-                                    FirebaseImage(id = image.id, url = image.urls.regular)
+                                    FirebaseImage(
+                                        imageId = image.id,
+                                        imageUrl = image.urls.regular,
+                                        timestamp = image.timestamp,
+                                        userLink = image.links.user,
+                                        downloadUrl = image.links.downloadLink,
+                                        userName = image.user.userName,
+                                        userRealName = image.user.name,
+                                        portfolioUrl = image.user.portfolioUrl ?: ""
+                                    )
                                 )
                             }
                         }
@@ -86,28 +222,31 @@ class FirebaseRepositoryImpl @Inject constructor(
                     if (localDataCount < firebaseCount) {
                         firebaseData.forEach { image ->
                             val containsLocation = localData.any { localImage ->
-                                localImage.id == image.id
+                                localImage.id == image.imageId
                             }
                             if (!containsLocation) {
                                 imageDataSource.addImage(
                                     ImageDto(
-                                        id = image.id,
+                                        id = image.imageId,
                                         description = null,
                                         altDescription = null,
                                         urls = ImageDto.PhotoUrls(
                                             full = "",
-                                            regular = image.url,
+                                            regular = image.imageUrl,
                                             small = "",
                                             thumb = ""
                                         ),
                                         user = ImageDto.UnsplashUser(
                                             id = "",
-                                            userName = "",
-                                            name = "",
-                                            portfolioUrl = null
+                                            userName = image.userName,
+                                            name = image.userRealName,
+                                            portfolioUrl = image.portfolioUrl
                                         ),
-                                        links = ImageDto.PhotoLinks(user = "", downloadLink = ""),
-                                        timestamp = null
+                                        links = ImageDto.PhotoLinks(
+                                            user = image.userLink,
+                                            downloadLink = image.downloadUrl
+                                        ),
+                                        timestamp = image.timestamp
                                     )
                                 )
 
@@ -302,10 +441,10 @@ class FirebaseRepositoryImpl @Inject constructor(
     override suspend fun deleteImage(image: FirebaseImage) {
         currentUser?.let { user ->
             val userImageRef = usersRef.child(user.uid).child(IMAGES_REF)
-            val imageItemRef = userImageRef.child(image.id)
+            val imageItemRef = userImageRef.child(image.imageId)
             imageItemRef.removeValue().addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    updateImageCount(Action.DELETE)
+
                     Timber.tag("firebaseDB").d("Image deleted successfully")
                 } else {
                     Timber.tag("firebaseDB").d("Failed to delete image: ${task.exception}")
@@ -320,7 +459,7 @@ class FirebaseRepositoryImpl @Inject constructor(
             val locationItemRef = userLocationsRef.child(location.id)
             locationItemRef.removeValue().addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    updateLocationCount(Action.DELETE)
+
                     Timber.tag("firebaseDB").d("Location deleted successfully")
                 } else {
                     Timber.tag("firebaseDB").d("Failed to delete location: ${task.exception}")
@@ -333,10 +472,10 @@ class FirebaseRepositoryImpl @Inject constructor(
     override suspend fun addImage(image: FirebaseImage) {
         currentUser?.let { user ->
             val userImagesRef = usersRef.child(user.uid).child(IMAGES_REF)
-            userImagesRef.child(image.id).setValue(image)
+            userImagesRef.child(image.imageId).setValue(image)
                 .addOnSuccessListener {
                     Timber.tag("firebaseDB").d("Added image successfully")
-                    updateImageCount(Action.INSERT)
+
                 }
                 .addOnFailureListener { exception ->
                     Timber.tag("firebaseDB").d("Couldn't add image $exception")
@@ -349,7 +488,7 @@ class FirebaseRepositoryImpl @Inject constructor(
             val userLocationsRef = usersRef.child(user.uid).child(LOCATIONS_REF)
             userLocationsRef.child(location.id).setValue(location)
                 .addOnSuccessListener {
-                    updateLocationCount(Action.INSERT)
+
                     Timber.tag("firebaseDB").d("Added location successfully")
                 }
                 .addOnFailureListener { exception ->

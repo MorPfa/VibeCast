@@ -51,7 +51,7 @@ class ImageAdapter(
 
         holder.removeButton.setOnClickListener {
             imageViewModel.deleteImage(image)
-//            accountViewModel.deleteImageFromFirebase(image)
+            accountViewModel.deleteImageFromFirebase(image)
         }
     }
 

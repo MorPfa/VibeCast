@@ -7,9 +7,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.vibecast.domain.model.FirebaseImage
 import app.vibecast.domain.model.FirebaseLocation
+import app.vibecast.domain.model.FirebaseSong
 import app.vibecast.domain.model.ImageDto
 import app.vibecast.domain.model.LocationDto
+import app.vibecast.domain.model.SongDto
 import app.vibecast.domain.repository.firebase.FirebaseRepository
+import app.vibecast.domain.repository.firebase.util.ImageUriParser
 import app.vibecast.domain.repository.image.ImageRepository
 import app.vibecast.domain.repository.music.MusicRepository
 import app.vibecast.domain.repository.weather.LocationRepository
@@ -54,7 +57,7 @@ class AccountViewModel @Inject constructor(
         get() = _updateNavHeader
 
 
-    fun update(value : Boolean){
+    fun update(value: Boolean) {
         _updateNavHeader.value = value
     }
 
@@ -100,9 +103,59 @@ class AccountViewModel @Inject constructor(
 
     fun addImageToFirebase(image: ImageDto) {
         viewModelScope.launch(Dispatchers.IO) {
-            firebaseRepository.addImage(FirebaseImage(image.id, image.urls.regular))
+            firebaseRepository.addImage(
+                FirebaseImage(
+                    imageId = image.id,
+                    imageUrl = image.urls.regular,
+                    timestamp = image.timestamp,
+                    userLink = image.links.user,
+                    downloadUrl = image.links.downloadLink,
+                    userName = image.user.userName,
+                    userRealName = image.user.name,
+                    portfolioUrl = image.user.portfolioUrl ?: ""
+                )
+            )
         }
 
+    }
+
+
+    fun addSongToFirebase(song: SongDto) {
+        Timber.tag("firebaseDB").d("called")
+        viewModelScope.launch(Dispatchers.IO) {
+            firebaseRepository.addSong(
+                FirebaseSong(
+                    name = song.name,
+                    album = song.album,
+                    artist = song.artist,
+                    imageUri = song.imageUri.raw ?: ImageUriParser.stripImageUri(song.imageUri),
+                    trackUri = song.trackUri,
+                    artistUri = song.artistUri,
+                    albumUri = song.albumUri,
+                    url = song.url,
+                    previewUrl = song.previewUrl
+                )
+            )
+        }
+    }
+
+    fun deleteSongFromFirebase(song: SongDto) {
+        Timber.tag("firebaseDB").d("called")
+        viewModelScope.launch(Dispatchers.IO) {
+            firebaseRepository.deleteSong(
+                FirebaseSong(
+                    name = song.name,
+                    album = song.album,
+                    artist = song.artist,
+                    imageUri = song.imageUri.raw ?: ImageUriParser.stripImageUri(song.imageUri),
+                    trackUri = song.trackUri,
+                    artistUri = song.artistUri,
+                    albumUri = song.albumUri,
+                    url = song.url,
+                    previewUrl = song.previewUrl
+                )
+            )
+        }
     }
 
     fun addLocationToFirebase(location: LocationModel) {
@@ -153,8 +206,8 @@ class AccountViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             firebaseRepository.deleteImage(
                 FirebaseImage(
-                    url = image.urls.regular,
-                    id = image.id,
+                    imageUrl = image.urls.regular,
+                    imageId = image.id,
                 )
             )
         }
