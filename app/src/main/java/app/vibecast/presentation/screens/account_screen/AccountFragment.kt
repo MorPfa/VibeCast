@@ -173,17 +173,12 @@ class AccountFragment : Fragment() {
         val coverArt = customView.findViewById<ImageView>(R.id.covertArt)
 
 
-        if (song.imageUri != null) {
-            musicViewModel.assertAppRemoteConnected()
-                .imagesApi
-                .getImage(song.imageUri, Image.Dimension.LARGE)
-                .setResultCallback { bitmap ->
-                    coverArt.setImageBitmap(bitmap)
-                }
-
-        } else {
-            coverArt.setImageResource(R.drawable.cover_art_placeholder)
-        }
+        musicViewModel.assertAppRemoteConnected()
+            .imagesApi
+            .getImage(song.imageUri, Image.Dimension.LARGE)
+            .setResultCallback { bitmap ->
+                coverArt.setImageBitmap(bitmap)
+            }
 
         songUriText.setOnClickListener {
             showSongInfoInSpotify(song)

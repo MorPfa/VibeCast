@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import app.vibecast.R
 import app.vibecast.databinding.ItemMusicCardviewBinding
 import app.vibecast.domain.model.SongDto
 import app.vibecast.presentation.screens.main_screen.music.MusicViewModel
@@ -49,17 +48,12 @@ class SongAdapter(private val musicViewModel: MusicViewModel) :
         Timber.tag("imageTest").d("curr uri ${song.imageUri}")
         holder.songName.text = song.name
         holder.artistName.text = song.artist
-        if (song.imageUri != null) {
-            musicViewModel.assertAppRemoteConnected()
-                .imagesApi
-                .getImage(song.imageUri, Image.Dimension.X_SMALL)
-                .setResultCallback { bitmap ->
-                    holder.coverArt.setImageBitmap(bitmap)
-                }
-
-        } else {
-            holder.coverArt.setImageResource(R.drawable.cover_art_placeholder)
-        }
+        musicViewModel.assertAppRemoteConnected()
+            .imagesApi
+            .getImage(song.imageUri, Image.Dimension.X_SMALL)
+            .setResultCallback { bitmap ->
+                holder.coverArt.setImageBitmap(bitmap)
+            }
     }
 }
 
