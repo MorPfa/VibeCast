@@ -36,26 +36,27 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
-class SearchResultFragment : Fragment(), MusicViewModel.PlayerStateListener {
+class SearchResultFragment : Fragment() {
 
     private var _binding: FragmentSearchResultBinding? = null
     private val binding get() = _binding!!
     private val mainViewModel: MainViewModel by activityViewModels()
     private val imageViewModel: ImageViewModel by activityViewModels()
     private val musicViewModel: MusicViewModel by activityViewModels()
-    private lateinit var playbackButton: ImageButton
-    private lateinit var shuffleButton: ImageButton
-    private lateinit var repeatButton: ImageButton
-    private lateinit var trackProgressBar: TrackProgressBar
+    private var playbackButton: ImageButton? = null
+    private var shuffleButton: ImageButton? = null
+    private var repeatButton: ImageButton? = null
+    private var trackProgressBar: TrackProgressBar? = null
+    private lateinit var snackBar: Snackbar
 
 
     private fun updatePlaybackBtn(playerState: PlayerState) {
 
         if (playerState.isPaused) {
-            playbackButton.setImageResource(R.drawable.play_btn)
+            playbackButton?.setImageResource(R.drawable.play_btn)
         } else {
 
-            playbackButton.setImageResource(R.drawable.pause_btn)
+            playbackButton?.setImageResource(R.drawable.pause_btn)
         }
     }
 
@@ -122,9 +123,9 @@ class SearchResultFragment : Fragment(), MusicViewModel.PlayerStateListener {
     private fun updateShuffleBtn(playerState: PlayerState) {
         shuffleButton.apply {
             if (playerState.playbackOptions.isShuffling) {
-                shuffleButton.setImageResource(R.drawable.shuffle_enabled)
+                shuffleButton?.setImageResource(R.drawable.shuffle_enabled)
             } else {
-                shuffleButton.setImageResource(R.drawable.shuffle_disabled)
+                shuffleButton?.setImageResource(R.drawable.shuffle_disabled)
             }
         }
 
@@ -132,7 +133,7 @@ class SearchResultFragment : Fragment(), MusicViewModel.PlayerStateListener {
 
     private fun updateSeekbar(playerState: PlayerState) {
         // Update progressbar
-        trackProgressBar.apply {
+        trackProgressBar?.apply {
             if (playerState.playbackSpeed > 0) {
                 unpause()
             } else {
@@ -147,7 +148,7 @@ class SearchResultFragment : Fragment(), MusicViewModel.PlayerStateListener {
     }
 
     private fun updateRepeatBtn(playerState: PlayerState) {
-        repeatButton.apply {
+        repeatButton?.apply {
             when (playerState.playbackOptions.repeatMode) {
                 Repeat.ALL -> {
                     setImageResource(R.drawable.repeat_all_enabled)
@@ -168,9 +169,7 @@ class SearchResultFragment : Fragment(), MusicViewModel.PlayerStateListener {
 
     }
 
-    override fun onPlayerStateUpdated(playerState: PlayerState) {
-        updateUI(playerState)
-    }
+
 
     private fun updateUI(playerState: PlayerState) {
         updatePlaybackBtn(playerState)
@@ -198,10 +197,12 @@ class SearchResultFragment : Fragment(), MusicViewModel.PlayerStateListener {
     ): View {
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         _binding = FragmentSearchResultBinding.inflate(inflater, container, false)
-        musicViewModel.setPlayerStateListener(this)
+        musicViewModel.playerState.observe(viewLifecycleOwner) {
+            updateUI(it)
+        }
         mainViewModel.emptySearchResponse.observe(viewLifecycleOwner){noData ->
             if(noData) {
-                val snackBar = Snackbar.make(
+                 snackBar = Snackbar.make(
                     requireView(),
                     getString(R.string.invalid_query_input),
                     Snackbar.LENGTH_SHORT
@@ -237,7 +238,7 @@ class SearchResultFragment : Fragment(), MusicViewModel.PlayerStateListener {
         playbackButton = binding.musicWidget.playPauseButton
         shuffleButton = binding.musicWidget.shuffleButton
         repeatButton = binding.musicWidget.repeatButton
-        repeatButton.setOnClickListener {
+        repeatButton?.setOnClickListener {
             try {
                 musicViewModel.setRepeatStatus()
             }catch (e : Exception){
@@ -245,7 +246,7 @@ class SearchResultFragment : Fragment(), MusicViewModel.PlayerStateListener {
             }
 
         }
-        playbackButton.setOnClickListener {
+        playbackButton?.setOnClickListener {
             try {
                 musicViewModel.onPlayPauseButtonClicked()
             } catch (e: Exception) {
@@ -253,7 +254,7 @@ class SearchResultFragment : Fragment(), MusicViewModel.PlayerStateListener {
             }
 
         }
-        shuffleButton.setOnClickListener {
+        shuffleButton?.setOnClickListener {
             try {
                 musicViewModel.setShuffleStatus()
             } catch (e: Exception) {
@@ -281,7 +282,7 @@ class SearchResultFragment : Fragment(), MusicViewModel.PlayerStateListener {
         return binding.root
     }
     private fun showSpotifySnackBar() {
-        val snackBar = Snackbar.make(
+         snackBar = Snackbar.make(
             requireView(),
             "Log into spotify to enable music",
             Snackbar.LENGTH_SHORT
@@ -352,8 +353,12 @@ class SearchResultFragment : Fragment(), MusicViewModel.PlayerStateListener {
                             val weather =
                                 weatherData.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
                             observeImageData(city, weather!!)
+                            musicViewModel.token.observe(viewLifecycleOwner){
+                                if(it != null){
+                                    musicViewModel.getPlaylist(weather)
+                                }
+                            }
 
-//                            musicViewModel.getPlaylist(weather)
                             binding.mainTemp.text =
                                 getString(R.string.center_temp, currentWeather.temperature)
                             //            Current hour values
@@ -405,12 +410,30 @@ class SearchResultFragment : Fragment(), MusicViewModel.PlayerStateListener {
 
     }
 
+
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
         mainViewModel.resetIndex()
-        mainViewModel.searchedWeather.removeObservers(this)
+        mainViewModel.currentWeather.removeObservers(viewLifecycleOwner)
+        musicViewModel.currentSong.removeObservers(viewLifecycleOwner)
+        musicViewModel.playerState.removeObservers(viewLifecycleOwner)
+
+        if (::snackBar.isInitialized) {
+            snackBar.dismiss()
+        }
+        playbackButton?.setOnClickListener(null)
+        shuffleButton?.setOnClickListener(null)
+        repeatButton?.setOnClickListener(null)
+        binding.musicWidget.forwardButton.setOnClickListener(null)
+        binding.musicWidget.rewindButton.setOnClickListener(null)
+        _binding = null
+        playbackButton = null
+        repeatButton = null
+        shuffleButton = null
+        playbackButton = null
+        trackProgressBar = null
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
+
 
 }

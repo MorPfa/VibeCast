@@ -2,6 +2,7 @@ package app.vibecast.presentation.screens.settings_screen
 
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.ListAdapter
@@ -24,6 +25,18 @@ class ImageSelectorAdapter(
         RecyclerView.ViewHolder(binding.root) {
         val savedImage = binding.savedImage
         val selectedIcon = binding.selectedIcon
+        init {
+            // Remove observer when view is detached from window
+            itemView.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+                override fun onViewAttachedToWindow(v: View) {
+                    // Do nothing
+                }
+
+                override fun onViewDetachedFromWindow(v: View) {
+                    viewModel.backgroundImage.removeObservers(owner)
+                }
+            })
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {

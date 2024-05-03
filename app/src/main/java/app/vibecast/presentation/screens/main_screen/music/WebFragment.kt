@@ -15,7 +15,8 @@ private const val TYPE_PARAM = "infoType"
 
 class WebFragment : Fragment() {
     private var type: InfoType? = null
-    private lateinit var binding: FragmentWebBinding
+    private var _binding: FragmentWebBinding? = null
+    private val binding get() = _binding!!
     private val musicViewModel: MusicViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,7 +30,7 @@ class WebFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        binding = FragmentWebBinding.inflate(inflater, container, false)
+        _binding = FragmentWebBinding.inflate(inflater, container, false)
         val webView = binding.webView
         val headers = HashMap<String, String>().apply {
             put("Authorization", "Bearer ${musicViewModel.token.value}")
@@ -44,7 +45,11 @@ class WebFragment : Fragment() {
         return binding.root
     }
 
-
+    override fun onDestroyView() {
+        super.onDestroyView()
+        musicViewModel.currentSong.removeObservers(viewLifecycleOwner)
+        _binding = null
+    }
 
     companion object {
 

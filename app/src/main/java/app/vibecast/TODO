@@ -2,12 +2,11 @@
 
 TASKS:
 today:
-fix redirect fragment memory leak
-fix music card text too long
 optimize image accuracy (maybe go back to GET /search/photos endpoint and combine query with collections)
 
+
+
 Next tasks:
-fix most memory leaks
 ensure spotify works correctly no matter if app is installed or not
 
 

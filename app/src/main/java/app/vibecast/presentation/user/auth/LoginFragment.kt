@@ -41,16 +41,17 @@ class LoginFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
     private lateinit var auth: FirebaseAuth
-    private lateinit var binding: FragmentLoginBinding
-    private lateinit var emailInput: EditText
-    private lateinit var passwordInput: EditText
-    private lateinit var signInBtn: Button
-    private lateinit var noAccountBtn: TextView
-    private lateinit var forgotBtn: TextView
-    private lateinit var googleSignInBtn: SignInButton
+    private var _binding: FragmentLoginBinding? = null
+    private val binding get() = _binding!!
+
+    private var emailInput: EditText? = null
+    private var passwordInput: EditText? = null
+    private var signInBtn: Button? = null
+    private var noAccountBtn: TextView? = null
+    private var forgotBtn: TextView? = null
+    private var googleSignInBtn: SignInButton? = null
     private var forgotPasswordDialog: AlertDialog? = null
     private val imageViewModel: ImageViewModel by activityViewModels()
-
 
 
     private var listener: OnGoogleSignInClickListener? = null
@@ -81,7 +82,7 @@ class LoginFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        binding = FragmentLoginBinding.inflate(inflater, container, false)
+        _binding = FragmentLoginBinding.inflate(inflater, container, false)
         emailInput = binding.emailInput
         passwordInput = binding.passwordInput
         signInBtn = binding.signInBtn
@@ -96,16 +97,16 @@ class LoginFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        googleSignInBtn.setOnClickListener {
+        googleSignInBtn?.setOnClickListener {
             listener?.onGoogleSignInClick()
 
         }
-        noAccountBtn.setOnClickListener {
+        noAccountBtn?.setOnClickListener {
             val action = LoginFragmentDirections.actionLoginFragmentToRegistrationFragment()
             findNavController().navigate(action)
         }
 
-        forgotBtn.setOnClickListener {
+        forgotBtn?.setOnClickListener {
             val alertDialogBuilder = AlertDialog.Builder(requireContext())
             val dialog =
                 LayoutInflater.from(requireContext()).inflate(R.layout.forgot_password_dialog, null)
@@ -128,9 +129,9 @@ class LoginFragment : Fragment() {
             forgotPasswordDialog?.show()
         }
 
-        signInBtn.setOnClickListener {
-            val email = emailInput.text.toString()
-            val password = passwordInput.text.toString()
+        signInBtn?.setOnClickListener {
+            val email = emailInput?.text.toString()
+            val password = passwordInput?.text.toString()
             val result = validateInput(email, password)
             when (result) {
                 LoginResult.INVALID_EMAIL -> showSnackBar("Invalid email")
@@ -221,6 +222,20 @@ class LoginFragment : Fragment() {
 
     private fun isPasswordEmpty(password: String): Boolean {
         return password.isNotEmpty()
+    }
+
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+        emailInput = null
+        passwordInput = null
+        signInBtn = null
+        noAccountBtn = null
+        forgotBtn = null
+        googleSignInBtn = null
+        forgotPasswordDialog = null
+
     }
 
     companion object {

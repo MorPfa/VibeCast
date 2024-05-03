@@ -40,14 +40,15 @@ class RegistrationFragment : Fragment() {
     private var param2: String? = null
     private val accountViewModel: AccountViewModel by activityViewModels()
     private val imageViewModel: ImageViewModel by activityViewModels()
-    private lateinit var binding: FragmentRegistrationBinding
+    private  var _binding: FragmentRegistrationBinding? = null
+    private  val binding get() = _binding!!
     private lateinit var auth: FirebaseAuth
-    private lateinit var emailInput: EditText
-    private lateinit var passwordInput: EditText
-    private lateinit var confirmPasswordInput: EditText
-    private lateinit var submitBtn: Button
-    private lateinit var userNameInput: EditText
-    private lateinit var googleSignINBtn: SignInButton
+    private var emailInput: EditText? = null
+    private  var passwordInput: EditText? = null
+    private  var confirmPasswordInput: EditText? = null
+    private  var submitBtn: Button? = null
+    private  var userNameInput: EditText? = null
+    private  var googleSignInBtn: SignInButton? = null
 
     private var listener: OnGoogleSignUpClickListener? = null
 
@@ -76,12 +77,12 @@ class RegistrationFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        binding = FragmentRegistrationBinding.inflate(inflater, container, false)
-        googleSignINBtn = binding.signInWithGoogle
+        _binding = FragmentRegistrationBinding.inflate(inflater, container, false)
+        googleSignInBtn = binding.signInWithGoogle
 
 
 
-        googleSignINBtn.setOnClickListener {
+        googleSignInBtn?.setOnClickListener {
             listener?.onGoogleSignUpClick()
 
         }
@@ -116,11 +117,11 @@ class RegistrationFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        submitBtn.setOnClickListener {
-            val email = emailInput.text.toString()
-            val userName = userNameInput.text.toString()
-            val password1 = passwordInput.text.toString()
-            val password2 = confirmPasswordInput.text.toString()
+        submitBtn?.setOnClickListener {
+            val email = emailInput?.text.toString()
+            val userName = userNameInput?.text.toString()
+            val password1 = passwordInput?.text.toString()
+            val password2 = confirmPasswordInput?.text.toString()
             val result = validateInput(userName, email, password1, password2)
             when (result) {
                 RegistrationResult.INVALID_EMAIL ->
@@ -207,6 +208,13 @@ class RegistrationFragment : Fragment() {
         val validEmail = Regex("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}")
 
         return validEmail.matches(email)
+    }
+
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        accountViewModel.userName.removeObservers(viewLifecycleOwner)
+        _binding = null
     }
 
     companion object {

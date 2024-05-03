@@ -72,6 +72,7 @@ class MainActivity : AppCompatActivity(), MusicViewModel.PlayerStateListener {
     private lateinit var userNameTv: TextView
     private lateinit var userEmailTv: TextView
     private lateinit var profilePicture: ImageView
+    private lateinit var snackBar: Snackbar
 
 
     override fun onPlayerStateUpdated(playerState: PlayerState) {
@@ -107,7 +108,7 @@ class MainActivity : AppCompatActivity(), MusicViewModel.PlayerStateListener {
                 }
 
                 AuthorizationResponse.Type.ERROR -> {
-                    Timber.tag("Spotify").d("Error while authorizing")
+                    Timber.tag("Spotify").d("Error while authorizing ${response.error}")
                 }
 
                 else -> {
@@ -276,7 +277,7 @@ class MainActivity : AppCompatActivity(), MusicViewModel.PlayerStateListener {
 
 
     private fun showSnackBar(text: String) {
-        val snackBar = Snackbar.make(
+        snackBar = Snackbar.make(
             findViewById(android.R.id.content),
             text,
             Snackbar.LENGTH_SHORT
@@ -317,7 +318,7 @@ class MainActivity : AppCompatActivity(), MusicViewModel.PlayerStateListener {
                     searchView.clearFocus()
 
                 } else {
-                    val snackBar = Snackbar.make(
+                     snackBar = Snackbar.make(
                         findViewById(android.R.id.content),
                         getString(R.string.invalid_query_input),
                         Snackbar.LENGTH_SHORT
@@ -649,8 +650,24 @@ class MainActivity : AppCompatActivity(), MusicViewModel.PlayerStateListener {
 
         }
         authorizeClient()
+    }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        accountViewModel.userName.removeObservers(this)
+        accountViewModel.userEmail.removeObservers(this)
+        musicViewModel.isSongSaved.removeObservers(this)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if(::snackBar.isInitialized){
+            snackBar.dismiss()
+        }
 
     }
+
+
+
 
 }

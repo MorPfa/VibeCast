@@ -35,26 +35,26 @@ import kotlinx.coroutines.withContext
 
 
 @AndroidEntryPoint
-class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
+class MainScreenFragment : Fragment() {
     private var _binding: FragmentMainScreenBinding? = null
     private val binding get() = _binding!!
     private lateinit var actionBar: ActionBar
     private val mainViewModel: MainViewModel by activityViewModels()
     private val imageViewModel: ImageViewModel by activityViewModels()
     private val musicViewModel: MusicViewModel by activityViewModels()
-    private lateinit var playbackButton: ImageButton
-    private lateinit var shuffleButton: ImageButton
-    private lateinit var repeatButton: ImageButton
-    private lateinit var trackProgressBar: TrackProgressBar
+    private var playbackButton: ImageButton? = null
+    private var shuffleButton: ImageButton? = null
+    private var repeatButton: ImageButton? = null
+    private var trackProgressBar: TrackProgressBar? = null
+    private lateinit var snackBar: Snackbar
 
 
     private fun updatePlaybackBtn(playerState: PlayerState) {
-
         if (playerState.isPaused) {
-            playbackButton.setImageResource(R.drawable.play_btn)
+            playbackButton?.setImageResource(R.drawable.play_btn)
         } else {
 
-            playbackButton.setImageResource(R.drawable.pause_btn)
+            playbackButton?.setImageResource(R.drawable.pause_btn)
         }
     }
 
@@ -118,9 +118,9 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
     private fun updateShuffleBtn(playerState: PlayerState) {
         shuffleButton.apply {
             if (playerState.playbackOptions.isShuffling) {
-                shuffleButton.setImageResource(R.drawable.shuffle_enabled)
+                shuffleButton?.setImageResource(R.drawable.shuffle_enabled)
             } else {
-                shuffleButton.setImageResource(R.drawable.shuffle_disabled)
+                shuffleButton?.setImageResource(R.drawable.shuffle_disabled)
             }
         }
 
@@ -128,7 +128,7 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
 
     private fun updateSeekbar(playerState: PlayerState) {
         // Update progressbar
-        trackProgressBar.apply {
+        trackProgressBar?.apply {
             if (playerState.playbackSpeed > 0) {
                 unpause()
             } else {
@@ -143,7 +143,7 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
     }
 
     private fun updateRepeatBtn(playerState: PlayerState) {
-        repeatButton.apply {
+        repeatButton?.apply {
             when (playerState.playbackOptions.repeatMode) {
                 Repeat.ALL -> {
                     setImageResource(R.drawable.repeat_all_enabled)
@@ -164,13 +164,13 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
 
     }
 
-    override fun onPlayerStateUpdated(playerState: PlayerState) {
-        updateUI(playerState)
-    }
+//    override fun onPlayerStateUpdated(playerState: PlayerState) {
+//        updateUI(playerState)
+//    }
 
 
     private fun showSpotifySnackBar() {
-        val snackBar = Snackbar.make(
+        snackBar = Snackbar.make(
             requireView(),
             "Log into spotify to enable music",
             Snackbar.LENGTH_SHORT
@@ -192,7 +192,10 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         _binding = FragmentMainScreenBinding.inflate(inflater, container, false)
 
-        musicViewModel.setPlayerStateListener(this)
+//        musicViewModel.setPlayerStateListener(this)
+        musicViewModel.playerState.observe(viewLifecycleOwner) {
+            updateUI(it)
+        }
         trackProgressBar =
             TrackProgressBar(binding.musicWidget.progressBar) { seekToPosition: Long ->
                 musicViewModel.seekTo(seekToPosition)
@@ -205,15 +208,15 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
 
 
 
-        repeatButton.setOnClickListener {
+        repeatButton?.setOnClickListener {
             try {
                 musicViewModel.setRepeatStatus()
-            }catch (e : Exception){
+            } catch (e: Exception) {
                 showSpotifySnackBar()
             }
 
         }
-        playbackButton.setOnClickListener {
+        playbackButton?.setOnClickListener {
             try {
                 musicViewModel.onPlayPauseButtonClicked()
             } catch (e: Exception) {
@@ -221,7 +224,7 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
             }
 
         }
-        shuffleButton.setOnClickListener {
+        shuffleButton?.setOnClickListener {
             try {
                 musicViewModel.setShuffleStatus()
             } catch (e: Exception) {
@@ -255,18 +258,18 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
                     MainScreenFragmentDirections.homeToSaved()
                 findNavController().navigate(action)
             } else {
-                val snackbar = Snackbar.make(
+                snackBar = Snackbar.make(
                     requireView(),
                     getString(R.string.none_saved_warning),
                     Snackbar.LENGTH_SHORT
                 )
-                val snackbarView = snackbar.view
+                val snackbarView = snackBar.view
                 val snackbarText =
                     snackbarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
                 snackbarText.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
                 snackbarView.background =
                     ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
-                snackbar.show()
+                snackBar.show()
             }
         }
         return binding.root
@@ -292,7 +295,7 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
                     }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    val snackbar = Snackbar.make(
+                    snackBar = Snackbar.make(
                         requireView(),
                         getString(R.string.error_loading_image),
                         Snackbar.LENGTH_SHORT
@@ -304,7 +307,7 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
                             image
                         )
                     )
-                    val snackbarView = snackbar.view
+                    val snackbarView = snackBar.view
                     val snackbarText =
                         snackbarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
                     snackbarText.setTextColor(
@@ -315,7 +318,7 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
                     )
                     snackbarView.background =
                         ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
-                    snackbar.show()
+                    snackBar.show()
                 }
             }
         }
@@ -342,8 +345,8 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
                         val weather =
                             weatherData.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
                         observeImageData(city, weather!!)
-                        musicViewModel.token.observe(viewLifecycleOwner){
-                            if(it != null){
+                        musicViewModel.token.observe(viewLifecycleOwner) {
+                            if (it != null) {
                                 musicViewModel.getPlaylist(weather)
                             }
                         }
@@ -407,7 +410,24 @@ class MainScreenFragment : Fragment(), MusicViewModel.PlayerStateListener {
         super.onDestroyView()
         mainViewModel.currentWeather.removeObservers(viewLifecycleOwner)
         musicViewModel.currentSong.removeObservers(viewLifecycleOwner)
+        musicViewModel.playerState.removeObservers(viewLifecycleOwner)
+        imageViewModel.backgroundImage.removeObservers(viewLifecycleOwner)
+
+        if (::snackBar.isInitialized) {
+            snackBar.dismiss()
+        }
+        playbackButton?.setOnClickListener(null)
+        shuffleButton?.setOnClickListener(null)
+        repeatButton?.setOnClickListener(null)
+        binding.musicWidget.forwardButton.setOnClickListener(null)
+        binding.musicWidget.rewindButton.setOnClickListener(null)
+        binding.nextScreenButton.setOnClickListener(null)
         _binding = null
+        playbackButton = null
+        repeatButton = null
+        shuffleButton = null
+        playbackButton = null
+        trackProgressBar = null
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
 

@@ -48,8 +48,8 @@ class AccountFragment : Fragment() {
     private val imageViewModel: ImageViewModel by activityViewModels()
     private val musicViewModel: MusicViewModel by activityViewModels()
     private val accountViewModel: AccountViewModel by activityViewModels()
-    private lateinit var profilePic: ImageView
-    private lateinit var changePictureBtn: ImageButton
+    private  var profilePic: ImageView? = null
+    private  var changePictureBtn: ImageButton? = null
     private var alertDialog: AlertDialog? = null
     private lateinit var auth: FirebaseAuth
 
@@ -87,10 +87,10 @@ class AccountFragment : Fragment() {
 
         val savedBitmap = ImageHandler.loadImageFromInternalStorage(requireContext())
         savedBitmap?.let {
-            profilePic.setImageBitmap(it)
+            profilePic?.setImageBitmap(it)
         }
 
-        changePictureBtn.setOnClickListener {
+        changePictureBtn?.setOnClickListener {
             val action = AccountFragmentDirections.accountToEditProfile()
             findNavController().navigate(action)
         }
@@ -238,6 +238,10 @@ class AccountFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+        changePictureBtn = null
+        profilePic = null
+        musicViewModel.savedSongs.removeObservers(viewLifecycleOwner)
+        imageViewModel.backgroundImage.removeObservers(viewLifecycleOwner)
         mainViewModel.locations.removeObservers(viewLifecycleOwner)
     }
 

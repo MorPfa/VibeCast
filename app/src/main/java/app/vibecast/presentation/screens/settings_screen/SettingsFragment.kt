@@ -32,14 +32,15 @@ import kotlin.math.abs
 @AndroidEntryPoint
 class SettingsFragment : Fragment() {
     private var _binding: FragmentSettingsBinding? = null
+    private val binding get() = _binding!!
     private lateinit var permissionHelper: PermissionHelper
     private val prefViewModel : PreferencesViewModel by activityViewModels()
     private val mainViewModel: MainViewModel by activityViewModels()
     private val imageViewModel: ImageViewModel by activityViewModels()
-    private lateinit var imageSelector : ViewPager2
+    private  var imageSelector : ViewPager2? = null
 
 
-    private val binding get() = _binding!!
+
 
 
     private fun getImagePosition(items: List<ImageDto>, bgValue: String?): Int {
@@ -65,18 +66,21 @@ class SettingsFragment : Fragment() {
 
 
         val adapter = ImageSelectorAdapter(imageLoader,this,  imageViewModel)
-        imageSelector.adapter = adapter
-        imageSelector.offscreenPageLimit = 3
-        imageSelector.clipToPadding = false
-        imageSelector.clipChildren = false
+        imageSelector?.apply {
+            this.adapter = adapter
+            this.offscreenPageLimit = 3
+            this.clipToPadding = false
+            this.clipChildren = false
+        }
+
         setUpTransformer()
 
 
 
         imageViewModel.galleryImages.observe(viewLifecycleOwner){images ->
             adapter.submitList(images)
-            imageSelector.post {
-                imageSelector.setCurrentItem(getImagePosition( images,
+            imageSelector?.post {
+                imageSelector?.setCurrentItem(getImagePosition( images,
                     imageViewModel.backgroundImage.value
                 ), false)
             }
@@ -184,7 +188,7 @@ class SettingsFragment : Fragment() {
             page.scaleY = 0.85f + r * 0.14f
         }
 
-        imageSelector.setPageTransformer(transformer)
+        imageSelector?.setPageTransformer(transformer)
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -216,6 +220,11 @@ class SettingsFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+        imageSelector = null
+        imageViewModel.backgroundImage.removeObservers(viewLifecycleOwner)
+        imageViewModel.galleryImages.removeObservers(viewLifecycleOwner)
+        prefViewModel.musicPreferences.removeObservers(viewLifecycleOwner)
+
     }
 
     companion object {
