@@ -26,9 +26,9 @@ class RemoteImageDataSourceImpl @Inject constructor(
     private val imageService: ImageService,
 ) : RemoteImageDataSource {
 
-    override fun getImages(query: String): Flow<ImageDto> = flow {
+    override fun getImages(query: String, collections : String): Flow<ImageDto> = flow {
         try {
-            val images = imageService.getImages(query, "portrait", 1, "high")
+            val images = imageService.getImages(query, "portrait", 1, "high", collections)
             if (images.isNotEmpty()) {
                 emit(images[0].toImagesDto())
             } else {

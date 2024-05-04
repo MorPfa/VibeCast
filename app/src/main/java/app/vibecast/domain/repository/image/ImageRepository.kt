@@ -8,7 +8,7 @@ interface ImageRepository {
 
     fun getImageForDownload(query: String) : Flow<String>
 
-    fun getRemoteImages(query:  String) : Flow<ImageDto>
+    fun getRemoteImages(query:  String, collections : String) : Flow<ImageDto>
 
     fun getLocalImages() : Flow<List<ImageDto>>
 

@@ -29,9 +29,9 @@ class ImageRepositoryImpl @Inject constructor(
     /**
      *  Gets an image from the remote datasource
      */
-    override fun getRemoteImages(query: String): Flow<ImageDto> = flow {
+    override fun getRemoteImages(query: String, collections : String): Flow<ImageDto> = flow {
         try {
-            emitAll(remoteImageDataSource.getImages(query))
+            emitAll(remoteImageDataSource.getImages(query, collections))
         } catch (e: Exception) {
             Timber.tag(IMAGE_ERROR).e(e.localizedMessage)
             throw ImageFetchException("Error fetching remote images", e)

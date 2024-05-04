@@ -28,6 +28,7 @@ interface ImageService {
         @Query("orientation") orientation: String,
         @Query("count") count: Int,
         @Query("content_filter") contentFilter: String,
+        @Query("collections") topics: String,
     ): List<ImageApiModel>
 
 }

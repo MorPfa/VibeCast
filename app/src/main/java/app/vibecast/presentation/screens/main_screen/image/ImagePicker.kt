@@ -1,6 +1,5 @@
 package app.vibecast.presentation.screens.main_screen.image
 
-import android.util.Log
 import app.vibecast.R
 import app.vibecast.domain.model.ImageDto
 import app.vibecast.domain.repository.image.ImageRepository
@@ -8,6 +7,7 @@ import app.vibecast.domain.util.TAGS.IMAGE_ERROR
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -15,11 +15,11 @@ import javax.inject.Inject
  *  picks correct default image in case of no internet or other error
  */
 class ImagePicker @Inject constructor(
-    private val imageRepository: ImageRepository
+    private val imageRepository: ImageRepository,
 ) {
 
 
-    fun pickRandomImage() : Int{
+    fun pickRandomImage(): Int {
         val images = listOf(
             R.drawable.snow_image_1,
             R.drawable.snow_image_2,
@@ -40,7 +40,8 @@ class ImagePicker @Inject constructor(
         val randomIndex = images.indices.random()
         return images[randomIndex]
     }
-    fun pickDefaultImage(weatherCondition: String) : Int{
+
+    fun pickDefaultImage(weatherCondition: String): Int {
         val randomIndex = (0..2).random()
         val snowList = listOf(
             R.drawable.snow_image_1,
@@ -67,7 +68,7 @@ class ImagePicker @Inject constructor(
             R.drawable.fog_image_2,
             R.drawable.fog_image_3
         )
-        val image = when(weatherCondition){
+        val image = when (weatherCondition) {
             "Clear" -> sunList[randomIndex]
             "Clouds" -> rainList[randomIndex]
             "Drizzle", "Rain" -> rainList[randomIndex]
@@ -84,7 +85,7 @@ class ImagePicker @Inject constructor(
         return image
     }
 
-    fun pickImage(cityName : String, weatherCondition : String) : Flow<ImageDto> {
+    fun pickImage(cityName: String, weatherCondition: String): Flow<ImageDto> {
         val weather = when (weatherCondition) {
             "Clear" -> "clear"
             "Clouds" -> "cloudy"
@@ -102,12 +103,14 @@ class ImagePicker @Inject constructor(
 
         val searchQuery = "$weather $cityName"
 
-         return try {
-             imageRepository.getRemoteImages(searchQuery)
-         }
-         catch(e : Exception) {
-             Log.e(IMAGE_ERROR, "Error fetching remote images: $e")
-             throw e
-         }.flowOn(Dispatchers.IO)
-         }
+        return try {
+            imageRepository.getRemoteImages(
+                query = searchQuery,
+                collections = "$cityName, Hd $cityName wallpapers"
+            )
+        } catch (e: Exception) {
+            Timber.tag(IMAGE_ERROR).e("Error fetching remote images: $e")
+            throw e
+        }.flowOn(Dispatchers.IO)
     }
+}

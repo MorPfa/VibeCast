@@ -20,10 +20,11 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Named
+
 /**
  * Hilt Module to provide network related utilities
  * Methods:
-    - All methods provide dependencies for Hilt but some of them have commented out versions that include Http loggers
+- All methods provide dependencies for Hilt but some of them have commented out versions that include Http loggers
  */
 
 @Module
@@ -50,12 +51,12 @@ class NetworkModule {
 //        .addConverterFactory(GsonConverterFactory.create())
 //        .build()
 
-    @Named("unsplash")
-    @Provides
-    fun provideUnsplashRetrofit(): Retrofit = Retrofit.Builder()
-        .baseUrl("https://api.unsplash.com/")
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
+//    @Named("unsplash")
+//    @Provides
+//    fun provideUnsplashRetrofit(): Retrofit = Retrofit.Builder()
+//        .baseUrl("https://api.unsplash.com/")
+//        .addConverterFactory(GsonConverterFactory.create())
+//        .build()
 
     @Named("music")
     @Provides
@@ -96,23 +97,23 @@ class NetworkModule {
     }
 
 
-    //    @Named("unsplash")
-//    @Provides
-//    fun provideUnsplashRetrofit() : Retrofit {
-//        val loggingInterceptor = HttpLoggingInterceptor().apply {
-//            level = HttpLoggingInterceptor.Level.BODY
-//        }
-//
-//        val client = OkHttpClient.Builder()
-//            .addInterceptor(loggingInterceptor)
-//            .build()
-//       return  Retrofit.Builder()
-//            .baseUrl("https://api.unsplash.com/")
-//            .addConverterFactory(GsonConverterFactory.create())
-//           .client(client)
-//            .build()
-//
-//    }
+    @Named("unsplash")
+    @Provides
+    fun provideUnsplashRetrofit(): Retrofit {
+        val loggingInterceptor = HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
+
+        val client = OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
+            .build()
+        return Retrofit.Builder()
+            .baseUrl("https://api.unsplash.com/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(client)
+            .build()
+
+    }
 
 
     @Provides

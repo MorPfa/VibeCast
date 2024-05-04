@@ -2,25 +2,30 @@
 
 TASKS:
 today:
-optimize image accuracy (maybe go back to GET /search/photos endpoint and combine query with collections)
-
+ensure spotify works correctly no matter if app is installed or not
+make token observation in fragment more elegant
 
 
 Next tasks:
-ensure spotify works correctly no matter if app is installed or not
+make long press on screen show bg image
+ensure everything works as intended and flawlessly
+use benchmarks to improve performance
 
 
 Miscellaneous:
-use benchmarks to improve performance
-
 configure pro guard r8
 
 
 
+
+
+
+
+
+
+
 Nice to have's:
-make token observation in fragment more elegant
 fix save icon issue (determine check status based off db)
-make long press on screen show bg image
 replace splash screen fragment with activity
 upload profile picture to firestore
 save background image to internal storage so it can be set with no internet connection (test with no / bad internet to see if necessary)
