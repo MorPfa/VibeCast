@@ -25,10 +25,8 @@ import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import app.vibecast.BuildConfig
 import app.vibecast.R
 import app.vibecast.databinding.ActivityMainBinding
-import app.vibecast.domain.model.SongDto
 import app.vibecast.presentation.permissions.LocationPermissionState
 import app.vibecast.presentation.permissions.PermissionHelper
 import app.vibecast.presentation.screens.account_screen.AccountViewModel
@@ -37,6 +35,9 @@ import app.vibecast.presentation.screens.main_screen.MainScreenFragmentDirection
 import app.vibecast.presentation.screens.main_screen.MainViewModel
 import app.vibecast.presentation.screens.main_screen.image.ImageViewModel
 import app.vibecast.presentation.screens.main_screen.music.MusicViewModel
+import app.vibecast.presentation.screens.main_screen.music.util.Constants.CLIENT_ID
+import app.vibecast.presentation.screens.main_screen.music.util.Constants.REDIRECT_URI
+import app.vibecast.presentation.screens.main_screen.music.util.Constants.REQUEST_CODE
 import app.vibecast.presentation.screens.saved_screen.SavedLocationFragmentDirections
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
@@ -66,8 +67,6 @@ class MainActivity : AppCompatActivity(), MusicViewModel.PlayerStateListener {
     private var showIcons: Boolean = true
     private lateinit var permissionHelper: PermissionHelper
     private lateinit var auth: FirebaseAuth
-    private val redirectUri = "vibecast://callback"
-    private val clientId = BuildConfig.SPOTIFY_KEY
     private var currentUser: FirebaseUser? = null
     private lateinit var userNameTv: TextView
     private lateinit var userEmailTv: TextView
@@ -78,20 +77,31 @@ class MainActivity : AppCompatActivity(), MusicViewModel.PlayerStateListener {
     override fun onPlayerStateUpdated(playerState: PlayerState) {
         invalidateOptionsMenu()
     }
-
     private fun authorizeClient() {
-        val request =
-            AuthorizationRequest.Builder(clientId, AuthorizationResponse.Type.TOKEN, redirectUri)
-                .setShowDialog(true)
-                .setScopes(
-                    arrayOf(
-                        "streaming",
-                        "app-remote-control",
-                        "user-read-currently-playing"
+        val pm = packageManager
+        var isSpotifyInstalled: Boolean
+        try {
+            pm.getPackageInfo("com.spotify.music", 0)
+            isSpotifyInstalled = true
+        } catch (e: PackageManager.NameNotFoundException) {
+            isSpotifyInstalled = false
+        }
+        if(isSpotifyInstalled){
+            val request =
+                AuthorizationRequest.Builder(CLIENT_ID, AuthorizationResponse.Type.TOKEN, REDIRECT_URI)
+                    .setShowDialog(true)
+                    .setScopes(
+                        arrayOf(
+                            "streaming",
+                            "app-remote-control",
+                            "user-read-currently-playing"
+                        )
                     )
-                )
-                .build()
-        AuthorizationClient.openLoginActivity(this, REQUEST_CODE, request)
+                    .build()
+            AuthorizationClient.openLoginActivity(this, REQUEST_CODE, request)
+        }
+
+
 
     }
 
@@ -121,7 +131,7 @@ class MainActivity : AppCompatActivity(), MusicViewModel.PlayerStateListener {
 
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
-        private const val REQUEST_CODE = 1337
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -382,37 +392,19 @@ class MainActivity : AppCompatActivity(), MusicViewModel.PlayerStateListener {
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         val saveImageItem = menu.findItem(R.id.action_save_image)
         val saveLocationItem = menu.findItem(R.id.action_save_location)
-        val saveSongItem = menu.findItem(R.id.action_save_song)
+
         val searchItem = menu.findItem(R.id.action_search)
-
-
-
-        musicViewModel.isSongSaved.observe(this) {
-            Timber.tag("music_db").d(it.toString())
-            if (it == false) {
-                saveSongItem?.icon =
-                    ContextCompat.getDrawable(this, R.drawable.song_saved_unselected)
-
-            } else {
-                saveSongItem?.icon =
-                    ContextCompat.getDrawable(this, R.drawable.save_song_unselected)
-            }
-        }
-
 
 
         if (showIcons) {
             saveImageItem?.isVisible = true
             saveLocationItem?.isVisible = true
-            saveSongItem?.isVisible = true
-            searchItem?.isVisible = true
-            saveImageItem?.icon = ContextCompat.getDrawable(this, R.drawable.favorite_unselected)
-        } else {
-            saveImageItem?.icon = ContextCompat.getDrawable(this, R.drawable.favorite_selected)
 
+            searchItem?.isVisible = true
+        } else {
             saveImageItem?.isVisible = false
             saveLocationItem?.isVisible = false
-            saveSongItem?.isVisible = false
+
             searchItem?.isVisible = false
         }
 
@@ -432,14 +424,15 @@ class MainActivity : AppCompatActivity(), MusicViewModel.PlayerStateListener {
                             item.isChecked = true
                             imageViewModel.addImage(imageViewModel.image.value!!)
                             accountViewModel.addImageToFirebase(imageViewModel.image.value!!)
+                            showSnackBar("Saved image")
                             item.icon =
-                                ContextCompat.getDrawable(this, R.drawable.favorite_selected)
+                                ContextCompat.getDrawable(this, R.drawable.delete_image_icon)
                         } else {
                             item.isChecked = false
                             imageViewModel.deleteImage(imageViewModel.image.value!!)
                             accountViewModel.deleteImageFromFirebase(imageViewModel.image.value!!)
                             item.icon =
-                                ContextCompat.getDrawable(this, R.drawable.favorite_unselected)
+                                ContextCompat.getDrawable(this, R.drawable.save_image_icon)
                         }
                     }
                 } else {
@@ -480,6 +473,7 @@ class MainActivity : AppCompatActivity(), MusicViewModel.PlayerStateListener {
                         item.isChecked = true
                         mainViewModel.addLocation(mainViewModel.currentLocation.value!!)
                         accountViewModel.addLocationToFirebase(mainViewModel.currentLocation.value!!)
+                        showSnackBar("Saved location")
                         item.icon = ContextCompat.getDrawable(this, R.drawable.delete_location_icon)
                     } else {
                         item.isChecked = false
@@ -519,110 +513,7 @@ class MainActivity : AppCompatActivity(), MusicViewModel.PlayerStateListener {
                 true
             }
 
-            R.id.action_save_song -> {
-                if (currentUser != null) {
-                    val currentSong = musicViewModel.playerState.value
-                    if (musicViewModel.isSongSaved.value == false) {
-                        item.isChecked = true
-                        item.icon =
-                            ContextCompat.getDrawable(this, R.drawable.save_song_unselected)
 
-                        currentSong?.let {
-                            Timber.tag("imageTest").d("saved uri ${it.track.imageUri}")
-                            musicViewModel.saveSong(
-                                SongDto(
-                                    album = currentSong.track.album.name,
-                                    name = currentSong.track.name,
-                                    imageUri = currentSong.track.imageUri,
-                                    url = "",
-                                    trackUri = currentSong.track.uri,
-                                    previewUrl = null,
-                                    artist = currentSong.track.artist.name,
-                                    artistUri = currentSong.track.artist.uri,
-                                    albumUri = currentSong.track.artist.uri,
-                                )
-                            )
-                            accountViewModel.addSongToFirebase(
-                                SongDto(
-                                    album = currentSong.track.album.name,
-                                    name = currentSong.track.name,
-                                    imageUri = currentSong.track.imageUri,
-                                    url = "",
-                                    trackUri = currentSong.track.uri,
-                                    previewUrl = null,
-                                    artist = currentSong.track.artist.name,
-                                    artistUri = currentSong.track.artist.uri,
-                                    albumUri = currentSong.track.artist.uri,
-                                )
-                            )
-                        }
-
-
-                    } else {
-                        currentSong?.let {
-                            Timber.tag("imageTest").d("saved uri ${it.track.imageUri}")
-                            musicViewModel.deleteSong(
-                                SongDto(
-                                    album = currentSong.track.album.name,
-                                    name = currentSong.track.name,
-                                    imageUri = currentSong.track.imageUri,
-                                    url = "",
-                                    trackUri = currentSong.track.uri,
-                                    previewUrl = null,
-                                    artist = currentSong.track.artist.name,
-                                    artistUri = currentSong.track.artist.uri,
-                                    albumUri = currentSong.track.artist.uri,
-                                )
-                            )
-                            accountViewModel.deleteSongFromFirebase(
-                                SongDto(
-                                    album = currentSong.track.album.name,
-                                    name = currentSong.track.name,
-                                    imageUri = currentSong.track.imageUri,
-                                    url = "",
-                                    trackUri = currentSong.track.uri,
-                                    previewUrl = null,
-                                    artist = currentSong.track.artist.name,
-                                    artistUri = currentSong.track.artist.uri,
-                                    albumUri = currentSong.track.artist.uri,
-                                )
-                            )
-                        }
-                        item.isChecked = false
-                        item.icon =
-                            ContextCompat.getDrawable(this, R.drawable.song_saved_unselected)
-                    }
-                } else {
-                    val snackBar = Snackbar.make(
-                        findViewById(android.R.id.content),
-                        getString(R.string.please_login_or_create_an_account_to_save_a_song),
-                        Snackbar.LENGTH_SHORT
-                    )
-
-                    val snackBarView = snackBar.view
-                    val snackBarText =
-                        snackBarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
-                    snackBarText.setTextColor(
-                        ContextCompat.getColor(
-                            this@MainActivity,
-                            R.color.white
-                        )
-                    )
-                    snackBarView.background =
-                        ContextCompat.getDrawable(this@MainActivity, R.drawable.snackbar_background)
-                    val params = snackBarView.layoutParams as FrameLayout.LayoutParams
-                    params.gravity = Gravity.TOP
-                    snackBarView.layoutParams = params
-                    val actionBarHeight = getActionBarHeight()
-                    params.setMargins(0, actionBarHeight, 0, 0)
-                    snackBarView.layoutParams = params
-                    if (resources.configuration.screenLayout and Configuration.SCREENLAYOUT_SIZE_MASK >= Configuration.SCREENLAYOUT_SIZE_LARGE) {
-                        params.gravity = Gravity.CENTER_HORIZONTAL
-                    }
-                    snackBar.show()
-                }
-                true
-            }
 
             else -> super.onOptionsItemSelected(item)
         }
@@ -641,6 +532,7 @@ class MainActivity : AppCompatActivity(), MusicViewModel.PlayerStateListener {
 
     override fun onStart() {
         super.onStart()
+        authorizeClient()
         if (currentUser != null) {
             accountViewModel.updateNavHeader.observe(this) { shouldUpdate ->
                 if (shouldUpdate) {
@@ -649,7 +541,7 @@ class MainActivity : AppCompatActivity(), MusicViewModel.PlayerStateListener {
             }
 
         }
-        authorizeClient()
+
     }
 
     override fun onDestroy() {

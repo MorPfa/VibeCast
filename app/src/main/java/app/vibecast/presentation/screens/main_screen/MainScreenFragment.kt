@@ -3,14 +3,21 @@ package app.vibecast.presentation.screens.main_screen
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.content.pm.PackageManager
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.ActionBar
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -20,6 +27,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import app.vibecast.R
 import app.vibecast.databinding.FragmentMainScreenBinding
+import app.vibecast.domain.model.SongDto
+import app.vibecast.presentation.screens.account_screen.AccountViewModel
 import app.vibecast.presentation.screens.main_screen.image.ImageViewModel
 import app.vibecast.presentation.screens.main_screen.music.MusicViewModel
 import app.vibecast.presentation.screens.main_screen.music.TrackProgressBar
@@ -28,6 +37,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.spotify.protocol.types.Image
 import com.spotify.protocol.types.PlayerState
 import com.spotify.protocol.types.Repeat
+import com.spotify.sdk.android.auth.AuthorizationClient
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -42,11 +52,36 @@ class MainScreenFragment : Fragment() {
     private val mainViewModel: MainViewModel by activityViewModels()
     private val imageViewModel: ImageViewModel by activityViewModels()
     private val musicViewModel: MusicViewModel by activityViewModels()
+    private val accountViewModel: AccountViewModel by activityViewModels()
     private var playbackButton: ImageButton? = null
     private var shuffleButton: ImageButton? = null
     private var repeatButton: ImageButton? = null
+    private var saveSongButton: ImageView? = null
     private var trackProgressBar: TrackProgressBar? = null
     private lateinit var snackBar: Snackbar
+    private var alertDialog: AlertDialog? = null
+
+
+    private fun updateCapabilities(canPlayOnDemand: Boolean) {
+        if (canPlayOnDemand) {
+            binding.musicWidget.progressBar.isEnabled = true
+            binding.musicWidget.forwardButton.isEnabled = true
+            binding.musicWidget.rewindButton.isEnabled = true
+        } else {
+            binding.musicWidget.rewindButton.setOnClickListener {
+                showSpotifyPremiumDialog()
+            }
+            binding.musicWidget.forwardButton.setOnClickListener {
+                showSpotifyPremiumDialog()
+            }
+            binding.musicWidget.progressBar.isEnabled = false
+
+            binding.musicWidget.progressBar.thumb =
+                ContextCompat.getDrawable(requireContext(), R.drawable.thumb_disabled)
+            binding.musicWidget.forwardButton.setImageResource(R.drawable.skip_next_disabled)
+            binding.musicWidget.rewindButton.setImageResource(R.drawable.skip_previous_disabled)
+        }
+    }
 
 
     private fun updatePlaybackBtn(playerState: PlayerState) {
@@ -60,12 +95,14 @@ class MainScreenFragment : Fragment() {
 
 
     private fun updateTrackCoverArt(playerState: PlayerState) {
-        musicViewModel.assertAppRemoteConnected()
-            .imagesApi
+        musicViewModel.spotifyAppRemote?.let {
+            it.imagesApi
             .getImage(playerState.track.imageUri, Image.Dimension.X_SMALL)
             .setResultCallback { bitmap ->
                 binding.musicWidget.albumArtImageView.setImageBitmap(bitmap)
             }
+        }
+
     }
 
     private fun updateTrackInfo(playerState: PlayerState) {
@@ -73,14 +110,11 @@ class MainScreenFragment : Fragment() {
             songTitleTextView.text = playerState.track.name
             songTitleTextView.setOnClickListener {
                 showSongInfoInSpotify(playerState)
-
             }
             artistNameTextView.text = playerState.track.artist.name
             artistNameTextView.setOnClickListener {
                 showArtistInfoInSpotify(playerState)
-
             }
-
         }
     }
 
@@ -91,12 +125,11 @@ class MainScreenFragment : Fragment() {
         val packageManager = context?.packageManager
         if (packageManager != null && intent.resolveActivity(packageManager) != null) {
             // Open the Spotify app
-            musicViewModel.getCurrentSong(playerState.track.name, playerState.track.artist.name)
-            findNavController().navigate(MainScreenFragmentDirections.navHomeToWeb(InfoType.SONG))
-//            context?.startActivity(intent)
+            context?.startActivity(intent)
         } else {
 //            // If Spotify app is not installed, open the Spotify web page instead
-
+            musicViewModel.getCurrentSong(playerState.track.name, playerState.track.artist.name)
+            findNavController().navigate(MainScreenFragmentDirections.navHomeToWeb(InfoType.SONG))
         }
     }
 
@@ -106,12 +139,11 @@ class MainScreenFragment : Fragment() {
         val packageManager = context?.packageManager
         if (packageManager != null && intent.resolveActivity(packageManager) != null) {
             // Open the Spotify app
-            musicViewModel.getCurrentSong(playerState.track.name, playerState.track.artist.name)
-            findNavController().navigate(MainScreenFragmentDirections.navHomeToWeb(InfoType.ARTIST))
-//            context?.startActivity(intent)
+            context?.startActivity(intent)
         } else {
 //            // If Spotify app is not installed, open the Spotify web page instead
-
+            musicViewModel.getCurrentSong(playerState.track.name, playerState.track.artist.name)
+            findNavController().navigate(MainScreenFragmentDirections.navHomeToWeb(InfoType.ARTIST))
         }
     }
 
@@ -123,11 +155,9 @@ class MainScreenFragment : Fragment() {
                 shuffleButton?.setImageResource(R.drawable.shuffle_disabled)
             }
         }
-
     }
 
     private fun updateSeekbar(playerState: PlayerState) {
-        // Update progressbar
         trackProgressBar?.apply {
             if (playerState.playbackSpeed > 0) {
                 unpause()
@@ -136,7 +166,6 @@ class MainScreenFragment : Fragment() {
             }
             // Invalidate seekbar length and position
             binding.musicWidget.progressBar.max = playerState.track.duration.toInt()
-            binding.musicWidget.progressBar.isEnabled = true
             setDuration(playerState.track.duration)
             update(playerState.playbackPosition)
         }
@@ -147,32 +176,39 @@ class MainScreenFragment : Fragment() {
             when (playerState.playbackOptions.repeatMode) {
                 Repeat.ALL -> {
                     setImageResource(R.drawable.repeat_all_enabled)
-
                 }
 
                 Repeat.ONE -> {
                     setImageResource(R.drawable.repeat_one_enabled)
-
                 }
 
                 else -> {
                     setImageResource(R.drawable.repeat_disabled2)
-
                 }
             }
         }
-
     }
 
-//    override fun onPlayerStateUpdated(playerState: PlayerState) {
-//        updateUI(playerState)
-//    }
+    private fun showSpotifyPremiumDialog() {
+        // Create the object of AlertDialog Builder class
+        val alertDialogBuilder = AlertDialog.Builder(requireContext())
+        val customView =
+            LayoutInflater.from(requireContext()).inflate(R.layout.spotify_premium_dialog, null)
 
+        alertDialogBuilder.setView(customView)
+        alertDialog = alertDialogBuilder.create()
+        alertDialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        val layoutParams = alertDialog?.window?.attributes
+        layoutParams?.y = -200
+        alertDialog?.window?.attributes = layoutParams
+        alertDialog?.show()
+        Handler(Looper.getMainLooper()).postDelayed({ alertDialog?.dismiss() }, 3000)
+    }
 
     private fun showSpotifySnackBar() {
         snackBar = Snackbar.make(
             requireView(),
-            "Log into spotify to enable music",
+            "Error authenticating with spotify",
             Snackbar.LENGTH_SHORT
         )
         val snackBarView = snackBar.view
@@ -182,6 +218,41 @@ class MainScreenFragment : Fragment() {
         snackBarView.background =
             ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
         snackBar.show()
+        Handler(Looper.getMainLooper()).postDelayed({ snackBar.dismiss() }, 4000)
+    }
+
+
+    private fun isSpotifyInstalled(): Boolean {
+        val pm = requireContext().packageManager
+        var isSpotifyInstalled: Boolean
+        try {
+            pm.getPackageInfo("com.spotify.music", 0)
+            isSpotifyInstalled = true
+        } catch (e: PackageManager.NameNotFoundException) {
+            isSpotifyInstalled = false
+        }
+        if (!isSpotifyInstalled) {
+            val snackBarText = "Spotify is not installed"
+            val clickableText = "GET SPOTIFY FREE"
+
+
+            val snackBar = Snackbar.make(
+                requireView(),
+                snackBarText,
+                Snackbar.LENGTH_SHORT
+            )
+
+            snackBar.show()
+
+            snackBar.setAction(clickableText) {
+                AuthorizationClient.openDownloadSpotifyActivity(requireActivity())
+                snackBar.dismiss()
+            }
+            snackBar.setActionTextColor(ContextCompat.getColor(requireContext(), R.color.green))
+            return false
+        } else {
+            return true
+        }
     }
 
     @SuppressLint("SourceLockedOrientationActivity")
@@ -192,63 +263,123 @@ class MainScreenFragment : Fragment() {
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         _binding = FragmentMainScreenBinding.inflate(inflater, container, false)
 
-//        musicViewModel.setPlayerStateListener(this)
-        musicViewModel.playerState.observe(viewLifecycleOwner) {
-            updateUI(it)
-        }
         trackProgressBar =
             TrackProgressBar(binding.musicWidget.progressBar) { seekToPosition: Long ->
                 musicViewModel.seekTo(seekToPosition)
             }
+
+
+        musicViewModel.userCapabilitiesState.observe(viewLifecycleOwner) { canPlayOnDemand ->
+            updateCapabilities(canPlayOnDemand)
+        }
+        musicViewModel.playerState.observe(viewLifecycleOwner) { playerState ->
+            if(playerState != null){
+                updateUI(playerState)
+            }
+        }
+
+
         playbackButton = binding.musicWidget.playPauseButton
         shuffleButton = binding.musicWidget.shuffleButton
         repeatButton = binding.musicWidget.repeatButton
+        saveSongButton = binding.musicWidget.saveSongBtn
+
+        saveSongButton?.setOnClickListener {
+            val playerState = musicViewModel.playerState.value
+            playerState?.let {
+                musicViewModel.saveSong(
+                    SongDto(
+                        album = playerState.track.album.name,
+                        name = playerState.track.name,
+                        imageUri = playerState.track.imageUri,
+                        url = "",
+                        trackUri = playerState.track.uri,
+                        previewUrl = null,
+                        artist = playerState.track.artist.name,
+                        artistUri = playerState.track.artist.uri,
+                        albumUri = playerState.track.artist.uri,
+                    )
+                )
+                accountViewModel.addSongToFirebase(
+                    SongDto(
+                        album = playerState.track.album.name,
+                        name = playerState.track.name,
+                        imageUri = playerState.track.imageUri,
+                        url = "",
+                        trackUri = playerState.track.uri,
+                        previewUrl = null,
+                        artist = playerState.track.artist.name,
+                        artistUri = playerState.track.artist.uri,
+                        albumUri = playerState.track.artist.uri,
+                    )
+                )
+                snackBar = Snackbar.make(
+                    requireView(),
+                    "Added song to your library",
+                    Snackbar.LENGTH_SHORT
+                )
+                val snackBarView = snackBar.view
+                val snackBarText =
+                    snackBarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+                snackBarText.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+                snackBarView.background =
+                    ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
+                snackBar.show()
+                Handler(Looper.getMainLooper()).postDelayed({ snackBar.dismiss() }, 2000)
+            }
+
+        }
+
+        repeatButton?.setOnClickListener {
+            if (isSpotifyInstalled()) {
+                try {
+                    musicViewModel.setRepeatStatus()
+                } catch (e: Exception) {
+                    showSpotifySnackBar()
+                }
+            }
+        }
+        playbackButton?.setOnClickListener {
+            if (isSpotifyInstalled()) {
+                try {
+                    musicViewModel.onPlayPauseButtonClicked()
+                } catch (e: Exception) {
+                    showSpotifySnackBar()
+
+                }
+            }
+        }
+        shuffleButton?.setOnClickListener {
+            if (isSpotifyInstalled()) {
+                try {
+                    musicViewModel.setShuffleStatus()
+                } catch (e: Exception) {
+                    showSpotifySnackBar()
+                }
+            }
+        }
+        binding.musicWidget.forwardButton.setOnClickListener {
+            if (isSpotifyInstalled()) {
+                try {
+                    musicViewModel.onSkipNextButtonClicked()
+                } catch (e: Exception) {
+                    showSpotifySnackBar()
+                }
+            }
+        }
+        binding.musicWidget.rewindButton.setOnClickListener {
+            if (isSpotifyInstalled()) {
+                try {
+                    musicViewModel.onSkipPreviousButtonClicked()
+                } catch (e: Exception) {
+                    showSpotifySnackBar()
+                }
+            }
+        }
+
         actionBar = (requireActivity() as AppCompatActivity).supportActionBar!!
         actionBar.show()
 
-
-
-        repeatButton?.setOnClickListener {
-            try {
-                musicViewModel.setRepeatStatus()
-            } catch (e: Exception) {
-                showSpotifySnackBar()
-            }
-
-        }
-        playbackButton?.setOnClickListener {
-            try {
-                musicViewModel.onPlayPauseButtonClicked()
-            } catch (e: Exception) {
-                showSpotifySnackBar()
-            }
-
-        }
-        shuffleButton?.setOnClickListener {
-            try {
-                musicViewModel.setShuffleStatus()
-            } catch (e: Exception) {
-                showSpotifySnackBar()
-            }
-
-        }
-        binding.musicWidget.forwardButton.setOnClickListener {
-            try {
-                musicViewModel.onSkipNextButtonClicked()
-            } catch (e: Exception) {
-                showSpotifySnackBar()
-            }
-
-        }
-        binding.musicWidget.rewindButton.setOnClickListener {
-            try {
-                musicViewModel.onSkipPreviousButtonClicked()
-            } catch (e: Exception) {
-                showSpotifySnackBar()
-            }
-
-
-        }
 
         val nextScreenButton = binding.nextScreenButton
         nextScreenButton.setOnClickListener {
@@ -423,11 +554,13 @@ class MainScreenFragment : Fragment() {
         binding.musicWidget.rewindButton.setOnClickListener(null)
         binding.nextScreenButton.setOnClickListener(null)
         _binding = null
+        alertDialog = null
         playbackButton = null
         repeatButton = null
         shuffleButton = null
         playbackButton = null
         trackProgressBar = null
+        saveSongButton = null
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
 

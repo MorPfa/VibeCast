@@ -234,6 +234,7 @@
     <string name="check_out_the_artist_on_spotify">Check out the artist on spotify</string>
     <string name="reset_password_content_desc">Enter your email address to receive an email to reset your password</string>
     <string name="initial_value">0</string>
+    <string name="spotify_premium_suggestion">Spotify Premium lets you play any track, ad-free and with better audio quality. Go to spotify.com/premium to try it for free.</string>
 
 
 </resources>

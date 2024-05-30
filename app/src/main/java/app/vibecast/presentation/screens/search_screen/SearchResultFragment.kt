@@ -3,9 +3,14 @@ package app.vibecast.presentation.screens.search_screen
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +19,7 @@ import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.activity.addCallback
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -31,6 +37,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.spotify.protocol.types.Image
 import com.spotify.protocol.types.PlayerState
 import com.spotify.protocol.types.Repeat
+import com.spotify.sdk.android.auth.AuthorizationClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -48,10 +55,46 @@ class SearchResultFragment : Fragment() {
     private var repeatButton: ImageButton? = null
     private var trackProgressBar: TrackProgressBar? = null
     private lateinit var snackBar: Snackbar
+    private var alertDialog: AlertDialog? = null
 
+
+
+    private fun updateCapabilities(canPlayOnDemand: Boolean) {
+        if (canPlayOnDemand) {
+            binding.musicWidget.progressBar.isEnabled = true
+            binding.musicWidget.forwardButton.isEnabled = true
+            binding.musicWidget.rewindButton.isEnabled = true
+        } else {
+            binding.musicWidget.rewindButton.setOnClickListener{
+                showSpotifyPremiumDialog()
+            }
+            binding.musicWidget.forwardButton.setOnClickListener{
+                showSpotifyPremiumDialog()
+            }
+            binding.musicWidget.progressBar.isEnabled = false
+
+            binding.musicWidget.progressBar.thumb =
+                ContextCompat.getDrawable(requireContext(), R.drawable.thumb_disabled)
+            binding.musicWidget.forwardButton.setImageResource(R.drawable.skip_next_disabled)
+            binding.musicWidget.rewindButton.setImageResource(R.drawable.skip_previous_disabled)
+        }
+    }
+    private fun showSpotifyPremiumDialog() {
+        val alertDialogBuilder = AlertDialog.Builder(requireContext())
+        val customView =
+            LayoutInflater.from(requireContext()).inflate(R.layout.spotify_premium_dialog, null)
+
+        alertDialogBuilder.setView(customView)
+        alertDialog = alertDialogBuilder.create()
+        alertDialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        val layoutParams = alertDialog?.window?.attributes
+        layoutParams?.y = -200
+        alertDialog?.window?.attributes = layoutParams
+        alertDialog?.show()
+        Handler(Looper.getMainLooper()).postDelayed({ alertDialog?.dismiss() }, 3000)
+    }
 
     private fun updatePlaybackBtn(playerState: PlayerState) {
-
         if (playerState.isPaused) {
             playbackButton?.setImageResource(R.drawable.play_btn)
         } else {
@@ -94,13 +137,12 @@ class SearchResultFragment : Fragment() {
         val packageManager = context?.packageManager
         if (packageManager != null && intent.resolveActivity(packageManager) != null) {
             // Open the Spotify app
+            context?.startActivity(intent)
+        } else {
+//            // If Spotify app is not installed, open the Spotify web page instead
             musicViewModel.getCurrentSong(playerState.track.name, playerState.track.artist.name)
             val action = SearchResultFragmentDirections.searchToWeb(InfoType.SONG)
             findNavController().navigate(action)
-//            context?.startActivity(intent)
-        } else {
-//            // If Spotify app is not installed, open the Spotify web page instead
-
         }
     }
 
@@ -110,13 +152,12 @@ class SearchResultFragment : Fragment() {
         val packageManager = context?.packageManager
         if (packageManager != null && intent.resolveActivity(packageManager) != null) {
             // Open the Spotify app
+            context?.startActivity(intent)
+        } else {
+//            // If Spotify app is not installed, open the Spotify web page instead
             musicViewModel.getCurrentSong(playerState.track.name, playerState.track.artist.name)
             val action = SearchResultFragmentDirections.searchToWeb(InfoType.ARTIST)
             findNavController().navigate(action)
-//            context?.startActivity(intent)
-        } else {
-//            // If Spotify app is not installed, open the Spotify web page instead
-
         }
     }
 
@@ -152,23 +193,16 @@ class SearchResultFragment : Fragment() {
             when (playerState.playbackOptions.repeatMode) {
                 Repeat.ALL -> {
                     setImageResource(R.drawable.repeat_all_enabled)
-
                 }
-
                 Repeat.ONE -> {
                     setImageResource(R.drawable.repeat_one_enabled)
-
                 }
-
                 else -> {
                     setImageResource(R.drawable.repeat_disabled2)
-
                 }
             }
         }
-
     }
-
 
 
     private fun updateUI(playerState: PlayerState) {
@@ -185,9 +219,7 @@ class SearchResultFragment : Fragment() {
         requireActivity().onBackPressedDispatcher.addCallback(this) {
             mainViewModel.checkPermissionState()
             findNavController().navigate(R.id.nav_home)
-
         }
-
     }
 
     @SuppressLint("SourceLockedOrientationActivity")
@@ -197,12 +229,17 @@ class SearchResultFragment : Fragment() {
     ): View {
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         _binding = FragmentSearchResultBinding.inflate(inflater, container, false)
-        musicViewModel.playerState.observe(viewLifecycleOwner) {
-            updateUI(it)
+        musicViewModel.playerState.observe(viewLifecycleOwner) { playerState ->
+            if(playerState != null){
+                updateUI(playerState)
+            }
         }
-        mainViewModel.emptySearchResponse.observe(viewLifecycleOwner){noData ->
-            if(noData) {
-                 snackBar = Snackbar.make(
+        musicViewModel.userCapabilitiesState.observe(viewLifecycleOwner) { canPlayOnDemand ->
+            updateCapabilities(canPlayOnDemand)
+        }
+        mainViewModel.emptySearchResponse.observe(viewLifecycleOwner) { noData ->
+            if (noData) {
+                snackBar = Snackbar.make(
                     requireView(),
                     getString(R.string.invalid_query_input),
                     Snackbar.LENGTH_SHORT
@@ -238,51 +275,57 @@ class SearchResultFragment : Fragment() {
         playbackButton = binding.musicWidget.playPauseButton
         shuffleButton = binding.musicWidget.shuffleButton
         repeatButton = binding.musicWidget.repeatButton
-        repeatButton?.setOnClickListener {
-            try {
-                musicViewModel.setRepeatStatus()
-            }catch (e : Exception){
-                showSpotifySnackBar()
-            }
 
+        repeatButton?.setOnClickListener {
+            if (isSpotifyInstalled()) {
+                try {
+                    musicViewModel.setRepeatStatus()
+                } catch (e: Exception) {
+                    showSpotifySnackBar()
+                }
+            }
         }
         playbackButton?.setOnClickListener {
-            try {
-                musicViewModel.onPlayPauseButtonClicked()
-            } catch (e: Exception) {
-                showSpotifySnackBar()
+            if (isSpotifyInstalled()) {
+                try {
+                    musicViewModel.onPlayPauseButtonClicked()
+                } catch (e: Exception) {
+                    showSpotifySnackBar()
+                }
             }
-
         }
         shuffleButton?.setOnClickListener {
-            try {
-                musicViewModel.setShuffleStatus()
-            } catch (e: Exception) {
-                showSpotifySnackBar()
+            if (isSpotifyInstalled()) {
+                try {
+                    musicViewModel.setShuffleStatus()
+                } catch (e: Exception) {
+                    showSpotifySnackBar()
+                }
             }
-
         }
         binding.musicWidget.forwardButton.setOnClickListener {
-            try {
-                musicViewModel.onSkipNextButtonClicked()
-            } catch (e: Exception) {
-                showSpotifySnackBar()
+            if (isSpotifyInstalled()) {
+                try {
+                    musicViewModel.onSkipNextButtonClicked()
+                } catch (e: Exception) {
+                    showSpotifySnackBar()
+                }
             }
-
         }
         binding.musicWidget.rewindButton.setOnClickListener {
-            try {
-                musicViewModel.onSkipPreviousButtonClicked()
-            } catch (e: Exception) {
-                showSpotifySnackBar()
+            if (isSpotifyInstalled()) {
+                try {
+                    musicViewModel.onSkipPreviousButtonClicked()
+                } catch (e: Exception) {
+                    showSpotifySnackBar()
+                }
             }
-
-
         }
         return binding.root
     }
+
     private fun showSpotifySnackBar() {
-         snackBar = Snackbar.make(
+        snackBar = Snackbar.make(
             requireView(),
             "Log into spotify to enable music",
             Snackbar.LENGTH_SHORT
@@ -295,6 +338,7 @@ class SearchResultFragment : Fragment() {
             ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
         snackBar.show()
     }
+
     /**
      * Loads and sets new image as background image when location or weather conditions change
      */
@@ -343,69 +387,102 @@ class SearchResultFragment : Fragment() {
         }
     }
 
+    private fun isSpotifyInstalled(): Boolean {
+        val pm = requireContext().packageManager
+        var isSpotifyInstalled: Boolean
+        try {
+            pm.getPackageInfo("com.spotify.music", 0)
+            isSpotifyInstalled = true
+        } catch (e: PackageManager.NameNotFoundException) {
+            isSpotifyInstalled = false
+        }
+        if (!isSpotifyInstalled) {
+            snackBar = Snackbar.make(
+                requireView(),
+                "Please download spotify to enable music",
+                Snackbar.LENGTH_SHORT
+            )
+            val snackBarView = snackBar.view
+            val snackBarText =
+                snackBarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+            snackBarText.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            snackBarView.background =
+                ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
+            snackBar.show()
+            Handler(Looper.getMainLooper()).postDelayed({
+                if (isAdded) {
+                    AuthorizationClient.openDownloadSpotifyActivity(requireActivity())
+                }
+            }, 2000)
+
+            return false
+        } else {
+            return true
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mainViewModel.searchedWeather.distinctUntilChanged()
             .observe(viewLifecycleOwner) { weatherData ->
-                        weatherData?.weather?.currentWeather?.let { currentWeather ->
-                            val city = weatherData.location.cityName
-                            val weather =
-                                weatherData.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
-                            observeImageData(city, weather!!)
-                            musicViewModel.token.observe(viewLifecycleOwner){
-                                if(it != null){
-                                    musicViewModel.getPlaylist(weather)
-                                }
-                            }
-
-                            binding.mainTemp.text =
-                                getString(R.string.center_temp, currentWeather.temperature)
-                            //            Current hour values
-                            binding.centerTempRow.leftWeather.text =
-                                currentWeather.weatherConditions[0].mainDescription
-                            binding.centerTempRow.leftTemp.text = currentWeather.temperature.toString()
-                            binding.centerTempRow.leftTime.text =
-                                weatherData.weather.hourlyWeather?.get(0)?.timestamp
-                            //            Next hour values
-                            binding.centerTempRow.centerWeather.text =
-                                weatherData.weather.hourlyWeather?.get(1)?.weatherConditions?.get(0)?.mainDescription
-                            binding.centerTempRow.centerTemp.text =
-                                weatherData.weather.hourlyWeather?.get(1)?.temperature.toString()
-                            binding.centerTempRow.centerTime.text =
-                                weatherData.weather.hourlyWeather?.get(1)?.timestamp.toString()
-                            //            2 hours from now values
-                            binding.centerTempRow.rightWeather.text =
-                                weatherData.weather.hourlyWeather?.get(2)?.weatherConditions?.get(0)?.mainDescription
-                            binding.centerTempRow.rightTemp.text =
-                                weatherData.weather.hourlyWeather?.get(2)?.temperature.toString()
-                            binding.centerTempRow.rightTime.text =
-                                weatherData.weather.hourlyWeather?.get(2)?.timestamp.toString()
-                            binding.locationDisplay.text =
-                                getString(
-                                    R.string.center_location_text,
-                                    weatherData.location.cityName,
-                                    weatherData.location.country
-                                )
-                            binding.mainWeatherWidget.feelsLikeTv.text =
-                                getString(R.string.feels_like, currentWeather.feelsLike)
-                            binding.mainWeatherWidget.windSpeedTv.text =
-                                getString(R.string.wind_speed, currentWeather.windSpeed)
-                            binding.mainWeatherWidget.visibilityValue.text =
-                                getString(R.string.visibility, currentWeather.visibility)
-
-                            binding.mainWeatherWidget.chanceOfRainTv.text =
-                                getString(
-                                    R.string.chance_of_rain,
-                                    weatherData.weather.hourlyWeather?.get(0)?.chanceOfRain
-                                )
-                            binding.mainWeatherWidget.uvIndexTv.text =
-                                getString(R.string.uv_index_value, currentWeather.uvi)
-                            binding.mainWeatherWidget.humidtyTv.text =
-                                getString(
-                                    R.string.humidity, currentWeather.humidity
-                                )
+                weatherData?.weather?.currentWeather?.let { currentWeather ->
+                    val city = weatherData.location.cityName
+                    val weather =
+                        weatherData.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
+                    observeImageData(city, weather!!)
+                    musicViewModel.token.observe(viewLifecycleOwner) {
+                        if (it != null) {
+                            musicViewModel.getPlaylist(weather)
                         }
+                    }
+
+                    binding.mainTemp.text =
+                        getString(R.string.center_temp, currentWeather.temperature)
+                    //            Current hour values
+                    binding.centerTempRow.leftWeather.text =
+                        currentWeather.weatherConditions[0].mainDescription
+                    binding.centerTempRow.leftTemp.text = currentWeather.temperature.toString()
+                    binding.centerTempRow.leftTime.text =
+                        weatherData.weather.hourlyWeather?.get(0)?.timestamp
+                    //            Next hour values
+                    binding.centerTempRow.centerWeather.text =
+                        weatherData.weather.hourlyWeather?.get(1)?.weatherConditions?.get(0)?.mainDescription
+                    binding.centerTempRow.centerTemp.text =
+                        weatherData.weather.hourlyWeather?.get(1)?.temperature.toString()
+                    binding.centerTempRow.centerTime.text =
+                        weatherData.weather.hourlyWeather?.get(1)?.timestamp.toString()
+                    //            2 hours from now values
+                    binding.centerTempRow.rightWeather.text =
+                        weatherData.weather.hourlyWeather?.get(2)?.weatherConditions?.get(0)?.mainDescription
+                    binding.centerTempRow.rightTemp.text =
+                        weatherData.weather.hourlyWeather?.get(2)?.temperature.toString()
+                    binding.centerTempRow.rightTime.text =
+                        weatherData.weather.hourlyWeather?.get(2)?.timestamp.toString()
+                    binding.locationDisplay.text =
+                        getString(
+                            R.string.center_location_text,
+                            weatherData.location.cityName,
+                            weatherData.location.country
+                        )
+                    binding.mainWeatherWidget.feelsLikeTv.text =
+                        getString(R.string.feels_like, currentWeather.feelsLike)
+                    binding.mainWeatherWidget.windSpeedTv.text =
+                        getString(R.string.wind_speed, currentWeather.windSpeed)
+                    binding.mainWeatherWidget.visibilityValue.text =
+                        getString(R.string.visibility, currentWeather.visibility)
+
+                    binding.mainWeatherWidget.chanceOfRainTv.text =
+                        getString(
+                            R.string.chance_of_rain,
+                            weatherData.weather.hourlyWeather?.get(0)?.chanceOfRain
+                        )
+                    binding.mainWeatherWidget.uvIndexTv.text =
+                        getString(R.string.uv_index_value, currentWeather.uvi)
+                    binding.mainWeatherWidget.humidtyTv.text =
+                        getString(
+                            R.string.humidity, currentWeather.humidity
+                        )
+                }
             }
 
     }
@@ -427,6 +504,7 @@ class SearchResultFragment : Fragment() {
         binding.musicWidget.forwardButton.setOnClickListener(null)
         binding.musicWidget.rewindButton.setOnClickListener(null)
         _binding = null
+        alertDialog = null
         playbackButton = null
         repeatButton = null
         shuffleButton = null

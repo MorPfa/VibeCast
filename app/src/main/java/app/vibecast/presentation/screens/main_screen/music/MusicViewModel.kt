@@ -20,6 +20,7 @@ import com.spotify.android.appremote.api.Connector
 import com.spotify.android.appremote.api.SpotifyAppRemote
 import com.spotify.android.appremote.api.error.SpotifyDisconnectedException
 import com.spotify.protocol.client.Subscription
+import com.spotify.protocol.client.error.RemoteClientException
 import com.spotify.protocol.types.PlayerState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -38,7 +39,7 @@ class MusicViewModel @Inject constructor(
 
 
     private var playerStateSubscription: Subscription<PlayerState>? = null
-    private var spotifyAppRemote: SpotifyAppRemote? = null
+    var spotifyAppRemote: SpotifyAppRemote? = null
     private val gson = GsonBuilder().setPrettyPrinting().create()
     private val clientId = BuildConfig.SPOTIFY_KEY
     private val redirectUri = "vibecast://callback"
@@ -46,13 +47,13 @@ class MusicViewModel @Inject constructor(
 
 
     private var _currentPlaylist = MutableLiveData<String>()
-    val currentPlaylist : LiveData<String> get() = _currentPlaylist
+    val currentPlaylist: LiveData<String> get() = _currentPlaylist
 
 
     private var _isSongSaved = MutableLiveData(false)
-    val isSongSaved : LiveData<Boolean> get() = _isSongSaved
+    val isSongSaved: LiveData<Boolean> get() = _isSongSaved
 
-     private fun updateSavedSongStatus(trackUri : String){
+    private fun updateSavedSongStatus(trackUri: String) {
 //         Timber.tag("music_db").d("curr track $trackUri ${savedSongs.value}")
         val containsSong = savedSongs.value?.any { song ->
             song.trackUri == trackUri
@@ -68,7 +69,7 @@ class MusicViewModel @Inject constructor(
     }.asLiveData()
 
     private var _currentSong = MutableLiveData<Items>()
-    val currentSong : LiveData<Items> get() = _currentSong
+    val currentSong: LiveData<Items> get() = _currentSong
 
     private suspend fun getGenre(weather: String): String {
         val category = when (weather) {
@@ -93,31 +94,32 @@ class MusicViewModel @Inject constructor(
     }
 
     private val _token = MutableLiveData<String>()
-     var token = _token
+    var token = _token
 
 
-     fun getCurrentSong(song : String, artist : String){
-         viewModelScope.launch(Dispatchers.IO) {
-             musicRepository.getCurrentSong(song, artist, token.value!!).collect{ result ->
-                 Timber.tag("music_db").d("result ${result.items.externalUrls.spotify}")
-                 withContext(Dispatchers.Main){
-                     _currentSong.value = result.items
-                 }
+    fun getCurrentSong(song: String, artist: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            musicRepository.getCurrentSong(song, artist, token.value!!).collect { result ->
+                Timber.tag("music_db").d("result ${result.items.externalUrls.spotify}")
+                withContext(Dispatchers.Main) {
+                    _currentSong.value = result.items
+                }
 
-             }
-         }
-     }
+            }
+        }
+    }
 
     fun getPlaylist(weather: String) {
         try {
             viewModelScope.launch {
                 val genre = getGenre(weather)
-                musicRepository.getPlaylist(genre, token.value!!).collect {result ->
+                musicRepository.getPlaylist(genre, token.value!!).collect { result ->
                     val playlists = result.items
                     _currentPlaylist.value = result.items[0].externalUrls.spotify
                     val index = playlists.indices.random()
                     Timber.tag("Spotify").d("Playlist name : ${playlists[index].name}")
-                    val lofiPlaylist = playlists.find { it.name.contains("lofi", ignoreCase = true) }
+                    val lofiPlaylist =
+                        playlists.find { it.name.contains("lofi", ignoreCase = true) }
                     if (lofiPlaylist != null) {
                         Timber.tag("Spotify").d("Lofi playlist found: ${lofiPlaylist.name}")
                         playPlaylist(lofiPlaylist.uri)
@@ -136,14 +138,14 @@ class MusicViewModel @Inject constructor(
         }
     }
 
-    fun saveSong(song : SongDto) {
+    fun saveSong(song: SongDto) {
         viewModelScope.launch(Dispatchers.IO) {
             musicRepository.saveSong(song)
         }
 
     }
 
-    fun deleteSong(song: SongDto){
+    fun deleteSong(song: SongDto) {
         viewModelScope.launch(Dispatchers.IO) {
             musicRepository.deleteSong(song)
         }
@@ -188,6 +190,7 @@ class MusicViewModel @Inject constructor(
             .setErrorCallback(errorCallback)
     }
 
+
     fun connectToSpotify(token: String) {
         val connectionParams = ConnectionParams.Builder(clientId)
             .setRedirectUri(redirectUri)
@@ -200,13 +203,18 @@ class MusicViewModel @Inject constructor(
                     spotifyAppRemote = appRemote
                     Timber.tag("Spotify").d("Connected! Yay!")
                     subscribeToPlayerState()
-                    _token.value = token
+                    spotifyAppRemote?.let {
+                        it.userApi.capabilities.setResultCallback { capabilities ->
+                            Timber.tag("Spotify").d("Capabilities $capabilities")
+                            _userCapabilitiesState.value = capabilities.canPlayOnDemand
+                        }
+                    }
+
 
                 }
 
                 override fun onFailure(throwable: Throwable) {
                     Timber.tag("Spotify").e(throwable)
-
                 }
             })
     }
@@ -215,13 +223,13 @@ class MusicViewModel @Inject constructor(
     private fun playPlaylist(uri: String) {
         Timber.tag("Spotify").d(uri)
         assertAppRemoteConnected().let {
-           it.playerApi.play(uri).setResultCallback { _ ->
-                    it.playerApi
-                        .pause()
-                        .setResultCallback {
-                            logMessage("pause")
-                        }
-                        .setErrorCallback(errorCallback)
+            it.playerApi.play(uri).setResultCallback { _ ->
+                it.playerApi
+                    .pause()
+                    .setResultCallback {
+                        logMessage("pause")
+                    }
+                    .setErrorCallback(errorCallback)
             }
 
         }
@@ -267,6 +275,9 @@ class MusicViewModel @Inject constructor(
             .setResultCallback { logMessage("skip previous") }
             .setErrorCallback(errorCallback)
     }
+
+
+
 
     private fun subscribeToPlayerState() {
         playerStateSubscription = cancelAndResetSubscription(playerStateSubscription)
@@ -321,9 +332,13 @@ class MusicViewModel @Inject constructor(
     }
 
 
+    private var _userCapabilitiesState = MutableLiveData<Boolean>()
+
+    val userCapabilitiesState: LiveData<Boolean> get() = _userCapabilitiesState
+
     private var _playerState = MutableLiveData<PlayerState>()
 
-    val playerState : LiveData<PlayerState> get() = _playerState
+    val playerState: LiveData<PlayerState> get() = _playerState
 
 
     private val playerStateEventCallback = Subscription.EventCallback<PlayerState> { playerState ->
@@ -332,6 +347,7 @@ class MusicViewModel @Inject constructor(
         updateSavedSongStatus(playerState.track.uri)
 //        Timber.tag("Spotify").v("Player State: %s", gson.toJson(playerState))
     }
+
 
 
     override fun onCleared() {
@@ -343,8 +359,14 @@ class MusicViewModel @Inject constructor(
         }
     }
 
+    private val errorCallback = { throwable: Throwable ->
+        if (throwable is RemoteClientException) {
+            logError(throwable)
+        } else {
+            logError(throwable)
+        }
+    }
 
-    private val errorCallback = { throwable: Throwable -> logError(throwable) }
     private fun logError(throwable: Throwable) {
         Timber.tag("Spotify").e(throwable)
     }

@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/weather_widget_background">
 
 
     <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/spotifyLogo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="8dp"
@@ -16,16 +18,29 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/saveSongBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="11dp"
+        android:layout_marginVertical="2dp"
+        android:src="@drawable/favorite_unselected"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/spotifyLogo" />
+
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/albumArtImageView"
-        android:layout_width="116dp"
+        android:layout_width="102dp"
         android:layout_height="116dp"
         android:layout_marginVertical="1dp"
         android:adjustViewBounds="true"
         android:background="#494646"
         android:contentDescription="@string/cover_art_description"
-        android:scaleType="centerInside"
+        android:scaleType="centerCrop"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="-12dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/music_info"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.5"
         app:srcCompat="@drawable/cover_art_placeholder" />
@@ -35,11 +50,13 @@
         android:id="@+id/music_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="25dp"
+        android:layout_marginStart="1dp"
+        android:layout_marginEnd="18dp"
         android:gravity="center"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/albumArtImageView"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.5">
 
@@ -69,6 +86,7 @@
         <androidx.appcompat.widget.AppCompatSeekBar
             android:id="@+id/progressBar"
             android:layout_width="200dp"
+
             android:layout_height="wrap_content"
             android:progressTint="@color/white"
             android:thumbTint="@android:color/white" />
@@ -87,7 +105,6 @@
                 android:layout_height="44dp"
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/shuffle_current_playlist"
-                android:paddingStart="10dp"
                 app:srcCompat="@drawable/shuffle_disabled" />
 
             <ImageButton
@@ -96,11 +113,11 @@
                 android:layout_height="48dp"
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/rewind_current_song"
-                app:srcCompat="@drawable/previous_track_btn" />
+                app:srcCompat="@drawable/skip_previous_enabled" />
 
             <ImageButton
                 android:id="@+id/playPauseButton"
-                android:layout_width="48dp"
+                android:layout_width="28dp"
                 android:layout_height="48dp"
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/pause_or_resume_current_song"
@@ -110,10 +127,9 @@
                 android:id="@+id/forwardButton"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/skip_to_next_song"
-                app:srcCompat="@drawable/next_track_btn" />
+                app:srcCompat="@drawable/skip_next_enabled" />
 
             <ImageButton
                 android:id="@+id/repeatButton"

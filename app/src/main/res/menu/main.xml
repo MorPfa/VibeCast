@@ -3,12 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     >
 
-    <item
-        android:title="@string/save_song"
-        android:id="@+id/action_save_song"
-        android:icon="@drawable/save_song_unselected"
-        app:showAsAction="always"
-        android:checkable="true"/>
+
     <item
         android:id="@+id/action_save_location"
         android:icon="@drawable/save_location_icon"
@@ -19,7 +14,7 @@
 
     <item
         android:id="@+id/action_save_image"
-        android:icon="@drawable/favorite_unselected"
+        android:icon="@drawable/save_image_icon"
         android:title="@string/save_image_btn"
         android:checkable="true"
         app:showAsAction="always" />

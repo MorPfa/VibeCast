@@ -33,7 +33,7 @@ class ImageAdapter(
 
         init {
             itemView.setOnClickListener {
-                onItemClickListener?.invoke(bindingAdapterPosition)
+                onItemClickListener?.invoke(absoluteAdapterPosition)
             }
         }
     }
