@@ -7,10 +7,7 @@ import app.vibecast.data.local_data.db.weather.model.WeatherEntity
 import app.vibecast.domain.model.LocationDto
 import app.vibecast.domain.model.LocationWithWeatherDataDto
 import app.vibecast.domain.model.WeatherDto
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
+import app.vibecast.domain.util.Resource
 import javax.inject.Inject
 
 
@@ -27,29 +24,42 @@ import javax.inject.Inject
 
 class LocalWeatherDataSourceImpl @Inject constructor(
     private val weatherDao: WeatherDao,
-    private val locationDao: LocationDao
+    private val locationDao: LocationDao,
 ) : LocalWeatherDataSource {
 
-    override fun getWeather(cityName: String): Flow<WeatherDto> = weatherDao.getWeather(cityName).map {
-            weatherEntity -> weatherEntity.toWeather()
-    }.flowOn(Dispatchers.IO)
-
-
-    override fun getLocationWithWeather(cityName: String): Flow<LocationWithWeatherDataDto> =
-        locationDao.getLocationWithWeather(cityName)
-            .map { locationWithWeatherEntity ->
-                locationWithWeatherEntity.let {
-
-                    val locationDto = LocationDto(
-                        city = it.location.cityName,
-                        country = it.location.country
-                    )
-
-                    val weatherDto = it.weather.weatherData
-
-                    LocationWithWeatherDataDto(location = locationDto, weather = weatherDto)
-                }
+    override suspend fun getWeather(cityName: String): Resource<WeatherDto> {
+        return try {
+            val cachedData = weatherDao.getWeather(cityName)
+            if (cachedData != null) {
+                Resource.Success(cachedData.toWeather())
+            } else {
+                Resource.Error("No cached weather data")
             }
+        } catch (e: Exception) {
+            return Resource.Error(e.localizedMessage)
+        }
+    }
+
+
+    override suspend fun getLocationWithWeather(cityName: String): Resource<LocationWithWeatherDataDto> {
+        return try {
+            val cachedData = locationDao.getLocationWithWeather(cityName)
+            if (cachedData != null) {
+                val formattedDto = LocationWithWeatherDataDto(
+                    location = LocationDto(
+                        city = cachedData.location.cityName,
+                        country = cachedData.location.country
+                    ), weather = cachedData.weather.weatherData
+                )
+                Resource.Success(formattedDto)
+            } else {
+                Resource.Error("No cached location data")
+            }
+        } catch (e: Exception) {
+            Resource.Error(e.localizedMessage)
+
+        }
+    }
 
 
     override suspend fun addLocationWithWeather(location: LocationWithWeatherDataDto) {
@@ -59,8 +69,8 @@ class LocalWeatherDataSourceImpl @Inject constructor(
         )
     }
 
-    override suspend fun addWeather(weather : WeatherDto) {
-       weatherDao.addWeather(weather.toWeatherEntity(weather.cityName))
+    override suspend fun addWeather(weather: WeatherDto) {
+        weatherDao.addWeather(weather.toWeatherEntity(weather.cityName))
     }
 
     private fun WeatherEntity.toWeather(): WeatherDto {

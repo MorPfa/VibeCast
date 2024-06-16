@@ -8,6 +8,7 @@ import app.vibecast.domain.model.LocationDto
 import app.vibecast.domain.model.LocationWithWeatherDataDto
 import app.vibecast.domain.model.WeatherDto
 import app.vibecast.domain.repository.weather.UnitPreferenceRepository
+import app.vibecast.domain.util.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -21,12 +22,11 @@ import javax.inject.Inject
  */
 class LocalLocationDataSourceImpl @Inject constructor(
     private val locationDao: LocationDao,
-    private val dataStoreRepository: UnitPreferenceRepository
+    private val dataStoreRepository: UnitPreferenceRepository,
 ) : LocalLocationDataSource {
 
 
-
-    override suspend fun addLocationWithWeather(location: LocationWithWeatherDataDto)  {
+    override suspend fun addLocationWithWeather(location: LocationWithWeatherDataDto) {
         val preferredUnit = dataStoreRepository.getPreference()
         locationDao.addLocationWithWeather(
             LocationEntity(location.location.city, location.location.country),
@@ -37,7 +37,7 @@ class LocalLocationDataSourceImpl @Inject constructor(
                 System.currentTimeMillis(),
                 preferredUnit
             )
-            )
+        )
     }
 
 
@@ -45,23 +45,37 @@ class LocalLocationDataSourceImpl @Inject constructor(
         locationDao.getLocationsWithWeather().map { locationWithWeatherList ->
             locationWithWeatherList.map { locationWithWeatherData ->
                 LocationWithWeatherDataDto(
-                    location = LocationDto(locationWithWeatherData.location.cityName, locationWithWeatherData.location.country),
+                    location = LocationDto(
+                        locationWithWeatherData.location.cityName,
+                        locationWithWeatherData.location.country
+                    ),
                     weather = locationWithWeatherData.weather.toWeatherDto() // Assuming a conversion function
                 )
             }
         }
 
 
-    override fun getLocations(): Flow<List<LocationDto>> = locationDao.getLocations().map { locations ->
-        locations.map {
+    override suspend fun getLocations(): Resource<List<LocationDto>> {
+        return try {
+            val locations = locationDao.getLocations()
+            if (locations != null) {
+                Resource.Success(locations.map {
+                    LocationDto(it.cityName, it.country)
+                })
+            } else {
+                Resource.Error("No locations found")
+            }
+        } catch (e: Exception) {
+            Resource.Error(e.message ?: "An error occurred")
+        }
+
+    }
+
+
+    override fun getLocation(cityName: String): Flow<LocationDto> =
+        locationDao.getLocation(cityName).map {
             LocationDto(it.cityName, it.country)
         }
-    }
-
-
-    override fun getLocation(cityName: String): Flow<LocationDto> = locationDao.getLocation(cityName).map {
-        LocationDto(it.cityName, it.country)
-    }
 
     override suspend fun addLocation(location: LocationDto) = locationDao.addLocation(
         LocationEntity(location.city, location.country)

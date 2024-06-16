@@ -3,10 +3,10 @@ package app.vibecast.presentation.screens.main_screen.image
 import app.vibecast.R
 import app.vibecast.domain.model.ImageDto
 import app.vibecast.domain.repository.image.ImageRepository
+import app.vibecast.domain.util.Resource
 import app.vibecast.domain.util.TAGS.IMAGE_ERROR
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOn
+
+
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -85,7 +85,7 @@ class ImagePicker @Inject constructor(
         return image
     }
 
-    fun pickImage(cityName: String, weatherCondition: String): Flow<ImageDto> {
+    suspend fun pickImage(cityName: String, weatherCondition: String): Resource<ImageDto> {
         val weather = when (weatherCondition) {
             "Clear" -> "clear"
             "Clouds" -> "cloudy"
@@ -102,15 +102,24 @@ class ImagePicker @Inject constructor(
         }
 
         val searchQuery = "$weather $cityName"
-
         return try {
-            imageRepository.getRemoteImages(
+            val data = imageRepository.getRemoteImages(
                 query = searchQuery,
                 collections = "$cityName, Hd $cityName wallpapers"
             )
+            when (data) {
+                is Resource.Success -> {
+                    data.data?.let {
+                        Resource.Success(it)
+                    } ?: Resource.Error("Data is null")
+                }
+                is Resource.Error -> {
+                    Resource.Error(data.message)
+                }
+            }
         } catch (e: Exception) {
             Timber.tag(IMAGE_ERROR).e("Error fetching remote images: $e")
-            throw e
-        }.flowOn(Dispatchers.IO)
+            Resource.Error(e.localizedMessage)
+        }
     }
 }

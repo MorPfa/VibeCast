@@ -20,7 +20,6 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Named
-import javax.inject.Singleton
 
 /**
  * Hilt Module to provide network related utilities
@@ -30,15 +29,9 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-class NetworkModule {
+object NetworkModule {
 
-    @Provides
-    @Singleton
-    fun provideOkHttpClient(): OkHttpClient {
-        return OkHttpClient.Builder()
-            .addInterceptor(HttpLoggingInterceptor())
-            .build()
-    }
+
     
     @Provides
     fun provideMoshi(): Moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
@@ -46,19 +39,13 @@ class NetworkModule {
     @Provides
     fun provideGson(): Gson = GsonBuilder().create()
 
-    @Named("weather")
-    @Provides
-    fun provideWeatherRetrofit(moshi: Moshi): Retrofit = Retrofit.Builder()
-        .baseUrl("https://api.openweathermap.org/")
-        .addConverterFactory(MoshiConverterFactory.create(moshi))
-        .build()
 
-//    @Named("music")
-//    @Provides
-//    fun provideSpotifyRetrofit(): Retrofit = Retrofit.Builder()
-//        .baseUrl("https://api.spotify.com/")
-//        .addConverterFactory(GsonConverterFactory.create())
-//        .build()
+    @Named("music")
+    @Provides
+    fun provideSpotifyRetrofit(): Retrofit = Retrofit.Builder()
+        .baseUrl("https://api.spotify.com/")
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
 
     @Named("unsplash")
     @Provides
@@ -67,9 +54,29 @@ class NetworkModule {
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
-    @Named("music")
+//    @Named("music")
+//    @Provides
+//    fun provideSpotifyRetrofit(): Retrofit {
+//                val loggingInterceptor = HttpLoggingInterceptor().apply {
+//            level = HttpLoggingInterceptor.Level.BODY
+//        }
+//
+//        val client = OkHttpClient.Builder()
+//            .addInterceptor(loggingInterceptor)
+//            .build()
+//        return Retrofit.Builder()
+//            .baseUrl("https://api.spotify.com/v1/")
+//            .addConverterFactory(GsonConverterFactory.create())
+//            .client(client)
+//            .build()
+//
+//
+//    }
+
+
+    @Named("weather")
     @Provides
-    fun provideSpotifyRetrofit(): Retrofit {
+    fun provideWeatherRetrofit(moshi: Moshi): Retrofit {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
@@ -77,33 +84,13 @@ class NetworkModule {
         val client = OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
             .build()
+
         return Retrofit.Builder()
-            .baseUrl("https://api.spotify.com/v1/")
-            .addConverterFactory(GsonConverterFactory.create())
+            .baseUrl("https://api.openweathermap.org/")
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
             .client(client)
             .build()
-
-
     }
-
-
-//    @Named("weather")
-//    @Provides
-//    fun provideWeatherRetrofit(moshi: Moshi): Retrofit {
-//        val loggingInterceptor = HttpLoggingInterceptor().apply {
-//            level = HttpLoggingInterceptor.Level.BODY
-//        }
-//
-//        val client = OkHttpClient.Builder()
-//            .addInterceptor(loggingInterceptor)
-//            .build()
-//
-//        return Retrofit.Builder()
-//            .baseUrl("https://api.openweathermap.org/")
-//            .addConverterFactory(MoshiConverterFactory.create(moshi))
-//            .client(client)
-//            .build()
-//    }
 
 
 //    @Named("unsplash")

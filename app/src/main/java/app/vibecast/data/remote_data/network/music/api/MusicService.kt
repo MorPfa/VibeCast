@@ -3,6 +3,7 @@ package app.vibecast.data.remote_data.network.music.api
 
 import app.vibecast.data.remote_data.network.music.model.PlaylistApiModel
 import app.vibecast.data.remote_data.network.music.model.TracksResponse
+import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Path
@@ -17,7 +18,7 @@ interface MusicService {
         @Header("Authorization") accessCode: String,
         @Query("limit") limit: Int = 10,
         @Query("offset") offset: Int = 0,
-    ): PlaylistApiModel
+    ): Response<PlaylistApiModel>
 
 
     @GET("search")
@@ -25,7 +26,7 @@ interface MusicService {
         @Header("Authorization") accessCode: String,
         @Query("q") query: String,
         @Query("type") type: String = "track",
-        @Query("limit") limit: Int = 5,
+        @Query("limit") limit: Int = 3,
         @Query("offset") offset: Int = 0,
-    ): TracksResponse
+    ): Response<TracksResponse>
 }

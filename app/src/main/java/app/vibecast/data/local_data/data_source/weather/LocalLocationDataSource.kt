@@ -2,6 +2,7 @@ package app.vibecast.data.local_data.data_source.weather
 
 import app.vibecast.domain.model.LocationDto
 import app.vibecast.domain.model.LocationWithWeatherDataDto
+import app.vibecast.domain.util.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface LocalLocationDataSource {
@@ -11,7 +12,7 @@ interface LocalLocationDataSource {
 
     suspend fun addLocationWithWeather(location: LocationWithWeatherDataDto)
 
-    fun getLocations() : Flow<List<LocationDto>>
+    suspend fun getLocations() : Resource<List<LocationDto>>
 
     fun getLocation(cityName : String) : Flow<LocationDto>
 

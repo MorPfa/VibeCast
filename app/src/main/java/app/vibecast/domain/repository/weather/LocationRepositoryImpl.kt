@@ -5,14 +5,12 @@ import app.vibecast.data.remote_data.data_source.weather.RemoteWeatherDataSource
 import app.vibecast.domain.model.LocationDto
 import app.vibecast.domain.model.LocationWithWeatherDataDto
 import app.vibecast.domain.model.WeatherDto
+import app.vibecast.domain.util.Resource
 import app.vibecast.presentation.screens.main_screen.weather.LocationModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.single
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -28,24 +26,24 @@ class LocationRepositoryImpl @Inject constructor(
 ) : LocationRepository {
     private val backgroundScope = CoroutineScope(Dispatchers.IO)
 
-    override fun refreshLocationWeather(): Flow<List<LocationWithWeatherDataDto>> {
-        backgroundScope.launch {
-            localLocationDataSource.getLocationWithWeather().map { locationWithWeatherDataList ->
-                locationWithWeatherDataList.map { locationWithWeatherData ->
-                    val cityName = locationWithWeatherData.location.city
-                    val newWeatherData = remoteWeatherDataSource.getWeather(cityName).firstOrNull()
-                    if (newWeatherData != null) {
-                        locationWithWeatherData.weather = newWeatherData.weather
-                    }
-
-                    localLocationDataSource.addLocationWithWeather(locationWithWeatherData)
-
-                }
-
-            }.single()
-        }
-        return localLocationDataSource.getLocationWithWeather()
-    }
+//    override fun refreshLocationWeather(): Flow<List<LocationWithWeatherDataDto>> {
+//        backgroundScope.launch {
+//            localLocationDataSource.getLocationWithWeather().map { locationWithWeatherDataList ->
+//                locationWithWeatherDataList.map { locationWithWeatherData ->
+//                    val cityName = locationWithWeatherData.location.city
+//                    val newWeatherData = remoteWeatherDataSource.getWeather(cityName).firstOrNull()
+//                    if (newWeatherData != null) {
+//                        locationWithWeatherData.weather = newWeatherData.weather
+//                    }
+//
+//                    localLocationDataSource.addLocationWithWeather(locationWithWeatherData)
+//
+//                }
+//
+//            }.single()
+//        }
+//        return localLocationDataSource.getLocationWithWeather()
+//    }
 
     override fun addLocationWeather(location: LocationWithWeatherDataDto) {
         CoroutineScope(Dispatchers.Main).launch {
@@ -75,9 +73,14 @@ class LocationRepositoryImpl @Inject constructor(
     }
 
 
-    override fun getLocations(): Flow<List<LocationModel>> = flow {
-        localLocationDataSource.getLocations().collect {
-            emit(it.toLocationModels())
+    override suspend fun getLocations(): Resource<List<LocationModel>> {
+        return when (val locations = localLocationDataSource.getLocations()) {
+            is Resource.Success -> {
+                 Resource.Success(locations.data!!.toLocationModels())
+            }
+            is Resource.Error -> {
+                Resource.Error(locations.message!!)
+            }
         }
     }
 

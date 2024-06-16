@@ -7,22 +7,11 @@ import app.vibecast.data.local_data.data_source.weather.LocalWeatherDataSource
 import app.vibecast.data.remote_data.data_source.weather.RemoteWeatherDataSource
 import app.vibecast.domain.model.LocationDto
 import app.vibecast.domain.model.LocationWithWeatherDataDto
-import app.vibecast.domain.model.WeatherDto
-import app.vibecast.domain.util.TAGS.WEATHER_ERROR
+import app.vibecast.domain.util.Resource
 import app.vibecast.presentation.TAG
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 import javax.inject.Inject
-import kotlin.coroutines.cancellation.CancellationException
 
 
 /**
@@ -45,153 +34,181 @@ class WeatherRepositoryImpl @Inject constructor(
 ) : WeatherRepository {
 
 
-    override val currentWeather = MutableStateFlow<String?>(null)
-
-    override fun getSearchedWeather(cityName: String): Flow<LocationWithWeatherDataDto?> = flow {
-        try {
-            val test = remoteWeatherDataSource.getSearchedWeather(cityName).firstOrNull()
-            val currentWeatherCondition =
-                test?.weather?.currentWeather?.weatherConditions?.get(0)?.mainDescription
-            currentWeather.emit(currentWeatherCondition)
-            emit(test)
-
-        } catch (e: Exception) {
-            Timber.tag(WEATHER_ERROR).e(e, "Error fetching weather data for $cityName")
-            throw e
-        }
-
-    }.flowOn(Dispatchers.IO)
-
-
-    override fun getWeather(cityName: String): Flow<LocationWithWeatherDataDto> = flow {
-        try {
-            val localWeatherFlow = localWeatherDataSource.getWeather(cityName)
-            localWeatherFlow.collect { weatherData ->
-                val timestamp = weatherData.dataTimestamp
-                if (
-                    (isDataOutdated(timestamp) && isInternetAvailable(appContext))
-                    ||
-                    (isWrongUnit(weatherData.unit) && isInternetAvailable(appContext))
-                ) {
-                    throw DataOutdatedException("Timestamp: $timestamp current time: ${System.currentTimeMillis()}")
-                } else {
-                    Timber.tag(TAG).d("local city")
-                    val output = LocationWithWeatherDataDto(
-                        LocationDto(
-                            weatherData.cityName,
-                            weatherData.country
-                        ), weatherData
-                    )
-                    val currentWeatherCondition =
-                        output.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
-                    currentWeather.emit(currentWeatherCondition)
-                    emit(output)
-                }
-
+    override suspend fun getSearchedWeather(cityName: String): Resource<LocationWithWeatherDataDto> {
+        return when (val weatherData = remoteWeatherDataSource.getWeather(cityName)) {
+            is Resource.Success -> {
+                Resource.Success(weatherData.data!!)
             }
-        } catch (e: Exception) {
-            Timber.tag(TAG).d("remote city ")
-            Timber.tag(TAG).d(e)
-            remoteWeatherDataSource.getWeather(cityName).map { data ->
-                data.weather.country = data.location.country
-                data.weather.cityName = data.location.city
-                data
-            }.onEach { localWeatherDataSource.addWeather(it.weather) }
-                .collect {
-                    val currentWeatherCondition =
-                        it.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
-                    currentWeather.emit(currentWeatherCondition)
-                    emit(it)
-                }
+
+            is Resource.Error -> {
+                Resource.Error(weatherData.message)
+            }
         }
-    }.flowOn(Dispatchers.IO)
+    }
 
 
-    override fun getWeather(lat: Double, lon: Double): Flow<LocationWithWeatherDataDto> = flow {
-        remoteWeatherDataSource.getCity(lat, lon)
-            .onCompletion { cause ->
-                if (cause != null && cause !is CancellationException) {
-                    Timber.tag(TAG)
-                        .e("Error during flow completion for getWeather with lat= $lat  $lon   $cause  in Repository")
+    override suspend fun getWeather(cityName: String): Resource<LocationWithWeatherDataDto>  {
+        return try {
+            when(val cachedWeatherData = localWeatherDataSource.getWeather(cityName)){
+                is Resource.Success -> {
+                    val timestamp = cachedWeatherData.data?.dataTimestamp!!
+                    if (
+                        (isDataOutdated(timestamp) && isInternetAvailable(appContext))
+                        ||
+                        (isWrongUnit(cachedWeatherData.data.unit) && isInternetAvailable(appContext))
+                    ) {
+                        when(val remoteWeatherData = remoteWeatherDataSource.getWeather(cityName)){
+                            is Resource.Success -> {
+                                remoteWeatherData.data?.weather?.country = cachedWeatherData.data.country
+                                remoteWeatherData.data?.weather?.cityName = cachedWeatherData.data.cityName
+                                localWeatherDataSource.addWeather(remoteWeatherData.data?.weather!!)
+                                Resource.Success(remoteWeatherData.data)
+                            }
+                            is Resource.Error -> {
+                                Resource.Error(remoteWeatherData.message!!)
+                            }
+                        }
+                    } else {
+                        Timber.tag("WEATHER_REFORMAT").d("local city")
+                   Resource.Success(LocationWithWeatherDataDto(
+                       LocationDto(
+                           cachedWeatherData.data.cityName,
+                           cachedWeatherData.data.country
+                       ),  cachedWeatherData.data
+                   ))
+                    }
+                }
+                is Resource.Error -> {
+                    when(val remoteWeatherData = remoteWeatherDataSource.getWeather(cityName)){
+                        is Resource.Success -> {
+                            remoteWeatherData.data?.weather?.country = remoteWeatherData.data?.location?.country!!
+                            remoteWeatherData.data.weather.cityName = remoteWeatherData.data.location.country
+                            localWeatherDataSource.addWeather(remoteWeatherData.data.weather)
+                            Resource.Success(remoteWeatherData.data)
+                        }
+                        is Resource.Error -> {
+                            Resource.Error(remoteWeatherData.message!!)
+                        }
+                    }
+
                 }
             }
-            .collect { data ->
-                val cityName = data.cityName
-                if (cityName.isNotBlank()) {
-                    try {
-                        val localWeatherFlow = localWeatherDataSource.getWeather(cityName)
-                        localWeatherFlow.collect { weatherData ->
-                            val timestamp = weatherData.dataTimestamp
+
+        } catch (e: Exception) {
+            Timber.tag("WEATHER_REFORMAT").d("remote city ")
+            Timber.tag("WEATHER_REFORMAT").d(e)
+           Resource.Error(e.localizedMessage!!)
+        }
+    }
+
+    override suspend fun getWeather(
+        lat: Double,
+        lon: Double,
+    ): Resource<LocationWithWeatherDataDto> {
+        return try {
+            when (val geoCodedLocation = remoteWeatherDataSource.getCity(lat, lon)) {
+                is Resource.Success -> {
+                    val cityName = geoCodedLocation.data?.cityName!!
+                    Timber.tag("WEATHER_REFORMAT").d("Cityname: $cityName")
+                    when (val cachedWeatherData = localWeatherDataSource.getWeather(cityName)) {
+                        is Resource.Success -> {
+                            val timestamp = cachedWeatherData.data?.dataTimestamp!!
                             if (
                                 (isDataOutdated(timestamp) && isInternetAvailable(appContext))
                                 ||
-                                (isWrongUnit(weatherData.unit) && isInternetAvailable(appContext))
+                                (isWrongUnit(cachedWeatherData.data.unit) && isInternetAvailable(
+                                    appContext
+                                ))
                             ) {
-                                throw DataOutdatedException("Timestamp: $timestamp current time: ${System.currentTimeMillis()}")
+                                val remoteData = remoteWeatherDataSource.getWeather(lat, lon)
+                                Timber.tag("WEATHER_REFORMAT").d("remote data: ${ geoCodedLocation.data.cityName}")
+                                when (remoteData) {
+                                    is Resource.Success -> {
+                                        remoteData.data?.weather?.country =
+                                            geoCodedLocation.data.countryName
+                                        remoteData.data?.weather?.cityName =
+                                            geoCodedLocation.data.cityName
+                                        localWeatherDataSource.addWeather(remoteData.data?.weather!!)
+                                        Resource.Success(remoteData.data)
+                                    }
+
+                                    is Resource.Error -> {
+                                        Resource.Error("Couldn't get weather data for coordinates ${remoteData.message}")
+                                    }
+                                }
                             } else {
-                                Timber.tag(TAG).d("local coordinates")
-                                val output = LocationWithWeatherDataDto(
-                                    LocationDto(
-                                        weatherData.cityName,
-                                        weatherData.country
-                                    ), weatherData
+                                Timber.tag("WEATHER_REFORMAT").d("local city: $cityName")
+
+                                Resource.Success(
+                                    LocationWithWeatherDataDto(
+                                        LocationDto(
+                                            cachedWeatherData.data.cityName,
+                                            cachedWeatherData.data.country
+                                        ), cachedWeatherData.data
+                                    )
                                 )
-                                val currentWeatherCondition =
-                                    output.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
-                                currentWeather.emit(currentWeatherCondition)
-                                emit(output)
+
                             }
                         }
-                    } catch (e: Exception) {
-                        Timber.tag(TAG).d("remote coordinates")
-                        Timber.tag(TAG).d(e)
-                        remoteWeatherDataSource.getWeather(lat, lon)
-                            .map { weather ->
-                                weather.weather.country = data.countryName
-                                weather
+
+                        is Resource.Error -> {
+
+                            when (val remoteData = remoteWeatherDataSource.getWeather(lat, lon)) {
+                                is Resource.Success -> {
+                                    remoteData.data?.weather?.country =
+                                        geoCodedLocation.data.countryName
+                                    remoteData.data?.weather?.cityName =
+                                        geoCodedLocation.data.cityName
+                                    Timber.tag("WEATHER_REFORMAT").d("remote City: ${ geoCodedLocation.data.cityName}")
+                                    Timber.tag("WEATHER_REFORMAT").d("Country: ${ geoCodedLocation.data.countryName}")
+                                    localWeatherDataSource.addWeather(remoteData.data?.weather!!)
+                                    Resource.Success(remoteData.data)
+                                }
+                                is Resource.Error -> {
+                                    Resource.Error("Couldn't get weather data for coordinates ${remoteData.message}")
+                                }
                             }
-                            .onEach { localWeatherDataSource.addWeather(it.weather) }
-                            .collect {
-                                it.location.city = data.cityName
-                                it.location.country = data.countryName
-                                val currentWeatherCondition =
-                                    it.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
-                                currentWeather.emit(currentWeatherCondition)
-                                emit(it)
-                            }
+                        }
                     }
                 }
-            }
-    }.flowOn(Dispatchers.IO)
-
-
-    override fun refreshWeather(cityName: String): Flow<WeatherDto> = flow {
-        remoteWeatherDataSource.getWeather(cityName)
-            .onEach {
-                localWeatherDataSource.addWeather(it.weather)
-                emit(it.weather)
-            }
-            .onCompletion { cause ->
-                if (cause != null && cause !is CancellationException) {
-                    Timber.tag(TAG)
-                        .e("Error during flow completion for refreshWeather with  $cityName  $cause  in Repository")
+                is Resource.Error -> {
+                    Resource.Error("Couldn't get city name for coordinates ${geoCodedLocation.message!!}")
                 }
             }
-    }.flowOn(Dispatchers.IO)
+        } catch(e : Exception){
+            Resource.Error("Couldn't get weather data for coordinates ${e.localizedMessage}")
+        }
+    }
 
-    override fun refreshWeather(lat: Double, lon: Double): Flow<WeatherDto> = flow {
-        remoteWeatherDataSource.getWeather(lat, lon)
-            .onEach {
-                localWeatherDataSource.addWeather(it.weather)
-                emit(it.weather)
-            }
-            .onCompletion { cause ->
-                if (cause != null && cause !is CancellationException) {
-                    Timber.tag(TAG)
-                        .e("Error during flow completion for getWeather with lat= $lat  $lon   $cause  in Repository")
-                }
-            }
-    }.flowOn(Dispatchers.IO)
+
+
+//    override fun refreshWeather(cityName: String): Flow<WeatherDto> = flow {
+//        remoteWeatherDataSource.getWeather(cityName)
+//            .onEach {
+//                localWeatherDataSource.addWeather(it.weather)
+//                emit(it.weather)
+//            }
+//            .onCompletion { cause ->
+//                if (cause != null && cause !is CancellationException) {
+//                    Timber.tag(TAG)
+//                        .e("Error during flow completion for refreshWeather with  $cityName  $cause  in Repository")
+//                }
+//            }
+//    }.flowOn(Dispatchers.IO)
+//
+//    override fun refreshWeather(lat: Double, lon: Double): Flow<WeatherDto> = flow {
+//        remoteWeatherDataSource.getWeather(lat, lon)
+//            .onEach {
+//                localWeatherDataSource.addWeather(it.weather)
+//                emit(it.weather)
+//            }
+//            .onCompletion { cause ->
+//                if (cause != null && cause !is CancellationException) {
+//                    Timber.tag(TAG)
+//                        .e("Error during flow completion for getWeather with lat= $lat  $lon   $cause  in Repository")
+//                }
+//            }
+//    }.flowOn(Dispatchers.IO)
 
 
     private fun isInternetAvailable(context: Context): Boolean {
@@ -226,9 +243,5 @@ class WeatherRepositoryImpl @Inject constructor(
         val previousUnit = dataStoreRepository.getPreference()
         return unit?.name != previousUnit.name
     }
-
-
-    class DataOutdatedException(message: String) : Exception(message)
-
 
 }

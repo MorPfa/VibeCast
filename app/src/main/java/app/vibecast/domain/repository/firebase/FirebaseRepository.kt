@@ -21,7 +21,7 @@ interface FirebaseRepository {
     suspend fun deleteSong(song : FirebaseSong)
     suspend fun deleteLocation(location: FirebaseLocation)
     fun getAllImages(): Flow<FirebaseResponse<FirebaseImage>>
-    fun getAllLocations(): Flow<FirebaseResponse<FirebaseLocation>>
+    suspend fun getAllLocations(): FirebaseResponse<FirebaseLocation>
 
     fun getAllSongs(): Flow<FirebaseResponse<FirebaseSong>>
 

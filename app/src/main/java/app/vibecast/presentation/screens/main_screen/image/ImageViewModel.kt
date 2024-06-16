@@ -9,14 +9,11 @@ import androidx.lifecycle.viewModelScope
 import app.vibecast.domain.model.ImageDto
 import app.vibecast.domain.repository.image.ImagePreferenceRepository
 import app.vibecast.domain.repository.image.ImageRepository
+import app.vibecast.domain.util.Resource
 import app.vibecast.domain.util.TAGS
+import app.vibecast.presentation.state.ImageState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -29,20 +26,24 @@ class ImageViewModel @Inject constructor(
     private val imagePrefRepository: ImagePreferenceRepository,
     private val imageLoader: ImageLoader,
     private val imagePicker: ImagePicker,
-    ): ViewModel() {
+) : ViewModel() {
 
     val galleryImages: LiveData<List<ImageDto>> = imageRepository.getLocalImages().asLiveData()
 
-    val backgroundImage : MutableLiveData<String?> = imagePrefRepository.getBackgroundImage().asLiveData() as MutableLiveData<String?>
+    val backgroundImage: MutableLiveData<String?> =
+        imagePrefRepository.getBackgroundImage().asLiveData() as MutableLiveData<String?>
+
+    private val _currentImage = MutableLiveData<ImageState>()
+
+    val currentImage: LiveData<ImageState> get() = _currentImage
 
 
-
-    private fun updateBackgroundImage(url : String){
+    private fun updateBackgroundImage(url: String) {
         backgroundImage.value = url
     }
 
 
-    fun saveBackgroundImage(url : String){
+    fun saveBackgroundImage(url: String) {
         viewModelScope.launch {
             imagePrefRepository.saveBackgroundImage(url)
             updateBackgroundImage(url)
@@ -65,11 +66,15 @@ class ImageViewModel @Inject constructor(
      * Queries repository for download URL of an image
      */
 
-    fun getImageForDownload(query: String) : Flow<String> = flow {
-        imageRepository.getImageForDownload(query).collect{
-            emit(it)
+    suspend fun getImageForDownload(query: String): Resource<String> {
+        return when (val response =  imageRepository.getImageForDownload(query)){
+            is Resource.Success -> {
+                Resource.Success(data = response.data!!)
+            }
+            is Resource.Error -> {
+                Resource.Error(response.message)
+            }
         }
-
     }
 
     fun addImage(imageDto: ImageDto) {
@@ -95,10 +100,10 @@ class ImageViewModel @Inject constructor(
     /**
      * Keeps track of the number of saved images
      */
-    fun setImageCountLiveData(){
+    fun setImageCountLiveData() {
         viewModelScope.launch {
-            imageRepository.getLocalImages().collect{
-                withContext(Dispatchers.Main){
+            imageRepository.getLocalImages().collect {
+                withContext(Dispatchers.Main) {
                     _imageCount.value = it.size
                 }
             }
@@ -109,9 +114,10 @@ class ImageViewModel @Inject constructor(
     /**
      * Picks image saved on users phone by default in case none can be fetched from the remote datasource
      */
-    fun pickDefaultImage(weatherCondition: String) : Int = imagePicker.pickDefaultImage(weatherCondition)
+    fun pickDefaultImage(weatherCondition: String): Int =
+        imagePicker.pickDefaultImage(weatherCondition)
 
-    fun pickDefaultBackground() : Int = imagePicker.pickRandomImage()
+    fun pickDefaultBackground(): Int = imagePicker.pickRandomImage()
 
     fun resetBackgroundImage() {
         viewModelScope.launch {
@@ -125,11 +131,17 @@ class ImageViewModel @Inject constructor(
         imageLoader.loadUrlIntoImageView(url, imageView, false, 0)
     }
 
-    fun loadImage(query: String, weatherCondition: String): Flow<ImageDto?> = flow {
-        emitAll(imagePicker.pickImage(query, weatherCondition).flowOn(Dispatchers.IO))
-    }.catch { e ->
-        Timber.tag(TAGS.IMAGE_ERROR).e("Error loading image: $e in ViewModel")
-        throw e
+    fun loadImage(city: String, weatherCondition: String) {
+        viewModelScope.launch {
+            when (val image = imagePicker.pickImage(city, weatherCondition)) {
+                is Resource.Success -> {
+                   _currentImage.value = ImageState(image = image.data, query = weatherCondition)
+                }
+                is Resource.Error -> {
+                    _currentImage.value = ImageState(error = image.message, query = weatherCondition)
+                }
+            }
+        }
     }
 
     fun setImageLiveData(image: ImageDto) {

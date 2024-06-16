@@ -229,6 +229,132 @@ class SearchResultFragment : Fragment() {
     ): View {
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         _binding = FragmentSearchResultBinding.inflate(inflater, container, false)
+        mainViewModel.searchedWeather.distinctUntilChanged()
+            .observe(viewLifecycleOwner) { weatherState ->
+                if(weatherState.combinedData != null) {
+
+                    weatherState.combinedData.weather.currentWeather?.let { currentWeather ->
+                        val city = weatherState.combinedData.location.cityName
+                        val weather =
+                            weatherState.combinedData.weather.currentWeather?.weatherConditions?.get(
+                                0
+                            )?.mainDescription
+                        imageViewModel.loadImage(city, weather!!)
+                        musicViewModel.token.observe(viewLifecycleOwner) {
+                            if (it != null) {
+                                musicViewModel.getPlaylist(weather)
+                            }
+                        }
+
+                        binding.mainTemp.text =
+                            getString(R.string.center_temp, currentWeather.temperature)
+                        //            Current hour values
+                        binding.centerTempRow.leftWeather.text =
+                            currentWeather.weatherConditions[0].mainDescription
+                        binding.centerTempRow.leftTemp.text = currentWeather.temperature.toString()
+                        binding.centerTempRow.leftTime.text =
+                            weatherState.combinedData.weather.hourlyWeather?.get(0)?.timestamp
+                        //            Next hour values
+                        binding.centerTempRow.centerWeather.text =
+                            weatherState.combinedData.weather.hourlyWeather?.get(1)?.weatherConditions?.get(
+                                0
+                            )?.mainDescription
+                        binding.centerTempRow.centerTemp.text =
+                            weatherState.combinedData.weather.hourlyWeather?.get(1)?.temperature.toString()
+                        binding.centerTempRow.centerTime.text =
+                            weatherState.combinedData.weather.hourlyWeather?.get(1)?.timestamp.toString()
+                        //            2 hours from now values
+                        binding.centerTempRow.rightWeather.text =
+                            weatherState.combinedData.weather.hourlyWeather?.get(2)?.weatherConditions?.get(
+                                0
+                            )?.mainDescription
+                        binding.centerTempRow.rightTemp.text =
+                            weatherState.combinedData.weather.hourlyWeather?.get(2)?.temperature.toString()
+                        binding.centerTempRow.rightTime.text =
+                            weatherState.combinedData.weather.hourlyWeather?.get(2)?.timestamp.toString()
+                        binding.locationDisplay.text =
+                            getString(
+                                R.string.center_location_text,
+                                weatherState.combinedData.location.cityName,
+                                weatherState.combinedData.location.country
+                            )
+                        binding.mainWeatherWidget.feelsLikeTv.text =
+                            getString(R.string.feels_like, currentWeather.feelsLike)
+                        binding.mainWeatherWidget.windSpeedTv.text =
+                            getString(R.string.wind_speed, currentWeather.windSpeed)
+                        binding.mainWeatherWidget.visibilityValue.text =
+                            getString(R.string.visibility, currentWeather.visibility)
+
+                        binding.mainWeatherWidget.chanceOfRainTv.text =
+                            getString(
+                                R.string.chance_of_rain,
+                                weatherState.combinedData.weather.hourlyWeather?.get(0)?.chanceOfRain
+                            )
+                        binding.mainWeatherWidget.uvIndexTv.text =
+                            getString(R.string.uv_index_value, currentWeather.uvi)
+                        binding.mainWeatherWidget.humidtyTv.text =
+                            getString(
+                                R.string.humidity, currentWeather.humidity
+                            )
+                    }
+                }else {
+                    snackBar = Snackbar.make(
+                        requireView(),
+                        "ERROR",
+                        Snackbar.LENGTH_SHORT
+                    )
+
+                    val snackbarView = snackBar.view
+                    val snackbarText =
+                        snackbarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+                    snackbarText.setTextColor(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.white
+                        )
+                    )
+                    snackbarView.background =
+                        ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
+                    snackBar.show()
+
+                }
+            }
+
+
+        imageViewModel.currentImage.observe(viewLifecycleOwner) { imageState ->
+            if (imageState.image != null) {
+                imageViewModel.setImageLiveData(imageState.image)
+                imageViewModel.loadImageIntoImageView(imageState.image.urls.regular, binding.backgroundImageView)
+            }
+            if (imageState.error != null) {
+                val image = imageViewModel.pickDefaultImage(imageState.query!!)
+                binding.backgroundImageView.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        requireContext(),
+                        image
+                    )
+                )
+                snackBar = Snackbar.make(
+                    requireView(),
+                    getString(R.string.error_loading_image),
+                    Snackbar.LENGTH_SHORT
+                )
+
+                val snackbarView = snackBar.view
+                val snackbarText =
+                    snackbarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+                snackbarText.setTextColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.white
+                    )
+                )
+                snackbarView.background =
+                    ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
+                snackBar.show()
+
+            }
+        }
         musicViewModel.playerState.observe(viewLifecycleOwner) { playerState ->
             if(playerState != null){
                 updateUI(playerState)
@@ -339,53 +465,6 @@ class SearchResultFragment : Fragment() {
         snackBar.show()
     }
 
-    /**
-     * Loads and sets new image as background image when location or weather conditions change
-     */
-    private fun observeImageData(city: String, weather: String) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                imageViewModel.loadImage(city, weather)
-                    .collect { imageDto ->
-                        imageDto!!.urls.regular.let { imageUrl ->
-                            withContext(Dispatchers.Main) {
-                                imageViewModel.setImageLiveData(imageDto)
-                                imageViewModel.loadImageIntoImageView(
-                                    imageUrl, binding.backgroundImageView
-                                )
-                            }
-                        }
-                    }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    val snackBar = Snackbar.make(
-                        requireView(),
-                        getString(R.string.error_loading_image),
-                        Snackbar.LENGTH_SHORT
-                    )
-                    val image = imageViewModel.pickDefaultImage(weather)
-                    binding.backgroundImageView.setImageDrawable(
-                        ContextCompat.getDrawable(
-                            requireContext(),
-                            image
-                        )
-                    )
-                    val snackBarView = snackBar.view
-                    val snackBarText =
-                        snackBarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
-                    snackBarText.setTextColor(
-                        ContextCompat.getColor(
-                            requireContext(),
-                            R.color.white
-                        )
-                    )
-                    snackBarView.background =
-                        ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
-                    snackBar.show()
-                }
-            }
-        }
-    }
 
     private fun isSpotifyInstalled(): Boolean {
         val pm = requireContext().packageManager
@@ -423,67 +502,6 @@ class SearchResultFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mainViewModel.searchedWeather.distinctUntilChanged()
-            .observe(viewLifecycleOwner) { weatherData ->
-                weatherData?.weather?.currentWeather?.let { currentWeather ->
-                    val city = weatherData.location.cityName
-                    val weather =
-                        weatherData.weather.currentWeather?.weatherConditions?.get(0)?.mainDescription
-                    observeImageData(city, weather!!)
-                    musicViewModel.token.observe(viewLifecycleOwner) {
-                        if (it != null) {
-                            musicViewModel.getPlaylist(weather)
-                        }
-                    }
-
-                    binding.mainTemp.text =
-                        getString(R.string.center_temp, currentWeather.temperature)
-                    //            Current hour values
-                    binding.centerTempRow.leftWeather.text =
-                        currentWeather.weatherConditions[0].mainDescription
-                    binding.centerTempRow.leftTemp.text = currentWeather.temperature.toString()
-                    binding.centerTempRow.leftTime.text =
-                        weatherData.weather.hourlyWeather?.get(0)?.timestamp
-                    //            Next hour values
-                    binding.centerTempRow.centerWeather.text =
-                        weatherData.weather.hourlyWeather?.get(1)?.weatherConditions?.get(0)?.mainDescription
-                    binding.centerTempRow.centerTemp.text =
-                        weatherData.weather.hourlyWeather?.get(1)?.temperature.toString()
-                    binding.centerTempRow.centerTime.text =
-                        weatherData.weather.hourlyWeather?.get(1)?.timestamp.toString()
-                    //            2 hours from now values
-                    binding.centerTempRow.rightWeather.text =
-                        weatherData.weather.hourlyWeather?.get(2)?.weatherConditions?.get(0)?.mainDescription
-                    binding.centerTempRow.rightTemp.text =
-                        weatherData.weather.hourlyWeather?.get(2)?.temperature.toString()
-                    binding.centerTempRow.rightTime.text =
-                        weatherData.weather.hourlyWeather?.get(2)?.timestamp.toString()
-                    binding.locationDisplay.text =
-                        getString(
-                            R.string.center_location_text,
-                            weatherData.location.cityName,
-                            weatherData.location.country
-                        )
-                    binding.mainWeatherWidget.feelsLikeTv.text =
-                        getString(R.string.feels_like, currentWeather.feelsLike)
-                    binding.mainWeatherWidget.windSpeedTv.text =
-                        getString(R.string.wind_speed, currentWeather.windSpeed)
-                    binding.mainWeatherWidget.visibilityValue.text =
-                        getString(R.string.visibility, currentWeather.visibility)
-
-                    binding.mainWeatherWidget.chanceOfRainTv.text =
-                        getString(
-                            R.string.chance_of_rain,
-                            weatherData.weather.hourlyWeather?.get(0)?.chanceOfRain
-                        )
-                    binding.mainWeatherWidget.uvIndexTv.text =
-                        getString(R.string.uv_index_value, currentWeather.uvi)
-                    binding.mainWeatherWidget.humidtyTv.text =
-                        getString(
-                            R.string.humidity, currentWeather.humidity
-                        )
-                }
-            }
 
     }
 

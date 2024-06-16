@@ -4,8 +4,7 @@ import app.vibecast.data.remote_data.network.music.api.MusicService
 import app.vibecast.data.remote_data.network.music.model.PlaylistApiModel
 import app.vibecast.domain.model.PlaylistDto
 import app.vibecast.domain.model.TracksDto
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import app.vibecast.domain.util.Resource
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -22,29 +21,54 @@ class RemoteMusicDataSourceImpl @Inject constructor(
     private val musicService: MusicService,
 ) : RemoteMusicDataSource {
 
-    override fun getPlaylist(category: String, accessCode: String): Flow<PlaylistDto> = flow {
-        try {
-            val playlist = musicService.getPlaylist(category, "Bearer $accessCode").toDto()
-            emit(playlist)
+    override suspend fun getPlaylist(category: String, accessCode: String): Resource<PlaylistDto> {
+        return try {
+            val response = musicService.getPlaylist(category, "Bearer $accessCode")
+            if (response.isSuccessful) {
+                val playlist = response.body()
+                if (playlist != null) {
+                    Resource.Success(playlist.toDto())
+                } else {
+                    Resource.Error("Playlist is null")
+                }
+            } else {
+                Resource.Error(response.message())
+            }
         } catch (e: Exception) {
             Timber.tag("Spotify").d(e.localizedMessage ?: "null")
+            Resource.Error(e.localizedMessage ?: "Unknown error")
         }
     }
 
-    override fun getCurrentSong(
+    override suspend fun getCurrentSong(
         song: String,
         artist: String,
         accessCode: String,
-    ): Flow<TracksDto> = flow {
-        try {
-            val result = musicService.getCurrentSong(
+    ): Resource<TracksDto> {
+        return try {
+            val response = musicService.getCurrentSong(
                 accessCode = "Bearer $accessCode",
                 query = "$song $artist"
             )
-            Timber.tag("Spotify").d("result $result")
-            emit(TracksDto(result.tracks.href, result.tracks.items[0]))
+            if (response.isSuccessful) {
+                val responseBody = response.body()
+                if (responseBody != null) {
+                    Timber.tag("Spotify").d("response $responseBody")
+                    Resource.Success(
+                        TracksDto(
+                            responseBody.tracks.href,
+                            responseBody.tracks.items[0]
+                        )
+                    )
+                } else {
+                    Resource.Error("Response body is null")
+                }
+            } else {
+                Resource.Error(response.message())
+            }
         } catch (e: Exception) {
             Timber.tag("Spotify").d(e.localizedMessage ?: "null")
+            Resource.Error(e.localizedMessage ?: "Unknown error")
         }
     }
 

@@ -1,17 +1,11 @@
 package app.vibecast.data.remote_data.data_source.image
 
 
-import app.vibecast.data.remote_data.network.image.model.ImageApiModel
 import app.vibecast.data.remote_data.network.image.api.ImageService
+import app.vibecast.data.remote_data.network.image.model.ImageApiModel
 import app.vibecast.domain.model.ImageDto
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
-import retrofit2.HttpException
+import app.vibecast.domain.util.Resource
 import javax.inject.Inject
-import app.vibecast.data.remote_data.data_source.image.util.ImageFetchException
-import app.vibecast.data.remote_data.data_source.image.util.EmptyApiResponseException
 
 
 /**
@@ -26,25 +20,43 @@ class RemoteImageDataSourceImpl @Inject constructor(
     private val imageService: ImageService,
 ) : RemoteImageDataSource {
 
-    override fun getImages(query: String, collections : String): Flow<ImageDto> = flow {
-        try {
-            val images = imageService.getImages(query, "portrait", 1, "high", collections)
-            if (images.isNotEmpty()) {
-                emit(images[0].toImagesDto())
+    override suspend fun getImages(query: String, collections: String): Resource<ImageDto> {
+        return try {
+            val response = imageService.getImages(query, "portrait", 1, "high", collections)
+            if(response.isSuccessful){
+                val body = response.body()
+                if(body != null){
+                    val firstImage = body[0].toImagesDto()
+                    Resource.Success(data = firstImage)
+                } else {
+                    Resource.Error(message = "Response body is null")
+                }
             } else {
-                throw EmptyApiResponseException("Empty API response")
+                Resource.Error(message = response.message())
             }
-        } catch (e: EmptyApiResponseException) {
-            throw e
-        } catch (e: HttpException) {
-            throw ImageFetchException("HTTP error fetching images", e)
+        }catch (e : Exception){
+            Resource.Error(message = e.message.toString())
         }
-    }.flowOn(Dispatchers.IO)
+    }
+
+    override suspend fun getImageForDownload(query: String): Resource<String> {
+        return try {
+            val response = imageService.getImageForDownload(query)
+            if(response.isSuccessful){
+                val body = response.body()
+                if(body != null){
+                    Resource.Success(data = body.url)
+                } else {
+                    Resource.Error(message = "Response body is null")
+                }
+            } else {
+                Resource.Error(message = response.message())
+            }
+        }catch (e : Exception){
+            Resource.Error(message = e.localizedMessage)
+        }
 
 
-    override fun getImageForDownload(query: String): Flow<String> = flow {
-        val image = imageService.getImageForDownload(query).url
-        emit(image)
     }
 
     private fun ImageApiModel.toImagesDto(): ImageDto {

@@ -3,17 +3,36 @@
 TASKS:
 today:
 
-figure out if you want to save song to library or create custom playlist
-if custom playlist, need 2 custom layouts
-honestly figure out if you can even display saved songs
+fix saved location screen index issue
+fix account screen saved location issue
+fix firebase repo
+
+fix local data streams
+fix data stream for weather
+fix state variables for image, location and music saving
+
+
+
+create playlist for each location
+    - make api call to create playlist when first song is liked for location
+when song is liked, add to that playlist
+    - make api call to add song to playlist
+if can play on demand display playlist widgets with list of songs
+if cannot play on demand display playlist widgets with summary
+    - make api call to get playlists
+
+
 
 ensure all of these design guidelines are followed https://developer.spotify.com/documentation/design
 
 
-make token observation in fragment more elegant
+
 
 
 Next tasks:
+make it so that even when weather data cannot be loaded, music and images still get loaded
+move operations for profile picture saving to background thread
+make token observation in fragment more elegant
 fix song refreshing with screen rotation
 make long press on screen show bg image
 try reworking image search again
@@ -26,6 +45,8 @@ configure pro guard r8
 
 
 Nice to have's:
+
+lazy initialization for viewmodel constructor dependencies
 fix save icon issue (determine check status based off db)
 replace splash screen fragment with activity
 upload profile picture to firestore

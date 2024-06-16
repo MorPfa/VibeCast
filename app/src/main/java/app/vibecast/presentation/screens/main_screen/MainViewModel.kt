@@ -11,7 +11,6 @@ import androidx.lifecycle.viewModelScope
 import app.vibecast.domain.model.CurrentWeather
 import app.vibecast.domain.model.HourlyWeather
 import app.vibecast.domain.model.LocationDto
-import app.vibecast.domain.model.LocationWithWeatherDataDto
 import app.vibecast.domain.model.WeatherCondition
 import app.vibecast.domain.model.WeatherDto
 import app.vibecast.domain.repository.weather.LocationRepository
@@ -19,17 +18,17 @@ import app.vibecast.domain.repository.weather.Unit
 import app.vibecast.domain.repository.weather.UnitPreferenceRepository
 import app.vibecast.domain.repository.weather.WeatherRepository
 import app.vibecast.domain.util.LocationGetter
-import app.vibecast.domain.util.TAGS.WEATHER_ERROR
+import app.vibecast.domain.util.Resource
 import app.vibecast.presentation.TAG
 import app.vibecast.presentation.permissions.LocationPermissionState
 import app.vibecast.presentation.screens.main_screen.weather.LocationModel
 import app.vibecast.presentation.screens.main_screen.weather.LocationWeatherModel
 import app.vibecast.presentation.screens.main_screen.weather.WeatherModel
+import app.vibecast.presentation.state.LocationWeatherState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -51,16 +50,24 @@ class MainViewModel @Inject constructor(
 
     fun setUpLocationData() {
         viewModelScope.launch {
-            locationRepository.getLocations().collect { locations ->
-                withContext(Dispatchers.Main) { _locations.value = locations }
+            when (val locations = locationRepository.getLocations()) {
+                is Resource.Success -> {
+                    Timber.tag("WEATHER_REFORMAT").d("Locations success: ${locations.data}")
+                    withContext(Dispatchers.Main) { _locations.value = locations.data!! }
+                }
 
+                is Resource.Error -> {
+                    Timber.tag("WEATHER_REFORMAT").d("Locations error: ${locations.data}")
+                    withContext(Dispatchers.Main) { _locations.value = emptyList() }
+                }
             }
+
         }
     }
 
 
-    private val _currentWeather = MutableLiveData<LocationWeatherModel>()
-    val currentWeather: LiveData<LocationWeatherModel> get() = _currentWeather.distinctUntilChanged()
+    private val _currentWeather = MutableLiveData<LocationWeatherState>()
+    val currentWeather: LiveData<LocationWeatherState> get() = _currentWeather.distinctUntilChanged()
 
     fun checkPermissionState() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -83,10 +90,10 @@ class MainViewModel @Inject constructor(
 
     /**
      * Queries repository to fetch weather data based on users last known coordinates
-     * fetches weather data for default location if location couldnt be determined
+     * fetches weather data for default location if location couldn't be determined
      */
     @SuppressLint("MissingPermission")
-    private suspend fun handleLocationGranted() {
+    private fun handleLocationGranted() {
         locationGetter.client.lastLocation
             .addOnSuccessListener { location ->
                 if (location != null) {
@@ -111,7 +118,7 @@ class MainViewModel @Inject constructor(
             }
     }
 
-    private suspend fun handleLocationDenied() {
+    private fun handleLocationDenied() {
         try {
             fetchDefaultWeatherData()
         } catch (e: Exception) {
@@ -120,78 +127,53 @@ class MainViewModel @Inject constructor(
     }
 
 
-    private suspend fun fetchWeatherData(
+    private fun fetchWeatherData(
         lat: Double,
         lon: Double,
-        weatherLiveDataObj: MutableLiveData<LocationWeatherModel>,
+        weatherLiveDataObj: MutableLiveData<LocationWeatherState>,
     ) {
-        try {
-            weatherRepository.getWeather(lat, lon).collect { weatherData ->
-                updateWeatherData(weatherData, weatherLiveDataObj)
+        viewModelScope.launch {
+            when (val result = weatherRepository.getWeather(lat, lon)) {
+                is Resource.Success -> {
+                    val weatherData = convertWeatherDtoToWeatherModel(result.data?.weather!!)
+                    val locationData = LocationModel(
+                        result.data.weather.cityName,
+                        result.data.weather.country
+                    )
+                    updateWeatherData(
+                        LocationWeatherState(
+                            combinedData = LocationWeatherModel(
+                                location = locationData,
+                                weather = weatherData
+                            )
+                        ), weatherLiveDataObj
+                    )
+                    setCurrLocation(locationData)
+                }
+
+                is Resource.Error -> {
+                    updateWeatherData(
+                        LocationWeatherState(error = result.message!!),
+                        weatherLiveDataObj
+                    )
+                }
             }
-        } catch (e: Exception) {
-            handleError(e)
         }
+
     }
-
-
-//    private suspend fun fetchWeatherData(
-//        cityName: String,
-//        weatherLiveDataObj: MutableLiveData<LocationWeatherModel>,
-//    ) {
-//        try {
-//            weatherRepository.getWeather(cityName).collect { weatherData ->
-//                updateWeatherData(weatherData, weatherLiveDataObj)
-//            }
-//        } catch (e: Exception) {
-//            handleError(e)
-//        }
-//    }
 
     /**
      * Updates appropriate livedata object once new weather data has been fetched for it
      */
-    private suspend fun updateWeatherData(
-        locationWithWeatherDataDto: LocationWithWeatherDataDto,
-        weatherLiveDataObj: MutableLiveData<LocationWeatherModel>,
+    private fun updateWeatherData(
+        state: LocationWeatherState,
+        weatherLiveDataObj: MutableLiveData<LocationWeatherState>,
     ) {
-
-        try {
-            val weatherData = convertWeatherDtoToWeatherModel(locationWithWeatherDataDto.weather)
-            val locationData = LocationModel(
-                locationWithWeatherDataDto.location.city,
-                locationWithWeatherDataDto.location.country
-            )
+        viewModelScope.launch {
             withContext(Dispatchers.Main) {
-                weatherLiveDataObj.value =
-                    LocationWeatherModel(location = locationData, weather = weatherData)
-                setCurrLocation(locationData)
+                weatherLiveDataObj.value = state
             }
-        } catch (e: Exception) {
-            handleError(e)
-        }
-    }
 
-
-
-    private suspend fun setSearchedWeatherData(
-        locationWithWeatherDataDto: LocationWithWeatherDataDto,
-        weatherLiveDataObj: MutableLiveData<LocationWeatherModel?>,
-    ) {
-
-        try {
-            val weatherData = convertWeatherDtoToWeatherModel(locationWithWeatherDataDto.weather)
-            val locationData = LocationModel(
-                locationWithWeatherDataDto.location.city,
-                locationWithWeatherDataDto.location.country
-            )
-            withContext(Dispatchers.Main) {
-                weatherLiveDataObj.value =
-                    LocationWeatherModel(location = locationData, weather = weatherData)
-                setCurrLocation(locationData)
-            }
-        } catch (e: Exception) {
-            handleError(e)
         }
     }
 
@@ -200,91 +182,83 @@ class MainViewModel @Inject constructor(
     }
 
 
-    private val _searchedWeather = MutableLiveData<LocationWeatherModel?>()
-    val searchedWeather: LiveData<LocationWeatherModel?> get() = _searchedWeather.distinctUntilChanged()
+    private val _searchedWeather = MutableLiveData<LocationWeatherState>()
+    val searchedWeather: LiveData<LocationWeatherState> get() = _searchedWeather.distinctUntilChanged()
 
 
     fun getSearchedLocationWeather(query: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            try {
-                weatherRepository.getSearchedWeather(query).collect { data ->
-                    try {
-                        withContext(Dispatchers.Main) {
-                            if (data != null) {
-                                Timber.tag("search").d(data.toString())
-                                _emptySearchResponse.value=false
-                                setSearchedWeatherData(data, _searchedWeather)
-                                setCurrLocation(
-                                    LocationModel(
-                                        data.location.city,
-                                        data.location.country
-                                    )
-                                )
-
-                            } else {
-                                _searchedWeather.value = currentWeather.value
-                                _emptySearchResponse.value=true
-                            }
-                        }
-                    } catch (e: Exception) {
-                        Timber.tag(WEATHER_ERROR).d("$query viewmodel")
-                        throw e
+            when (val result = weatherRepository.getSearchedWeather(query)) {
+                is Resource.Success -> {
+                    val weatherData = convertWeatherDtoToWeatherModel(result.data?.weather!!)
+                    val locationData = LocationModel(
+                        result.data.location.city,
+                        result.data.location.country
+                    )
+                    Timber.tag("WEATHER_REFORMAT").d("Searched data: ${locationData.cityName}")
+                    Timber.tag("WEATHER_REFORMAT").d("Searched data: ${locationData.country}")
+                    val formattedWeatherData = LocationWeatherState(
+                        combinedData = LocationWeatherModel(
+                            location = locationData,
+                            weather = weatherData
+                        )
+                    )
+                    updateWeatherData(formattedWeatherData, _searchedWeather)
+                    withContext(Dispatchers.Main) {
+                        setCurrLocation(
+                            locationData
+                        )
                     }
                 }
-            } catch (e: Exception) {
-                Timber.tag(WEATHER_ERROR).d("$query viewmodel")
-                throw e
+
+                is Resource.Error -> {
+                    _searchedWeather.value = currentWeather.value
+
+                }
             }
         }
     }
 
 
-
     private val _emptySearchResponse = MutableLiveData<Boolean>()
     val emptySearchResponse: LiveData<Boolean> get() = _emptySearchResponse
 
-    private val _savedWeather = MutableLiveData<LocationWeatherModel>()
-    val savedWeather: LiveData<LocationWeatherModel> get() = _savedWeather.distinctUntilChanged()
+    private val _savedWeather = MutableLiveData<LocationWeatherState>()
+    val savedWeather: LiveData<LocationWeatherState> get() = _savedWeather.distinctUntilChanged()
 
 
     fun getSavedLocationWeather() {
         viewModelScope.launch {
-            try {
-                locationRepository.getLocations().collect { locations ->
-                    if (locationIndex.value != null && locations.isNotEmpty()) {
-                        try {
-                            weatherRepository.getWeather(locations[locationIndex.value!!].cityName)
-                                .distinctUntilChanged()
-                                .collect { data ->
-                                    try {
-//                                        val weatherData = convertWeatherDtoToWeatherModel(data.weather)
-//                                        val location = LocationModel(
-//                                            data.location.cityName,
-//                                            data.location.country
-//                                        )
-//                                        _savedWeather.value = LocationWeatherModel(
-//                                            location = location,
-//                                            weather = weatherData
-//                                        )
-                                        updateWeatherData(data, _savedWeather)
-                                        setCurrLocation(
-                                            LocationModel(
-                                                data.location.city,
-                                                data.location.country
-                                            )
-                                        )
-                                    } catch (e: Exception) {
-                                        handleError(e)
-                                    }
-                                }
-                        } catch (e: Exception) {
-                            handleError(e)
-                        }
-                    }
+            when(  val weatherResult =
+                weatherRepository.getWeather(locations.value!![locationIndex.value!!].cityName)){
+                is Resource.Success -> {
+                    Timber.tag("WEATHER_REFORMAT").d("weatherResult weather: ${weatherResult.data?.weather?.cityName}")
+                    Timber.tag("WEATHER_REFORMAT").d("weatherResult location: ${weatherResult.data?.location?.city}")
+                    val weatherDataModel = convertWeatherDtoToWeatherModel(weatherResult.data?.weather!!)
+                    val locationData = LocationModel(
+                        weatherResult.data.location.city,
+                        weatherResult.data.location.country
+                    )
+                    val formattedWeatherData =
+                        LocationWeatherModel(location = locationData, weather = weatherDataModel)
+                    updateWeatherData(
+                        LocationWeatherState(combinedData = formattedWeatherData),
+                        _savedWeather
+                    )
+                    setCurrLocation(
+                        LocationModel(
+                            weatherResult.data.location.city,
+                            weatherResult.data.location.country
+                        )
+                    )
+
                 }
-            } catch (e: Exception) {
-                handleError(e)
+                is Resource.Error-> {
+                    Timber.tag("WEATHER_REFORMAT").d("weatherResult error: ${weatherResult.message}")
+                }
             }
+
+
         }
     }
 
@@ -303,6 +277,7 @@ class MainViewModel @Inject constructor(
 
     fun addLocation(location: LocationModel) {
         locationRepository.addLocation(LocationDto(location.cityName, location.country))
+        setUpLocationData()
     }
 
     fun deleteLocation(location: LocationModel) {
@@ -326,14 +301,25 @@ class MainViewModel @Inject constructor(
     }
 
 
-    private suspend fun fetchDefaultWeatherData() {
-        val defaultLocation = getDefaultLocation()
-        try {
-            weatherRepository.getWeather(defaultLocation).collect { weatherData ->
-                updateWeatherData(weatherData, _currentWeather)
+    private fun fetchDefaultWeatherData() {
+        viewModelScope.launch {
+            val defaultLocation = getDefaultLocation()
+            when (val result = weatherRepository.getWeather(defaultLocation)) {
+                is Resource.Success -> {
+                    val weatherData = convertWeatherDtoToWeatherModel(result.data?.weather!!)
+                    val model = LocationWeatherModel(
+                        location = LocationModel(
+                            result.data.location.city,
+                            result.data.location.country
+                        ), weather = weatherData
+                    )
+                    updateWeatherData(LocationWeatherState(combinedData = model), _currentWeather)
+                }
+
+                is Resource.Error -> {
+                    updateWeatherData(LocationWeatherState(error = result.message), _currentWeather)
+                }
             }
-        } catch (e: Exception) {
-            handleError(e)
         }
     }
 

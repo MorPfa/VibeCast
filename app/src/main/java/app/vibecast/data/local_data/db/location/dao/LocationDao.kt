@@ -20,7 +20,7 @@ interface LocationDao {
 
     @Transaction
     @Query("SELECT * FROM locations WHERE cityName = :cityName")
-    fun getLocationWithWeather(cityName: String) : Flow<LocationWithWeatherData>
+    suspend fun getLocationWithWeather(cityName: String) : LocationWithWeatherData?
 
 
     @Transaction
@@ -32,7 +32,7 @@ interface LocationDao {
     fun getLocation(cityName : String) : Flow<LocationEntity>
 
     @Query("SELECT * FROM locations")
-    fun getLocations() : Flow<List<LocationEntity>>
+    suspend fun getLocations() : List<LocationEntity>?
 
     @Upsert
     suspend fun addLocation(locationEntity: LocationEntity)

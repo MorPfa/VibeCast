@@ -17,6 +17,7 @@ import app.vibecast.domain.util.Constants.IMAGES_REF
 import app.vibecast.domain.util.Constants.LOCATIONS_REF
 import app.vibecast.domain.util.Constants.MUSIC_REF
 import app.vibecast.domain.util.Constants.USERS_REF
+import app.vibecast.domain.util.Resource
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
@@ -263,17 +264,15 @@ class FirebaseRepositoryImpl @Inject constructor(
     }
 
     private suspend fun syncLocationData() {
-
-        locationDataSource.getLocations()
-            .combine(getAllLocations()) { localData, firebaseResponse ->
-                val localDataCount = localData.size
-                firebaseResponse.data?.let { firebaseData ->
-                    val firebaseCount = firebaseData.size
-                    Timber.tag("firebaseDB").d("Firebase data: $firebaseData")
-
+        when (val localData = locationDataSource.getLocations()) {
+            is Resource.Success -> {
+                val localDataCount = localData.data?.size!!
+                val firebaseData = getAllLocations()
+                if (firebaseData.data != null) {
+                    val firebaseCount = firebaseData.data?.size!!
                     if (localDataCount > firebaseCount) {
-                        localData.forEach { location ->
-                            val containsLocation = firebaseData.any { firebaseLocation ->
+                        localData.data.forEach { location ->
+                            val containsLocation = firebaseData.data!!.any { firebaseLocation ->
                                 firebaseLocation.city == location.city
                             }
                             if (!containsLocation) {
@@ -287,10 +286,9 @@ class FirebaseRepositoryImpl @Inject constructor(
                             }
                         }
                     }
-
                     if (localDataCount < firebaseCount) {
-                        firebaseData.forEach { location ->
-                            val containsLocation = localData.any { localLocation ->
+                        firebaseData.data!!.forEach { location ->
+                            val containsLocation = localData.data.any { localLocation ->
                                 localLocation.city == location.city
                             }
                             if (!containsLocation) {
@@ -300,13 +298,18 @@ class FirebaseRepositoryImpl @Inject constructor(
                             }
                         }
                     }
-                }
 
-                if (firebaseResponse.exception != null) {
-                    Timber.tag("firebaseDB")
-                        .e("Error fetching Firebase locations: ${firebaseResponse.exception}")
                 }
-            }.collect {}
+                if (firebaseData.exception != null) {
+                    Timber.tag("firebaseDB")
+                        .e("Error fetching Firebase locations: ${firebaseData.exception}")
+                }
+            }
+
+            is Resource.Error -> {
+                Timber.tag("firebaseDB").e("Error getting locations: ${localData.message}")
+            }
+        }
     }
 
 
@@ -559,10 +562,11 @@ class FirebaseRepositoryImpl @Inject constructor(
     }.flowOn(Dispatchers.IO)
 
 
-    override fun getAllLocations(): Flow<FirebaseResponse<FirebaseLocation>> = flow {
-        currentUser?.let { user ->
-            val locationsRef = usersRef.child(user.uid).child(LOCATIONS_REF)
-            try {
+    override suspend fun getAllLocations(): FirebaseResponse<FirebaseLocation> {
+        return try {
+            var locationList: List<FirebaseLocation> = emptyList()
+            currentUser?.let { user ->
+                val locationsRef = usersRef.child(user.uid).child(LOCATIONS_REF)
                 val dataSnapshot = suspendCoroutine<DataSnapshot> { continuation ->
                     locationsRef.get().addOnCompleteListener { task ->
                         if (task.isSuccessful) {
@@ -574,17 +578,20 @@ class FirebaseRepositoryImpl @Inject constructor(
                         }
                     }
                 }
-                val locationList = dataSnapshot.children.mapNotNull { locationSnapshot ->
+                locationList = dataSnapshot.children.mapNotNull { locationSnapshot ->
                     locationSnapshot.getValue(FirebaseLocation::class.java)
                 }
-                emit(FirebaseResponse(data = locationList))
-                Timber.tag("firebaseDB").d("Retrieved locations successfully")
-            } catch (e: Exception) {
-                emit(FirebaseResponse(exception = e))
-                Timber.tag("firebaseDB").e("Error getting locations: $e")
             }
+
+            Timber.tag("firebaseDB").d("Retrieved locations successfully")
+            FirebaseResponse(data = locationList)
+        } catch (e: Exception) {
+            Timber.tag("firebaseDB").e("Error getting locations: $e")
+            FirebaseResponse(exception = e)
+
         }
-    }.flowOn(Dispatchers.IO)
+
+    }
 
 }
 

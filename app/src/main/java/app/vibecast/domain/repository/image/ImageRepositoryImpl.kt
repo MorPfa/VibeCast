@@ -2,8 +2,8 @@ package app.vibecast.domain.repository.image
 
 import app.vibecast.data.local_data.data_source.image.LocalImageDataSource
 import app.vibecast.data.remote_data.data_source.image.RemoteImageDataSource
-import app.vibecast.data.remote_data.data_source.image.util.ImageFetchException
 import app.vibecast.domain.model.ImageDto
+import app.vibecast.domain.util.Resource
 import app.vibecast.domain.util.TAGS.COROUTINE_ERROR
 import app.vibecast.domain.util.TAGS.IMAGE_ERROR
 import kotlinx.coroutines.CoroutineScope
@@ -29,23 +29,36 @@ class ImageRepositoryImpl @Inject constructor(
     /**
      *  Gets an image from the remote datasource
      */
-    override fun getRemoteImages(query: String, collections : String): Flow<ImageDto> = flow {
-        try {
-            emitAll(remoteImageDataSource.getImages(query, collections))
+    override suspend fun getRemoteImages(query: String, collections: String): Resource<ImageDto> {
+        return try {
+            when (val data = remoteImageDataSource.getImages(query, collections)) {
+                is Resource.Success -> {
+                    data.data?.let {
+                        Resource.Success(it)
+                    } ?: Resource.Error("Data is null")
+                }
+                is Resource.Error -> {
+                    Resource.Error(data.message)
+                }
+            }
         } catch (e: Exception) {
             Timber.tag(IMAGE_ERROR).e(e.localizedMessage)
-            throw ImageFetchException("Error fetching remote images", e)
+            Resource.Error(e.localizedMessage)
         }
-    }.flowOn(Dispatchers.IO)
+    }
 
     /**
      *  Gets the download URL for an image from the remote datasource
      */
-    override fun getImageForDownload(query: String): Flow<String> = flow {
-       remoteImageDataSource.getImageForDownload(query).collect{
-            emit(it)
+    override suspend fun getImageForDownload(query: String): Resource<String>  {
+        return when (val response = remoteImageDataSource.getImageForDownload(query)){
+            is Resource.Success -> {
+                Resource.Success(data = response.data!!)
+            }
+            is Resource.Error -> {
+                Resource.Error(response.message)
+            }
         }
-
     }
 
     /**

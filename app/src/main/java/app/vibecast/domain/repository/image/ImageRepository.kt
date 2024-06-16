@@ -1,14 +1,15 @@
 package app.vibecast.domain.repository.image
 
 import app.vibecast.domain.model.ImageDto
+import app.vibecast.domain.util.Resource
 import kotlinx.coroutines.flow.Flow
 
 
 interface ImageRepository {
 
-    fun getImageForDownload(query: String) : Flow<String>
+    suspend fun getImageForDownload(query: String) : Resource<String>
 
-    fun getRemoteImages(query:  String, collections : String) : Flow<ImageDto>
+    suspend fun getRemoteImages(query:  String, collections : String) : Resource<ImageDto>
 
     fun getLocalImages() : Flow<List<ImageDto>>
 

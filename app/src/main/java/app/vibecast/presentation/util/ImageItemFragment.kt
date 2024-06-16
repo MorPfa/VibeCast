@@ -14,6 +14,7 @@ import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
@@ -25,6 +26,7 @@ import app.vibecast.presentation.screens.account_screen.AccountViewModel
 import app.vibecast.presentation.screens.main_screen.image.ImageLoader
 import app.vibecast.presentation.screens.main_screen.image.ImageSaver
 import app.vibecast.presentation.screens.main_screen.image.ImageViewModel
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import java.util.Date
 import java.util.Locale
@@ -35,7 +37,7 @@ class ImageItemFragment : DialogFragment() {
     private val imageViewModel: ImageViewModel by activityViewModels()
     private val accountViewModel: AccountViewModel by activityViewModels()
     private var image: ImageDto? = null
-
+    private lateinit var snackBar: Snackbar
 
     private lateinit var binding: FragmentImageItemBinding
     private lateinit var imageLoader: ImageLoader
@@ -139,14 +141,30 @@ class ImageItemFragment : DialogFragment() {
         }
         binding.downloadBtn.setOnClickListener {
             lifecycleScope.launch {
-                imageViewModel.getImageForDownload(image?.links!!.downloadLink).collect { image ->
-                    ImageSaver.saveImageFromUrlToGallery(
-                        image, requireContext()
+                val image = imageViewModel.getImageForDownload(image?.links!!.downloadLink)
+                if (image.data != null) {
+                    ImageSaver.saveImageFromUrlToGallery(image.data, requireContext())
+                }else {
+                    snackBar = Snackbar.make(
+                        requireView(),
+                        getString(R.string.error_loading_image),
+                        Snackbar.LENGTH_SHORT
                     )
+
+                    val snackbarView = snackBar.view
+                    val snackbarText =
+                        snackbarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+                    snackbarText.setTextColor(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.white
+                        )
+                    )
+                    snackbarView.background =
+                        ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
+                    snackBar.show()
                 }
             }
-
-
         }
         return binding.root
     }
@@ -184,6 +202,14 @@ class ImageItemFragment : DialogFragment() {
     private inline fun <reified T : Parcelable> Bundle.parcelable(key: String): T? = when {
         Build.VERSION.SDK_INT >= 33 -> getParcelable(key, T::class.java)
         else -> @Suppress("DEPRECATION") getParcelable(key) as? T
+    }
+
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        if (::snackBar.isInitialized) {
+            snackBar.dismiss()
+        }
     }
 
     companion object {

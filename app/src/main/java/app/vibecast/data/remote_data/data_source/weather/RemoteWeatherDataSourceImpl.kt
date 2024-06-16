@@ -1,6 +1,7 @@
 package app.vibecast.data.remote_data.data_source.weather
 
 import app.vibecast.BuildConfig
+import app.vibecast.data.remote_data.data_source.weather.RemoteWeatherDataSourceImpl.Companion.toWeatherDto
 import app.vibecast.data.remote_data.network.weather.api.WeatherService
 import app.vibecast.data.remote_data.network.weather.model.CityApiModel
 import app.vibecast.data.remote_data.network.weather.model.CoordinateApiModel
@@ -16,13 +17,8 @@ import app.vibecast.domain.model.WeatherCondition
 import app.vibecast.domain.model.WeatherDto
 import app.vibecast.domain.repository.weather.Unit
 import app.vibecast.domain.repository.weather.UnitPreferenceRepository
+import app.vibecast.domain.util.Resource
 import app.vibecast.domain.util.TAGS.WEATHER_ERROR
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.withContext
-import retrofit2.HttpException
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -47,192 +43,198 @@ class RemoteWeatherDataSourceImpl @Inject constructor(
 
     private var preferredUnit: Unit? = null
 
-    override fun getCity(lat: Double, lon: Double): Flow<CityApiModel> = flow {
-        try {
-            val locationInfo = weatherService.getCiyName(lat, lon, 1, BuildConfig.OWM_KEY)
-            if (locationInfo.isNotEmpty()) {
-                emit(locationInfo[0])
-            }
-        } catch (e: HttpException) {
-            Timber.tag(WEATHER_ERROR).e(e)
-            throw WeatherFetchException("HTTP error fetching weather data", e)
-        } catch (e: Exception) {
-            Timber.tag(WEATHER_ERROR).e("$e in Datasource")
-            throw WeatherFetchException("Error fetching city for lat $lat lon $lon", e)
-        }
-    }.flowOn(Dispatchers.IO)
+//    override suspend getCity(lat: Double, lon: Double): Resource<CityApiModel>  {
+//        try {
+//            val locationInfo = weatherService.getCiyName(lat, lon, 1, BuildConfig.OWM_KEY)
+//            if (locationInfo.isNotEmpty()) {
+//                emit(locationInfo[0])
+//            }
+//        } catch (e: HttpException) {
+//            Timber.tag(WEATHER_ERROR).e(e)
+//            throw WeatherFetchException("HTTP error fetching weather data", e)
+//        } catch (e: Exception) {
+//            Timber.tag(WEATHER_ERROR).e("$e in Datasource")
+//            throw WeatherFetchException("Error fetching city for lat $lat lon $lon", e)
+//        }
+//    }.flowOn(Dispatchers.IO)
 
-    override fun getCoordinates(name: String): Flow<CoordinateApiModel> = flow {
-        try {
-            val coordinatesList = withContext(Dispatchers.IO) {
-                weatherService.getCiyCoordinates(name, 1, BuildConfig.OWM_KEY)
+    override suspend fun getCity(lat: Double, lon: Double): Resource<CityApiModel> {
+        return try {
+            val response = weatherService.getCiyName(lat, lon, 1, BuildConfig.OWM_KEY)
+            if (response.isSuccessful) {
+                val responseBody = response.body()
+                if (responseBody != null) {
+                    Resource.Success(responseBody.first())
+                } else {
+                    Resource.Error("Response body is null")
+                }
+            } else {
+                Resource.Error(response.message())
             }
-            coordinatesList.firstOrNull()?.let {
-                emit(it)
-            }
-        } catch (e: HttpException) {
-            throw WeatherFetchException("HTTP error fetching weather", e)
         } catch (e: Exception) {
-            throw e
+            Resource.Error(e.localizedMessage)
         }
     }
 
-    override fun getSearchCoordinates(name: String): Flow<CoordinateApiModel?> = flow {
-        try {
-            val coordinatesList = weatherService.getCiyCoordinates(name, 1, BuildConfig.OWM_KEY)
-            emit(coordinatesList.firstOrNull())
-
-        } catch (e: HttpException) {
-            throw WeatherFetchException("HTTP error fetching weather", e)
-        } catch (e: Exception) {
-            throw e
-        }
-    }.flowOn(Dispatchers.IO)
-
-    override fun getSearchedWeather(cityName: String): Flow<LocationWithWeatherDataDto?> = flow {
-        getSearchCoordinates(cityName)
-            .collect { coordinate ->
-                coordinate?.let {
-                    try {
-                        preferredUnit = dataStoreRepository.getPreference()
-                        val weatherData: WeatherApiModel = when (preferredUnit) {
-                            Unit.IMPERIAL -> weatherService.getWeather(
-                                it.latitude,
-                                it.longitude,
-                                "minutely,daily,alerts",
-                                "imperial",
-                                BuildConfig.OWM_KEY
-                            )
-
-                            Unit.METRIC -> weatherService.getWeather(
-                                it.latitude,
-                                it.longitude,
-                                "minutely,daily,alerts",
-                                "metric",
-                                BuildConfig.OWM_KEY
-                            )
-
-                            else -> {
-                                weatherService.getWeather(
-                                    it.latitude,
-                                    it.longitude,
-                                    "minutely,daily,alerts",
-                                    "imperial",
-                                    BuildConfig.OWM_KEY
-                                )
-                            }
-                        }
-                        val combinedData = LocationWithWeatherDataDto(
-                            LocationDto(it.name, it.country),
-                            weatherData.toWeatherDto(preferredUnit)
-                        )
-                        emit(combinedData)
-                    } catch (e: Exception) {
-                        Timber.tag(WEATHER_ERROR).e("$e in DataSource")
-                    }
-                } ?: emit(null)
-            }
-    }.flowOn(Dispatchers.IO)
-
-
-    override fun getWeather(cityName: String): Flow<LocationWithWeatherDataDto> = flow {
-        getCoordinates(cityName)
-            .collect {
-                try {
-                    preferredUnit = dataStoreRepository.getPreference()
-                    val weatherData: WeatherApiModel = when (preferredUnit) {
-                        Unit.IMPERIAL -> weatherService.getWeather(
-                            it.latitude,
-                            it.longitude,
-                            "minutely,daily,alerts",
-                            "imperial",
-                            BuildConfig.OWM_KEY
-                        )
-
-                        Unit.METRIC -> weatherService.getWeather(
-                            it.latitude,
-                            it.longitude,
-                            "minutely,daily,alerts",
-                            "metric",
-                            BuildConfig.OWM_KEY
-                        )
-
-                        else -> {
-                            weatherService.getWeather(
-                                it.latitude,
-                                it.longitude,
-                                "minutely,daily,alerts",
-                                "imperial",
-                                BuildConfig.OWM_KEY
-                            )
-                        }
-                    }
-                    val combinedData = LocationWithWeatherDataDto(
-                        LocationDto(it.name, it.country),
-                        weatherData.toWeatherDto(preferredUnit)
-                    )
-                    emit(combinedData)
-                } catch (e: HttpException) {
-                    Timber.tag(WEATHER_ERROR).e("$e in DataSource")
-                    throw WeatherFetchException("HTTP error fetching weather data", e)
-                } catch (e: Exception) {
-                    Timber.tag(WEATHER_ERROR).e("$e in DataSource")
-                    throw WeatherFetchException("Error fetching weather data for $cityName", e)
+    override suspend fun getCoordinates(name: String): Resource<CoordinateApiModel> {
+        return try {
+            val response = weatherService.getCiyCoordinates(name, 1, BuildConfig.OWM_KEY)
+            if (response.isSuccessful) {
+                val responseBody = response.body()
+                if (responseBody != null) {
+                    Resource.Success(responseBody.first())
+                } else {
+                    Resource.Error("Response body is null")
                 }
+            } else {
+                Resource.Error(response.message())
             }
-    }.flowOn(Dispatchers.IO)
+        } catch (e: Exception) {
+            Resource.Error(e.localizedMessage)
+        }
+    }
 
+    override suspend fun getSearchCoordinates(name: String): Resource<CoordinateApiModel> {
+        return try {
+            val response = weatherService.getCiyCoordinates(name, 1, BuildConfig.OWM_KEY)
+            if (response.isSuccessful) {
+                val responseBody = response.body()
+                if (responseBody != null) {
+                    Resource.Success(responseBody.first())
+                } else {
+                    Resource.Error("Response body is null")
+                }
+            } else {
+                Resource.Error(response.message())
+            }
+        } catch (e: Exception) {
+            Resource.Error(e.localizedMessage)
+        }
+    }
 
-    override fun getWeather(lat: Double, lon: Double): Flow<LocationWithWeatherDataDto> = flow {
-        try {
-            preferredUnit = dataStoreRepository.getPreference()
-            val weatherData: WeatherApiModel = when (preferredUnit) {
-                Unit.IMPERIAL -> weatherService.getWeather(
-                    lat,
-                    lon,
-                    "minutely,daily,alerts",
-                    "imperial",
-                    BuildConfig.OWM_KEY
-                )
-
-                Unit.METRIC -> weatherService.getWeather(
-                    lat,
-                    lon,
-                    "minutely,daily,alerts",
-                    "metric",
-                    BuildConfig.OWM_KEY
-                )
-
-                else -> {
-                    weatherService.getWeather(
-                        lat,
-                        lon,
+    override suspend fun getSearchedWeather(cityName: String): Resource<LocationWithWeatherDataDto> {
+        return try {
+            val correctUnit = chooseUnit()
+            when (val coordinates = getSearchCoordinates(cityName)) {
+                is Resource.Success -> {
+                    val response = weatherService.getWeather(
+                        coordinates.data?.latitude!!,
+                        coordinates.data.longitude,
                         "minutely,daily,alerts",
-                        "imperial",
+                        correctUnit,
                         BuildConfig.OWM_KEY
                     )
+                    if (response.isSuccessful) {
+                        val body = response.body()
+                        if (body != null) {
+                            val formattedDto = LocationWithWeatherDataDto(
+                                LocationDto(coordinates.data.name, coordinates.data.country),
+                                body.toWeatherDto(preferredUnit)
+                            )
+                            Resource.Success(data = formattedDto)
+                        } else {
+                            Resource.Error("Response body is empty")
+                        }
+                    } else {
+                        Resource.Error(message = response.message())
+                    }
+                }
+
+                is Resource.Error -> {
+                    Resource.Error(message = coordinates.message)
                 }
             }
-            emit(
-                LocationWithWeatherDataDto(
-                    LocationDto(
-                        weatherData.cityName, ""
-                    ),
-                    weatherData.toWeatherDto(preferredUnit)
-                )
-            )
-        } catch (e: HttpException) {
-            Timber.tag(WEATHER_ERROR).e("$e in DataSource")
-            throw WeatherFetchException("HTTP error fetching weather data", e)
+        } catch (e: Exception) {
+            Resource.Error(e.localizedMessage)
+        }
+    }
+
+
+    override suspend fun getWeather(cityName: String): Resource<LocationWithWeatherDataDto> {
+        return try {
+            val correctUnit = chooseUnit()
+            when (val coordinates = getCoordinates(cityName)) {
+                is Resource.Success -> {
+                    val response = weatherService.getWeather(
+                        coordinates.data?.latitude!!,
+                        coordinates.data.longitude,
+                        "minutely,daily,alerts",
+                        correctUnit,
+                        BuildConfig.OWM_KEY
+                    )
+                    if (response.isSuccessful) {
+                        val body = response.body()
+                        if (body != null) {
+                            val formattedDto = LocationWithWeatherDataDto(
+                                LocationDto(coordinates.data.name, coordinates.data.country),
+                                body.toWeatherDto(preferredUnit)
+                            )
+                            Resource.Success(formattedDto)
+                        } else {
+                            Resource.Error("Response body is empty")
+                        }
+                    } else {
+                        Resource.Error(message = response.message())
+                    }
+                }
+
+                is Resource.Error -> {
+                    Resource.Error(message = coordinates.message)
+                }
+            }
         } catch (e: Exception) {
             Timber.tag(WEATHER_ERROR).e("$e in DataSource")
-            throw WeatherFetchException("Error fetching weather data", e)
+            Resource.Error(e.localizedMessage)
         }
-    }.flowOn(Dispatchers.IO)
+    }
+
+    private suspend fun chooseUnit(): String {
+        preferredUnit = dataStoreRepository.getPreference()
+        return when (preferredUnit) {
+            Unit.IMPERIAL -> "imperial"
+
+            Unit.METRIC -> "metric"
+
+            else -> "imperial"
+        }
+    }
 
 
-    class WeatherFetchException(message: String, cause: Throwable? = null) :
-        Exception(message, cause)
+    override suspend fun getWeather(
+        lat: Double,
+        lon: Double,
+    ): Resource<LocationWithWeatherDataDto> {
+        return try {
+            val correctUnit = chooseUnit()
+            val response = weatherService.getWeather(
+                lat,
+                lon,
+                "minutely,daily,alerts",
+                correctUnit,
+                BuildConfig.OWM_KEY
+            )
+            if (response.isSuccessful) {
+                val body = response.body()
+                if (body != null) {
+                    Resource.Success(
+                        LocationWithWeatherDataDto(
+                            LocationDto(
+                                body.cityName, ""
+                            ),
+                            body.toWeatherDto(preferredUnit)
+                        )
+                    )
+                } else {
+                    Resource.Error("Response body is empty")
+                }
+            } else {
+                Resource.Error(response.message())
+            }
+        } catch (e: Exception) {
+            Timber.tag(WEATHER_ERROR).e("$e in DataSource")
+            Resource.Error(e.localizedMessage)
+        }
+    }
 
 
     companion object {

@@ -8,11 +8,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import app.vibecast.BuildConfig
-import app.vibecast.data.remote_data.network.music.model.Items
 import app.vibecast.domain.model.SongDto
 import app.vibecast.domain.repository.music.MusicPreferenceRepository
 import app.vibecast.domain.repository.music.MusicRepository
 import app.vibecast.domain.repository.music.WeatherCondition
+import app.vibecast.domain.util.Resource
+import app.vibecast.presentation.state.SongState
 import app.vibecast.presentation.util.GenreFormatter
 import com.google.gson.GsonBuilder
 import com.spotify.android.appremote.api.ConnectionParams
@@ -68,8 +69,8 @@ class MusicViewModel @Inject constructor(
         }
     }.asLiveData()
 
-    private var _currentSong = MutableLiveData<Items>()
-    val currentSong: LiveData<Items> get() = _currentSong
+    private var _currentSong = MutableLiveData<SongState>()
+    val currentSong: LiveData<SongState> get() = _currentSong
 
     private suspend fun getGenre(weather: String): String {
         val category = when (weather) {
@@ -99,12 +100,22 @@ class MusicViewModel @Inject constructor(
 
     fun getCurrentSong(song: String, artist: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            musicRepository.getCurrentSong(song, artist, token.value!!).collect { result ->
-                Timber.tag("music_db").d("result ${result.items.externalUrls.spotify}")
-                withContext(Dispatchers.Main) {
-                    _currentSong.value = result.items
+            when (val result = musicRepository.getCurrentSong(song, artist, token.value!!)) {
+                is Resource.Success -> {
+                    result.data?.let {
+                        Timber.tag("music_db").d("result ${result.data.items.externalUrls.spotify}")
+                        withContext(Dispatchers.Main) {
+                            _currentSong.value = SongState(song = result.data.items)
+                        }
+                    }
                 }
 
+                is Resource.Error -> {
+                    withContext(Dispatchers.Main) {
+                        _currentSong.value = SongState(error = "Couldn't get song info")
+                    }
+
+                }
             }
         }
     }
@@ -113,26 +124,32 @@ class MusicViewModel @Inject constructor(
         try {
             viewModelScope.launch {
                 val genre = getGenre(weather)
-                musicRepository.getPlaylist(genre, token.value!!).collect { result ->
-                    val playlists = result.items
-                    _currentPlaylist.value = result.items[0].externalUrls.spotify
-                    val index = playlists.indices.random()
-                    Timber.tag("Spotify").d("Playlist name : ${playlists[index].name}")
-                    val lofiPlaylist =
-                        playlists.find { it.name.contains("lofi", ignoreCase = true) }
-                    if (lofiPlaylist != null) {
-                        Timber.tag("Spotify").d("Lofi playlist found: ${lofiPlaylist.name}")
-                        playPlaylist(lofiPlaylist.uri)
+                when (val result = musicRepository.getPlaylist(genre, token.value!!)) {
+                    is Resource.Success -> {
+                        result.data?.let { playlists ->
+                            _currentPlaylist.value = result.data.items[0].externalUrls.spotify
+                            val index = playlists.items.indices.random()
+                            Timber.tag("Spotify")
+                                .d("Playlist name : ${playlists.items[index].name}")
+                            val lofiPlaylist =
+                                playlists.items.find { it.name.contains("lofi", ignoreCase = true) }
+                            if (lofiPlaylist != null) {
+                                Timber.tag("Spotify").d("Lofi playlist found: ${lofiPlaylist.name}")
+                                playPlaylist(lofiPlaylist.uri)
 
-                    } else {
-                        Timber.tag("Spotify").d("No lofi playlist found")
-                        playPlaylist(playlists[index].uri)
+                            } else {
+                                Timber.tag("Spotify").d("No lofi playlist found")
+                                playPlaylist(playlists.items[index].uri)
 
+                            }
+                        }
                     }
 
+                    is Resource.Error -> {
+
+                    }
                 }
             }
-
         } catch (e: Exception) {
             Timber.tag("Spotify").d(e.localizedMessage ?: "null")
         }
@@ -203,6 +220,7 @@ class MusicViewModel @Inject constructor(
                     spotifyAppRemote = appRemote
                     Timber.tag("Spotify").d("Connected! Yay!")
                     subscribeToPlayerState()
+                    _token.value = token
                     spotifyAppRemote?.let {
                         it.userApi.capabilities.setResultCallback { capabilities ->
                             Timber.tag("Spotify").d("Capabilities $capabilities")
@@ -256,7 +274,6 @@ class MusicViewModel @Inject constructor(
                     }
                 }
         }
-
     }
 
 
@@ -275,8 +292,6 @@ class MusicViewModel @Inject constructor(
             .setResultCallback { logMessage("skip previous") }
             .setErrorCallback(errorCallback)
     }
-
-
 
 
     private fun subscribeToPlayerState() {
@@ -349,7 +364,6 @@ class MusicViewModel @Inject constructor(
     }
 
 
-
     override fun onCleared() {
         super.onCleared()
         spotifyAppRemote.let { remote ->
@@ -360,6 +374,9 @@ class MusicViewModel @Inject constructor(
     }
 
     private val errorCallback = { throwable: Throwable ->
+        if(spotifyAppRemote?.isConnected == false){
+            connectToSpotify(token.value!!)
+        }
         if (throwable is RemoteClientException) {
             logError(throwable)
         } else {

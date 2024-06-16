@@ -21,7 +21,7 @@ class SyncSavedLocationsWeatherWorker @Inject constructor(
 
     override suspend fun doWork(): Result {
         return try {
-            locationRepository.refreshLocationWeather()
+//            locationRepository.refreshLocationWeather()
             Result.success()
         } catch (e: Exception) {
             Result.failure()
