@@ -24,7 +24,6 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.distinctUntilChanged
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import app.vibecast.R
 import app.vibecast.databinding.FragmentSearchResultBinding
@@ -38,9 +37,6 @@ import com.spotify.protocol.types.Image
 import com.spotify.protocol.types.PlayerState
 import com.spotify.protocol.types.Repeat
 import com.spotify.sdk.android.auth.AuthorizationClient
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 
 class SearchResultFragment : Fragment() {
@@ -231,7 +227,7 @@ class SearchResultFragment : Fragment() {
         _binding = FragmentSearchResultBinding.inflate(inflater, container, false)
         mainViewModel.searchedWeather.distinctUntilChanged()
             .observe(viewLifecycleOwner) { weatherState ->
-                if(weatherState.combinedData != null) {
+                if(weatherState.combinedData != null && weatherState.error == null) {
 
                     weatherState.combinedData.weather.currentWeather?.let { currentWeather ->
                         val city = weatherState.combinedData.location.cityName
@@ -298,25 +294,100 @@ class SearchResultFragment : Fragment() {
                             )
                     }
                 }else {
+                    if(weatherState.combinedData != null) {
+                        weatherState.combinedData.weather.currentWeather?.let { currentWeather ->
+                            val city = weatherState.combinedData.location.cityName
+                            val weather =
+                                weatherState.combinedData.weather.currentWeather?.weatherConditions?.get(
+                                    0
+                                )?.mainDescription
+                            imageViewModel.loadImage(city, weather!!)
+                            musicViewModel.token.observe(viewLifecycleOwner) {
+                                if (it != null) {
+                                    musicViewModel.getPlaylist(weather)
+                                }
+                            }
+
+                            binding.mainTemp.text =
+                                getString(R.string.center_temp, currentWeather.temperature)
+                            //            Current hour values
+                            binding.centerTempRow.leftWeather.text =
+                                currentWeather.weatherConditions[0].mainDescription
+                            binding.centerTempRow.leftTemp.text =
+                                currentWeather.temperature.toString()
+                            binding.centerTempRow.leftTime.text =
+                                weatherState.combinedData.weather.hourlyWeather?.get(0)?.timestamp
+                            //            Next hour values
+                            binding.centerTempRow.centerWeather.text =
+                                weatherState.combinedData.weather.hourlyWeather?.get(1)?.weatherConditions?.get(
+                                    0
+                                )?.mainDescription
+                            binding.centerTempRow.centerTemp.text =
+                                weatherState.combinedData.weather.hourlyWeather?.get(1)?.temperature.toString()
+                            binding.centerTempRow.centerTime.text =
+                                weatherState.combinedData.weather.hourlyWeather?.get(1)?.timestamp.toString()
+                            //            2 hours from now values
+                            binding.centerTempRow.rightWeather.text =
+                                weatherState.combinedData.weather.hourlyWeather?.get(2)?.weatherConditions?.get(
+                                    0
+                                )?.mainDescription
+                            binding.centerTempRow.rightTemp.text =
+                                weatherState.combinedData.weather.hourlyWeather?.get(2)?.temperature.toString()
+                            binding.centerTempRow.rightTime.text =
+                                weatherState.combinedData.weather.hourlyWeather?.get(2)?.timestamp.toString()
+                            binding.locationDisplay.text =
+                                getString(
+                                    R.string.center_location_text,
+                                    weatherState.combinedData.location.cityName,
+                                    weatherState.combinedData.location.country
+                                )
+                            binding.mainWeatherWidget.feelsLikeTv.text =
+                                getString(R.string.feels_like, currentWeather.feelsLike)
+                            binding.mainWeatherWidget.windSpeedTv.text =
+                                getString(R.string.wind_speed, currentWeather.windSpeed)
+                            binding.mainWeatherWidget.visibilityValue.text =
+                                getString(R.string.visibility, currentWeather.visibility)
+
+                            binding.mainWeatherWidget.chanceOfRainTv.text =
+                                getString(
+                                    R.string.chance_of_rain,
+                                    weatherState.combinedData.weather.hourlyWeather?.get(0)?.chanceOfRain
+                                )
+                            binding.mainWeatherWidget.uvIndexTv.text =
+                                getString(R.string.uv_index_value, currentWeather.uvi)
+                            binding.mainWeatherWidget.humidtyTv.text =
+                                getString(
+                                    R.string.humidity, currentWeather.humidity
+                                )
+                        }
+                    }
                     snackBar = Snackbar.make(
                         requireView(),
-                        "ERROR",
+                        weatherState.error.toString(),
                         Snackbar.LENGTH_SHORT
                     )
 
-                    val snackbarView = snackBar.view
-                    val snackbarText =
-                        snackbarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
-                    snackbarText.setTextColor(
+                    val snackBarView = snackBar.view
+                    val snackBarText =
+                        snackBarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+                    snackBarText.setTextColor(
                         ContextCompat.getColor(
                             requireContext(),
                             R.color.white
                         )
                     )
-                    snackbarView.background =
+                    snackBarView.background =
                         ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
+                    val params = snackBarView.layoutParams as FrameLayout.LayoutParams
+                    params.gravity = Gravity.TOP
+                    snackBarView.layoutParams = params
+                    val actionBarHeight = requireActivity().actionBar?.height
+                    params.setMargins(0, actionBarHeight ?: 200, 0, 0)
+                    snackBarView.layoutParams = params
+                    if (resources.configuration.screenLayout and Configuration.SCREENLAYOUT_SIZE_MASK >= Configuration.SCREENLAYOUT_SIZE_LARGE) {
+                        params.gravity = Gravity.CENTER_HORIZONTAL
+                    }
                     snackBar.show()
-
                 }
             }
 
@@ -362,37 +433,6 @@ class SearchResultFragment : Fragment() {
         }
         musicViewModel.userCapabilitiesState.observe(viewLifecycleOwner) { canPlayOnDemand ->
             updateCapabilities(canPlayOnDemand)
-        }
-        mainViewModel.emptySearchResponse.observe(viewLifecycleOwner) { noData ->
-            if (noData) {
-                snackBar = Snackbar.make(
-                    requireView(),
-                    getString(R.string.invalid_query_input),
-                    Snackbar.LENGTH_SHORT
-                )
-
-                val snackBarView = snackBar.view
-                val snackBarText =
-                    snackBarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
-                snackBarText.setTextColor(
-                    ContextCompat.getColor(
-                        requireContext(),
-                        R.color.white
-                    )
-                )
-                snackBarView.background =
-                    ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
-                val params = snackBarView.layoutParams as FrameLayout.LayoutParams
-                params.gravity = Gravity.TOP
-                snackBarView.layoutParams = params
-                val actionBarHeight = requireActivity().actionBar?.height
-                params.setMargins(0, actionBarHeight ?: 200, 0, 0)
-                snackBarView.layoutParams = params
-                if (resources.configuration.screenLayout and Configuration.SCREENLAYOUT_SIZE_MASK >= Configuration.SCREENLAYOUT_SIZE_LARGE) {
-                    params.gravity = Gravity.CENTER_HORIZONTAL
-                }
-                snackBar.show()
-            }
         }
         trackProgressBar =
             TrackProgressBar(binding.musicWidget.progressBar) { seekToPosition: Long ->
@@ -498,11 +538,6 @@ class SearchResultFragment : Fragment() {
         } else {
             return true
         }
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
     }
 
 

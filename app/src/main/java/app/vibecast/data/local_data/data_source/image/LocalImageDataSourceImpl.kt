@@ -3,6 +3,7 @@ package app.vibecast.data.local_data.data_source.image
 import app.vibecast.data.local_data.db.image.dao.ImageDao
 import app.vibecast.data.local_data.db.image.model.ImageEntity
 import app.vibecast.domain.model.ImageDto
+import app.vibecast.domain.util.Resource
 import app.vibecast.domain.util.TAGS.COROUTINE_ERROR
 import app.vibecast.domain.util.TAGS.DB_ERROR
 import kotlinx.coroutines.Dispatchers
@@ -13,6 +14,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.cancellation.CancellationException
+
 /**
  * Implementation of [LocalImageDataSource]
  *
@@ -35,6 +37,7 @@ class LocalImageDataSourceImpl @Inject constructor(
 
         }
     }
+
 
     override suspend fun addImage(image: ImageDto) {
         withContext(Dispatchers.IO) {
@@ -75,8 +78,7 @@ class LocalImageDataSourceImpl @Inject constructor(
             } catch (e: CancellationException) {
                 Timber.tag(COROUTINE_ERROR).e("Coroutine cancelled $e")
                 throw e
-            }
-            catch(e: Exception) {
+            } catch (e: Exception) {
                 Timber.tag(DB_ERROR).e("Error deleting image from db")
                 throw e
             }
@@ -104,14 +106,25 @@ class LocalImageDataSourceImpl @Inject constructor(
             } catch (e: CancellationException) {
                 Timber.tag(COROUTINE_ERROR).e("Coroutine cancelled $e")
                 throw e
-            }
-            catch(e: Exception) {
+            } catch (e: Exception) {
                 Timber.tag(DB_ERROR).e("Error deleting image from db")
                 throw e
             }
         }
     }
 
+    override suspend fun getImagesForSync(): Resource<List<ImageDto>> {
+        return try {
+            val imageList = imageDao.getImagesForSync()
+            if (imageList != null) {
+                Resource.Success(data = imageList.map { it.toImageDto() })
+            } else {
+                Resource.Error(message = "No images found")
+            }
+        } catch (e: Exception) {
+            Resource.Error(message = "Error occurred while fetching images: ${e.localizedMessage}")
+        }
+    }
 
     private fun ImageEntity.toImageDto(): ImageDto {
         return ImageDto(

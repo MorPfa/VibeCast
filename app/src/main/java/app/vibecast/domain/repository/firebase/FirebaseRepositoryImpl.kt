@@ -36,6 +36,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.resume
@@ -64,13 +65,15 @@ class FirebaseRepositoryImpl @Inject constructor(
 
     override suspend fun syncData() {
         coroutineScope {
-            val locationDeferred = async { syncLocationData() }
-            val imageDeferred = async { syncImageData() }
-            val musicDeferred = async { syncMusicData() }
+            withContext(Dispatchers.IO){
+                val locationDeferred = async { syncLocationData() }
+                val imageDeferred = async { syncImageData() }
+                val musicDeferred = async { syncMusicData() }
 
-            locationDeferred.await()
-            imageDeferred.await()
-            musicDeferred.await()
+                locationDeferred.await()
+                imageDeferred.await()
+                musicDeferred.await()
+            }
         }
     }
 
@@ -193,40 +196,35 @@ class FirebaseRepositoryImpl @Inject constructor(
     }
 
     private suspend fun syncImageData() {
-        imageDataSource.getImages()
-            .combine(getAllImages()) { localData, firebaseResponse ->
-                val localDataCount = localData.size
-                firebaseResponse.data?.let { firebaseData ->
-                    val firebaseCount = firebaseData.size
-                    if (localDataCount > firebaseCount) {
-                        localData.forEach { image ->
-                            val containsLocation = firebaseData.any { firebaseImage ->
-                                firebaseImage.imageId == image.id
-                            }
-                            if (!containsLocation) {
-                                addImage(
-                                    FirebaseImage(
-                                        imageId = image.id,
-                                        imageUrl = image.urls.regular,
-                                        timestamp = image.timestamp,
-                                        userLink = image.links.user,
-                                        downloadUrl = image.links.downloadLink,
-                                        userName = image.user.userName,
-                                        userRealName = image.user.name,
-                                        portfolioUrl = image.user.portfolioUrl ?: ""
-                                    )
-                                )
-                            }
-                        }
-                    }
+        when (val localData = imageDataSource.getImagesForSync()) {
+            is Resource.Success -> {
+                val cachedImages = localData.data.orEmpty()
+                val firebaseImages = getAllImages().data.orEmpty()
+                if (cachedImages.size > firebaseImages.size) {
+                    val firebaseImageIds = firebaseImages.map { it.imageId }.toSet()
+                    val imagesToAdd = cachedImages.filterNot { it.id in firebaseImageIds }
 
-                    if (localDataCount < firebaseCount) {
-                        firebaseData.forEach { image ->
-                            val containsLocation = localData.any { localImage ->
-                                localImage.id == image.imageId
-                            }
-                            if (!containsLocation) {
-                                imageDataSource.addImage(
+                    imagesToAdd.forEach { image ->
+                        addImage(
+                            FirebaseImage(
+                                imageId = image.id,
+                                imageUrl = image.urls.regular,
+                                timestamp = image.timestamp,
+                                userLink = image.links.user,
+                                downloadUrl = image.links.downloadLink,
+                                userName = image.user.userName,
+                                userRealName = image.user.name,
+                                portfolioUrl = image.user.portfolioUrl ?: ""
+                            )
+                        )
+                    }
+                }
+                if(firebaseImages.size > cachedImages.size){
+                    val cachedImageIds = cachedImages.map { it.id }.toSet()
+                    val imagesToAdd = firebaseImages.filterNot { it.imageId in cachedImageIds }
+
+                    imagesToAdd.forEach { image ->
+                        imageDataSource.addImage(
                                     ImageDto(
                                         id = image.imageId,
                                         description = null,
@@ -251,61 +249,45 @@ class FirebaseRepositoryImpl @Inject constructor(
                                     )
                                 )
 
-                            }
-                        }
                     }
                 }
-
-                if (firebaseResponse.exception != null) {
-                    Timber.tag("firebaseDB")
-                        .e("Error fetching Firebase locations: ${firebaseResponse.exception}")
-                }
-            }.collect {}
+            }
+            is Resource.Error -> {
+                Timber.tag("firebaseDB").e("Error getting images: ${localData.message}")
+            }
+        }
     }
 
     private suspend fun syncLocationData() {
         when (val localData = locationDataSource.getLocations()) {
             is Resource.Success -> {
-                val localDataCount = localData.data?.size!!
-                val firebaseData = getAllLocations()
-                if (firebaseData.data != null) {
-                    val firebaseCount = firebaseData.data?.size!!
-                    if (localDataCount > firebaseCount) {
-                        localData.data.forEach { location ->
-                            val containsLocation = firebaseData.data!!.any { firebaseLocation ->
-                                firebaseLocation.city == location.city
-                            }
-                            if (!containsLocation) {
-                                addLocation(
-                                    FirebaseLocation(
-                                        id = location.city,
-                                        city = location.city,
-                                        country = location.country
-                                    )
-                                )
-                            }
-                        }
-                    }
-                    if (localDataCount < firebaseCount) {
-                        firebaseData.data!!.forEach { location ->
-                            val containsLocation = localData.data.any { localLocation ->
-                                localLocation.city == location.city
-                            }
-                            if (!containsLocation) {
-                                locationDataSource.addLocation(
-                                    LocationDto(city = location.city, country = location.country)
-                                )
-                            }
-                        }
-                    }
+                val cachedLocations = localData.data.orEmpty()
+                val firebaseLocations = getAllLocations().data.orEmpty()
+                if (cachedLocations.size > firebaseLocations.size) {
+                    val firebaseCities = firebaseLocations.map { it.city }.toSet()
+                    val locationsToAdd = cachedLocations.filterNot { it.city in firebaseCities }
 
+                    locationsToAdd.forEach { location ->
+                        addLocation(
+                            FirebaseLocation(
+                                id = location.city,
+                                city = location.city,
+                                country = location.country
+                            )
+                        )
+                    }
                 }
-                if (firebaseData.exception != null) {
-                    Timber.tag("firebaseDB")
-                        .e("Error fetching Firebase locations: ${firebaseData.exception}")
+                if(firebaseLocations.size > cachedLocations.size){
+                    val cachedCities = cachedLocations.map { it.city }.toSet()
+                    val locationsToAdd = firebaseLocations.filterNot { it.city in cachedCities }
+
+                    locationsToAdd.forEach { location ->
+                        locationDataSource.addLocation(
+                            LocationDto(city = location.city, country = location.country)
+                        )
+                    }
                 }
             }
-
             is Resource.Error -> {
                 Timber.tag("firebaseDB").e("Error getting locations: ${localData.message}")
             }
@@ -534,12 +516,13 @@ class FirebaseRepositoryImpl @Inject constructor(
     }
 
 
-    override fun getAllImages(): Flow<FirebaseResponse<FirebaseImage>> = flow {
-        currentUser?.let { user ->
-            val imagesRef = usersRef.child(user.uid).child(IMAGES_REF)
-            try {
+    override suspend fun getAllImages(): FirebaseResponse<FirebaseImage> {
+        return try {
+            var imageList: List<FirebaseImage> = emptyList()
+            currentUser?.let { user ->
+                val imageRef = usersRef.child(user.uid).child(IMAGES_REF)
                 val dataSnapshot = suspendCoroutine<DataSnapshot> { continuation ->
-                    imagesRef.get().addOnCompleteListener { task ->
+                    imageRef.get().addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             continuation.resume(task.result)
                         } else {
@@ -549,17 +532,19 @@ class FirebaseRepositoryImpl @Inject constructor(
                         }
                     }
                 }
-                val imagesList = dataSnapshot.children.mapNotNull { imageSnapShot ->
-                    imageSnapShot.getValue(FirebaseImage::class.java)
+                imageList = dataSnapshot.children.mapNotNull { imageSnapshot ->
+                    imageSnapshot.getValue(FirebaseImage::class.java)
                 }
-                emit(FirebaseResponse(data = imagesList))
-                Timber.tag("firebaseDB").d("Retrieved images successfully")
-            } catch (e: Exception) {
-                emit(FirebaseResponse(exception = e))
-                Timber.tag("firebaseDB").e("Error getting images: $e")
             }
+
+            Timber.tag("firebaseDB").d("Retrieved images successfully")
+            FirebaseResponse(data = imageList)
+        } catch (e: Exception) {
+            Timber.tag("firebaseDB").e("Error getting images: $e")
+            FirebaseResponse(exception = e)
+
         }
-    }.flowOn(Dispatchers.IO)
+    }
 
 
     override suspend fun getAllLocations(): FirebaseResponse<FirebaseLocation> {

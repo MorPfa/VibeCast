@@ -48,26 +48,50 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
 
+    private val _currentWeather = MutableLiveData<LocationWeatherState>()
+    val currentWeather: LiveData<LocationWeatherState> get() = _currentWeather.distinctUntilChanged()
+
+
+    private val _locationPermissionState =
+        MutableStateFlow<LocationPermissionState>(LocationPermissionState.Granted)
+    private val locationPermissionState: StateFlow<LocationPermissionState> =
+        _locationPermissionState
+
+
+    private val _searchedWeather = MutableLiveData<LocationWeatherState>()
+    val searchedWeather: LiveData<LocationWeatherState> get() = _searchedWeather.distinctUntilChanged()
+
+
+    private val _savedWeather = MutableLiveData<LocationWeatherState>()
+    val savedWeather: LiveData<LocationWeatherState> get() = _savedWeather.distinctUntilChanged()
+
+
+    private var _locations = MutableLiveData<List<LocationModel>>()
+    val locations: LiveData<List<LocationModel>> get() = _locations
+
+
+    private var _currentLocation = MutableLiveData<LocationModel>()
+    val currentLocation: LiveData<LocationModel> get() = _currentLocation.distinctUntilChanged()
+
+
+    private var _locationIndex = MutableLiveData(0)
+    val locationIndex: LiveData<Int> get() = _locationIndex
+
+
     fun setUpLocationData() {
         viewModelScope.launch {
             when (val locations = locationRepository.getLocations()) {
                 is Resource.Success -> {
-                    Timber.tag("WEATHER_REFORMAT").d("Locations success: ${locations.data}")
                     withContext(Dispatchers.Main) { _locations.value = locations.data!! }
                 }
 
                 is Resource.Error -> {
-                    Timber.tag("WEATHER_REFORMAT").d("Locations error: ${locations.data}")
                     withContext(Dispatchers.Main) { _locations.value = emptyList() }
                 }
             }
-
         }
     }
 
-
-    private val _currentWeather = MutableLiveData<LocationWeatherState>()
-    val currentWeather: LiveData<LocationWeatherState> get() = _currentWeather.distinctUntilChanged()
 
     fun checkPermissionState() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -78,10 +102,6 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private val _locationPermissionState =
-        MutableStateFlow<LocationPermissionState>(LocationPermissionState.Granted)
-    private val locationPermissionState: StateFlow<LocationPermissionState> =
-        _locationPermissionState
 
     fun updatePermissionState(state: LocationPermissionState) {
         _locationPermissionState.value = state
@@ -101,7 +121,6 @@ class MainViewModel @Inject constructor(
                         try {
                             fetchWeatherData(location.latitude, location.longitude, _currentWeather)
                         } catch (e: Exception) {
-                            // Handle specific error for fetching weather data
                             handleError(e)
                         }
                     }
@@ -132,7 +151,7 @@ class MainViewModel @Inject constructor(
         lon: Double,
         weatherLiveDataObj: MutableLiveData<LocationWeatherState>,
     ) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             when (val result = weatherRepository.getWeather(lat, lon)) {
                 is Resource.Success -> {
                     val weatherData = convertWeatherDtoToWeatherModel(result.data?.weather!!)
@@ -165,25 +184,18 @@ class MainViewModel @Inject constructor(
     /**
      * Updates appropriate livedata object once new weather data has been fetched for it
      */
-    private fun updateWeatherData(
+    private suspend fun updateWeatherData(
         state: LocationWeatherState,
         weatherLiveDataObj: MutableLiveData<LocationWeatherState>,
     ) {
-        viewModelScope.launch {
-            withContext(Dispatchers.Main) {
-                weatherLiveDataObj.value = state
-            }
-
+        withContext(Dispatchers.Main) {
+            weatherLiveDataObj.value = state
         }
     }
 
     private fun getDefaultLocation(): String {
         return "Chicago"
     }
-
-
-    private val _searchedWeather = MutableLiveData<LocationWeatherState>()
-    val searchedWeather: LiveData<LocationWeatherState> get() = _searchedWeather.distinctUntilChanged()
 
 
     fun getSearchedLocationWeather(query: String) {
@@ -195,8 +207,6 @@ class MainViewModel @Inject constructor(
                         result.data.location.city,
                         result.data.location.country
                     )
-                    Timber.tag("WEATHER_REFORMAT").d("Searched data: ${locationData.cityName}")
-                    Timber.tag("WEATHER_REFORMAT").d("Searched data: ${locationData.country}")
                     val formattedWeatherData = LocationWeatherState(
                         combinedData = LocationWeatherModel(
                             location = locationData,
@@ -204,37 +214,27 @@ class MainViewModel @Inject constructor(
                         )
                     )
                     updateWeatherData(formattedWeatherData, _searchedWeather)
-                    withContext(Dispatchers.Main) {
-                        setCurrLocation(
-                            locationData
-                        )
-                    }
+                    setCurrLocation(locationData)
+
                 }
-
                 is Resource.Error -> {
-                    _searchedWeather.value = currentWeather.value
-
+                    withContext(Dispatchers.Main) {
+                        _searchedWeather.value =
+                            currentWeather.value?.copy(error = "Could not fetch weather data for this location")
+                    }
                 }
             }
         }
     }
 
 
-    private val _emptySearchResponse = MutableLiveData<Boolean>()
-    val emptySearchResponse: LiveData<Boolean> get() = _emptySearchResponse
-
-    private val _savedWeather = MutableLiveData<LocationWeatherState>()
-    val savedWeather: LiveData<LocationWeatherState> get() = _savedWeather.distinctUntilChanged()
-
-
     fun getSavedLocationWeather() {
-        viewModelScope.launch {
-            when(  val weatherResult =
-                weatherRepository.getWeather(locations.value!![locationIndex.value!!].cityName)){
+        viewModelScope.launch(Dispatchers.IO) {
+            when (val weatherResult =
+                weatherRepository.getWeather(locations.value!![locationIndex.value!!].cityName)) {
                 is Resource.Success -> {
-                    Timber.tag("WEATHER_REFORMAT").d("weatherResult weather: ${weatherResult.data?.weather?.cityName}")
-                    Timber.tag("WEATHER_REFORMAT").d("weatherResult location: ${weatherResult.data?.location?.city}")
-                    val weatherDataModel = convertWeatherDtoToWeatherModel(weatherResult.data?.weather!!)
+                    val weatherDataModel =
+                        convertWeatherDtoToWeatherModel(weatherResult.data?.weather!!)
                     val locationData = LocationModel(
                         weatherResult.data.location.city,
                         weatherResult.data.location.country
@@ -253,8 +253,10 @@ class MainViewModel @Inject constructor(
                     )
 
                 }
-                is Resource.Error-> {
-                    Timber.tag("WEATHER_REFORMAT").d("weatherResult error: ${weatherResult.message}")
+
+                is Resource.Error -> {
+                    Timber.tag("WEATHER_REFORMAT")
+                        .d("weatherResult error: ${weatherResult.message}")
                 }
             }
 
@@ -263,30 +265,24 @@ class MainViewModel @Inject constructor(
     }
 
 
-    private var _locations = MutableLiveData<List<LocationModel>>()
-    val locations: LiveData<List<LocationModel>> get() = _locations
+    private suspend fun setCurrLocation(location: LocationModel) {
+        withContext(Dispatchers.Main) {
+            _currentLocation.value = location
+        }
 
-
-    private var _currentLocation = MutableLiveData<LocationModel>()
-    val currentLocation: LiveData<LocationModel> get() = _currentLocation.distinctUntilChanged()
-
-    private fun setCurrLocation(location: LocationModel) {
-        _currentLocation.value = location
     }
 
 
     fun addLocation(location: LocationModel) {
         locationRepository.addLocation(LocationDto(location.cityName, location.country))
-        setUpLocationData()
+        _locations.value = locations.value?.plus(location)
     }
 
     fun deleteLocation(location: LocationModel) {
         locationRepository.deleteLocation(LocationDto(location.cityName, location.country))
+        _locations.value = locations.value?.filter { it != location }
     }
 
-    private var _locationIndex = MutableLiveData(0)
-
-    val locationIndex: LiveData<Int> get() = _locationIndex
 
     fun incrementIndex() {
         _locationIndex.value = _locationIndex.value?.plus(1)
@@ -302,7 +298,7 @@ class MainViewModel @Inject constructor(
 
 
     private fun fetchDefaultWeatherData() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val defaultLocation = getDefaultLocation()
             when (val result = weatherRepository.getWeather(defaultLocation)) {
                 is Resource.Success -> {

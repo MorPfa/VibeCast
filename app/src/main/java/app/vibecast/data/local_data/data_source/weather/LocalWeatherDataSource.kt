@@ -3,7 +3,6 @@ package app.vibecast.data.local_data.data_source.weather
 import app.vibecast.domain.model.LocationWithWeatherDataDto
 import app.vibecast.domain.model.WeatherDto
 import app.vibecast.domain.util.Resource
-import kotlinx.coroutines.flow.Flow
 
 
 interface LocalWeatherDataSource {

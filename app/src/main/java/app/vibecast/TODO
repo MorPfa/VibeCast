@@ -3,16 +3,6 @@
 TASKS:
 today:
 
-fix saved location screen index issue
-fix account screen saved location issue
-fix firebase repo
-
-fix local data streams
-fix data stream for weather
-fix state variables for image, location and music saving
-
-
-
 create playlist for each location
     - make api call to create playlist when first song is liked for location
 when song is liked, add to that playlist
@@ -33,8 +23,9 @@ Next tasks:
 make it so that even when weather data cannot be loaded, music and images still get loaded
 move operations for profile picture saving to background thread
 make token observation in fragment more elegant
-fix song refreshing with screen rotation
+fix song refreshing with screen rotation - maybe saved state handle ??
 make long press on screen show bg image
+fix save icon issue (determine check status based off db)
 try reworking image search again
 ensure everything works as intended and flawlessly
 use benchmarks to improve performance
@@ -45,9 +36,6 @@ configure pro guard r8
 
 
 Nice to have's:
-
 lazy initialization for viewmodel constructor dependencies
-fix save icon issue (determine check status based off db)
-replace splash screen fragment with activity
 upload profile picture to firestore
 save background image to internal storage so it can be set with no internet connection (test with no / bad internet to see if necessary)

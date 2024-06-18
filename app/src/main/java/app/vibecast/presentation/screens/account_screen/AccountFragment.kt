@@ -57,8 +57,8 @@ class AccountFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         auth = Firebase.auth
-
         imageViewModel.setImageCountLiveData()
+        mainViewModel.setUpLocationData()
     }
 
     override fun onCreateView(
@@ -77,6 +77,7 @@ class AccountFragment : Fragment() {
         savedLocationsRv.setHasFixedSize(true)
         val locationLayoutManager = LinearLayoutManager(requireContext())
         savedLocationsRv.layoutManager = locationLayoutManager
+
         val savedSongsRv: RecyclerView = binding.savedSongs
         val songAdapter = SongAdapter(musicViewModel)
         savedSongsRv.adapter = songAdapter
