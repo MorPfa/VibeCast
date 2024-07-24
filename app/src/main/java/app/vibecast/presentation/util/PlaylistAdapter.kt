@@ -5,15 +5,14 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import app.vibecast.data.remote_data.network.music.model.UserItem
 import app.vibecast.databinding.ItemMusicCardviewBinding
-import app.vibecast.domain.model.SongDto
+import app.vibecast.presentation.screens.main_screen.image.ImageLoader
 import app.vibecast.presentation.screens.main_screen.music.MusicViewModel
-import com.spotify.protocol.types.Image
-import timber.log.Timber
 
 
-class SongAdapter(private val musicViewModel: MusicViewModel) :
-    ListAdapter<SongDto, SongAdapter.SongViewHolder>(SongDiffCallback()) {
+class PlaylistAdapter(private val imageLoader: ImageLoader, private val musicViewModel: MusicViewModel) :
+    ListAdapter<UserItem, PlaylistAdapter.SongViewHolder>(SongDiffCallback()) {
 
     /**
      * Captures click on current item and allows for custom logic upon click
@@ -44,26 +43,26 @@ class SongAdapter(private val musicViewModel: MusicViewModel) :
     }
 
     override fun onBindViewHolder(holder: SongViewHolder, position: Int) {
-        val song = getItem(position)
-        Timber.tag("imageTest").d("curr uri ${song.imageUri}")
-        holder.songName.text = song.name
-        holder.artistName.text = song.artist
-        musicViewModel.assertAppRemoteConnected()
-            .imagesApi
-            .getImage(song.imageUri, Image.Dimension.X_SMALL)
-            .setResultCallback { bitmap ->
-                holder.coverArt.setImageBitmap(bitmap)
-            }
+        val item = getItem(position)
+        holder.songName.text = item.track.name
+        holder.artistName.text = item.track.album.name
+//        imageLoader.loadUrlIntoImageView(item.track, holder.coverArt, false,0)
+//        musicViewModel.assertAppRemoteConnected()
+//            .imagesApi
+//            .getImage(song.imageUri, Image.Dimension.X_SMALL)
+//            .setResultCallback { bitmap ->
+//                holder.coverArt.setImageBitmap(bitmap)
+//            }
     }
 }
 
 
-class SongDiffCallback : DiffUtil.ItemCallback<SongDto>() {
-    override fun areItemsTheSame(oldItem: SongDto, newItem: SongDto): Boolean {
-        return oldItem.trackUri == newItem.trackUri
+class SongDiffCallback : DiffUtil.ItemCallback<UserItem>() {
+    override fun areItemsTheSame(oldItem: UserItem, newItem: UserItem): Boolean {
+        return oldItem.track.id == newItem.track.id
     }
 
-    override fun areContentsTheSame(oldItem: SongDto, newItem: SongDto): Boolean {
+    override fun areContentsTheSame(oldItem: UserItem, newItem: UserItem): Boolean {
         return oldItem == newItem
     }
 }

@@ -172,7 +172,7 @@
                     android:paddingEnd="24dp"
                     android:paddingTop="6dp"
                     android:paddingBottom="12dp"
-                    android:text="@string/saved_songs"
+                    android:text="@string/saved_playlists"
                     android:textAlignment="center"
                     android:textColor="@color/white"
                     android:textSize="16sp"
@@ -206,7 +206,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="@string/saved_songs"
+                android:text="@string/saved_playlists"
                 android:textSize="22sp" />
 
             <androidx.recyclerview.widget.RecyclerView
@@ -222,6 +222,9 @@
                 app:layout_constraintVertical_bias="0.5"
                 app:spanCount="2"
                 tools:listitem="@layout/item_music_cardview" />
+<!--            <include-->
+<!--                android:id="@+id/savedSongButton"-->
+<!--                layout="@layout/item_music_cardview" />-->
 
         </LinearLayout>
     </ScrollView>

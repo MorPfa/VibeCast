@@ -14,6 +14,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -24,6 +25,7 @@ import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import app.vibecast.R
+import app.vibecast.data.remote_data.network.music.model.AddToPlaylistPayload
 import app.vibecast.databinding.FragmentSavedLocationBinding
 import app.vibecast.presentation.TAG
 import app.vibecast.presentation.screens.main_screen.MainViewModel
@@ -37,9 +39,7 @@ import com.spotify.protocol.types.Image
 import com.spotify.protocol.types.PlayerState
 import com.spotify.protocol.types.Repeat
 import com.spotify.sdk.android.auth.AuthorizationClient
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 
@@ -52,6 +52,7 @@ class SavedLocationFragment : Fragment() {
     private var playbackButton: ImageButton? = null
     private var shuffleButton: ImageButton? = null
     private var repeatButton: ImageButton? = null
+    private var saveSongButton: ImageView? = null
     private var trackProgressBar: TrackProgressBar? = null
     private lateinit var snackBar: Snackbar
     private var alertDialog: AlertDialog? = null
@@ -347,7 +348,29 @@ class SavedLocationFragment : Fragment() {
 
         musicViewModel.playerState.observe(viewLifecycleOwner) { playerState ->
             if (playerState != null) {
-                updateUI(playerState)
+                if(playerState.error != null){
+                    snackBar = Snackbar.make(
+                        requireView(),
+                        "Could not get songs from Spotify",
+                        Snackbar.LENGTH_SHORT
+                    )
+
+                    val snackbarView = snackBar.view
+                    val snackbarText =
+                        snackbarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+                    snackbarText.setTextColor(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.white
+                        )
+                    )
+                    snackbarView.background =
+                        ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
+                    snackBar.show()
+                }else {
+                    updateUI(playerState.state)
+                }
+
             }
         }
 
@@ -364,6 +387,18 @@ class SavedLocationFragment : Fragment() {
         playbackButton = binding.musicWidget.playPauseButton
         shuffleButton = binding.musicWidget.shuffleButton
         repeatButton = binding.musicWidget.repeatButton
+        saveSongButton = binding.musicWidget.saveSongBtn
+
+        saveSongButton?.setOnClickListener {
+            val playerState = musicViewModel.playerState.value
+            playerState?.state?.let { trackData ->
+                mainViewModel.savedWeather.value?.combinedData?.location?.cityName?.let { playlistName ->
+                    musicViewModel.addSongToPlaylist(
+                        playlistName, AddToPlaylistPayload(listOf(trackData.track.uri),0))
+                }
+            }
+
+        }
 
         repeatButton?.setOnClickListener {
             if (isSpotifyInstalled()) {
@@ -409,6 +444,38 @@ class SavedLocationFragment : Fragment() {
                     showSpotifySnackBar()
                 }
             }
+        }
+        musicViewModel.saveResult.observe(viewLifecycleOwner){ result ->
+            if(result.error != null){
+                snackBar = Snackbar.make(
+                    requireView(),
+                    result.error,
+                    Snackbar.LENGTH_SHORT
+                )
+                val snackBarView = snackBar.view
+                val snackBarText =
+                    snackBarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+                snackBarText.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+                snackBarView.background =
+                    ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
+                snackBar.show()
+                Handler(Looper.getMainLooper()).postDelayed({ snackBar.dismiss() }, 2000)
+            } else {
+                snackBar = Snackbar.make(
+                    requireView(),
+                    "Added song to playlist: ${result.playlistName}",
+                    Snackbar.LENGTH_SHORT
+                )
+                val snackBarView = snackBar.view
+                val snackBarText =
+                    snackBarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+                snackBarText.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+                snackBarView.background =
+                    ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
+                snackBar.show()
+                Handler(Looper.getMainLooper()).postDelayed({ snackBar.dismiss() }, 2000)
+            }
+
         }
         return binding.root
     }
@@ -543,6 +610,7 @@ class SavedLocationFragment : Fragment() {
         shuffleButton = null
         playbackButton = null
         trackProgressBar = null
+        saveSongButton = null
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
 

@@ -40,12 +40,12 @@ object NetworkModule {
     fun provideGson(): Gson = GsonBuilder().create()
 
 
-    @Named("music")
-    @Provides
-    fun provideSpotifyRetrofit(): Retrofit = Retrofit.Builder()
-        .baseUrl("https://api.spotify.com/")
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
+//    @Named("music")
+//    @Provides
+//    fun provideSpotifyRetrofit(): Retrofit = Retrofit.Builder()
+//        .baseUrl("https://api.spotify.com/")
+//        .addConverterFactory(GsonConverterFactory.create())
+//        .build()
 
     @Named("unsplash")
     @Provides
@@ -54,41 +54,37 @@ object NetworkModule {
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
-//    @Named("music")
-//    @Provides
-//    fun provideSpotifyRetrofit(): Retrofit {
-//                val loggingInterceptor = HttpLoggingInterceptor().apply {
+    @Named("music")
+    @Provides
+    fun provideSpotifyRetrofit(): Retrofit {
+        val client = OkHttpClient.Builder()
+            .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+            .build()
+        return Retrofit.Builder()
+            .baseUrl("https://api.spotify.com/v1/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(client)
+            .build()
+
+
+    }
+
+
+    @Named("weather")
+    @Provides
+    fun provideWeatherRetrofit(moshi: Moshi): Retrofit {
+//        val loggingInterceptor = HttpLoggingInterceptor().apply {
 //            level = HttpLoggingInterceptor.Level.BODY
 //        }
 //
 //        val client = OkHttpClient.Builder()
 //            .addInterceptor(loggingInterceptor)
 //            .build()
-//        return Retrofit.Builder()
-//            .baseUrl("https://api.spotify.com/v1/")
-//            .addConverterFactory(GsonConverterFactory.create())
-//            .client(client)
-//            .build()
-//
-//
-//    }
-
-
-    @Named("weather")
-    @Provides
-    fun provideWeatherRetrofit(moshi: Moshi): Retrofit {
-        val loggingInterceptor = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
-        }
-
-        val client = OkHttpClient.Builder()
-            .addInterceptor(loggingInterceptor)
-            .build()
 
         return Retrofit.Builder()
             .baseUrl("https://api.openweathermap.org/")
             .addConverterFactory(MoshiConverterFactory.create(moshi))
-            .client(client)
+//            .client(client)
             .build()
     }
 

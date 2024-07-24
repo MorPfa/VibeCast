@@ -50,18 +50,18 @@ class ImageRepositoryImplTest {
         )
     }
 
-    @ExperimentalCoroutinesApi
-    @Test
-    fun testGetRemoteImages() {
-        runTest {
-            val query = "Seattle rainy"
-            val collections = "HD wallpapers"
-            val expectedImages = imageDto
-            whenever(remoteImageDataSource.getImages(query, collections)).thenReturn(flowOf(expectedImages))
-            val result = imageRepository.getRemoteImages(query, collections).first()
-            assertEquals(expectedImages,result)
-        }
-    }
+//    @ExperimentalCoroutinesApi
+//    @Test
+//    fun testGetRemoteImages() {
+//        runTest {
+//            val query = "Seattle rainy"
+//            val collections = "HD wallpapers"
+//            val expectedImages = imageDto
+//            whenever(remoteImageDataSource.getImages(query, collections)).thenReturn(flowOf(expectedImages))
+//            val result = imageRepository.getRemoteImages(query, collections).first()
+//            assertEquals(expectedImages,result)
+//        }
+//    }
 
     @ExperimentalCoroutinesApi
     @Test

@@ -74,6 +74,18 @@
                 android:name="infoType"
                 app:argType="app.vibecast.presentation.screens.main_screen.music.util.InfoType" />
         </action>
+        <action
+            android:id="@+id/nav_account_to_nav_music"
+            app:destination="@id/nav_music"
+            app:enterAnim="@anim/fui_slide_in_right"
+            app:exitAnim="@anim/fui_slide_out_left"
+            app:popEnterAnim="@anim/fui_slide_in_right"
+            app:popExitAnim="@anim/fui_slide_out_left" >
+
+            <argument
+                android:name="canPlayOnDemand"
+                app:argType="boolean" />
+        </action>
     </fragment>
 
 
@@ -159,6 +171,11 @@
         android:name="app.vibecast.presentation.user.auth.LogoutFragment"
         android:label="fragment_logout"
         tools:layout="@layout/fragment_logout" />
+    <fragment
+        android:id="@+id/nav_music"
+        android:name="app.vibecast.presentation.screens.account_screen.MusicFragment"
+        android:label="fragment_music"
+        tools:layout="@layout/fragment_music" />
 
 
 </navigation>

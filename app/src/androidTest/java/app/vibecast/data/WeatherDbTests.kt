@@ -110,7 +110,7 @@ class WeatherDbTests {
     fun testAddWeather() {
         runBlocking {
             weatherDao.addWeather(weatherData)
-            val retrievedData = weatherDao.getWeather("Seattle").firstOrNull()
+            val retrievedData = weatherDao.getWeather("Seattle")
             assertNotNull(retrievedData)
             assertEquals(weatherData, retrievedData)
         }
@@ -121,7 +121,7 @@ class WeatherDbTests {
         runBlocking {
             weatherDao.addWeather(weatherData)
             weatherDao.deleteWeather(weatherData)
-            val dataAfterDeletion = weatherDao.getWeather("Seattle").firstOrNull()
+            val dataAfterDeletion = weatherDao.getWeather("Seattle")
             assertNull(dataAfterDeletion)
 
         }
@@ -132,7 +132,7 @@ class WeatherDbTests {
     fun testGetWeatherByCity() {
         runBlocking {
             weatherDao.addWeather(weatherData)
-            val retrievedData = weatherDao.getWeather("Seattle").firstOrNull()
+            val retrievedData = weatherDao.getWeather("Seattle")
             assertNotNull(retrievedData)
             assertEquals(weatherData, retrievedData)
         }

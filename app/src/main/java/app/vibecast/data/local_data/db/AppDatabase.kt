@@ -9,6 +9,7 @@ import app.vibecast.data.local_data.db.image.dao.ImageDao
 import app.vibecast.data.local_data.db.image.model.ImageEntity
 import app.vibecast.data.local_data.db.music.dao.SongDao
 import app.vibecast.data.local_data.db.music.model.SongEntity
+import app.vibecast.data.local_data.db.music.model.UserPlaylistEntity
 import app.vibecast.data.local_data.db.music.util.ImageUriConverter
 import app.vibecast.data.local_data.db.user.UserDao
 import app.vibecast.data.local_data.db.user.UserEntity
@@ -25,7 +26,8 @@ import app.vibecast.data.local_data.db.weather.util.WeatherTypeConverter
         LocationEntity::class,
         ImageEntity::class,
         SongEntity::class,
-    ], version = 19
+        UserPlaylistEntity::class
+    ], version = 20
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun weatherDao(): WeatherDao

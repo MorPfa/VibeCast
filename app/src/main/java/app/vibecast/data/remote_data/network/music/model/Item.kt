@@ -10,7 +10,6 @@ data class Item(
     @SerializedName("images") val images: List<Image>,
     @SerializedName("name") val name: String,
     @SerializedName("owner") val owner: Owner,
-    @SerializedName("primary_color") val primaryColor: String,
     @SerializedName("public") val public: Boolean,
     @SerializedName("snapshot_id") val snapshotId: String,
     @SerializedName("tracks") val tracks: Tracks,

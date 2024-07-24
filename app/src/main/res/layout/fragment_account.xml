@@ -55,7 +55,7 @@
                 android:layout_width="120dp"
                 android:layout_height="120dp"
                 android:layout_gravity="center"
-                android:layout_marginTop="82dp"
+
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/profile_picture_content_desc"
                 android:scaleType="centerCrop"
@@ -168,7 +168,7 @@
                     android:paddingHorizontal="14dp"
                     android:paddingTop="6dp"
                     android:paddingBottom="12dp"
-                    android:text="@string/saved_songs"
+                    android:text="@string/saved_playlists"
                     android:textAlignment="center"
                     android:textColor="@color/white"
                     android:textSize="18sp"
@@ -201,7 +201,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="@string/saved_songs"
+                android:text="@string/saved_playlists"
                 android:textColor="@color/white"
                 android:textSize="20sp" />
 
@@ -212,6 +212,7 @@
                 android:layout_marginHorizontal="12dp"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:listitem="@layout/item_music_cardview" />
+
 
         </LinearLayout>
 

@@ -8,13 +8,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import app.vibecast.BuildConfig
+import app.vibecast.data.remote_data.network.music.model.AddToPlaylistPayload
+import app.vibecast.data.remote_data.network.music.model.RemoveFromPlaylistPayload
+import app.vibecast.domain.model.SelectedPlaylistDto
 import app.vibecast.domain.model.SongDto
+import app.vibecast.domain.model.UserDto
 import app.vibecast.domain.repository.music.MusicPreferenceRepository
 import app.vibecast.domain.repository.music.MusicRepository
 import app.vibecast.domain.repository.music.WeatherCondition
 import app.vibecast.domain.util.Resource
+import app.vibecast.presentation.state.PlayerState
+import app.vibecast.presentation.state.PlaylistState
+import app.vibecast.presentation.state.SelectedPlaylistState
 import app.vibecast.presentation.state.SongState
 import app.vibecast.presentation.util.GenreFormatter
+import app.vibecast.presentation.util.SaveResult
 import com.google.gson.GsonBuilder
 import com.spotify.android.appremote.api.ConnectionParams
 import com.spotify.android.appremote.api.Connector
@@ -22,9 +30,11 @@ import com.spotify.android.appremote.api.SpotifyAppRemote
 import com.spotify.android.appremote.api.error.SpotifyDisconnectedException
 import com.spotify.protocol.client.Subscription
 import com.spotify.protocol.client.error.RemoteClientException
-import com.spotify.protocol.types.PlayerState
+import com.spotify.protocol.types.PlayerState as SpotifyPlayerState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -39,7 +49,7 @@ class MusicViewModel @Inject constructor(
 ) : ViewModel() {
 
 
-    private var playerStateSubscription: Subscription<PlayerState>? = null
+    private var playerStateSubscription: Subscription<SpotifyPlayerState>? = null
     var spotifyAppRemote: SpotifyAppRemote? = null
     private val gson = GsonBuilder().setPrettyPrinting().create()
     private val clientId = BuildConfig.SPOTIFY_KEY
@@ -47,12 +57,100 @@ class MusicViewModel @Inject constructor(
     private val genreFormatter = GenreFormatter()
 
 
-    private var _currentPlaylist = MutableLiveData<String>()
-    val currentPlaylist: LiveData<String> get() = _currentPlaylist
+    private var _curPlaylistState = MutableLiveData<SelectedPlaylistState>()
+    val curPlaylistState: LiveData<SelectedPlaylistState> get() = _curPlaylistState
 
 
     private var _isSongSaved = MutableLiveData(false)
     val isSongSaved: LiveData<Boolean> get() = _isSongSaved
+
+    private var _saveResult = MutableLiveData<SaveResult>()
+    val saveResult: LiveData<SaveResult> get() = _saveResult
+
+
+    private var _curUser = MutableStateFlow<UserDto?>(null)
+    private val curUser: StateFlow<UserDto?> get() = _curUser
+
+
+    fun getSelectedPlaylist(id : String){
+        viewModelScope.launch(Dispatchers.IO) {
+            when(val result = musicRepository.getSelectedPlaylist(id, token.value!!)){
+                is Resource.Success -> setCurPlaylist(SelectedPlaylistState(data = result.data))
+                is Resource.Error -> setCurPlaylist(SelectedPlaylistState(error = result.message))
+            }
+        }
+    }
+    private suspend fun setCurPlaylist(playlistState : SelectedPlaylistState){
+        withContext(Dispatchers.Main){
+            _curPlaylistState.value = playlistState
+        }
+
+    }
+    fun addSongToPlaylist(
+        playlistName: String,
+        data: AddToPlaylistPayload,
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            when (val result = musicRepository.addSongToPlaylist(
+                curUser.value!!.id,
+                playlistName,
+                token.value!!,
+                data
+            )) {
+                is Resource.Success -> {
+                    withContext(Dispatchers.Main) {
+                        _saveResult.value = SaveResult(success = true, playlistName = playlistName)
+                    }
+                }
+
+                is Resource.Error -> {
+                    withContext(Dispatchers.Main) {
+                        _saveResult.value = SaveResult(success = false, error = result.message)
+                    }
+                }
+            }
+        }
+    }
+
+    suspend fun deleteSongFromPlaylist(
+        playlistId: String,
+        data: RemoveFromPlaylistPayload,
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            when (val result =
+                musicRepository.deleteSongFromPlaylist(playlistId, token.value!!, data)) {
+                is Resource.Success -> {
+                    withContext(Dispatchers.Main) {
+                        _saveResult.value = SaveResult(success = true, playlistName = playlistId)
+                    }
+                }
+
+                is Resource.Error -> {
+                    withContext(Dispatchers.Main) {
+                        _saveResult.value = SaveResult(success = false, error = result.message)
+                    }
+                }
+            }
+        }
+    }
+
+    suspend fun deletePlaylist(playlistId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            when (val result = musicRepository.deletePlaylist(playlistId, token.value!!)) {
+                is Resource.Success -> {
+                    withContext(Dispatchers.Main) {
+                        _saveResult.value = SaveResult(success = true, playlistName = playlistId)
+                    }
+                }
+
+                is Resource.Error -> {
+                    withContext(Dispatchers.Main) {
+                        _saveResult.value = SaveResult(success = false, error = result.message)
+                    }
+                }
+            }
+        }
+    }
 
     private fun updateSavedSongStatus(trackUri: String) {
 //         Timber.tag("music_db").d("curr track $trackUri ${savedSongs.value}")
@@ -68,6 +166,40 @@ class MusicViewModel @Inject constructor(
             song
         }
     }.asLiveData()
+
+    private var _playlistState = MutableLiveData<PlaylistState>()
+    val playlistState: LiveData<PlaylistState> get() = _playlistState
+
+    fun setupSelectedPlaylist(playlist: SelectedPlaylistDto){
+        assertAppRemoteConnected().let {
+            it.playerApi.play(playlist.uri).setResultCallback { _ ->
+                it.playerApi
+                    .pause()
+                    .setResultCallback {
+                        logMessage("pause")
+                    }
+                    .setErrorCallback(errorCallback)
+            }
+        }
+    }
+
+    fun getUserPlaylists() {
+        viewModelScope.launch(Dispatchers.IO) {
+            when (val result = musicRepository.getUserPlaylists(token.value!!)) {
+                is Resource.Success -> {
+                    withContext(Dispatchers.Main) {
+                        _playlistState.value = PlaylistState(data = result.data)
+                    }
+                }
+
+                is Resource.Error -> {
+                    withContext(Dispatchers.Main) {
+                        _playlistState.value = PlaylistState(error = result.message)
+                    }
+                }
+            }
+        }
+    }
 
     private var _currentSong = MutableLiveData<SongState>()
     val currentSong: LiveData<SongState> get() = _currentSong
@@ -126,8 +258,9 @@ class MusicViewModel @Inject constructor(
                 val genre = getGenre(weather)
                 when (val result = musicRepository.getPlaylist(genre, token.value!!)) {
                     is Resource.Success -> {
+                        Timber.tag("Spotify")
+                            .d("Playlist name : ${result.data?.items?.get(0)?.name}")
                         result.data?.let { playlists ->
-                            _currentPlaylist.value = result.data.items[0].externalUrls.spotify
                             val index = playlists.items.indices.random()
                             Timber.tag("Spotify")
                                 .d("Playlist name : ${playlists.items[index].name}")
@@ -153,13 +286,6 @@ class MusicViewModel @Inject constructor(
         } catch (e: Exception) {
             Timber.tag("Spotify").d(e.localizedMessage ?: "null")
         }
-    }
-
-    fun saveSong(song: SongDto) {
-        viewModelScope.launch(Dispatchers.IO) {
-            musicRepository.saveSong(song)
-        }
-
     }
 
     fun deleteSong(song: SongDto) {
@@ -221,6 +347,7 @@ class MusicViewModel @Inject constructor(
                     Timber.tag("Spotify").d("Connected! Yay!")
                     subscribeToPlayerState()
                     _token.value = token
+                    getCurrentUser()
                     spotifyAppRemote?.let {
                         it.userApi.capabilities.setResultCallback { capabilities ->
                             Timber.tag("Spotify").d("Capabilities $capabilities")
@@ -237,6 +364,15 @@ class MusicViewModel @Inject constructor(
             })
     }
 
+
+    fun getCurrentUser() {
+        viewModelScope.launch(Dispatchers.IO) {
+            when (val result = musicRepository.getCurrentUser(token.value!!)) {
+                is Resource.Success -> _curUser.value = result.data!!
+                is Resource.Error -> Timber.tag("Spotify").e(result.message)
+            }
+        }
+    }
 
     private fun playPlaylist(uri: String) {
         Timber.tag("Spotify").d(uri)
@@ -311,7 +447,7 @@ class MusicViewModel @Inject constructor(
                     }
                 })
             .setErrorCallback {
-            } as Subscription<PlayerState>
+            } as Subscription<SpotifyPlayerState>
     }
 
 
@@ -335,16 +471,11 @@ class MusicViewModel @Inject constructor(
 
 
     interface PlayerStateListener {
-        fun onPlayerStateUpdated(playerState: PlayerState)
+        fun onPlayerStateUpdated(playerState: SpotifyPlayerState)
     }
 
 
     private var playerStateListener: PlayerStateListener? = null
-
-
-    fun setPlayerStateListener(listener: PlayerStateListener) {
-        playerStateListener = listener
-    }
 
 
     private var _userCapabilitiesState = MutableLiveData<Boolean>()
@@ -356,12 +487,13 @@ class MusicViewModel @Inject constructor(
     val playerState: LiveData<PlayerState> get() = _playerState
 
 
-    private val playerStateEventCallback = Subscription.EventCallback<PlayerState> { playerState ->
-        playerStateListener?.onPlayerStateUpdated(playerState)
-        _playerState.value = playerState
-        updateSavedSongStatus(playerState.track.uri)
+    private val playerStateEventCallback =
+        Subscription.EventCallback<SpotifyPlayerState> { playerState ->
+            playerStateListener?.onPlayerStateUpdated(playerState)
+            _playerState.value = PlayerState(state = playerState)
+            updateSavedSongStatus(playerState.track.uri)
 //        Timber.tag("Spotify").v("Player State: %s", gson.toJson(playerState))
-    }
+        }
 
 
     override fun onCleared() {
@@ -374,7 +506,7 @@ class MusicViewModel @Inject constructor(
     }
 
     private val errorCallback = { throwable: Throwable ->
-        if(spotifyAppRemote?.isConnected == false){
+        if (spotifyAppRemote?.isConnected == false) {
             connectToSpotify(token.value!!)
         }
         if (throwable is RemoteClientException) {

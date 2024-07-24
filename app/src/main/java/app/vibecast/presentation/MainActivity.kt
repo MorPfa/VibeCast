@@ -39,6 +39,7 @@ import app.vibecast.presentation.screens.main_screen.music.util.Constants.CLIENT
 import app.vibecast.presentation.screens.main_screen.music.util.Constants.REDIRECT_URI
 import app.vibecast.presentation.screens.main_screen.music.util.Constants.REQUEST_CODE
 import app.vibecast.presentation.screens.saved_screen.SavedLocationFragmentDirections
+import app.vibecast.presentation.util.SpotifyScopes
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
@@ -91,11 +92,7 @@ class MainActivity : AppCompatActivity(), MusicViewModel.PlayerStateListener {
                 AuthorizationRequest.Builder(CLIENT_ID, AuthorizationResponse.Type.TOKEN, REDIRECT_URI)
                     .setShowDialog(true)
                     .setScopes(
-                        arrayOf(
-                            "streaming",
-                            "app-remote-control",
-                            "user-read-currently-playing"
-                        )
+                        SpotifyScopes.getScopes()
                     )
                     .build()
             AuthorizationClient.openLoginActivity(this, REQUEST_CODE, request)

@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Upsert
 import app.vibecast.data.local_data.db.music.model.SongEntity
+import app.vibecast.data.local_data.db.music.model.UserPlaylistEntity
 import kotlinx.coroutines.flow.Flow
 
 
@@ -24,4 +25,10 @@ interface SongDao {
 
     @Query("SELECT * FROM songs")
     fun getAllSongs() : Flow<List<SongEntity>>
+
+    @Query("SELECT * FROM user_playlists")
+    fun getAllPlaylists() : Flow<List<UserPlaylistEntity>>
+
+    @Upsert
+    suspend fun addPlaylist(playlist: UserPlaylistEntity)
 }

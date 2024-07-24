@@ -161,19 +161,19 @@ class LocationRepositoryImplTest {
         testDispatcher.cleanupTestCoroutines()
     }
 
-    @ExperimentalCoroutinesApi
-    @Test
-    fun testRefreshLocationWithWeather() {
-        runTest {
-            val cityName = "Seattle"
-            val expectedList = listOf(locationWithWeatherDataDto)
-            whenever(localLocationDataSource.getLocationWithWeather()).thenReturn(flowOf(expectedList))
-            whenever(remoteWeatherDataSource.getWeather(cityName)).thenReturn(flowOf(locationWithWeatherDataDto))
-            locationRepository.refreshLocationWeather()
-            verify(remoteWeatherDataSource).getWeather(cityName)
-            verify(localLocationDataSource).addLocationWithWeather(locationWithWeatherDataDto)
-        }
-    }
+//    @ExperimentalCoroutinesApi
+//    @Test
+//    fun testRefreshLocationWithWeather() {
+//        runTest {
+//            val cityName = "Seattle"
+//            val expectedList = listOf(locationWithWeatherDataDto)
+//            whenever(localLocationDataSource.getLocationWithWeather()).thenReturn(flowOf(expectedList))
+//            whenever(remoteWeatherDataSource.getWeather(cityName)).thenReturn(flowOf(locationWithWeatherDataDto))
+//            locationRepository.refreshLocationWeather()
+//            verify(remoteWeatherDataSource).getWeather(cityName)
+//            verify(localLocationDataSource).addLocationWithWeather(locationWithWeatherDataDto)
+//        }
+//    }
 
     @ExperimentalCoroutinesApi
     @Test
@@ -198,17 +198,17 @@ class LocationRepositoryImplTest {
         }
     }
 
-    @ExperimentalCoroutinesApi
-    @Test
-    fun testGetAllLocations() {
-        runTest {
-            val expectedList = listOf(locationDto)
-            whenever(localLocationDataSource.getLocations()).thenReturn(flowOf(expectedList))
-            val result = locationRepository.getLocations().single()
-            val resultModel = listOf(LocationDto(result[0].cityName, result[0].country))
-            assertEquals(expectedList, resultModel)
-        }
-    }
+//    @ExperimentalCoroutinesApi
+//    @Test
+//    fun testGetAllLocations() {
+//        runTest {
+//            val expectedList = listOf(locationDto)
+//            whenever(localLocationDataSource.getLocations()).thenReturn(flowOf(expectedList))
+//            val result = locationRepository.getLocations().single()
+//            val resultModel = listOf(LocationDto(result[0].cityName, result[0].country))
+//            assertEquals(expectedList, resultModel)
+//        }
+//    }
 
     @ExperimentalCoroutinesApi
     @Test

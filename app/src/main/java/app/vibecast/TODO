@@ -3,24 +3,10 @@
 TASKS:
 today:
 
-create playlist for each location
-    - make api call to create playlist when first song is liked for location
-when song is liked, add to that playlist
-    - make api call to add song to playlist
-if can play on demand display playlist widgets with list of songs
-if cannot play on demand display playlist widgets with summary
-    - make api call to get playlists
-
-
-
 ensure all of these design guidelines are followed https://developer.spotify.com/documentation/design
 
-
-
-
-
 Next tasks:
-make it so that even when weather data cannot be loaded, music and images still get loaded
+
 move operations for profile picture saving to background thread
 make token observation in fragment more elegant
 fix song refreshing with screen rotation - maybe saved state handle ??
@@ -29,13 +15,12 @@ fix save icon issue (determine check status based off db)
 try reworking image search again
 ensure everything works as intended and flawlessly
 use benchmarks to improve performance
-
-
-Miscellaneous:
 configure pro guard r8
 
 
+
 Nice to have's:
+make it so that even when weather data cannot be loaded, music and images still get loaded
 lazy initialization for viewmodel constructor dependencies
 upload profile picture to firestore
 save background image to internal storage so it can be set with no internet connection (test with no / bad internet to see if necessary)

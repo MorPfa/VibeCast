@@ -29,7 +29,6 @@ import app.vibecast.presentation.screens.main_screen.music.MusicViewModel
 import app.vibecast.presentation.screens.main_screen.music.util.InfoType
 import app.vibecast.presentation.screens.main_screen.weather.LocationModel
 import app.vibecast.presentation.util.LocationAdapter
-import app.vibecast.presentation.util.SongAdapter
 import com.google.android.material.button.MaterialButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -71,20 +70,29 @@ class AccountFragment : Fragment() {
         changePictureBtn = binding.editProfileBtn
         binding.username.text = auth.currentUser?.displayName ?: "-"
         binding.userEmail.text = auth.currentUser?.email ?: "-"
+        val imageLoader = ImageLoader(requireContext())
         val savedLocationsRv: RecyclerView = binding.savedLocations
         val locationAdapter = LocationAdapter(requireContext())
         savedLocationsRv.adapter = locationAdapter
         savedLocationsRv.setHasFixedSize(true)
         val locationLayoutManager = LinearLayoutManager(requireContext())
         savedLocationsRv.layoutManager = locationLayoutManager
+        val savedPlaylistRv: RecyclerView = binding.savedSongs
+        val maxHeight = 120
+        val playlistAdapter = PlaylistOverViewAdapter(imageLoader)
+        savedPlaylistRv.adapter = playlistAdapter
+        savedPlaylistRv.setHasFixedSize(true)
+        val playlistLayoutManager = LinearLayoutManager(requireContext())
+        savedLocationsRv.layoutManager = playlistLayoutManager
+        musicViewModel.getUserPlaylists()
+        musicViewModel.playlistState.observe(viewLifecycleOwner) {state ->
+            if(state.error != null){
+                Timber.tag("PLAYLIST").d(state.error)
+            }else {
+                playlistAdapter.submitList(state.data!!.items)
+            }
 
-        val savedSongsRv: RecyclerView = binding.savedSongs
-        val songAdapter = SongAdapter(musicViewModel)
-        savedSongsRv.adapter = songAdapter
-        val songLayoutManager = LinearLayoutManager(requireContext())
-        savedLocationsRv.layoutManager = songLayoutManager
-        savedSongsRv.setHasFixedSize(true)
-        val imageLoader = ImageLoader(requireContext())
+        }
 
         val savedBitmap = ImageHandler.loadImageFromInternalStorage(requireContext())
         savedBitmap?.let {
@@ -100,16 +108,16 @@ class AccountFragment : Fragment() {
             showDeleteConfirmationDialog(clickedItem)
         }
 
-        songAdapter.setOnItemClickListener { position ->
-            val clickedItem = songAdapter.currentList[position]
-            showSongCard(clickedItem)
+        playlistAdapter.setOnItemClickListener { position ->
+            val clickedItem = playlistAdapter.currentList[position]
+            musicViewModel.getSelectedPlaylist(clickedItem.id)
+            musicViewModel.userCapabilitiesState.observe(viewLifecycleOwner){ canPlayOnDemand ->
+                val action = AccountFragmentDirections.navAccountToNavMusic(canPlayOnDemand)
+                findNavController().navigate(action)
+            }
+
         }
         lifecycleScope.launch {
-            musicViewModel.savedSongs.observe(viewLifecycleOwner) { songs ->
-                binding.savedSongCount.text = songs.size.toString()
-                Timber.tag("music_db").d(songs.toString())
-                songAdapter.submitList(songs)
-            }
             imageViewModel.imageCount.observe(viewLifecycleOwner) {
                 binding.savedImageCount.text = getString(R.string.saved_image_count, it)
 
@@ -165,82 +173,13 @@ class AccountFragment : Fragment() {
         alertDialog?.show()
     }
 
-    private fun showSongCard(song: SongDto) {
-        val alertDialogBuilder = AlertDialog.Builder(requireContext())
-        val customView = LayoutInflater.from(requireContext()).inflate(R.layout.music_card, null)
-        val removeButton = customView.findViewById<MaterialButton>(R.id.removeBtn)
-        val songUriText = customView.findViewById<TextView>(R.id.song_link_tv)
-        val artistUriText = customView.findViewById<TextView>(R.id.artist_link_tv)
-        val coverArt = customView.findViewById<ImageView>(R.id.covertArt)
-
-
-        musicViewModel.assertAppRemoteConnected()
-            .imagesApi
-            .getImage(song.imageUri, Image.Dimension.LARGE)
-            .setResultCallback { bitmap ->
-                coverArt.setImageBitmap(bitmap)
-            }
-
-        songUriText.setOnClickListener {
-            showSongInfoInSpotify(song)
-            alertDialog?.dismiss()
-        }
-
-        artistUriText.setOnClickListener {
-            showArtistInfoInSpotify(song)
-            alertDialog?.dismiss()
-
-        }
-
-        removeButton.setOnClickListener {
-            musicViewModel.deleteSong(song)
-            alertDialog?.dismiss()
-        }
-
-        alertDialogBuilder.setView(customView)
-        alertDialog = alertDialogBuilder.create()
-        alertDialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        alertDialog?.show()
-    }
-
-
-    private fun showSongInfoInSpotify(song: SongDto) {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(song.trackUri))
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        val packageManager = context?.packageManager
-        if (packageManager != null && intent.resolveActivity(packageManager) != null) {
-            // Open the Spotify app
-            musicViewModel.getCurrentSong(song.name, song.artist)
-            val action = AccountFragmentDirections.accountToWeb(InfoType.SONG)
-            findNavController().navigate(action)
-//            context?.startActivity(intent)
-        } else {
-//            // If Spotify app is not installed, open the Spotify web page instead
-
-        }
-    }
-
-    private fun showArtistInfoInSpotify(song: SongDto) {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(song.artistUri))
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        val packageManager = context?.packageManager
-        if (packageManager != null && intent.resolveActivity(packageManager) != null) {
-            // Open the Spotify app
-            val action = AccountFragmentDirections.accountToWeb(InfoType.ARTIST)
-            findNavController().navigate(action)
-//            context?.startActivity(intent)
-        } else {
-//            // If Spotify app is not installed, open the Spotify web page instead
-
-        }
-    }
-
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
         changePictureBtn = null
         profilePic = null
+        alertDialog = null
         musicViewModel.savedSongs.removeObservers(viewLifecycleOwner)
         imageViewModel.backgroundImage.removeObservers(viewLifecycleOwner)
         mainViewModel.locations.removeObservers(viewLifecycleOwner)

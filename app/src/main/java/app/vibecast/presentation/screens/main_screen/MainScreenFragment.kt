@@ -26,8 +26,8 @@ import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import app.vibecast.R
+import app.vibecast.data.remote_data.network.music.model.AddToPlaylistPayload
 import app.vibecast.databinding.FragmentMainScreenBinding
-import app.vibecast.domain.model.SongDto
 import app.vibecast.presentation.screens.account_screen.AccountViewModel
 import app.vibecast.presentation.screens.main_screen.image.ImageViewModel
 import app.vibecast.presentation.screens.main_screen.music.MusicViewModel
@@ -40,6 +40,7 @@ import com.spotify.protocol.types.Repeat
 import com.spotify.sdk.android.auth.AuthorizationClient
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 
 @AndroidEntryPoint
@@ -391,48 +392,37 @@ class MainScreenFragment : Fragment() {
         }
         musicViewModel.playerState.observe(viewLifecycleOwner) { playerState ->
             if (playerState != null) {
-                updateUI(playerState)
+                if(playerState.error != null){
+                    snackBar = Snackbar.make(
+                        requireView(),
+                        "Could not get songs from Spotify",
+                        Snackbar.LENGTH_SHORT
+                    )
+
+                    val snackbarView = snackBar.view
+                    val snackbarText =
+                        snackbarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+                    snackbarText.setTextColor(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.white
+                        )
+                    )
+                    snackbarView.background =
+                        ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
+                    snackBar.show()
+                }else {
+                    updateUI(playerState.state)
+                }
+
             }
         }
 
-
-        playbackButton = binding.musicWidget.playPauseButton
-        shuffleButton = binding.musicWidget.shuffleButton
-        repeatButton = binding.musicWidget.repeatButton
-        saveSongButton = binding.musicWidget.saveSongBtn
-
-        saveSongButton?.setOnClickListener {
-            val playerState = musicViewModel.playerState.value
-            playerState?.let {
-                musicViewModel.saveSong(
-                    SongDto(
-                        album = playerState.track.album.name,
-                        name = playerState.track.name,
-                        imageUri = playerState.track.imageUri,
-                        url = "",
-                        trackUri = playerState.track.uri,
-                        previewUrl = null,
-                        artist = playerState.track.artist.name,
-                        artistUri = playerState.track.artist.uri,
-                        albumUri = playerState.track.artist.uri,
-                    )
-                )
-                accountViewModel.addSongToFirebase(
-                    SongDto(
-                        album = playerState.track.album.name,
-                        name = playerState.track.name,
-                        imageUri = playerState.track.imageUri,
-                        url = "",
-                        trackUri = playerState.track.uri,
-                        previewUrl = null,
-                        artist = playerState.track.artist.name,
-                        artistUri = playerState.track.artist.uri,
-                        albumUri = playerState.track.artist.uri,
-                    )
-                )
+        musicViewModel.saveResult.observe(viewLifecycleOwner){ result ->
+            if(result.error != null){
                 snackBar = Snackbar.make(
                     requireView(),
-                    "Added song to your library",
+                    result.error,
                     Snackbar.LENGTH_SHORT
                 )
                 val snackBarView = snackBar.view
@@ -443,6 +433,35 @@ class MainScreenFragment : Fragment() {
                     ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
                 snackBar.show()
                 Handler(Looper.getMainLooper()).postDelayed({ snackBar.dismiss() }, 2000)
+            } else {
+                snackBar = Snackbar.make(
+                    requireView(),
+                    "Added song to playlist: ${result.playlistName}",
+                    Snackbar.LENGTH_SHORT
+                )
+                val snackBarView = snackBar.view
+                val snackBarText =
+                    snackBarView.findViewById<TextView>(com.google.android.material.R.id.snackbar_text)
+                snackBarText.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+                snackBarView.background =
+                    ContextCompat.getDrawable(requireContext(), R.drawable.snackbar_background)
+                snackBar.show()
+                Handler(Looper.getMainLooper()).postDelayed({ snackBar.dismiss() }, 2000)
+            }
+
+        }
+        playbackButton = binding.musicWidget.playPauseButton
+        shuffleButton = binding.musicWidget.shuffleButton
+        repeatButton = binding.musicWidget.repeatButton
+        saveSongButton = binding.musicWidget.saveSongBtn
+
+        saveSongButton?.setOnClickListener {
+            val playerState = musicViewModel.playerState.value
+            playerState?.state?.let { trackData ->
+                mainViewModel.currentLocation.value?.cityName?.let { playlistName ->
+                    musicViewModel.addSongToPlaylist(
+                        playlistName, AddToPlaylistPayload(listOf(trackData.track.uri),0))
+                }
             }
 
         }
@@ -526,6 +545,7 @@ class MainScreenFragment : Fragment() {
 
 
     private fun updateUI(playerState: PlayerState) {
+        Timber.tag("Spotify").d("updateUI: $playerState")
         updatePlaybackBtn(playerState)
         updateShuffleBtn(playerState)
         updateRepeatBtn(playerState)

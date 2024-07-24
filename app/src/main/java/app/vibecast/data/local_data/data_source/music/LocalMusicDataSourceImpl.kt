@@ -2,9 +2,13 @@ package app.vibecast.data.local_data.data_source.music
 
 import app.vibecast.data.local_data.db.music.dao.SongDao
 import app.vibecast.data.local_data.db.music.model.SongEntity
+import app.vibecast.data.local_data.db.music.model.UserPlaylistEntity
 import app.vibecast.domain.model.SongDto
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -20,6 +24,19 @@ import javax.inject.Inject
 class LocalMusicDataSourceImpl @Inject constructor(private val songDao: SongDao) :
     LocalMusicDataSource {
 
+
+    override suspend fun savePlaylist(playlist: UserPlaylistEntity) {
+        try {
+            songDao.addPlaylist(playlist)
+        }catch(e : Exception){
+            Timber.tag("PLAYLIST").d("Couldn't add playlist $e")
+        }
+    }
+
+    override fun getAllPlaylists(): Flow<List<UserPlaylistEntity>> = songDao.getAllPlaylists().catch {
+        Timber.tag("PLAYLIST").d("Couldn't get playlists")
+    }.flowOn(Dispatchers.IO)
+
     override suspend fun saveSong(song: SongDto) {
         try {
             songDao.saveSong(
@@ -27,7 +44,7 @@ class LocalMusicDataSourceImpl @Inject constructor(private val songDao: SongDao)
                     url = song.url,
                     uri = song.trackUri,
                     album = song.album,
-                    imageUri = song.imageUri!!,
+                    imageUri = song.imageUri,
                     name = song.name,
                     previewUrl = song.previewUrl,
                     artist = song.artist,
@@ -48,7 +65,7 @@ class LocalMusicDataSourceImpl @Inject constructor(private val songDao: SongDao)
                     url = song.url,
                     uri = song.trackUri,
                     album = song.album,
-                    imageUri = song.imageUri!!,
+                    imageUri = song.imageUri,
                     name = song.name,
                     previewUrl = song.previewUrl,
                     artist = song.artist,

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".presentation.screens.account_screen.MusicFragment">
+
+    <ImageView
+        android:id="@+id/backgroundImageView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:importantForAccessibility="no"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5" />
+
+
+    <ImageView
+        android:id="@+id/coverArt"
+        android:layout_width="260dp"
+        android:layout_height="280dp"
+        android:layout_marginTop="86dp"
+        android:layout_marginBottom="4dp"
+        android:scaleType="centerCrop"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:src="@drawable/cover_art_placeholder"
+        android:background="@drawable/covert_art_header_placeholder"/>
+
+
+    <TextView
+        android:id="@+id/song_info_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginVertical="12dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginEnd="100dp"
+        android:text="@string/loading_placeholder"
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        app:layout_constraintEnd_toEndOf="@+id/play_btn"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/coverArt" />
+
+    <ImageButton
+        android:id="@+id/play_btn"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginVertical="8dp"
+        android:background="@drawable/circle_play_background"
+        android:src="@drawable/play_btn_large"
+        android:contentDescription="@string/start_playing_this_playlist"
+        app:layout_constraintEnd_toEndOf="@+id/coverArt"
+        app:layout_constraintStart_toEndOf="@+id/song_info_header"
+        app:layout_constraintTop_toBottomOf="@+id/coverArt" />
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/nonShuffleView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginVertical="8dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/play_btn"
+        tools:listitem="@layout/item_music_cardview" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

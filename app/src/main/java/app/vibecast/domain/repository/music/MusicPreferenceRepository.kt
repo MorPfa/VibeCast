@@ -7,4 +7,5 @@ interface MusicPreferenceRepository {
     suspend fun getPreferences(): Map<WeatherCondition, String>
     suspend fun getPreference(weather: WeatherCondition): String
     suspend fun clearPreference()
+
 }
